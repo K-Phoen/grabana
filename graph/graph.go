@@ -125,3 +125,15 @@ func DataSource(datasource string) Option {
 		graph.Builder.Datasource = &datasource
 	}
 }
+
+func Span(span float32) Option {
+	return func(graph *Graph) {
+		graph.Builder.Span = span
+	}
+}
+
+func Height(height string) Option {
+	return func(graph *Graph) {
+		graph.Builder.Height = &height
+	}
+}

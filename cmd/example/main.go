@@ -43,6 +43,8 @@ func main() {
 			"Prometheus",
 			grabana.WithGraph(
 				"HTTP Rate",
+				graph.Height("400px"),
+				graph.Span(12),
 				graph.DataSource("prometheus-default"),
 				graph.WithPrometheusTarget(graph.PrometheusTarget{
 					RefID:        "A",
