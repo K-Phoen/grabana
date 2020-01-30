@@ -50,6 +50,9 @@ func main() {
 					LegendFormat: "{{handler}} - {{ code }}",
 				}),
 			),
+		),
+		grabana.WithRow(
+			"Some text, because it might be useful",
 			grabana.WithText(
 				"Some awesome text?",
 				text.Markdown("# Title\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n"),
