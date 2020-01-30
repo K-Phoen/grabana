@@ -127,7 +127,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 	return nil, ErrAlertChannelNotFound
 }
 
-func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, dashboardBuilder *DashboardBuilder) (*Dashboard, error) {
+func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, dashboardBuilder DashboardBuilder) (*Dashboard, error) {
 	buf, err := json.Marshal(struct {
 		Dashboard *sdk.Board `json:"dashboard"`
 		FolderID  uint       `json:"folderId"`
