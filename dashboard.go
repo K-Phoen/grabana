@@ -30,6 +30,18 @@ func NewDashboardBuilder(title string, options ...DashboardBuilderOption) Dashbo
 	return *builder
 }
 
+func Editable() DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Editable = true
+	}
+}
+
+func ReadOnly() DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Editable = false
+	}
+}
+
 func WithRow(title string, options ...RowOption) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		row := &Row{builder: builder.board.AddRow(title)}
