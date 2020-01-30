@@ -48,7 +48,7 @@ func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, e
 
 	defer func() { _ = resp.Body.Close() }()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 
 	defer func() { _ = resp.Body.Close() }()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
@@ -104,7 +104,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 
 	defer func() { _ = resp.Body.Close() }()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
@@ -148,7 +148,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, dashb
 
 	defer func() { _ = resp.Body.Close() }()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
