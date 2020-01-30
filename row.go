@@ -1,6 +1,9 @@
 package grabana
 
-import "github.com/grafana-tools/sdk"
+import (
+	"github.com/K-Phoen/grabana/text"
+	"github.com/grafana-tools/sdk"
+)
 
 type RowOption func(row *Row)
 
@@ -19,6 +22,20 @@ func WithGraph(title string, options ...GraphOption) RowOption {
 		}
 
 		row.builder.Add(graph.builder)
+	}
+}
+
+func WithText(title string, options ...text.Option) RowOption {
+	return func(row *Row) {
+		textPanel := &text.Text{Builder: sdk.NewText(title)}
+
+		text.Defaults(textPanel)
+
+		for _, opt := range options {
+			opt(textPanel)
+		}
+
+		row.builder.Add(textPanel.Builder)
 	}
 }
 
