@@ -8,6 +8,7 @@ import (
 
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/graph"
+	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/text"
 )
 
@@ -41,7 +42,7 @@ func main() {
 		grabana.WithTags([]string{"generated"}),
 		grabana.WithRow(
 			"Prometheus",
-			grabana.WithGraph(
+			row.WithGraph(
 				"HTTP Rate",
 				graph.Height("400px"),
 				graph.Span(12),
@@ -56,11 +57,11 @@ func main() {
 		),
 		grabana.WithRow(
 			"Some text, because it might be useful",
-			grabana.WithText(
+			row.WithText(
 				"Some awesome text?",
 				text.Markdown("# Title\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n"),
 			),
-			grabana.WithText(
+			row.WithText(
 				"Some awesome html?",
 				text.HTML("<b>lalalala</b>"),
 			),

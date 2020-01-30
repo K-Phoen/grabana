@@ -1,6 +1,7 @@
 package grabana
 
 import (
+	"github.com/K-Phoen/grabana/row"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -23,11 +24,7 @@ func NewDashboardBuilder(title string, options ...DashboardBuilderOption) Dashbo
 
 	builder := &DashboardBuilder{board: board}
 
-	for _, opt := range dashboardDefaults() {
-		opt(builder)
-	}
-
-	for _, opt := range options {
+	for _, opt := range append(dashboardDefaults(), options...) {
 		opt(builder)
 	}
 
@@ -43,17 +40,9 @@ func dashboardDefaults() []DashboardBuilderOption {
 }
 
 // WithRow adds a row to the dashboard.
-func WithRow(title string, options ...RowOption) DashboardBuilderOption {
+func WithRow(title string, options ...row.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
-		row := &Row{builder: builder.board.AddRow(title)}
-
-		for _, opt := range rowDefaults() {
-			opt(row)
-		}
-
-		for _, opt := range options {
-			opt(row)
-		}
+		row.New(builder.board, title, options...)
 	}
 }
 
