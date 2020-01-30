@@ -32,3 +32,15 @@ func Markdown(content string) Option {
 		text.Builder.TextPanel.Content = content
 	}
 }
+
+func Span(span float32) Option {
+	return func(text *Text) {
+		text.Builder.Span = span
+	}
+}
+
+func Height(height string) Option {
+	return func(text *Text) {
+		text.Builder.Height = &height
+	}
+}
