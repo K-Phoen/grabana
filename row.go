@@ -1,6 +1,7 @@
 package grabana
 
 import (
+	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/grafana-tools/sdk"
 )
@@ -11,17 +12,17 @@ type Row struct {
 	builder *sdk.Row
 }
 
-func WithGraph(title string, options ...GraphOption) RowOption {
+func WithGraph(title string, options ...graph.Option) RowOption {
 	return func(row *Row) {
-		graph := &Graph{builder: sdk.NewGraph(title)}
+		graphPanel := &graph.Graph{Builder: sdk.NewGraph(title)}
 
-		GraphDefaults(graph)
+		graph.Defaults(graphPanel)
 
 		for _, opt := range options {
-			opt(graph)
+			opt(graphPanel)
 		}
 
-		row.builder.Add(graph.builder)
+		row.builder.Add(graphPanel.Builder)
 	}
 }
 

@@ -1,10 +1,10 @@
-package grabana
+package graph
 
 import (
 	"github.com/grafana-tools/sdk"
 )
 
-type GraphOption func(graph *Graph)
+type Option func(graph *Graph)
 
 type PrometheusTarget struct {
 	RefID      string
@@ -20,35 +20,35 @@ type PrometheusTarget struct {
 }
 
 type Graph struct {
-	builder *sdk.Panel
+	Builder *sdk.Panel
 }
 
-func GraphDefaults(graph *Graph) {
-	graph.builder.AliasColors = make(map[string]interface{})
-	graph.builder.IsNew = false
-	graph.builder.Lines = true
-	graph.builder.Linewidth = 1
-	graph.builder.Fill = 1
-	graph.builder.Tooltip.Sort = 2
-	graph.builder.Tooltip.Shared = true
-	graph.builder.GraphPanel.NullPointMode = "null as zero"
-	graph.builder.GraphPanel.Lines = true
-	graph.builder.Span = 6
+func Defaults(graph *Graph) {
+	graph.Builder.AliasColors = make(map[string]interface{})
+	graph.Builder.IsNew = false
+	graph.Builder.Lines = true
+	graph.Builder.Linewidth = 1
+	graph.Builder.Fill = 1
+	graph.Builder.Tooltip.Sort = 2
+	graph.Builder.Tooltip.Shared = true
+	graph.Builder.GraphPanel.NullPointMode = "null as zero"
+	graph.Builder.GraphPanel.Lines = true
+	graph.Builder.Span = 6
 
 	Editable()(graph)
 	WithDefaultAxes()(graph)
 	WithDefaultLegend()(graph)
 }
 
-func WithDefaultAxes() GraphOption {
+func WithDefaultAxes() Option {
 	return func(graph *Graph) {
-		graph.builder.GraphPanel.YAxis = true
-		graph.builder.GraphPanel.XAxis = true
-		graph.builder.GraphPanel.Yaxes = []sdk.Axis{
+		graph.Builder.GraphPanel.YAxis = true
+		graph.Builder.GraphPanel.XAxis = true
+		graph.Builder.GraphPanel.Yaxes = []sdk.Axis{
 			{Format: "short", Show: true, LogBase: 1},
 			{Format: "short", Show: false},
 		}
-		graph.builder.GraphPanel.Xaxis = sdk.Axis{
+		graph.Builder.GraphPanel.Xaxis = sdk.Axis{
 			Format:  "time",
 			LogBase: 1,
 			Show:    true,
@@ -56,9 +56,9 @@ func WithDefaultAxes() GraphOption {
 	}
 }
 
-func WithDefaultLegend() GraphOption {
+func WithDefaultLegend() Option {
 	return func(graph *Graph) {
-		graph.builder.Legend = struct {
+		graph.Builder.Legend = struct {
 			AlignAsTable bool  `json:"alignAsTable"`
 			Avg          bool  `json:"avg"`
 			Current      bool  `json:"current"`
@@ -88,9 +88,9 @@ func WithDefaultLegend() GraphOption {
 	}
 }
 
-func WithPrometheusTarget(target PrometheusTarget) GraphOption {
+func WithPrometheusTarget(target PrometheusTarget) Option {
 	return func(graph *Graph) {
-		graph.builder.AddTarget(&sdk.Target{
+		graph.Builder.AddTarget(&sdk.Target{
 			RefID:          target.RefID,
 			Datasource:     target.Datasource,
 			Expr:           target.Expr,
@@ -104,20 +104,20 @@ func WithPrometheusTarget(target PrometheusTarget) GraphOption {
 	}
 }
 
-func Editable() GraphOption {
+func Editable() Option {
 	return func(graph *Graph) {
-		graph.builder.Editable = true
+		graph.Builder.Editable = true
 	}
 }
 
-func ReadOnly() GraphOption {
+func ReadOnly() Option {
 	return func(graph *Graph) {
-		graph.builder.Editable = false
+		graph.Builder.Editable = false
 	}
 }
 
-func WithDataSource(datasource string) GraphOption {
+func DataSource(datasource string) Option {
 	return func(graph *Graph) {
-		graph.builder.Datasource = &datasource
+		graph.Builder.Datasource = &datasource
 	}
 }
