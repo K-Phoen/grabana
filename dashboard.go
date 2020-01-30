@@ -42,6 +42,7 @@ func dashboardDefaults() []DashboardBuilderOption {
 	}
 }
 
+// WithRow adds a row to the dashboard.
 func WithRow(title string, options ...RowOption) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		row := &Row{builder: builder.board.AddRow(title)}
@@ -74,30 +75,35 @@ func WithDefaultTimePicker() DashboardBuilderOption {
 	}
 }
 
+// Editable marks the graph as editable.
 func Editable() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Editable = true
 	}
 }
 
+// ReadOnly marks the graph as non-editable.
 func ReadOnly() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Editable = false
 	}
 }
 
+// WithSharedCrossHair configures the graph tooltip to be shared across panels.
 func WithSharedCrossHair() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.SharedCrosshair = true
 	}
 }
 
+// WithoutSharedCrossHair configures the graph tooltip NOT to be shared across panels.
 func WithoutSharedCrossHair() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.SharedCrosshair = false
 	}
 }
 
+// WithTags adds the given set of tags to the dashboard.
 func WithTags(tags []string) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Tags = tags

@@ -19,6 +19,7 @@ func New(title string) *Text {
 	return panel
 }
 
+// HTML sets the content of the panel, to be rendered as HTML.
 func HTML(content string) Option {
 	return func(text *Text) {
 		text.Builder.TextPanel.Mode = "html"
@@ -26,6 +27,7 @@ func HTML(content string) Option {
 	}
 }
 
+// Markdown sets the content of the panel, to be rendered as markdown.
 func Markdown(content string) Option {
 	return func(text *Text) {
 		text.Builder.TextPanel.Mode = "markdown"
@@ -33,12 +35,15 @@ func Markdown(content string) Option {
 	}
 }
 
+// Span sets the width of the panel, in grid units. Should be a positive
+// number between 1 and 12. Example: 6.
 func Span(span float32) Option {
 	return func(text *Text) {
 		text.Builder.Span = span
 	}
 }
 
+// Height sets the height of the panel, in pixels. Example: "400px".
 func Height(height string) Option {
 	return func(text *Text) {
 		text.Builder.Height = &height

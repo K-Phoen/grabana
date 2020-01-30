@@ -108,30 +108,36 @@ func WithPrometheusTarget(target PrometheusTarget) Option {
 	}
 }
 
+// Editable marks the graph as editable.
 func Editable() Option {
 	return func(graph *Graph) {
 		graph.Builder.Editable = true
 	}
 }
 
+// ReadOnly marks the graph as non-editable.
 func ReadOnly() Option {
 	return func(graph *Graph) {
 		graph.Builder.Editable = false
 	}
 }
 
+// DataSource sets the data source to be used by the graph.
 func DataSource(datasource string) Option {
 	return func(graph *Graph) {
 		graph.Builder.Datasource = &datasource
 	}
 }
 
+// Span sets the width of the panel, in grid units. Should be a positive
+// number between 1 and 12. Example: 6.
 func Span(span float32) Option {
 	return func(graph *Graph) {
 		graph.Builder.Span = span
 	}
 }
 
+// Height sets the height of the panel, in pixels. Example: "400px".
 func Height(height string) Option {
 	return func(graph *Graph) {
 		graph.Builder.Height = &height

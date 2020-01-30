@@ -18,6 +18,7 @@ func rowDefaults() []RowOption {
 	}
 }
 
+// WithText adds a "graph" panel in the row.
 func WithGraph(title string, options ...graph.Option) RowOption {
 	return func(row *Row) {
 		graphPanel := graph.New(title)
@@ -30,6 +31,7 @@ func WithGraph(title string, options ...graph.Option) RowOption {
 	}
 }
 
+// WithText adds a "text" panel in the row.
 func WithText(title string, options ...text.Option) RowOption {
 	return func(row *Row) {
 		textPanel := text.New(title)
@@ -42,12 +44,14 @@ func WithText(title string, options ...text.Option) RowOption {
 	}
 }
 
+// ShowRowTitle ensures that the title of the row will be displayed.
 func ShowRowTitle() RowOption {
 	return func(row *Row) {
 		row.builder.ShowTitle = true
 	}
 }
 
+// HideRowTitle ensures that the title of the row will NOT be displayed.
 func HideRowTitle() RowOption {
 	return func(row *Row) {
 		row.builder.ShowTitle = false
