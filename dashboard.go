@@ -42,18 +42,6 @@ func dashboardDefaults() []DashboardBuilderOption {
 	}
 }
 
-func Editable() DashboardBuilderOption {
-	return func(builder *DashboardBuilder) {
-		builder.board.Editable = true
-	}
-}
-
-func ReadOnly() DashboardBuilderOption {
-	return func(builder *DashboardBuilder) {
-		builder.board.Editable = false
-	}
-}
-
 func WithRow(title string, options ...RowOption) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		row := &Row{builder: builder.board.AddRow(title)}
@@ -86,6 +74,18 @@ func WithDefaultTimePicker() DashboardBuilderOption {
 	}
 }
 
+func Editable() DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Editable = true
+	}
+}
+
+func ReadOnly() DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Editable = false
+	}
+}
+
 func WithSharedCrossHair() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.SharedCrosshair = true
@@ -95,5 +95,11 @@ func WithSharedCrossHair() DashboardBuilderOption {
 func WithoutSharedCrossHair() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.SharedCrosshair = false
+	}
+}
+
+func WithTags(tags []string) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Tags = tags
 	}
 }

@@ -38,6 +38,7 @@ func main() {
 
 	dashboard := grabana.NewDashboardBuilder(
 		"Awesome dashboard",
+		grabana.WithTags([]string{"generated"}),
 		grabana.WithRow(
 			"Prometheus",
 			grabana.WithGraph(
