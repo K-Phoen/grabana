@@ -23,11 +23,23 @@ func NewDashboardBuilder(title string, options ...DashboardBuilderOption) Dashbo
 
 	builder := &DashboardBuilder{board: board}
 
+	for _, opt := range dashboardDefaults() {
+		opt(builder)
+	}
+
 	for _, opt := range options {
 		opt(builder)
 	}
 
 	return *builder
+}
+
+func dashboardDefaults() []DashboardBuilderOption {
+	return []DashboardBuilderOption{
+		WithDefaultTimePicker(),
+		WithDefaultTime(),
+		WithSharedCrossHair(),
+	}
 }
 
 func Editable() DashboardBuilderOption {
@@ -53,14 +65,6 @@ func WithRow(title string, options ...RowOption) DashboardBuilderOption {
 		for _, opt := range options {
 			opt(row)
 		}
-	}
-}
-
-func (builder *DashboardBuilder) DashboardDefaults() []DashboardBuilderOption {
-	return []DashboardBuilderOption{
-		WithDefaultTimePicker(),
-		WithDefaultTime(),
-		WithSharedCrossHair(),
 	}
 }
 

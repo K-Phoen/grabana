@@ -10,11 +10,13 @@ type Text struct {
 	Builder *sdk.Panel
 }
 
-func Defaults(text *Text) {
-	text.Builder.IsNew = false
-	text.Builder.Span = 6
+func New(title string) *Text {
+	panel := &Text{Builder: sdk.NewText(title)}
 
-	Editable()(text)
+	panel.Builder.IsNew = false
+	panel.Builder.Span = 6
+
+	return panel
 }
 
 func HTML(content string) Option {
@@ -28,17 +30,5 @@ func Markdown(content string) Option {
 	return func(text *Text) {
 		text.Builder.TextPanel.Mode = "markdown"
 		text.Builder.TextPanel.Content = content
-	}
-}
-
-func Editable() Option {
-	return func(text *Text) {
-		text.Builder.Editable = true
-	}
-}
-
-func ReadOnly() Option {
-	return func(text *Text) {
-		text.Builder.Editable = false
 	}
 }

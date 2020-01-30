@@ -23,21 +23,25 @@ type Graph struct {
 	Builder *sdk.Panel
 }
 
-func Defaults(graph *Graph) {
-	graph.Builder.AliasColors = make(map[string]interface{})
-	graph.Builder.IsNew = false
-	graph.Builder.Lines = true
-	graph.Builder.Linewidth = 1
-	graph.Builder.Fill = 1
-	graph.Builder.Tooltip.Sort = 2
-	graph.Builder.Tooltip.Shared = true
-	graph.Builder.GraphPanel.NullPointMode = "null as zero"
-	graph.Builder.GraphPanel.Lines = true
-	graph.Builder.Span = 6
+func New(title string) *Graph {
+	panel := &Graph{Builder: sdk.NewGraph(title)}
 
-	Editable()(graph)
-	WithDefaultAxes()(graph)
-	WithDefaultLegend()(graph)
+	panel.Builder.AliasColors = make(map[string]interface{})
+	panel.Builder.IsNew = false
+	panel.Builder.Lines = true
+	panel.Builder.Linewidth = 1
+	panel.Builder.Fill = 1
+	panel.Builder.Tooltip.Sort = 2
+	panel.Builder.Tooltip.Shared = true
+	panel.Builder.GraphPanel.NullPointMode = "null as zero"
+	panel.Builder.GraphPanel.Lines = true
+	panel.Builder.Span = 6
+
+	Editable()(panel)
+	WithDefaultAxes()(panel)
+	WithDefaultLegend()(panel)
+
+	return panel
 }
 
 func WithDefaultAxes() Option {

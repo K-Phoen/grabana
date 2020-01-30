@@ -12,11 +12,15 @@ type Row struct {
 	builder *sdk.Row
 }
 
+func rowDefaults() []RowOption {
+	return []RowOption{
+		ShowRowTitle(),
+	}
+}
+
 func WithGraph(title string, options ...graph.Option) RowOption {
 	return func(row *Row) {
-		graphPanel := &graph.Graph{Builder: sdk.NewGraph(title)}
-
-		graph.Defaults(graphPanel)
+		graphPanel := graph.New(title)
 
 		for _, opt := range options {
 			opt(graphPanel)
@@ -28,22 +32,13 @@ func WithGraph(title string, options ...graph.Option) RowOption {
 
 func WithText(title string, options ...text.Option) RowOption {
 	return func(row *Row) {
-		textPanel := &text.Text{Builder: sdk.NewText(title)}
-
-		text.Defaults(textPanel)
+		textPanel := text.New(title)
 
 		for _, opt := range options {
 			opt(textPanel)
 		}
 
 		row.builder.Add(textPanel.Builder)
-	}
-}
-
-func rowDefaults() []RowOption {
-	return []RowOption{
-		ShowRowTitle(),
-		EditableRow(),
 	}
 }
 
@@ -56,17 +51,5 @@ func ShowRowTitle() RowOption {
 func HideRowTitle() RowOption {
 	return func(row *Row) {
 		row.builder.ShowTitle = false
-	}
-}
-
-func EditableRow() RowOption {
-	return func(row *Row) {
-		row.builder.Editable = true
-	}
-}
-
-func ReadOnlyRow() RowOption {
-	return func(row *Row) {
-		row.builder.Editable = false
 	}
 }
