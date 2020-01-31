@@ -44,11 +44,7 @@ func WithGraph(title string, options ...graph.Option) Option {
 // WithText adds a "text" panel in the row.
 func WithText(title string, options ...text.Option) Option {
 	return func(row *Row) {
-		textPanel := text.New(title)
-
-		for _, opt := range options {
-			opt(textPanel)
-		}
+		textPanel := text.New(title, options...)
 
 		row.builder.Add(textPanel.Builder)
 	}

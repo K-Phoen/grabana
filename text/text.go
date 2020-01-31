@@ -10,11 +10,15 @@ type Text struct {
 	Builder *sdk.Panel
 }
 
-func New(title string) *Text {
+func New(title string, options ...Option) *Text {
 	panel := &Text{Builder: sdk.NewText(title)}
 
 	panel.Builder.IsNew = false
 	panel.Builder.Span = 6
+
+	for _, opt := range options {
+		opt(panel)
+	}
 
 	return panel
 }
