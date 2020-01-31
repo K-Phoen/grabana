@@ -1,7 +1,7 @@
 WITH_COVERAGE?=false
 
 ifeq ($(WITH_COVERAGE),true)
-GOCMD_TEST?=go test -mod=vendor -coverprofile=coverage.txt -covermode=atomic
+GOCMD_TEST?=go test -mod=vendor -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
 else
 GOCMD_TEST?=go test -mod=vendor
 endif
