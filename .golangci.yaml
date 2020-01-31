@@ -36,3 +36,6 @@ linters:
 linters-settings:
   errcheck:
     ignore: fmt:.*
+
+run:
+  modules-download-mode: vendor
