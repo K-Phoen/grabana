@@ -40,6 +40,12 @@ func main() {
 	dashboard := grabana.NewDashboardBuilder(
 		"Awesome dashboard",
 		grabana.WithTags([]string{"generated"}),
+		grabana.WithTagsAnnotation(grabana.TagAnnotation{
+			Name:       "Deployments",
+			Datasource: "-- Grafana --",
+			IconColor:  "#5794F2",
+			Tags:       []string{"deploy", "production"},
+		}),
 		grabana.WithRow(
 			"Prometheus",
 			row.WithGraph(
