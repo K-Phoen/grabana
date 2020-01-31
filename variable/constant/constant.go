@@ -6,10 +6,8 @@ import (
 
 type Option func(constant *Constant)
 
-type Value struct {
-	Text  string
-	Value string
-}
+// Values represent a "label" to "value" map of options for a constant variable.
+type Values map[string]string
 
 type Constant struct {
 	Builder sdk.TemplateVar
@@ -29,12 +27,12 @@ func New(name string, options ...Option) *Constant {
 	return constant
 }
 
-func WithValues(values []Value) Option {
+func WithValues(values Values) Option {
 	return func(constant *Constant) {
-		for _, value := range values {
+		for label, value := range values {
 			constant.Builder.Options = append(constant.Builder.Options, sdk.Option{
-				Text:  value.Text,
-				Value: value.Value,
+				Text:  label,
+				Value: value,
 			})
 		}
 	}
@@ -51,5 +49,17 @@ func WithDefault(value string) Option {
 func WithLabel(label string) Option {
 	return func(constant *Constant) {
 		constant.Builder.Label = label
+	}
+}
+
+func HideLabel() Option {
+	return func(constant *Constant) {
+		constant.Builder.Hide = 1
+	}
+}
+
+func Hide() Option {
+	return func(constant *Constant) {
+		constant.Builder.Hide = 2
 	}
 }

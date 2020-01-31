@@ -28,21 +28,45 @@ func TestLabelCanBeSet(t *testing.T) {
 func TestValuesCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("const", WithValues([]Value{
-		{Text: "90th", Value: "90"},
-		{Text: "95th", Value: "95"},
-		{Text: "99th", Value: "99"},
+	panel := New("const", WithValues(map[string]string{
+		"90th": "90",
+		"95th": "95",
+		"99th": "99",
 	}))
 
-	req.Len(panel.Builder.Options, 3)
-	req.Equal("90th", panel.Builder.Options[0].Text)
-	req.Equal("90", panel.Builder.Options[0].Value)
+	labels := make([]string, 0, 3)
+	values := make([]string, 0, 3)
+
+	for _, opt := range panel.Builder.Options {
+		labels = append(labels, opt.Text)
+		values = append(values, opt.Value)
+	}
+
+	req.Len(values, 3)
+	req.Equal([]string{"90th", "95th", "99th"}, labels)
+	req.Equal([]string{"90", "95", "99"}, values)
 }
 
 func TestDefaultValueCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("const", WithDefault("99"))
+	panel := New("const", WithDefault("99th"))
 
-	req.Equal("99", panel.Builder.Current.Text)
+	req.Equal("99th", panel.Builder.Current.Text)
+}
+
+func TestLabelCanBeHidden(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", HideLabel())
+
+	req.Equal(uint8(1), panel.Builder.Hide)
+}
+
+func TestVariableCanBeHidden(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("custom", Hide())
+
+	req.Equal(uint8(2), panel.Builder.Hide)
 }

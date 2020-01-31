@@ -12,6 +12,7 @@ import (
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/variable/constant"
+	"github.com/K-Phoen/grabana/variable/custom"
 )
 
 func main() {
@@ -51,16 +52,26 @@ func main() {
 		grabana.WithVariableAsConst(
 			"percentile",
 			constant.WithLabel("Percentile"),
-			constant.WithValues([]constant.Value{
-				{Text: "50", Value: "50"},
-				{Text: "75", Value: "75"},
-				{Text: "80", Value: "80"},
-				{Text: "85", Value: "85"},
-				{Text: "90", Value: "90"},
-				{Text: "95", Value: "95"},
-				{Text: "99", Value: "99"},
+			constant.WithValues(map[string]string{
+				"50th": "50",
+				"75th": "75",
+				"80th": "80",
+				"85th": "85",
+				"90th": "90",
+				"95th": "95",
+				"99th": "99",
 			}),
-			constant.WithDefault("80"),
+			constant.WithDefault("80th"),
+		),
+		grabana.WithVariableAsCustom(
+			"vX",
+			custom.Multi(),
+			custom.IncludeAll(),
+			custom.WithValues(map[string]string{
+				"v1": "v1",
+				"v2": "v2",
+			}),
+			custom.WithDefault("v2"),
 		),
 		grabana.WithRow(
 			"Prometheus",
@@ -79,7 +90,7 @@ func main() {
 			"Some text, because it might be useful",
 			row.WithText(
 				"Some awesome text?",
-				text.Markdown("# Title\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n"),
+				text.Markdown("Markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n${percentile}"),
 			),
 			row.WithText(
 				"Some awesome html?",
