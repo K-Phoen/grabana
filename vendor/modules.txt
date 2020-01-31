@@ -1,0 +1,16 @@
+# github.com/davecgh/go-spew v1.1.0
+github.com/davecgh/go-spew/spew
+# github.com/gosimple/slug v1.1.1
+github.com/gosimple/slug
+# github.com/grafana-tools/sdk v0.0.0-20200127194913-bdcab199ffde
+github.com/grafana-tools/sdk
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be
+github.com/rainycape/unidecode
+# github.com/stretchr/testify v1.4.0
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
+github.com/stretchr/testify/suite
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2

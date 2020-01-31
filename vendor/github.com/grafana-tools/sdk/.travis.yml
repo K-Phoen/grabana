@@ -1,0 +1,26 @@
+language: go
+
+services:
+- docker
+
+# Versions of go that are explicitly supported.
+go:
+ - 1.13.x
+
+env:
+ - GRAFANA_INTEGRATION=1
+
+# Required for coverage.
+before_install:
+ - go get golang.org/x/tools/cmd/cover
+ - go get github.com/mattn/goveralls
+ # Run Grafana
+ - docker pull grafana/grafana:6.6.0
+ - docker run --rm -d -p 3000:3000 grafana/grafana:6.6.0
+
+# only one subpackage tested yet
+script:
+ - go build -a -v ./...
+ - diff <(gofmt -d .) <("")
+ - go test -v -covermode=count -coverprofile=coverage.out
+ - $GOPATH/bin/goveralls -coverprofile=coverage.out -service=travis-ci
