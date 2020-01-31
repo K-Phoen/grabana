@@ -9,6 +9,7 @@ import (
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
 )
 
@@ -53,12 +54,10 @@ func main() {
 				graph.Height("400px"),
 				graph.Span(12),
 				graph.DataSource("prometheus-default"),
-				graph.WithPrometheusTarget(graph.PrometheusTarget{
-					RefID:        "A",
-					Expr:         "rate(prometheus_http_requests_total[30s])",
-					Format:       "time_series",
-					LegendFormat: "{{handler}} - {{ code }}",
-				}),
+				graph.WithPrometheusTarget(
+					"rate(prometheus_http_requests_total[30s])",
+					prometheus.WithLegend("{{handler}} - {{ code }}"),
+				),
 			),
 		),
 		grabana.WithRow(
