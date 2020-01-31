@@ -42,20 +42,13 @@ func NewDashboardBuilder(title string, options ...DashboardBuilderOption) Dashbo
 
 func dashboardDefaults() []DashboardBuilderOption {
 	return []DashboardBuilderOption{
-		WithDefaultTimePicker(),
-		WithDefaultTime(),
+		defaultTimePicker(),
+		defaultTime(),
 		WithSharedCrossHair(),
 	}
 }
 
-// WithRow adds a row to the dashboard.
-func WithRow(title string, options ...row.Option) DashboardBuilderOption {
-	return func(builder *DashboardBuilder) {
-		row.New(builder.board, title, options...)
-	}
-}
-
-func WithDefaultTime() DashboardBuilderOption {
+func defaultTime() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Time = sdk.Time{
 			From: "now-3h",
@@ -64,12 +57,19 @@ func WithDefaultTime() DashboardBuilderOption {
 	}
 }
 
-func WithDefaultTimePicker() DashboardBuilderOption {
+func defaultTimePicker() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Timepicker = sdk.Timepicker{
 			RefreshIntervals: []string{"5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"},
 			TimeOptions:      []string{"5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"},
 		}
+	}
+}
+
+// WithRow adds a row to the dashboard.
+func WithRow(title string, options ...row.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		row.New(builder.board, title, options...)
 	}
 }
 
