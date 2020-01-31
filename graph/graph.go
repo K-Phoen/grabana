@@ -11,7 +11,7 @@ type Graph struct {
 	Builder *sdk.Panel
 }
 
-func New(title string) *Graph {
+func New(title string, options ...Option) *Graph {
 	panel := &Graph{Builder: sdk.NewGraph(title)}
 
 	panel.Builder.AliasColors = make(map[string]interface{})
@@ -25,14 +25,22 @@ func New(title string) *Graph {
 	panel.Builder.GraphPanel.Lines = true
 	panel.Builder.Span = 6
 
-	Editable()(panel)
-	WithDefaultAxes()(panel)
-	WithDefaultLegend()(panel)
+	for _, opt := range append(defaults(), options...) {
+		opt(panel)
+	}
 
 	return panel
 }
 
-func WithDefaultAxes() Option {
+func defaults() []Option {
+	return []Option{
+		Editable(),
+		defaultAxes(),
+		defaultLegend(),
+	}
+}
+
+func defaultAxes() Option {
 	return func(graph *Graph) {
 		graph.Builder.GraphPanel.YAxis = true
 		graph.Builder.GraphPanel.XAxis = true
@@ -48,7 +56,7 @@ func WithDefaultAxes() Option {
 	}
 }
 
-func WithDefaultLegend() Option {
+func defaultLegend() Option {
 	return func(graph *Graph) {
 		graph.Builder.Legend = struct {
 			AlignAsTable bool  `json:"alignAsTable"`
