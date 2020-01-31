@@ -31,11 +31,7 @@ func defaults() []Option {
 // WithText adds a "graph" panel in the row.
 func WithGraph(title string, options ...graph.Option) Option {
 	return func(row *Row) {
-		graphPanel := graph.New(title)
-
-		for _, opt := range options {
-			opt(graphPanel)
-		}
+		graphPanel := graph.New(title, options...)
 
 		row.builder.Add(graphPanel.Builder)
 	}
