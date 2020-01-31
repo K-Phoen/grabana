@@ -11,6 +11,15 @@ type Dashboard struct {
 	URL string `json:"url"`
 }
 
+// TagAnnotation describes an annotation represented as a Tag.
+// See https://grafana.com/docs/grafana/latest/reference/annotations/#query-by-tag
+type TagAnnotation struct {
+	Name       string
+	Datasource string
+	IconColor  string
+	Tags       []string
+}
+
 type DashboardBuilderOption func(dashboard *DashboardBuilder)
 
 type DashboardBuilder struct {
@@ -61,6 +70,20 @@ func WithDefaultTimePicker() DashboardBuilderOption {
 			RefreshIntervals: []string{"5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"},
 			TimeOptions:      []string{"5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"},
 		}
+	}
+}
+
+// WithTagsAnnotation adds a new source of annotation for the dashboard.
+func WithTagsAnnotation(annotation TagAnnotation) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Annotations.List = append(builder.board.Annotations.List, sdk.Annotation{
+			Name:       annotation.Name,
+			Datasource: &annotation.Datasource,
+			IconColor:  annotation.IconColor,
+			Enable:     true,
+			Tags:       annotation.Tags,
+			Type:       "tags",
+		})
 	}
 }
 
