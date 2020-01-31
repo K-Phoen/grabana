@@ -88,7 +88,7 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 	}
 
 	for i := range folders {
-		if strings.ToLower(folders[i].Title) == strings.ToLower(title) {
+		if strings.EqualFold(folders[i].Title, title) {
 			return &folders[i], nil
 		}
 	}
@@ -119,7 +119,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 	}
 
 	for i := range channels {
-		if strings.ToLower(channels[i].Name) == strings.ToLower(name) {
+		if strings.EqualFold(channels[i].Name, name) {
 			return &channels[i], nil
 		}
 	}
