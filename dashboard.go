@@ -2,6 +2,7 @@ package grabana
 
 import (
 	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -63,6 +64,17 @@ func defaultTimePicker() DashboardBuilderOption {
 			RefreshIntervals: []string{"5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"},
 			TimeOptions:      []string{"5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"},
 		}
+	}
+}
+
+// WithVariableAsConst adds templated variable, defined as a set of constant
+// values.
+// See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
+func WithVariableAsConst(name string, options ...constant.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		templatedVar := constant.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
 	}
 }
 

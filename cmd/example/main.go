@@ -11,6 +11,7 @@ import (
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
+	"github.com/K-Phoen/grabana/variable/constant"
 )
 
 func main() {
@@ -47,6 +48,20 @@ func main() {
 			IconColor:  "#5794F2",
 			Tags:       []string{"deploy", "production"},
 		}),
+		grabana.WithVariableAsConst(
+			"percentile",
+			constant.WithLabel("Percentile"),
+			constant.WithValues([]constant.Value{
+				{Text: "50", Value: "50"},
+				{Text: "75", Value: "75"},
+				{Text: "80", Value: "80"},
+				{Text: "85", Value: "85"},
+				{Text: "90", Value: "90"},
+				{Text: "95", Value: "95"},
+				{Text: "99", Value: "99"},
+			}),
+			constant.WithDefault("80"),
+		),
 		grabana.WithRow(
 			"Prometheus",
 			row.WithGraph(
