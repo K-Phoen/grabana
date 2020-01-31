@@ -1,23 +1,11 @@
 package graph
 
 import (
+	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/grafana-tools/sdk"
 )
 
 type Option func(graph *Graph)
-
-type PrometheusTarget struct {
-	RefID      string
-	Datasource string
-
-	Expr           string
-	IntervalFactor int
-	Interval       string
-	Step           int
-	LegendFormat   string
-	Instant        bool
-	Format         string
-}
 
 type Graph struct {
 	Builder *sdk.Panel
@@ -92,11 +80,11 @@ func WithDefaultLegend() Option {
 	}
 }
 
-func WithPrometheusTarget(target PrometheusTarget) Option {
+func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
+	target := prometheus.New(query, options...)
+
 	return func(graph *Graph) {
 		graph.Builder.AddTarget(&sdk.Target{
-			RefID:          target.RefID,
-			Datasource:     target.Datasource,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
 			Interval:       target.Interval,
@@ -123,9 +111,9 @@ func ReadOnly() Option {
 }
 
 // DataSource sets the data source to be used by the graph.
-func DataSource(datasource string) Option {
+func DataSource(source string) Option {
 	return func(graph *Graph) {
-		graph.Builder.Datasource = &datasource
+		graph.Builder.Datasource = &source
 	}
 }
 
