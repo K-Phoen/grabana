@@ -29,8 +29,8 @@ linters:
     - gosec
     - golint
     - gochecknoglobals
-    - lll
   disable:
+    - lll
     - maligned
 
 linters-settings:
