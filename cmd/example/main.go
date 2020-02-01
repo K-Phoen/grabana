@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/K-Phoen/grabana"
+	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -90,13 +91,21 @@ func main() {
 			"Prometheus",
 			row.WithGraph(
 				"HTTP Rate",
+				graph.Span(6),
 				graph.Height("400px"),
-				graph.Span(12),
 				graph.DataSource("prometheus-default"),
 				graph.WithPrometheusTarget(
 					"rate(prometheus_http_requests_total[30s])",
 					prometheus.Legend("{{handler}} - {{ code }}"),
 				),
+			),
+			row.WithGraph(
+				"Heap allocations",
+				graph.Span(6),
+				graph.Height("400px"),
+				graph.DataSource("prometheus-default"),
+				graph.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
+				graph.LeftYAxis(axis.Unit("bytes"), axis.Label("memory"), axis.Min(0)),
 			),
 		),
 		grabana.Row(

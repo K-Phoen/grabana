@@ -3,6 +3,8 @@ package graph
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/axis"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -64,4 +66,28 @@ func TestGraphPanelDataSourceCanBeConfigured(t *testing.T) {
 	panel := New("", DataSource("prometheus-default"))
 
 	req.Equal("prometheus-default", *panel.Builder.Datasource)
+}
+
+func TestLeftYAxisCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", LeftYAxis(axis.Hide()))
+
+	req.False(panel.Builder.Yaxes[0].Show)
+}
+
+func TestRightYAxisCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", RightYAxis())
+
+	req.True(panel.Builder.Yaxes[0].Show)
+}
+
+func TestXAxisCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", XAxis(axis.Hide()))
+
+	req.False(panel.Builder.Xaxis.Show)
 }
