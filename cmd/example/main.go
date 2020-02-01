@@ -95,7 +95,7 @@ func main() {
 				graph.DataSource("prometheus-default"),
 				graph.WithPrometheusTarget(
 					"rate(prometheus_http_requests_total[30s])",
-					prometheus.WithLegend("{{handler}} - {{ code }}"),
+					prometheus.Legend("{{handler}} - {{ code }}"),
 				),
 			),
 		),
