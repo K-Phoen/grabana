@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/grafana-tools/sdk"
 )
@@ -45,14 +46,10 @@ func defaultAxes() Option {
 		graph.Builder.GraphPanel.YAxis = true
 		graph.Builder.GraphPanel.XAxis = true
 		graph.Builder.GraphPanel.Yaxes = []sdk.Axis{
-			{Format: "short", Show: true, LogBase: 1},
-			{Format: "short", Show: false},
+			*axis.New().Builder,
+			*axis.New(axis.Hide()).Builder,
 		}
-		graph.Builder.GraphPanel.Xaxis = sdk.Axis{
-			Format:  "time",
-			LogBase: 1,
-			Show:    true,
-		}
+		graph.Builder.GraphPanel.Xaxis = *axis.New(axis.Unit("time")).Builder
 	}
 }
 
@@ -137,5 +134,26 @@ func Span(span float32) Option {
 func Height(height string) Option {
 	return func(graph *Graph) {
 		graph.Builder.Height = &height
+	}
+}
+
+// LeftYAxis configures the left Y axis.
+func LeftYAxis(opts ...axis.Option) Option {
+	return func(graph *Graph) {
+		graph.Builder.GraphPanel.Yaxes[0] = *axis.New(opts...).Builder
+	}
+}
+
+// RightYAxis configures the right Y axis.
+func RightYAxis(opts ...axis.Option) Option {
+	return func(graph *Graph) {
+		graph.Builder.GraphPanel.Yaxes[1] = *axis.New(opts...).Builder
+	}
+}
+
+// XAxis configures the X axis.
+func XAxis(opts ...axis.Option) Option {
+	return func(graph *Graph) {
+		graph.Builder.GraphPanel.Xaxis = *axis.New(opts...).Builder
 	}
 }
