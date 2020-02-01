@@ -11,6 +11,10 @@ import (
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
+	"github.com/K-Phoen/grabana/variable/constant"
+	"github.com/K-Phoen/grabana/variable/custom"
+	"github.com/K-Phoen/grabana/variable/interval"
+	"github.com/K-Phoen/grabana/variable/query"
 )
 
 func main() {
@@ -40,6 +44,7 @@ func main() {
 
 	dashboard := grabana.NewDashboardBuilder(
 		"Awesome dashboard",
+		grabana.AutoRefresh("5s"),
 		grabana.WithTags([]string{"generated"}),
 		grabana.WithTagsAnnotation(grabana.TagAnnotation{
 			Name:       "Deployments",
@@ -47,6 +52,40 @@ func main() {
 			IconColor:  "#5794F2",
 			Tags:       []string{"deploy", "production"},
 		}),
+		grabana.WithVariableAsInterval(
+			"interval",
+			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
+		),
+		grabana.WithVariableAsQuery(
+			"status",
+			query.DataSource("prometheus-default"),
+			query.Request("label_values(prometheus_http_requests_total, code)"),
+			query.Sort(query.NumericalAsc),
+		),
+		grabana.WithVariableAsConst(
+			"percentile",
+			constant.Label("Percentile"),
+			constant.Values(map[string]string{
+				"50th": "50",
+				"75th": "75",
+				"80th": "80",
+				"85th": "85",
+				"90th": "90",
+				"95th": "95",
+				"99th": "99",
+			}),
+			constant.Default("80th"),
+		),
+		grabana.WithVariableAsCustom(
+			"vX",
+			custom.Multi(),
+			custom.IncludeAll(),
+			custom.Values(map[string]string{
+				"v1": "v1",
+				"v2": "v2",
+			}),
+			custom.Default("v2"),
+		),
 		grabana.WithRow(
 			"Prometheus",
 			row.WithGraph(
@@ -64,7 +103,7 @@ func main() {
 			"Some text, because it might be useful",
 			row.WithText(
 				"Some awesome text?",
-				text.Markdown("# Title\n\nFor markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n"),
+				text.Markdown("Markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n${percentile}"),
 			),
 			row.WithText(
 				"Some awesome html?",

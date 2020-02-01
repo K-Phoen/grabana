@@ -2,6 +2,10 @@ package grabana
 
 import (
 	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/variable/constant"
+	"github.com/K-Phoen/grabana/variable/custom"
+	"github.com/K-Phoen/grabana/variable/interval"
+	"github.com/K-Phoen/grabana/variable/query"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -42,20 +46,13 @@ func NewDashboardBuilder(title string, options ...DashboardBuilderOption) Dashbo
 
 func dashboardDefaults() []DashboardBuilderOption {
 	return []DashboardBuilderOption{
-		WithDefaultTimePicker(),
-		WithDefaultTime(),
+		defaultTimePicker(),
+		defaultTime(),
 		WithSharedCrossHair(),
 	}
 }
 
-// WithRow adds a row to the dashboard.
-func WithRow(title string, options ...row.Option) DashboardBuilderOption {
-	return func(builder *DashboardBuilder) {
-		row.New(builder.board, title, options...)
-	}
-}
-
-func WithDefaultTime() DashboardBuilderOption {
+func defaultTime() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Time = sdk.Time{
 			From: "now-3h",
@@ -64,12 +61,61 @@ func WithDefaultTime() DashboardBuilderOption {
 	}
 }
 
-func WithDefaultTimePicker() DashboardBuilderOption {
+func defaultTimePicker() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Timepicker = sdk.Timepicker{
 			RefreshIntervals: []string{"5s", "10s", "30s", "1m", "5m", "15m", "30m", "1h", "2h", "1d"},
 			TimeOptions:      []string{"5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"},
 		}
+	}
+}
+
+// WithVariableAsConst adds a templated variable, defined as a set of constant
+// values.
+// See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
+func WithVariableAsConst(name string, options ...constant.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		templatedVar := constant.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+	}
+}
+
+// WithVariableAsCustom adds a templated variable, defined as a set of custom
+// values.
+// See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
+func WithVariableAsCustom(name string, options ...custom.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		templatedVar := custom.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+	}
+}
+
+// WithVariableAsInterval adds a templated variable, defined as an interval.
+// See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
+func WithVariableAsInterval(name string, options ...interval.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		templatedVar := interval.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+	}
+}
+
+// WithVariableAsQuery adds a templated variable, defined as a query.
+// See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
+func WithVariableAsQuery(name string, options ...query.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		templatedVar := query.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+	}
+}
+
+// WithRow adds a row to the dashboard.
+func WithRow(title string, options ...row.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		row.New(builder.board, title, options...)
 	}
 }
 
@@ -119,5 +165,12 @@ func WithoutSharedCrossHair() DashboardBuilderOption {
 func WithTags(tags []string) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Tags = tags
+	}
+}
+
+// AutoRefresh defines the auto-refresh interval for the dashboard.
+func AutoRefresh(interval string) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Refresh = &sdk.BoolString{Flag: true, Value: interval}
 	}
 }
