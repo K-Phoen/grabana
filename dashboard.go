@@ -5,6 +5,7 @@ import (
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/interval"
+	"github.com/K-Phoen/grabana/variable/query"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -96,6 +97,16 @@ func WithVariableAsCustom(name string, options ...custom.Option) DashboardBuilde
 func WithVariableAsInterval(name string, options ...interval.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		templatedVar := interval.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+	}
+}
+
+// WithVariableAsQuery adds a templated variable, defined as a query.
+// See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
+func WithVariableAsQuery(name string, options ...query.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		templatedVar := query.New(name, options...)
 
 		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
 	}

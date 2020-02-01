@@ -6,7 +6,7 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
-type Option func(constant *Interval)
+type Option func(interval *Interval)
 
 // ValuesList represent a list of options for an interval variable.
 type ValuesList []string

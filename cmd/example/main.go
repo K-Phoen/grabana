@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/K-Phoen/grabana/variable/interval"
-
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
@@ -15,6 +13,8 @@ import (
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
+	"github.com/K-Phoen/grabana/variable/interval"
+	"github.com/K-Phoen/grabana/variable/query"
 )
 
 func main() {
@@ -55,6 +55,12 @@ func main() {
 		grabana.WithVariableAsInterval(
 			"interval",
 			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
+		),
+		grabana.WithVariableAsQuery(
+			"status",
+			query.DataSource("prometheus-default"),
+			query.Request("label_values(prometheus_http_requests_total, code)"),
+			query.Sort(query.NumericalAsc),
 		),
 		grabana.WithVariableAsConst(
 			"percentile",
