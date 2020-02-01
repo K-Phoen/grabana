@@ -43,8 +43,8 @@ func TestValuesCanBeSet(t *testing.T) {
 	}
 
 	req.Len(values, 3)
-	req.Equal([]string{"90th", "95th", "99th"}, labels)
-	req.Equal([]string{"90", "95", "99"}, values)
+	req.ElementsMatch([]string{"90th", "95th", "99th"}, labels)
+	req.ElementsMatch([]string{"90", "95", "99"}, values)
 }
 
 func TestDefaultValueCanBeSet(t *testing.T) {

@@ -48,7 +48,7 @@ func dashboardDefaults() []DashboardBuilderOption {
 	return []DashboardBuilderOption{
 		defaultTimePicker(),
 		defaultTime(),
-		WithSharedCrossHair(),
+		SharedCrossHair(),
 	}
 }
 
@@ -70,10 +70,10 @@ func defaultTimePicker() DashboardBuilderOption {
 	}
 }
 
-// WithVariableAsConst adds a templated variable, defined as a set of constant
+// VariableAsConst adds a templated variable, defined as a set of constant
 // values.
 // See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
-func WithVariableAsConst(name string, options ...constant.Option) DashboardBuilderOption {
+func VariableAsConst(name string, options ...constant.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		templatedVar := constant.New(name, options...)
 
@@ -81,10 +81,10 @@ func WithVariableAsConst(name string, options ...constant.Option) DashboardBuild
 	}
 }
 
-// WithVariableAsCustom adds a templated variable, defined as a set of custom
+// VariableAsCustom adds a templated variable, defined as a set of custom
 // values.
 // See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
-func WithVariableAsCustom(name string, options ...custom.Option) DashboardBuilderOption {
+func VariableAsCustom(name string, options ...custom.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		templatedVar := custom.New(name, options...)
 
@@ -92,9 +92,9 @@ func WithVariableAsCustom(name string, options ...custom.Option) DashboardBuilde
 	}
 }
 
-// WithVariableAsInterval adds a templated variable, defined as an interval.
+// VariableAsInterval adds a templated variable, defined as an interval.
 // See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
-func WithVariableAsInterval(name string, options ...interval.Option) DashboardBuilderOption {
+func VariableAsInterval(name string, options ...interval.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		templatedVar := interval.New(name, options...)
 
@@ -102,9 +102,9 @@ func WithVariableAsInterval(name string, options ...interval.Option) DashboardBu
 	}
 }
 
-// WithVariableAsQuery adds a templated variable, defined as a query.
+// VariableAsQuery adds a templated variable, defined as a query.
 // See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
-func WithVariableAsQuery(name string, options ...query.Option) DashboardBuilderOption {
+func VariableAsQuery(name string, options ...query.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		templatedVar := query.New(name, options...)
 
@@ -112,15 +112,15 @@ func WithVariableAsQuery(name string, options ...query.Option) DashboardBuilderO
 	}
 }
 
-// WithRow adds a row to the dashboard.
-func WithRow(title string, options ...row.Option) DashboardBuilderOption {
+// Row adds a row to the dashboard.
+func Row(title string, options ...row.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		row.New(builder.board, title, options...)
 	}
 }
 
-// WithTagsAnnotation adds a new source of annotation for the dashboard.
-func WithTagsAnnotation(annotation TagAnnotation) DashboardBuilderOption {
+// TagsAnnotation adds a new source of annotation for the dashboard.
+func TagsAnnotation(annotation TagAnnotation) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Annotations.List = append(builder.board.Annotations.List, sdk.Annotation{
 			Name:       annotation.Name,
@@ -147,22 +147,22 @@ func ReadOnly() DashboardBuilderOption {
 	}
 }
 
-// WithSharedCrossHair configures the graph tooltip to be shared across panels.
-func WithSharedCrossHair() DashboardBuilderOption {
+// SharedCrossHair configures the graph tooltip to be shared across panels.
+func SharedCrossHair() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.SharedCrosshair = true
 	}
 }
 
-// WithoutSharedCrossHair configures the graph tooltip NOT to be shared across panels.
-func WithoutSharedCrossHair() DashboardBuilderOption {
+// DefaultTooltip configures the graph tooltip NOT to be shared across panels.
+func DefaultTooltip() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.SharedCrosshair = false
 	}
 }
 
-// WithTags adds the given set of tags to the dashboard.
-func WithTags(tags []string) DashboardBuilderOption {
+// Tags adds the given set of tags to the dashboard.
+func Tags(tags []string) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Tags = tags
 	}
