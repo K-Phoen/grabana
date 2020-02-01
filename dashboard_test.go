@@ -37,6 +37,22 @@ func TestDashboardCanBeMadeReadOnly(t *testing.T) {
 	req.False(panel.board.Editable)
 }
 
+func TestDashboardCanHaveASharedCrossHair(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", SharedCrossHair())
+
+	req.True(panel.board.SharedCrosshair)
+}
+
+func TestDashboardCanHaveADefaultTooltip(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", DefaultTooltip())
+
+	req.False(panel.board.SharedCrosshair)
+}
+
 func TestDashboardCanBeAutoRefreshed(t *testing.T) {
 	req := require.New(t)
 
@@ -44,4 +60,62 @@ func TestDashboardCanBeAutoRefreshed(t *testing.T) {
 
 	req.True(panel.board.Refresh.Flag)
 	req.Equal("5s", panel.board.Refresh.Value)
+}
+
+func TestDashboardCanHaveTags(t *testing.T) {
+	req := require.New(t)
+	tags := []string{"generated", "grabana"}
+
+	panel := NewDashboardBuilder("", Tags(tags))
+
+	req.Len(panel.board.Tags, 2)
+	req.ElementsMatch(tags, panel.board.Tags)
+}
+
+func TestDashboardCanHaveVariablesAsConstants(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", VariableAsConst("percentile"))
+
+	req.Len(panel.board.Templating.List, 1)
+}
+
+func TestDashboardCanHaveVariablesAsCustom(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", VariableAsCustom("vX"))
+
+	req.Len(panel.board.Templating.List, 1)
+}
+
+func TestDashboardCanHaveVariablesAsInterval(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", VariableAsInterval("interval"))
+
+	req.Len(panel.board.Templating.List, 1)
+}
+
+func TestDashboardCanHaveVariablesAsQuery(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", VariableAsQuery("status"))
+
+	req.Len(panel.board.Templating.List, 1)
+}
+
+func TestDashboardCanHaveRows(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", Row("Prometheus"))
+
+	req.Len(panel.board.Rows, 1)
+}
+
+func TestDashboardCanHaveAnnotationsFromTags(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", TagsAnnotation(TagAnnotation{}))
+
+	req.Len(panel.board.Annotations.List, 1)
 }

@@ -45,24 +45,24 @@ func main() {
 	dashboard := grabana.NewDashboardBuilder(
 		"Awesome dashboard",
 		grabana.AutoRefresh("5s"),
-		grabana.WithTags([]string{"generated"}),
-		grabana.WithTagsAnnotation(grabana.TagAnnotation{
+		grabana.Tags([]string{"generated"}),
+		grabana.TagsAnnotation(grabana.TagAnnotation{
 			Name:       "Deployments",
 			Datasource: "-- Grafana --",
 			IconColor:  "#5794F2",
 			Tags:       []string{"deploy", "production"},
 		}),
-		grabana.WithVariableAsInterval(
+		grabana.VariableAsInterval(
 			"interval",
 			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
 		),
-		grabana.WithVariableAsQuery(
+		grabana.VariableAsQuery(
 			"status",
 			query.DataSource("prometheus-default"),
 			query.Request("label_values(prometheus_http_requests_total, code)"),
 			query.Sort(query.NumericalAsc),
 		),
-		grabana.WithVariableAsConst(
+		grabana.VariableAsConst(
 			"percentile",
 			constant.Label("Percentile"),
 			constant.Values(map[string]string{
@@ -76,7 +76,7 @@ func main() {
 			}),
 			constant.Default("80th"),
 		),
-		grabana.WithVariableAsCustom(
+		grabana.VariableAsCustom(
 			"vX",
 			custom.Multi(),
 			custom.IncludeAll(),
@@ -86,7 +86,7 @@ func main() {
 			}),
 			custom.Default("v2"),
 		),
-		grabana.WithRow(
+		grabana.Row(
 			"Prometheus",
 			row.WithGraph(
 				"HTTP Rate",
@@ -99,7 +99,7 @@ func main() {
 				),
 			),
 		),
-		grabana.WithRow(
+		grabana.Row(
 			"Some text, because it might be useful",
 			row.WithText(
 				"Some awesome text?",
