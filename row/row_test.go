@@ -52,3 +52,12 @@ func TestRowsCanHaveTextPanels(t *testing.T) {
 
 	req.Len(panel.builder.Panels, 1)
 }
+
+func TestRowsCanHaveTablePanels(t *testing.T) {
+	req := require.New(t)
+	board := sdk.NewBoard("")
+
+	panel := New(board, "", WithTable("Some table"))
+
+	req.Len(panel.builder.Panels, 1)
+}

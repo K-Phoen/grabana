@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/K-Phoen/grabana/table"
+
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/graph"
@@ -106,6 +108,21 @@ func main() {
 				graph.DataSource("prometheus-default"),
 				graph.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
 				graph.LeftYAxis(axis.Unit("bytes"), axis.Label("memory"), axis.Min(0)),
+			),
+			row.WithTable(
+				"Threads",
+				table.WithPrometheusTarget("go_threads"),
+				table.HideColumn("Time"),
+				table.AsTimeSeriesAggregations([]table.Aggregation{
+					{
+						Label: "AVG",
+						Type:  table.AVG,
+					},
+					{
+						Label: "Current",
+						Type:  table.Current,
+					},
+				}),
 			),
 		),
 		grabana.Row(
