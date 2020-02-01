@@ -21,7 +21,7 @@ func TestLegendCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 	legend := "{{ code }} - {{ path }}"
 
-	target := prometheus.New("", prometheus.WithLegend(legend))
+	target := prometheus.New("", prometheus.Legend(legend))
 
 	req.Equal(legend, target.LegendFormat)
 }

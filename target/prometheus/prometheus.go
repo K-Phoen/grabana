@@ -25,8 +25,8 @@ func New(query string, options ...Option) *Prometheus {
 	return prometheus
 }
 
-// WithLegend sets the legend format.
-func WithLegend(legend string) Option {
+// Legend sets the legend format.
+func Legend(legend string) Option {
 	return func(prometheus *Prometheus) {
 		prometheus.LegendFormat = legend
 	}
