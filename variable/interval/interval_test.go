@@ -19,7 +19,7 @@ func TestNewIntervalVariablesCanBeCreated(t *testing.T) {
 func TestLabelCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("interval var", WithLabel("IntervalVariable"))
+	panel := New("interval var", Label("IntervalVariable"))
 
 	req.Equal("interval var", panel.Builder.Name)
 	req.Equal("IntervalVariable", panel.Builder.Label)
@@ -29,7 +29,7 @@ func TestValuesCanBeSet(t *testing.T) {
 	req := require.New(t)
 	values := []string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}
 
-	panel := New("", WithValues(values))
+	panel := New("", Values(values))
 
 	req.Equal("30s,1m,5m,10m,30m,1h,6h,12h", panel.Builder.Query)
 }
@@ -37,7 +37,7 @@ func TestValuesCanBeSet(t *testing.T) {
 func TestDefaultValueCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", WithDefault("99"))
+	panel := New("", Default("99"))
 
 	req.Equal("99", panel.Builder.Current.Text)
 }

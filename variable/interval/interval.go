@@ -8,8 +8,8 @@ import (
 
 type Option func(constant *Interval)
 
-// Values represent a list of options for an interval variable.
-type Values []string
+// ValuesList represent a list of options for an interval variable.
+type ValuesList []string
 
 type Interval struct {
 	Builder sdk.TemplateVar
@@ -29,13 +29,13 @@ func New(name string, options ...Option) *Interval {
 	return interval
 }
 
-func WithValues(values Values) Option {
+func Values(values ValuesList) Option {
 	return func(interval *Interval) {
 		interval.Builder.Query = strings.Join(values, ",")
 	}
 }
 
-func WithDefault(value string) Option {
+func Default(value string) Option {
 	return func(interval *Interval) {
 		interval.Builder.Current = sdk.Current{
 			Text: value,
@@ -43,7 +43,7 @@ func WithDefault(value string) Option {
 	}
 }
 
-func WithLabel(label string) Option {
+func Label(label string) Option {
 	return func(interval *Interval) {
 		interval.Builder.Label = label
 	}

@@ -19,7 +19,7 @@ func TestNewConstantsCanBeCreated(t *testing.T) {
 func TestLabelCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("const", WithLabel("Constant"))
+	panel := New("const", Label("Constant"))
 
 	req.Equal("const", panel.Builder.Name)
 	req.Equal("Constant", panel.Builder.Label)
@@ -28,7 +28,7 @@ func TestLabelCanBeSet(t *testing.T) {
 func TestValuesCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("const", WithValues(map[string]string{
+	panel := New("const", Values(map[string]string{
 		"90th": "90",
 		"95th": "95",
 		"99th": "99",
@@ -50,7 +50,7 @@ func TestValuesCanBeSet(t *testing.T) {
 func TestDefaultValueCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("const", WithDefault("99th"))
+	panel := New("const", Default("99th"))
 
 	req.Equal("99th", panel.Builder.Current.Text)
 }

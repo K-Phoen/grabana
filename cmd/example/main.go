@@ -52,11 +52,14 @@ func main() {
 			IconColor:  "#5794F2",
 			Tags:       []string{"deploy", "production"},
 		}),
-		grabana.WithVariableAsInterval("interval", interval.WithValues([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"})),
+		grabana.WithVariableAsInterval(
+			"interval",
+			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
+		),
 		grabana.WithVariableAsConst(
 			"percentile",
-			constant.WithLabel("Percentile"),
-			constant.WithValues(map[string]string{
+			constant.Label("Percentile"),
+			constant.Values(map[string]string{
 				"50th": "50",
 				"75th": "75",
 				"80th": "80",
@@ -65,17 +68,17 @@ func main() {
 				"95th": "95",
 				"99th": "99",
 			}),
-			constant.WithDefault("80th"),
+			constant.Default("80th"),
 		),
 		grabana.WithVariableAsCustom(
 			"vX",
 			custom.Multi(),
 			custom.IncludeAll(),
-			custom.WithValues(map[string]string{
+			custom.Values(map[string]string{
 				"v1": "v1",
 				"v2": "v2",
 			}),
-			custom.WithDefault("v2"),
+			custom.Default("v2"),
 		),
 		grabana.WithRow(
 			"Prometheus",

@@ -19,7 +19,7 @@ func TestNewCustomVariablesCanBeCreated(t *testing.T) {
 func TestLabelCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("custom var", WithLabel("CustomVariable"))
+	panel := New("custom var", Label("CustomVariable"))
 
 	req.Equal("custom var", panel.Builder.Name)
 	req.Equal("CustomVariable", panel.Builder.Label)
@@ -28,7 +28,7 @@ func TestLabelCanBeSet(t *testing.T) {
 func TestValuesCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("const", WithValues(map[string]string{
+	panel := New("const", Values(map[string]string{
 		"v1": "v1-value",
 		"v2": "v2-value",
 	}))
@@ -49,7 +49,7 @@ func TestValuesCanBeSet(t *testing.T) {
 func TestDefaultValueCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", WithDefault("99"))
+	panel := New("", Default("99"))
 
 	req.Equal("99", panel.Builder.Current.Text)
 }

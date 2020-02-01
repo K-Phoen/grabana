@@ -6,8 +6,8 @@ import (
 
 type Option func(constant *Constant)
 
-// Values represent a "label" to "value" map of options for a constant variable.
-type Values map[string]string
+// ValuesMap represent a "label" to "value" map of options for a constant variable.
+type ValuesMap map[string]string
 
 type Constant struct {
 	Builder sdk.TemplateVar
@@ -27,7 +27,7 @@ func New(name string, options ...Option) *Constant {
 	return constant
 }
 
-func WithValues(values Values) Option {
+func Values(values ValuesMap) Option {
 	return func(constant *Constant) {
 		for label, value := range values {
 			constant.Builder.Options = append(constant.Builder.Options, sdk.Option{
@@ -38,7 +38,7 @@ func WithValues(values Values) Option {
 	}
 }
 
-func WithDefault(value string) Option {
+func Default(value string) Option {
 	return func(constant *Constant) {
 		constant.Builder.Current = sdk.Current{
 			Text: value,
@@ -46,7 +46,7 @@ func WithDefault(value string) Option {
 	}
 }
 
-func WithLabel(label string) Option {
+func Label(label string) Option {
 	return func(constant *Constant) {
 		constant.Builder.Label = label
 	}
