@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/K-Phoen/grabana/variable/interval"
+
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
@@ -50,6 +52,7 @@ func main() {
 			IconColor:  "#5794F2",
 			Tags:       []string{"deploy", "production"},
 		}),
+		grabana.WithVariableAsInterval("interval", interval.WithValues([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"})),
 		grabana.WithVariableAsConst(
 			"percentile",
 			constant.WithLabel("Percentile"),

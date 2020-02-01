@@ -4,6 +4,7 @@ import (
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
+	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -85,6 +86,16 @@ func WithVariableAsConst(name string, options ...constant.Option) DashboardBuild
 func WithVariableAsCustom(name string, options ...custom.Option) DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		templatedVar := custom.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+	}
+}
+
+// WithVariableAsInterval adds a templated variable, defined as an interval.
+// See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
+func WithVariableAsInterval(name string, options ...interval.Option) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		templatedVar := interval.New(name, options...)
 
 		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
 	}
