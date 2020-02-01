@@ -21,7 +21,7 @@ func TestNewDashboardsCanBeCreated(t *testing.T) {
 	req.NotEmpty(panel.board.Time.To)
 }
 
-func TestGraphPanelCanBeMadeEditable(t *testing.T) {
+func TestDashboardCanBeMadeEditable(t *testing.T) {
 	req := require.New(t)
 
 	panel := NewDashboardBuilder("", Editable())
@@ -29,10 +29,19 @@ func TestGraphPanelCanBeMadeEditable(t *testing.T) {
 	req.True(panel.board.Editable)
 }
 
-func TestGraphPanelCanBeMadeReadOnly(t *testing.T) {
+func TestDashboardCanBeMadeReadOnly(t *testing.T) {
 	req := require.New(t)
 
 	panel := NewDashboardBuilder("", ReadOnly())
 
 	req.False(panel.board.Editable)
+}
+
+func TestDashboardCanBeAutoRefreshed(t *testing.T) {
+	req := require.New(t)
+
+	panel := NewDashboardBuilder("", AutoRefresh("5s"))
+
+	req.True(panel.board.Refresh.Flag)
+	req.Equal("5s", panel.board.Refresh.Value)
 }

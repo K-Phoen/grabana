@@ -145,3 +145,10 @@ func WithTags(tags []string) DashboardBuilderOption {
 		builder.board.Tags = tags
 	}
 }
+
+// AutoRefresh defines the auto-refresh interval for the dashboard.
+func AutoRefresh(interval string) DashboardBuilderOption {
+	return func(builder *DashboardBuilder) {
+		builder.board.Refresh = &sdk.BoolString{Flag: true, Value: interval}
+	}
+}

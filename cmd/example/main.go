@@ -42,6 +42,7 @@ func main() {
 
 	dashboard := grabana.NewDashboardBuilder(
 		"Awesome dashboard",
+		grabana.AutoRefresh("5s"),
 		grabana.WithTags([]string{"generated"}),
 		grabana.WithTagsAnnotation(grabana.TagAnnotation{
 			Name:       "Deployments",
