@@ -32,6 +32,16 @@ func TestGraphPanelCanBeMadeReadOnly(t *testing.T) {
 	req.False(panel.Builder.Editable)
 }
 
+func TestGraphPanelCanHavePrometheusTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", WithPrometheusTarget(
+		"rate(prometheus_http_requests_total[30s])",
+	))
+
+	req.Len(panel.Builder.GraphPanel.Targets, 1)
+}
+
 func TestGraphPanelWidthCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
