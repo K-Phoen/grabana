@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+
       - name: Tag
         uses: K-Phoen/semver-release-action@master
         with:
