@@ -110,3 +110,35 @@ func TestDrawModeCanBeConfigured(t *testing.T) {
 	req.True(panel.Builder.Points)
 	req.True(panel.Builder.Bars)
 }
+
+func TestLineFillCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Fill(3))
+
+	req.Equal(3, panel.Builder.Fill)
+}
+
+func TestLineWidthCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", LineWidth(3))
+
+	req.Equal(uint(3), panel.Builder.Linewidth)
+}
+
+func TestStaircaseModeCanBeEnabled(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Staircase())
+
+	req.True(panel.Builder.GraphPanel.SteppedLine)
+}
+
+func TestPointRadiusCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", PointRadius(3))
+
+	req.Equal(3, panel.Builder.Pointradius)
+}

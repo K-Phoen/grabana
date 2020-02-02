@@ -34,12 +34,9 @@ func New(title string, options ...Option) *Graph {
 
 	panel.Builder.AliasColors = make(map[string]interface{})
 	panel.Builder.IsNew = false
-	panel.Builder.Linewidth = 1
-	panel.Builder.Fill = 1
 	panel.Builder.Tooltip.Sort = 2
 	panel.Builder.Tooltip.Shared = true
 	panel.Builder.GraphPanel.NullPointMode = "null as zero"
-	panel.Builder.Span = 6
 
 	for _, opt := range append(defaults(), options...) {
 		opt(panel)
@@ -52,6 +49,9 @@ func defaults() []Option {
 	return []Option{
 		Editable(),
 		Draw(Lines),
+		Span(6),
+		Fill(1),
+		LineWidth(1),
 		defaultAxes(),
 		defaultLegend(),
 	}
@@ -200,5 +200,33 @@ func Draw(modes ...DrawMode) Option {
 				graph.Builder.Points = true
 			}
 		}
+	}
+}
+
+// Fill defines the amount of color fill for a series (default 1, max 10, 0 is none).
+func Fill(value int) Option {
+	return func(graph *Graph) {
+		graph.Builder.Fill = value
+	}
+}
+
+// LineWidth defines the width of the line for a series (default 1, max 10, 0 is none).
+func LineWidth(value uint) Option {
+	return func(graph *Graph) {
+		graph.Builder.Linewidth = value
+	}
+}
+
+// Staircase draws adjacent points as staircase.
+func Staircase() Option {
+	return func(graph *Graph) {
+		graph.Builder.GraphPanel.SteppedLine = true
+	}
+}
+
+// PointRadius adjusts the size of points when Points are selected as Draw Mode.
+func PointRadius(value int) Option {
+	return func(graph *Graph) {
+		graph.Builder.Pointradius = value
 	}
 }
