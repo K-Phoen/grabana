@@ -51,7 +51,7 @@ func New(title string, options ...Option) *Graph {
 func defaults() []Option {
 	return []Option{
 		Editable(),
-		Draw(Lines, Points),
+		Draw(Lines),
 		defaultAxes(),
 		defaultLegend(),
 	}
