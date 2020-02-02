@@ -10,6 +10,19 @@ import (
 // Option represents an option that can be used to configure a graph panel.
 type Option func(graph *Graph)
 
+// DrawMode represents a type of visualization that will be drawn in the graph
+// (lines, bars, points)
+type DrawMode uint8
+
+const (
+	// Bars will display bars.
+	Bars DrawMode = iota
+	// Lines will display lines.
+	Lines
+	// Points will display points.
+	Points
+)
+
 // Graph represents a graph panel.
 type Graph struct {
 	Builder *sdk.Panel
@@ -21,13 +34,11 @@ func New(title string, options ...Option) *Graph {
 
 	panel.Builder.AliasColors = make(map[string]interface{})
 	panel.Builder.IsNew = false
-	panel.Builder.Lines = true
 	panel.Builder.Linewidth = 1
 	panel.Builder.Fill = 1
 	panel.Builder.Tooltip.Sort = 2
 	panel.Builder.Tooltip.Shared = true
 	panel.Builder.GraphPanel.NullPointMode = "null as zero"
-	panel.Builder.GraphPanel.Lines = true
 	panel.Builder.Span = 6
 
 	for _, opt := range append(defaults(), options...) {
@@ -40,6 +51,7 @@ func New(title string, options ...Option) *Graph {
 func defaults() []Option {
 	return []Option{
 		Editable(),
+		Draw(Lines, Points),
 		defaultAxes(),
 		defaultLegend(),
 	}
@@ -168,5 +180,25 @@ func XAxis(opts ...axis.Option) Option {
 func Alert(name string, opts ...alert.Option) Option {
 	return func(graph *Graph) {
 		graph.Builder.Alert = alert.New(name, opts...).Builder
+	}
+}
+
+// Draw specifies how the graph will be drawn.
+func Draw(modes ...DrawMode) Option {
+	return func(graph *Graph) {
+		graph.Builder.Bars = false
+		graph.Builder.Lines = false
+		graph.Builder.Points = false
+
+		for _, mode := range modes {
+			switch mode {
+			case Bars:
+				graph.Builder.Bars = true
+			case Lines:
+				graph.Builder.Lines = true
+			case Points:
+				graph.Builder.Points = true
+			}
+		}
 	}
 }

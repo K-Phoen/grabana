@@ -100,3 +100,13 @@ func TestAlertsCanBeConfigured(t *testing.T) {
 	req.NotNil(panel.Builder.Alert)
 	req.Equal("some alert", panel.Builder.Alert.Name)
 }
+
+func TestDrawModeCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Draw(Lines, Points, Bars))
+
+	req.True(panel.Builder.Lines)
+	req.True(panel.Builder.Points)
+	req.True(panel.Builder.Bars)
+}
