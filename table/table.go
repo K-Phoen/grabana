@@ -121,7 +121,7 @@ func AsTable() Option {
 	}
 }
 
-// AsTable displays the data as annotations.
+// AsAnnotations displays the data as annotations.
 func AsAnnotations() Option {
 	return func(table *Table) {
 		table.Builder.TablePanel.Transform = "annotations"
