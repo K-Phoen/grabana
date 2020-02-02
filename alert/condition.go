@@ -4,10 +4,16 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
+// Operator represents a logical operator used to chain conditions.
 type Operator string
+
+// ConditionOption represents an option that can be used to configure a condition.
 type ConditionOption func(condition *condition)
 
+// And chains conditions with a logical AND
 const And Operator = "and"
+
+// Or chains conditions with a logical OR
 const Or Operator = "or"
 
 type evaluator struct {
@@ -125,30 +131,35 @@ func PercentDiff(refID string, from string, to string) ConditionOption {
 	}
 }
 
+// HasNoValue will match queries returning no value.
 func HasNoValue() ConditionOption {
 	return func(cond *condition) {
 		cond.builder.Evaluator = evaluator{Type: "no_value", Params: []float64{}}
 	}
 }
 
+// IsAbove will match queries returning a value above the given threshold.
 func IsAbove(value float64) ConditionOption {
 	return func(cond *condition) {
 		cond.builder.Evaluator = evaluator{Type: "gt", Params: []float64{value}}
 	}
 }
 
+// IsBelow will match queries returning a value below the given threshold.
 func IsBelow(value float64) ConditionOption {
 	return func(cond *condition) {
 		cond.builder.Evaluator = evaluator{Type: "lt", Params: []float64{value}}
 	}
 }
 
+// IsOutsideRange will match queries returning a value outside the given range.
 func IsOutsideRange(min float64, max float64) ConditionOption {
 	return func(cond *condition) {
 		cond.builder.Evaluator = evaluator{Type: "outside_range", Params: []float64{min, max}}
 	}
 }
 
+// IsWithinRange will match queries returning a value within the given range.
 func IsWithinRange(min float64, max float64) ConditionOption {
 	return func(cond *condition) {
 		cond.builder.Evaluator = evaluator{Type: "within_range", Params: []float64{min, max}}

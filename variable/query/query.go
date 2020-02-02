@@ -4,23 +4,45 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
-type SortOption int
-type RefreshOption int
-
 // Option represents an option that can be used to configure a query.
 type Option func(constant *Query)
 
-const None SortOption = 0
-const AlphabeticalAsc SortOption = 1
-const AlphabeticalDesc SortOption = 2
-const NumericalAsc SortOption = 3
-const NumericalDesc SortOption = 4
-const AlphabeticalNoCaseAsc SortOption = 5
-const AlphabeticalNoCaseDesc SortOption = 6
+// SortOrder represents the ordering method applied to values.
+type SortOrder int
 
-const Never RefreshOption = 0
-const DashboardLoad RefreshOption = 1
-const TimeChange RefreshOption = 2
+// None will preserve the results ordering as returned by the query.
+const None SortOrder = 0
+
+// AlphabeticalAsc will sort the results by ascending alphabetical order.
+const AlphabeticalAsc SortOrder = 1
+
+// AlphabeticalDesc will sort the results by descending alphabetical order.
+const AlphabeticalDesc SortOrder = 2
+
+// NumericalAsc will sort the results by ascending numerical order.
+const NumericalAsc SortOrder = 3
+
+// NumericalDesc will sort the results by descending numerical order.
+const NumericalDesc SortOrder = 4
+
+// AlphabeticalNoCaseAsc will sort the results by ascending alphabetical order, case-insensitive.
+const AlphabeticalNoCaseAsc SortOrder = 5
+
+// AlphabeticalNoCaseDesc will sort the results by descending alphabetical order, case-insensitive.
+const AlphabeticalNoCaseDesc SortOrder = 6
+
+// RefreshInterval represents the interval at which the results of a query will
+// be refreshed.
+type RefreshInterval int
+
+// Never will prevent the results from being refreshed.
+const Never RefreshInterval = 0
+
+// DashboardLoad will refresh the results every time the dashboard is loaded.
+const DashboardLoad RefreshInterval = 1
+
+// TimeChange will refresh the results every time the time interval changes.
+const TimeChange RefreshInterval = 2
 
 // Query represents a "query" templated variable.
 type Query struct {
@@ -57,14 +79,14 @@ func Request(request string) Option {
 }
 
 // Sort defines the order in which the values will be sorted.
-func Sort(order SortOption) Option {
+func Sort(order SortOrder) Option {
 	return func(query *Query) {
 		query.Builder.Sort = int(order)
 	}
 }
 
 // Refresh defines the interval in which the values will be refreshed.
-func Refresh(refresh RefreshOption) Option {
+func Refresh(refresh RefreshInterval) Option {
 	return func(query *Query) {
 		value := int64(refresh)
 		query.Builder.Refresh = sdk.BoolInt{Flag: true, Value: &value}

@@ -4,18 +4,36 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
+// ErrorMode represents the behavior of an alert in case of execution error.
 type ErrorMode string
-type NoDataMode string
-type Option func(alert *Alert)
 
+// Alerting will set the alert state to "alerting".
 const Alerting ErrorMode = "alerting"
+
+// KeepLastState will set the alert state to its previous state.
 const LastState ErrorMode = "keep_state"
 
+// NoDataMode represents the behavior of an alert when no data is returned by
+// the query.
+type NoDataMode string
+
+// NoData will set the alert state to "no data".
 const NoData NoDataMode = "no_data"
+
+// Error will set the alert state to "alerting".
 const Error NoDataMode = "alerting"
+
+// KeepLastState will set the alert state to its previous state.
 const KeepLastState NoDataMode = "keep_state"
+
+// OK will set the alert state to "ok".
 const OK NoDataMode = "ok"
 
+// Option represents an option that can be used to configure an alert.
+type Option func(alert *Alert)
+
+// Channel represents an alert notification channel.
+// See https://grafana.com/docs/grafana/latest/alerting/notifications/#notification-channel-setup
 type Channel struct {
 	ID   uint   `json:"id"`
 	UID  string `json:"uid"`
@@ -23,10 +41,12 @@ type Channel struct {
 	Type string `json:"type"`
 }
 
+// Alert represents an alert that can be triggered by a query.
 type Alert struct {
 	Builder *sdk.Alert
 }
 
+// New creates a new alert.
 func New(name string, options ...Option) *Alert {
 	alert := &Alert{Builder: &sdk.Alert{
 		Name:                name,
