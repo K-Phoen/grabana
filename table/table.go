@@ -15,16 +15,16 @@ type AggregationType string
 // AVG aggregates results by computing the average.
 const AVG AggregationType = "avg"
 
-// AVG aggregates results by counting them.
+// Count aggregates results by counting them.
 const Count AggregationType = "count"
 
-// AVG aggregates results by keeping only the current value.
+// Current aggregates results by keeping only the current value.
 const Current AggregationType = "current"
 
-// AVG aggregates results by keeping only the smallest value.
+// Min aggregates results by keeping only the smallest value.
 const Min AggregationType = "min"
 
-// AVG aggregates results by keeping only the largest value.
+// Max aggregates results by keeping only the largest value.
 const Max AggregationType = "max"
 
 type Aggregation struct {

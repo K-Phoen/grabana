@@ -50,7 +50,7 @@ func newCondition(options ...ConditionOption) *condition {
 	return cond
 }
 
-// Avg defines the query to execute.
+// Avg defines the query to execute and computes the average of the results.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#query-condition-example
 func Avg(refID string, from string, to string) ConditionOption {
 	return func(cond *condition) {
@@ -59,7 +59,7 @@ func Avg(refID string, from string, to string) ConditionOption {
 	}
 }
 
-// Avg defines the query to execute.
+// Sum defines the query to execute and computes the sum of the results.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#query-condition-example
 func Sum(refID string, from string, to string) ConditionOption {
 	return func(cond *condition) {
@@ -68,7 +68,7 @@ func Sum(refID string, from string, to string) ConditionOption {
 	}
 }
 
-// Avg defines the query to execute.
+// Count defines the query to execute and counts the results.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#query-condition-example
 func Count(refID string, from string, to string) ConditionOption {
 	return func(cond *condition) {
@@ -77,7 +77,7 @@ func Count(refID string, from string, to string) ConditionOption {
 	}
 }
 
-// Avg defines the query to execute.
+// Last defines the query to execute and takes the last result.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#query-condition-example
 func Last(refID string, from string, to string) ConditionOption {
 	return func(cond *condition) {
@@ -86,7 +86,7 @@ func Last(refID string, from string, to string) ConditionOption {
 	}
 }
 
-// Min defines the query to execute.
+// Min defines the query to execute and takes the smallest result.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#query-condition-example
 func Min(refID string, from string, to string) ConditionOption {
 	return func(cond *condition) {
@@ -95,7 +95,7 @@ func Min(refID string, from string, to string) ConditionOption {
 	}
 }
 
-// Max defines the query to execute.
+// Max defines the query to execute and takes the largest result.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#query-condition-example
 func Max(refID string, from string, to string) ConditionOption {
 	return func(cond *condition) {
@@ -104,7 +104,7 @@ func Max(refID string, from string, to string) ConditionOption {
 	}
 }
 
-// Median defines the query to execute.
+// Median defines the query to execute and computes the mediam of the results.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#query-condition-example
 func Median(refID string, from string, to string) ConditionOption {
 	return func(cond *condition) {
