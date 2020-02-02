@@ -6,6 +6,8 @@ import (
 )
 
 type AggregationType string
+
+// Option represents an option that can be used to configure a table panel.
 type Option func(table *Table)
 
 const AVG AggregationType = "avg"
@@ -19,10 +21,12 @@ type Aggregation struct {
 	Type  AggregationType
 }
 
+// Table represents a table panel.
 type Table struct {
 	Builder *sdk.Panel
 }
 
+// New creates a new table panel.
 func New(title string, options ...Option) *Table {
 	panel := &Table{Builder: sdk.NewTable(title)}
 	empty := ""

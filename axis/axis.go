@@ -4,12 +4,15 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
+// Option represents an option that can be used to configure an axis.
 type Option func(axis *Axis)
 
+// Axis represents a visualization axis.
 type Axis struct {
 	Builder *sdk.Axis
 }
 
+// New creates a new Axis configuration.
 func New(options ...Option) *Axis {
 	axis := &Axis{Builder: &sdk.Axis{
 		Format:  "short",

@@ -7,12 +7,15 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
+// Option represents an option that can be used to configure a row.
 type Option func(row *Row)
 
+// Row represents a dashboard row.
 type Row struct {
 	builder *sdk.Row
 }
 
+// New creates a new row.
 func New(board *sdk.Board, title string, options ...Option) *Row {
 	panel := &Row{builder: board.AddRow(title)}
 

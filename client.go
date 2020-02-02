@@ -16,15 +16,22 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
+// ErrFolderNotFound is returned when the given folder can not be found.
 var ErrFolderNotFound = errors.New("folder not found")
+
+// ErrAlertChannelNotFound is returned when the given alert notification
+// channel can not be found.
 var ErrAlertChannelNotFound = errors.New("alert channel not found")
 
+// Dashboard represents a Grafana dashboard.
 type Dashboard struct {
 	ID  uint   `json:"id"`
 	UID string `json:"uid"`
 	URL string `json:"url"`
 }
 
+// Folder represents a dashboard folder.
+// See https://grafana.com/docs/grafana/latest/reference/dashboard_folders/
 type Folder struct {
 	ID    uint   `json:"id"`
 	UID   string `json:"uid"`
@@ -37,6 +44,7 @@ type Client struct {
 	apiToken string
 }
 
+// NewClient creates a new Grafana HTTP client.
 func NewClient(http *http.Client, host string, apiToken string) *Client {
 	return &Client{
 		http:     http,
