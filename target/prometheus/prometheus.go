@@ -1,7 +1,9 @@
 package prometheus
 
+// Option represents an option that can be used to configure a prometheus query.
 type Option func(target *Prometheus)
 
+// Prometheus represents a prometheus query.
 type Prometheus struct {
 	Ref            string
 	Expr           string
@@ -13,6 +15,7 @@ type Prometheus struct {
 	Format         string
 }
 
+// New creates a new prometheus query.
 func New(query string, options ...Option) *Prometheus {
 	prometheus := &Prometheus{
 		Expr:   query,

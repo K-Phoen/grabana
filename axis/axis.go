@@ -41,6 +41,7 @@ func Hide() Option {
 	}
 }
 
+// LogBase allows to change the logarithmic scale used to display the values.
 func LogBase(base int) Option {
 	return func(axis *Axis) {
 		axis.Builder.LogBase = base
