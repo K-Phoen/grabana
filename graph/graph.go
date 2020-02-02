@@ -26,6 +26,7 @@ const AsNull = "null"
 // Connected connects null values.
 const Connected = "connected"
 
+// LegendOption allows to configure a legend.
 type LegendOption uint16
 
 const (
@@ -37,7 +38,7 @@ const (
 	ToTheRight
 	// Min displays the smallest value of the series.
 	Min
-	// Maxd isplays the largest value of the series.
+	// Max displays the largest value of the series.
 	Max
 	// Avg displays the average of the series.
 	Avg
