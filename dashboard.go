@@ -131,14 +131,14 @@ func TagsAnnotation(annotation TagAnnotation) DashboardBuilderOption {
 	}
 }
 
-// Editable marks the graph as editable.
+// Editable marks the dashboard as editable.
 func Editable() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Editable = true
 	}
 }
 
-// ReadOnly marks the graph as non-editable.
+// ReadOnly marks the dashboard as non-editable.
 func ReadOnly() DashboardBuilderOption {
 	return func(builder *DashboardBuilder) {
 		builder.board.Editable = false

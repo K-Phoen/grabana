@@ -10,7 +10,7 @@ type ErrorMode string
 // Alerting will set the alert state to "alerting".
 const Alerting ErrorMode = "alerting"
 
-// KeepLastState will set the alert state to its previous state.
+// LastState will set the alert state to its previous state.
 const LastState ErrorMode = "keep_state"
 
 // NoDataMode represents the behavior of an alert when no data is returned by

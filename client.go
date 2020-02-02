@@ -38,6 +38,7 @@ type Folder struct {
 	Title string `json:"title"`
 }
 
+// Client represents a Grafana HTTP client.
 type Client struct {
 	http     *http.Client
 	host     string
@@ -53,6 +54,8 @@ func NewClient(http *http.Client, host string, apiToken string) *Client {
 	}
 }
 
+// CreateFolder creates a dashboard folder.
+// See https://grafana.com/docs/grafana/latest/reference/dashboard_folders/
 func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, error) {
 	buf, err := json.Marshal(struct {
 		Title string `json:"title"`
@@ -87,6 +90,7 @@ func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, e
 	return &folder, nil
 }
 
+// GetFolderByTitle finds a folder, given its title.
 func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Folder, error) {
 	resp, err := client.get(ctx, "/api/folders?limit=100")
 	if err != nil {
@@ -118,6 +122,7 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 	return nil, ErrFolderNotFound
 }
 
+// GetAlertChannelByName finds an alert notification channel, given its name.
 func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*alert.Channel, error) {
 	resp, err := client.get(ctx, "/api/alert-notifications")
 	if err != nil {
@@ -149,6 +154,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 	return nil, ErrAlertChannelNotFound
 }
 
+// UpsertDashboard creates or replaces a dashboard, in the given folder.
 func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, builder DashboardBuilder) (*Dashboard, error) {
 	buf, err := json.Marshal(struct {
 		Dashboard *sdk.Board `json:"dashboard"`
