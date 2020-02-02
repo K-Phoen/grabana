@@ -103,7 +103,7 @@ func main() {
 				graph.Height("400px"),
 				graph.DataSource("prometheus-default"),
 				graph.WithPrometheusTarget(
-					"rate(prometheus_http_requests_total[30s])",
+					"rate(promhttp_metric_handler_requests_total[$interval])",
 					prometheus.Legend("{{handler}} - {{ code }}"),
 				),
 			),
@@ -114,6 +114,7 @@ func main() {
 				graph.DataSource("prometheus-default"),
 				graph.WithPrometheusTarget("go_memstats_heap_alloc_bytes", prometheus.Ref("A")),
 				graph.LeftYAxis(axis.Unit("bytes"), axis.Label("memory"), axis.Min(0)),
+				graph.Legend(graph.Current, graph.NoNullSeries, graph.NoZeroSeries, graph.AsTable),
 				graph.Alert(
 					"Too many heap allocations",
 					alert.If(

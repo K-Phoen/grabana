@@ -10,6 +10,71 @@ import (
 // Option represents an option that can be used to configure a graph panel.
 type Option func(graph *Graph)
 
+// DrawMode represents a type of visualization that will be drawn in the graph
+// (lines, bars, points)
+type DrawMode uint8
+
+// NullValue describes how null values are displayed.
+type NullValue string
+
+// AsZero treats null values as zero values.
+const AsZero = "null as zero"
+
+// AsNull treats null values as null.
+const AsNull = "null"
+
+// Connected connects null values.
+const Connected = "connected"
+
+type LegendOption uint16
+
+const (
+	// Hide keeps the legend from being displayed.
+	Hide LegendOption = iota
+	// AsTable displays the legend as a table.
+	AsTable
+	// ToTheRight displays the legend on the right side of the graph.
+	ToTheRight
+	// Min displays the smallest value of the series.
+	Min
+	// Maxd isplays the largest value of the series.
+	Max
+	// Avg displays the average of the series.
+	Avg
+	// Current displays the current value of the series.
+	Current
+	// Total displays the total value of the series.
+	Total
+	// NoNullSeries hides series with only null values from the legend.
+	NoNullSeries
+	// NoZeroSeries hides series with only 0 values from the legend.
+	NoZeroSeries
+)
+
+type legend struct {
+	AlignAsTable bool  `json:"alignAsTable"`
+	Avg          bool  `json:"avg"`
+	Current      bool  `json:"current"`
+	HideEmpty    bool  `json:"hideEmpty"`
+	HideZero     bool  `json:"hideZero"`
+	Max          bool  `json:"max"`
+	Min          bool  `json:"min"`
+	RightSide    bool  `json:"rightSide"`
+	Show         bool  `json:"show"`
+	SideWidth    *uint `json:"sideWidth,omitempty"`
+	Total        bool  `json:"total"`
+	Values       bool  `json:"values"`
+}
+
+const (
+	// Bars will display bars.
+	Bars DrawMode = iota
+	// Lines will display lines.
+	Lines
+	// Points will display points.
+	Points
+)
+
 // Graph represents a graph panel.
 type Graph struct {
 	Builder *sdk.Panel
@@ -21,14 +86,8 @@ func New(title string, options ...Option) *Graph {
 
 	panel.Builder.AliasColors = make(map[string]interface{})
 	panel.Builder.IsNew = false
-	panel.Builder.Lines = true
-	panel.Builder.Linewidth = 1
-	panel.Builder.Fill = 1
 	panel.Builder.Tooltip.Sort = 2
 	panel.Builder.Tooltip.Shared = true
-	panel.Builder.GraphPanel.NullPointMode = "null as zero"
-	panel.Builder.GraphPanel.Lines = true
-	panel.Builder.Span = 6
 
 	for _, opt := range append(defaults(), options...) {
 		opt(panel)
@@ -40,8 +99,13 @@ func New(title string, options ...Option) *Graph {
 func defaults() []Option {
 	return []Option{
 		Editable(),
+		Draw(Lines),
+		Span(6),
+		Fill(1),
+		Null(AsZero),
+		LineWidth(1),
+		Legend(NoZeroSeries, NoNullSeries),
 		defaultAxes(),
-		defaultLegend(),
 	}
 }
 
@@ -54,38 +118,6 @@ func defaultAxes() Option {
 			*axis.New(axis.Hide()).Builder,
 		}
 		graph.Builder.GraphPanel.Xaxis = *axis.New(axis.Unit("time")).Builder
-	}
-}
-
-func defaultLegend() Option {
-	return func(graph *Graph) {
-		graph.Builder.Legend = struct {
-			AlignAsTable bool  `json:"alignAsTable"`
-			Avg          bool  `json:"avg"`
-			Current      bool  `json:"current"`
-			HideEmpty    bool  `json:"hideEmpty"`
-			HideZero     bool  `json:"hideZero"`
-			Max          bool  `json:"max"`
-			Min          bool  `json:"min"`
-			RightSide    bool  `json:"rightSide"`
-			Show         bool  `json:"show"`
-			SideWidth    *uint `json:"sideWidth,omitempty"`
-			Total        bool  `json:"total"`
-			Values       bool  `json:"values"`
-		}{
-			AlignAsTable: false,
-			Avg:          false,
-			Current:      false,
-			HideEmpty:    true,
-			HideZero:     true,
-			Max:          false,
-			Min:          false,
-			RightSide:    false,
-			Show:         true,
-			SideWidth:    nil,
-			Total:        false,
-			Values:       false,
-		}
 	}
 }
 
@@ -168,5 +200,99 @@ func XAxis(opts ...axis.Option) Option {
 func Alert(name string, opts ...alert.Option) Option {
 	return func(graph *Graph) {
 		graph.Builder.Alert = alert.New(name, opts...).Builder
+	}
+}
+
+// Draw specifies how the graph will be drawn.
+func Draw(modes ...DrawMode) Option {
+	return func(graph *Graph) {
+		graph.Builder.Bars = false
+		graph.Builder.Lines = false
+		graph.Builder.Points = false
+
+		for _, mode := range modes {
+			switch mode {
+			case Bars:
+				graph.Builder.Bars = true
+			case Lines:
+				graph.Builder.Lines = true
+			case Points:
+				graph.Builder.Points = true
+			}
+		}
+	}
+}
+
+// Fill defines the amount of color fill for a series (default 1, max 10, 0 is none).
+func Fill(value int) Option {
+	return func(graph *Graph) {
+		graph.Builder.Fill = value
+	}
+}
+
+// LineWidth defines the width of the line for a series (default 1, max 10, 0 is none).
+func LineWidth(value uint) Option {
+	return func(graph *Graph) {
+		graph.Builder.Linewidth = value
+	}
+}
+
+// Staircase draws adjacent points as staircase.
+func Staircase() Option {
+	return func(graph *Graph) {
+		graph.Builder.GraphPanel.SteppedLine = true
+	}
+}
+
+// PointRadius adjusts the size of points when Points are selected as Draw Mode.
+func PointRadius(value int) Option {
+	return func(graph *Graph) {
+		graph.Builder.Pointradius = value
+	}
+}
+
+// Null configures how null values are displayed.
+func Null(mode NullValue) Option {
+	return func(graph *Graph) {
+		graph.Builder.GraphPanel.NullPointMode = string(mode)
+	}
+}
+
+// Legend defines what should be shown in the legend.
+func Legend(opts ...LegendOption) Option {
+	return func(graph *Graph) {
+		legend := legend{Show: true}
+
+		for _, opt := range opts {
+			switch opt {
+			case Hide:
+				legend.Show = false
+			case AsTable:
+				legend.AlignAsTable = true
+			case ToTheRight:
+				legend.RightSide = true
+			case Min:
+				legend.Min = true
+				legend.Values = true
+			case Max:
+				legend.Max = true
+				legend.Values = true
+			case Avg:
+				legend.Avg = true
+				legend.Values = true
+			case Current:
+				legend.Current = true
+				legend.Values = true
+			case Total:
+				legend.Total = true
+				legend.Values = true
+			case NoNullSeries:
+				legend.HideEmpty = true
+			case NoZeroSeries:
+				legend.HideZero = true
+			}
+		}
+
+		graph.Builder.Legend = legend
 	}
 }
