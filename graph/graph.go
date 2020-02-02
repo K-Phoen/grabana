@@ -26,6 +26,46 @@ const AsNull = "null"
 // Connected connects null values.
 const Connected = "connected"
 
+type LegendOption uint16
+
+const (
+	// Hide keeps the legend from being displayed.
+	Hide LegendOption = iota
+	// AsTable displays the legend as a table.
+	AsTable
+	// ToTheRight displays the legend on the right side of the graph.
+	ToTheRight
+	// Min displays the smallest value of the series.
+	Min
+	// Maxd isplays the largest value of the series.
+	Max
+	// Avg displays the average of the series.
+	Avg
+	// Current displays the current value of the series.
+	Current
+	// Total displays the total value of the series.
+	Total
+	// NoNullSeries hides series with only null values from the legend.
+	NoNullSeries
+	// NoZeroSeries hides series with only 0 values from the legend.
+	NoZeroSeries
+)
+
+type legend struct {
+	AlignAsTable bool  `json:"alignAsTable"`
+	Avg          bool  `json:"avg"`
+	Current      bool  `json:"current"`
+	HideEmpty    bool  `json:"hideEmpty"`
+	HideZero     bool  `json:"hideZero"`
+	Max          bool  `json:"max"`
+	Min          bool  `json:"min"`
+	RightSide    bool  `json:"rightSide"`
+	Show         bool  `json:"show"`
+	SideWidth    *uint `json:"sideWidth,omitempty"`
+	Total        bool  `json:"total"`
+	Values       bool  `json:"values"`
+}
+
 const (
 	// Bars will display bars.
 	Bars DrawMode = iota
@@ -64,8 +104,8 @@ func defaults() []Option {
 		Fill(1),
 		Null(AsZero),
 		LineWidth(1),
+		Legend(NoZeroSeries, NoNullSeries),
 		defaultAxes(),
-		defaultLegend(),
 	}
 }
 
@@ -78,38 +118,6 @@ func defaultAxes() Option {
 			*axis.New(axis.Hide()).Builder,
 		}
 		graph.Builder.GraphPanel.Xaxis = *axis.New(axis.Unit("time")).Builder
-	}
-}
-
-func defaultLegend() Option {
-	return func(graph *Graph) {
-		graph.Builder.Legend = struct {
-			AlignAsTable bool  `json:"alignAsTable"`
-			Avg          bool  `json:"avg"`
-			Current      bool  `json:"current"`
-			HideEmpty    bool  `json:"hideEmpty"`
-			HideZero     bool  `json:"hideZero"`
-			Max          bool  `json:"max"`
-			Min          bool  `json:"min"`
-			RightSide    bool  `json:"rightSide"`
-			Show         bool  `json:"show"`
-			SideWidth    *uint `json:"sideWidth,omitempty"`
-			Total        bool  `json:"total"`
-			Values       bool  `json:"values"`
-		}{
-			AlignAsTable: false,
-			Avg:          false,
-			Current:      false,
-			HideEmpty:    true,
-			HideZero:     true,
-			Max:          false,
-			Min:          false,
-			RightSide:    false,
-			Show:         true,
-			SideWidth:    nil,
-			Total:        false,
-			Values:       false,
-		}
 	}
 }
 
@@ -247,5 +255,44 @@ func PointRadius(value int) Option {
 func Null(mode NullValue) Option {
 	return func(graph *Graph) {
 		graph.Builder.GraphPanel.NullPointMode = string(mode)
+	}
+}
+
+// Legend defines what should be shown in the legend.
+func Legend(opts ...LegendOption) Option {
+	return func(graph *Graph) {
+		legend := legend{Show: true}
+
+		for _, opt := range opts {
+			switch opt {
+			case Hide:
+				legend.Show = false
+			case AsTable:
+				legend.AlignAsTable = true
+			case ToTheRight:
+				legend.RightSide = true
+			case Min:
+				legend.Min = true
+				legend.Values = true
+			case Max:
+				legend.Max = true
+				legend.Values = true
+			case Avg:
+				legend.Avg = true
+				legend.Values = true
+			case Current:
+				legend.Current = true
+				legend.Values = true
+			case Total:
+				legend.Total = true
+				legend.Values = true
+			case NoNullSeries:
+				legend.HideEmpty = true
+			case NoZeroSeries:
+				legend.HideZero = true
+			}
+		}
+
+		graph.Builder.Legend = legend
 	}
 }

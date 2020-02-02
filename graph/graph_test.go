@@ -150,3 +150,88 @@ func TestNullValueModeCanBeConfigured(t *testing.T) {
 
 	req.Equal("null", panel.Builder.GraphPanel.NullPointMode)
 }
+
+func TestLegendCanBeHidden(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Hide))
+
+	req.False(panel.Builder.Legend.Show)
+}
+
+func TestLegendCanBeShownToTheRight(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(ToTheRight))
+
+	req.True(panel.Builder.Legend.RightSide)
+}
+
+func TestLegendCanBeDisplayedAsATable(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(AsTable))
+
+	req.True(panel.Builder.Legend.AlignAsTable)
+}
+
+func TestLegendCanShowAvg(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Avg))
+
+	req.True(panel.Builder.Legend.Avg)
+	req.True(panel.Builder.Legend.Values)
+}
+
+func TestLegendCanShowMin(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Min))
+
+	req.True(panel.Builder.Legend.Min)
+	req.True(panel.Builder.Legend.Values)
+}
+
+func TestLegendCanShowMax(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Max))
+
+	req.True(panel.Builder.Legend.Max)
+	req.True(panel.Builder.Legend.Values)
+}
+
+func TestLegendCanShowCurrent(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Current))
+
+	req.True(panel.Builder.Legend.Current)
+	req.True(panel.Builder.Legend.Values)
+}
+
+func TestLegendCanShowTotal(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Total))
+
+	req.True(panel.Builder.Legend.Total)
+	req.True(panel.Builder.Legend.Values)
+}
+
+func TestLegendCanHideZeroSeries(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(NoZeroSeries))
+
+	req.True(panel.Builder.Legend.HideZero)
+}
+
+func TestLegendCanHideNullSeries(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(NoNullSeries))
+
+	req.True(panel.Builder.Legend.HideEmpty)
+}
