@@ -4,12 +4,15 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
+// Option represents an option that can be used to configure a text panel.
 type Option func(text *Text)
 
+// Text represents a text panel.
 type Text struct {
 	Builder *sdk.Panel
 }
 
+// New creates a new text panel.
 func New(title string, options ...Option) *Text {
 	panel := &Text{Builder: sdk.NewText(title)}
 

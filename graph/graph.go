@@ -7,12 +7,15 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
+// Option represents an option that can be used to configure a graph panel.
 type Option func(graph *Graph)
 
+// Graph represents a graph panel.
 type Graph struct {
 	Builder *sdk.Panel
 }
 
+// New creates a new graph panel.
 func New(title string, options ...Option) *Graph {
 	panel := &Graph{Builder: sdk.NewGraph(title)}
 
@@ -86,6 +89,7 @@ func defaultLegend() Option {
 	}
 }
 
+// WithPrometheusTarget adds a prometheus query to the graph.
 func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	target := prometheus.New(query, options...)
 

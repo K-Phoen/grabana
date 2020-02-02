@@ -5,13 +5,26 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
-type AggregationType string
+// Option represents an option that can be used to configure a table panel.
 type Option func(table *Table)
 
+// AggregationType represents an aggregation function used on values returned
+// by the query.
+type AggregationType string
+
+// AVG aggregates results by computing the average.
 const AVG AggregationType = "avg"
+
+// AVG aggregates results by counting them.
 const Count AggregationType = "count"
+
+// AVG aggregates results by keeping only the current value.
 const Current AggregationType = "current"
+
+// AVG aggregates results by keeping only the smallest value.
 const Min AggregationType = "min"
+
+// AVG aggregates results by keeping only the largest value.
 const Max AggregationType = "max"
 
 type Aggregation struct {
@@ -19,10 +32,12 @@ type Aggregation struct {
 	Type  AggregationType
 }
 
+// Table represents a table panel.
 type Table struct {
 	Builder *sdk.Panel
 }
 
+// New creates a new table panel.
 func New(title string, options ...Option) *Table {
 	panel := &Table{Builder: sdk.NewTable(title)}
 	empty := ""

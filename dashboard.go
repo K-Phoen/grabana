@@ -18,12 +18,16 @@ type TagAnnotation struct {
 	Tags       []string
 }
 
+// DashboardBuilderOption represents an option that can be used to configure a
+// dashboard.
 type DashboardBuilderOption func(dashboard *DashboardBuilder)
 
+// DashboardBuilder is the main builder used to configure dashboards.
 type DashboardBuilder struct {
 	board *sdk.Board
 }
 
+// NewDashboardBuilder creates a new dashboard builder.
 func NewDashboardBuilder(title string, options ...DashboardBuilderOption) DashboardBuilder {
 	board := sdk.NewBoard(title)
 	board.ID = 0
