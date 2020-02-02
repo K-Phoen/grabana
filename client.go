@@ -11,11 +11,25 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/K-Phoen/grabana/alert"
+
 	"github.com/grafana-tools/sdk"
 )
 
 var ErrFolderNotFound = errors.New("folder not found")
 var ErrAlertChannelNotFound = errors.New("alert channel not found")
+
+type Dashboard struct {
+	ID  uint   `json:"id"`
+	UID string `json:"uid"`
+	URL string `json:"url"`
+}
+
+type Folder struct {
+	ID    uint   `json:"id"`
+	UID   string `json:"uid"`
+	Title string `json:"title"`
+}
 
 type Client struct {
 	http     *http.Client
@@ -96,7 +110,7 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 	return nil, ErrFolderNotFound
 }
 
-func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*AlertChannel, error) {
+func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*alert.Channel, error) {
 	resp, err := client.get(ctx, "/api/alert-notifications")
 	if err != nil {
 		return nil, err
@@ -113,7 +127,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 		return nil, fmt.Errorf("could lookup alert channels: %s (HTTP status %d)", body, resp.StatusCode)
 	}
 
-	var channels []AlertChannel
+	var channels []alert.Channel
 	if err := decodeJSON(resp.Body, &channels); err != nil {
 		return nil, err
 	}
