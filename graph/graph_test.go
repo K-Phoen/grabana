@@ -142,3 +142,11 @@ func TestPointRadiusCanBeConfigured(t *testing.T) {
 
 	req.Equal(3, panel.Builder.Pointradius)
 }
+
+func TestNullValueModeCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Null(AsNull))
+
+	req.Equal("null", panel.Builder.GraphPanel.NullPointMode)
+}

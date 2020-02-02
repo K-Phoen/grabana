@@ -14,6 +14,18 @@ type Option func(graph *Graph)
 // (lines, bars, points)
 type DrawMode uint8
 
+// NullValue describes how null values are displayed.
+type NullValue string
+
+// AsZero treats null values as zero values.
+const AsZero = "null as zero"
+
+// AsNull treats null values as null.
+const AsNull = "null"
+
+// Connected connects null values.
+const Connected = "connected"
+
 const (
 	// Bars will display bars.
 	Bars DrawMode = iota
@@ -36,7 +48,6 @@ func New(title string, options ...Option) *Graph {
 	panel.Builder.IsNew = false
 	panel.Builder.Tooltip.Sort = 2
 	panel.Builder.Tooltip.Shared = true
-	panel.Builder.GraphPanel.NullPointMode = "null as zero"
 
 	for _, opt := range append(defaults(), options...) {
 		opt(panel)
@@ -51,6 +62,7 @@ func defaults() []Option {
 		Draw(Lines),
 		Span(6),
 		Fill(1),
+		Null(AsZero),
 		LineWidth(1),
 		defaultAxes(),
 		defaultLegend(),
@@ -228,5 +240,12 @@ func Staircase() Option {
 func PointRadius(value int) Option {
 	return func(graph *Graph) {
 		graph.Builder.Pointradius = value
+	}
+}
+
+// Null configures how null values are displayed.
+func Null(mode NullValue) Option {
+	return func(graph *Graph) {
+		graph.Builder.GraphPanel.NullPointMode = string(mode)
 	}
 }
