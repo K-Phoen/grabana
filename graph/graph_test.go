@@ -91,3 +91,12 @@ func TestXAxisCanBeConfigured(t *testing.T) {
 
 	req.False(panel.Builder.Xaxis.Show)
 }
+
+func TestAlertsCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Alert("some alert"))
+
+	req.NotNil(panel.Builder.Alert)
+	req.Equal("some alert", panel.Builder.Alert.Name)
+}

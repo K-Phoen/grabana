@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/K-Phoen/grabana/table"
-
 	"github.com/K-Phoen/grabana"
+	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/variable/constant"
@@ -43,6 +43,12 @@ func main() {
 		}
 
 		fmt.Printf("Folder created (id: %d, uid: %s)\n", folder.ID, folder.UID)
+	}
+
+	channel, err := client.GetAlertChannelByName(ctx, "Mail")
+	if err != nil {
+		fmt.Printf("Could not find notification channel 'Mail': %s\n", err)
+		os.Exit(1)
 	}
 
 	dashboard := grabana.NewDashboardBuilder(
@@ -106,8 +112,19 @@ func main() {
 				graph.Span(6),
 				graph.Height("400px"),
 				graph.DataSource("prometheus-default"),
-				graph.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
+				graph.WithPrometheusTarget("go_memstats_heap_alloc_bytes", prometheus.Ref("A")),
 				graph.LeftYAxis(axis.Unit("bytes"), axis.Label("memory"), axis.Min(0)),
+				graph.Alert(
+					"Too many heap allocations",
+					alert.If(
+						alert.And,
+						alert.Avg("A", "1m", "now"),
+						alert.IsAbove(35000000),
+					),
+					alert.EvaluateEvery("1m"),
+					alert.For("1m"),
+					alert.Notification(channel),
+				),
 			),
 			row.WithTable(
 				"Threads",

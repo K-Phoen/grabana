@@ -3,6 +3,7 @@ package prometheus
 type Option func(target *Prometheus)
 
 type Prometheus struct {
+	Ref            string
 	Expr           string
 	IntervalFactor int
 	Interval       string
@@ -29,5 +30,12 @@ func New(query string, options ...Option) *Prometheus {
 func Legend(legend string) Option {
 	return func(prometheus *Prometheus) {
 		prometheus.LegendFormat = legend
+	}
+}
+
+// Ref sets the reference ID for this query.
+func Ref(ref string) Option {
+	return func(prometheus *Prometheus) {
+		prometheus.Ref = ref
 	}
 }

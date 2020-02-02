@@ -9,12 +9,6 @@ import (
 	"github.com/grafana-tools/sdk"
 )
 
-type Dashboard struct {
-	ID  uint   `json:"id"`
-	UID string `json:"uid"`
-	URL string `json:"url"`
-}
-
 // TagAnnotation describes an annotation represented as a Tag.
 // See https://grafana.com/docs/grafana/latest/reference/annotations/#query-by-tag
 type TagAnnotation struct {

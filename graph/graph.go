@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/grafana-tools/sdk"
@@ -90,6 +91,7 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 
 	return func(graph *Graph) {
 		graph.Builder.AddTarget(&sdk.Target{
+			RefID:          target.Ref,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
 			Interval:       target.Interval,
@@ -155,5 +157,12 @@ func RightYAxis(opts ...axis.Option) Option {
 func XAxis(opts ...axis.Option) Option {
 	return func(graph *Graph) {
 		graph.Builder.GraphPanel.Xaxis = *axis.New(opts...).Builder
+	}
+}
+
+// Alert creates an alert for this graph.
+func Alert(name string, opts ...alert.Option) Option {
+	return func(graph *Graph) {
+		graph.Builder.Alert = alert.New(name, opts...).Builder
 	}
 }
