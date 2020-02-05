@@ -2,6 +2,7 @@ package row
 
 import (
 	"github.com/K-Phoen/grabana/graph"
+	"github.com/K-Phoen/grabana/singlestat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/grafana-tools/sdk"
@@ -38,6 +39,15 @@ func WithGraph(title string, options ...graph.Option) Option {
 		graphPanel := graph.New(title, options...)
 
 		row.builder.Add(graphPanel.Builder)
+	}
+}
+
+// WithSingleStat adds a "single stat" panel in the row.
+func WithSingleStat(title string, options ...singlestat.Option) Option {
+	return func(row *Row) {
+		singleStatPanel := singlestat.New(title, options...)
+
+		row.builder.Add(singleStatPanel.Builder)
 	}
 }
 
