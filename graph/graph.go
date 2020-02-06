@@ -14,17 +14,28 @@ type Option func(graph *Graph)
 // (lines, bars, points)
 type DrawMode uint8
 
+const (
+	// Bars will display bars.
+	Bars DrawMode = iota
+	// Lines will display lines.
+	Lines
+	// Points will display points.
+	Points
+)
+
 // NullValue describes how null values are displayed.
 type NullValue string
 
-// AsZero treats null values as zero values.
-const AsZero = "null as zero"
+const (
+	// AsZero treats null values as zero values.
+	AsZero NullValue = "null as zero"
 
-// AsNull treats null values as null.
-const AsNull = "null"
+	// AsNull treats null values as null.
+	AsNull NullValue = "null"
 
-// Connected connects null values.
-const Connected = "connected"
+	// Connected connects null values.
+	Connected NullValue = "connected"
+)
 
 // LegendOption allows to configure a legend.
 type LegendOption uint16
@@ -66,15 +77,6 @@ type legend struct {
 	Total        bool  `json:"total"`
 	Values       bool  `json:"values"`
 }
-
-const (
-	// Bars will display bars.
-	Bars DrawMode = iota
-	// Lines will display lines.
-	Lines
-	// Points will display points.
-	Points
-)
 
 // Graph represents a graph panel.
 type Graph struct {

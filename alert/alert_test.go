@@ -28,7 +28,7 @@ func TestNotificationCanBeSet(t *testing.T) {
 	req := require.New(t)
 	channel := &Channel{ID: 1, UID: "channel"}
 
-	a := New("", Notification(channel))
+	a := New("", Notify(channel))
 
 	req.Len(a.Builder.Notifications, 1)
 	req.Equal("channel", a.Builder.Notifications[0].UID)

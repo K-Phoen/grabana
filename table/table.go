@@ -12,20 +12,22 @@ type Option func(table *Table)
 // by the query.
 type AggregationType string
 
-// AVG aggregates results by computing the average.
-const AVG AggregationType = "avg"
+const (
+	// AVG aggregates results by computing the average.
+	AVG AggregationType = "avg"
 
-// Count aggregates results by counting them.
-const Count AggregationType = "count"
+	// Count aggregates results by counting them.
+	Count AggregationType = "count"
 
-// Current aggregates results by keeping only the current value.
-const Current AggregationType = "current"
+	// Current aggregates results by keeping only the current value.
+	Current AggregationType = "current"
 
-// Min aggregates results by keeping only the smallest value.
-const Min AggregationType = "min"
+	// Min aggregates results by keeping only the smallest value.
+	Min AggregationType = "min"
 
-// Max aggregates results by keeping only the largest value.
-const Max AggregationType = "max"
+	// Max aggregates results by keeping only the largest value.
+	Max AggregationType = "max"
+)
 
 // Aggregation configures how to display an aggregate in the table.
 type Aggregation struct {
