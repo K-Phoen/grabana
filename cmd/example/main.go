@@ -133,14 +133,8 @@ func main() {
 				table.WithPrometheusTarget("go_threads"),
 				table.HideColumn("Time"),
 				table.AsTimeSeriesAggregations([]table.Aggregation{
-					{
-						Label: "AVG",
-						Type:  table.AVG,
-					},
-					{
-						Label: "Current",
-						Type:  table.Current,
-					},
+					{Label: "AVG", Type: table.AVG},
+					{Label: "Current", Type: table.Current},
 				}),
 			),
 			row.WithSingleStat(
