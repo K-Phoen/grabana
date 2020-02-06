@@ -48,41 +48,58 @@ const (
 	Range StatType = "range"
 )
 
+// ValueMap allows to map a value into explicit text.
 type ValueMap struct {
-	Text  string
 	Value string
+	Text  string
 }
+
+// RangeMap allows to map a range of values into explicit text.
+type RangeMap struct {
+	From string
+	To   string
+	Text string
+}
+
+// nolint: gochecknoglobals
+var valueToTextMapping = 1
+
+// nolint: gochecknoglobals
+var rangeToTextMapping = 2
 
 // SingleStat represents a single stat panel.
 type SingleStat struct {
 	Builder *sdk.Panel
 }
 
-func strPtr(input string) *string {
-	return &input
-}
-
-func intPtr(input int) *int {
-	return &input
-}
-
 // New creates a new single stat panel.
 func New(title string, options ...Option) *SingleStat {
 	panel := &SingleStat{Builder: sdk.NewSinglestat(title)}
 
+	valueToText := "value to text"
+	rangeToText := "range to text"
+
 	panel.Builder.IsNew = false
-	mappingType := uint(1)
+	mappingType := uint(valueToTextMapping)
 	panel.Builder.MappingType = &mappingType
 	panel.Builder.MappingTypes = []*sdk.MapType{
 		{
-			Name:  strPtr("value to text"),
-			Value: intPtr(1),
+			Name:  &valueToText,
+			Value: &valueToTextMapping,
 		},
 		{
-			Name:  strPtr("range to text"),
-			Value: intPtr(2),
+			Name:  &rangeToText,
+			Value: &rangeToTextMapping,
 		},
 	}
+	panel.Builder.SparkLine = struct {
+		FillColor *string  `json:"fillColor,omitempty"`
+		Full      bool     `json:"full,omitempty"`
+		LineColor *string  `json:"lineColor,omitempty"`
+		Show      bool     `json:"show,omitempty"`
+		YMin      *float64 `json:"ymin,omitempty"`
+		YMax      *float64 `json:"ymax,omitempty"`
+	}{}
 
 	for _, opt := range append(defaults(), options...) {
 		opt(panel)
@@ -98,12 +115,14 @@ func defaults() []Option {
 		ValueFontSize("100%"),
 		ValueType(Avg),
 		Colors([3]string{"#299c46", "rgba(237, 129, 40, 0.89)", "#d44a3a"}),
-		MapValuesToText([]ValueMap{
+		ValuesToText([]ValueMap{
 			{
-				Text:  "N/A",
 				Value: "null",
+				Text:  "N/A",
 			},
 		}),
+		SparkLineColor("rgb(31, 120, 193)"),
+		SparkLineFillColor("rgba(31, 118, 189, 0.18)"),
 	}
 }
 
@@ -168,67 +187,129 @@ func Unit(unit string) Option {
 	}
 }
 
+// SparkLine displays the spark line summary of the series in addition to the
+// single stat.
+func SparkLine() Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.SparkLine.Show = true
+		singleStat.Builder.SparkLine.Full = false
+	}
+}
+
+// FullSparkLine displays a full height spark line summary of the series in
+// addition to the single stat.
+func FullSparkLine() Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.SparkLine.Show = true
+		singleStat.Builder.SparkLine.Full = true
+	}
+}
+
+// SparkLineColor sets the line color of the spark line.
+func SparkLineColor(color string) Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.SparkLine.LineColor = &color
+	}
+}
+
+// SparkLineFillColor sets the color the spark line will be filled with.
+func SparkLineFillColor(color string) Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.SparkLine.FillColor = &color
+	}
+}
+
+// SparkLineYMin defines the smallest value expected on the Y axis of the spark line.
+func SparkLineYMin(value float64) Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.SparkLine.YMin = &value
+	}
+}
+
+// SparkLineYMax defines the largest value expected on the Y axis of the spark line.
+func SparkLineYMax(value float64) Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.SparkLine.YMax = &value
+	}
+}
+
+// ValueType configures how the series will be reduced to a single value.
 func ValueType(valueType StatType) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.ValueName = string(valueType)
 	}
 }
 
+// ValueFontSize sets the font size used to display the value (eg: "100%").
 func ValueFontSize(size string) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.ValueFontSize = size
 	}
 }
 
+// Postfix sets the text used as prefix of the value.
 func Prefix(prefix string) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.Prefix = &prefix
 	}
 }
 
+// PrefixFontSize sets the size used for the prefix text (eg: "110%").
 func PrefixFontSize(size string) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.PrefixFontSize = &size
 	}
 }
 
+// Postfix sets the text used as postfix of the value.
 func Postfix(postfix string) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.Postfix = &postfix
 	}
 }
 
+// PostfixFontSize sets the size used for the postfix text (eg: "110%")
 func PostfixFontSize(size string) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.PostfixFontSize = &size
 	}
 }
 
+// ColorBackground will show the threshold's colors on the value itself.
 func ColorValue() Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.ColorValue = true
 	}
 }
 
+// ColorBackground will show the threshold's colors in the background.
 func ColorBackground() Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.ColorBackground = true
 	}
 }
 
-func Thresholds(values []string) Option {
+// Thresholds change the background and value colors dynamically within the
+// panel, depending on the Singlestat value. The threshold is defined by 2
+// values which represent 3 ranges that correspond to the three colors directly
+// to the right.
+func Thresholds(values [2]string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.SinglestatPanel.Thresholds = strings.Join(values, ",")
+		singleStat.Builder.SinglestatPanel.Thresholds = strings.Join([]string{values[0], values[1]}, ",")
 	}
 }
 
+// Colors define which colors will be applied to the single value based on the
+// threshold levels.
 func Colors(values [3]string) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.SinglestatPanel.Colors = []string{values[0], values[1], values[2]}
 	}
 }
 
-func MapValuesToText(mapping []ValueMap) Option {
+// ValuesToText allows to translate the value of the summary stat into explicit
+// text.
+func ValuesToText(mapping []ValueMap) Option {
 	return func(singleStat *SingleStat) {
 		valueMap := make([]sdk.ValueMap, 0, len(mapping))
 
@@ -240,8 +321,28 @@ func MapValuesToText(mapping []ValueMap) Option {
 			})
 		}
 
-		mappingType := uint(1)
+		mappingType := uint(valueToTextMapping)
 		singleStat.Builder.MappingType = &mappingType
 		singleStat.Builder.ValueMaps = valueMap
+	}
+}
+
+// RangesToText allows to translate the value of the summary stat into explicit
+// text.
+func RangesToText(mapping []RangeMap) Option {
+	return func(singleStat *SingleStat) {
+		rangeMap := make([]*sdk.RangeMap, 0, len(mapping))
+
+		for i := range mapping {
+			rangeMap = append(rangeMap, &sdk.RangeMap{
+				From: &mapping[i].From,
+				To:   &mapping[i].To,
+				Text: &mapping[i].Text,
+			})
+		}
+
+		mappingType := uint(rangeToTextMapping)
+		singleStat.Builder.MappingType = &mappingType
+		singleStat.Builder.RangeMaps = rangeMap
 	}
 }

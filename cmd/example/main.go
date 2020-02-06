@@ -148,7 +148,7 @@ func main() {
 				singlestat.Unit("bytes"),
 				singlestat.ColorValue(),
 				singlestat.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
-				singlestat.Thresholds([]string{"24000000", "26000000", "28000000"}),
+				singlestat.Thresholds([2]string{"26000000", "28000000"}),
 			),
 		),
 		grabana.Row(
