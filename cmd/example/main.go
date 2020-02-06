@@ -125,7 +125,7 @@ func main() {
 					),
 					alert.EvaluateEvery("1m"),
 					alert.For("1m"),
-					alert.Notification(channel),
+					alert.Notify(channel),
 				),
 			),
 			row.WithTable(

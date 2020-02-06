@@ -10,39 +10,43 @@ type Option func(constant *Query)
 // SortOrder represents the ordering method applied to values.
 type SortOrder int
 
-// None will preserve the results ordering as returned by the query.
-const None SortOrder = 0
+const (
+	// None will preserve the results ordering as returned by the query.
+	None SortOrder = 0
 
-// AlphabeticalAsc will sort the results by ascending alphabetical order.
-const AlphabeticalAsc SortOrder = 1
+	// AlphabeticalAsc will sort the results by ascending alphabetical order.
+	AlphabeticalAsc SortOrder = 1
 
-// AlphabeticalDesc will sort the results by descending alphabetical order.
-const AlphabeticalDesc SortOrder = 2
+	// AlphabeticalDesc will sort the results by descending alphabetical order.
+	AlphabeticalDesc SortOrder = 2
 
-// NumericalAsc will sort the results by ascending numerical order.
-const NumericalAsc SortOrder = 3
+	// NumericalAsc will sort the results by ascending numerical order.
+	NumericalAsc SortOrder = 3
 
-// NumericalDesc will sort the results by descending numerical order.
-const NumericalDesc SortOrder = 4
+	// NumericalDesc will sort the results by descending numerical order.
+	NumericalDesc SortOrder = 4
 
-// AlphabeticalNoCaseAsc will sort the results by ascending alphabetical order, case-insensitive.
-const AlphabeticalNoCaseAsc SortOrder = 5
+	// AlphabeticalNoCaseAsc will sort the results by ascending alphabetical order, case-insensitive.
+	AlphabeticalNoCaseAsc SortOrder = 5
 
-// AlphabeticalNoCaseDesc will sort the results by descending alphabetical order, case-insensitive.
-const AlphabeticalNoCaseDesc SortOrder = 6
+	// AlphabeticalNoCaseDesc will sort the results by descending alphabetical order, case-insensitive.
+	AlphabeticalNoCaseDesc SortOrder = 6
+)
 
 // RefreshInterval represents the interval at which the results of a query will
 // be refreshed.
 type RefreshInterval int
 
-// Never will prevent the results from being refreshed.
-const Never RefreshInterval = 0
+const (
+	// Never will prevent the results from being refreshed.
+	Never = 0
 
-// DashboardLoad will refresh the results every time the dashboard is loaded.
-const DashboardLoad RefreshInterval = 1
+	// DashboardLoad will refresh the results every time the dashboard is loaded.
+	DashboardLoad = 1
 
-// TimeChange will refresh the results every time the time interval changes.
-const TimeChange RefreshInterval = 2
+	// TimeChange will refresh the results every time the time interval changes.
+	TimeChange = 2
+)
 
 // Query represents a "query" templated variable.
 type Query struct {
