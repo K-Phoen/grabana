@@ -27,6 +27,7 @@ const Min AggregationType = "min"
 // Max aggregates results by keeping only the largest value.
 const Max AggregationType = "max"
 
+// Aggregation configures how to display an aggregate in the table.
 type Aggregation struct {
 	Label string
 	Type  AggregationType
