@@ -247,7 +247,7 @@ func ValueFontSize(size string) Option {
 	}
 }
 
-// Postfix sets the text used as prefix of the value.
+// Prefix sets the text used as prefix of the value.
 func Prefix(prefix string) Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.Prefix = &prefix
@@ -275,7 +275,7 @@ func PostfixFontSize(size string) Option {
 	}
 }
 
-// ColorBackground will show the threshold's colors on the value itself.
+// ColorValue will show the threshold's colors on the value itself.
 func ColorValue() Option {
 	return func(singleStat *SingleStat) {
 		singleStat.Builder.ColorValue = true
