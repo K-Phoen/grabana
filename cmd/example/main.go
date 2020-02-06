@@ -11,6 +11,7 @@ import (
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/singlestat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
@@ -141,6 +142,13 @@ func main() {
 						Type:  table.Current,
 					},
 				}),
+			),
+			row.WithSingleStat(
+				"Heap Allocations",
+				singlestat.Unit("bytes"),
+				singlestat.ColorValue(),
+				singlestat.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
+				singlestat.Thresholds([2]string{"26000000", "28000000"}),
 			),
 		),
 		grabana.Row(

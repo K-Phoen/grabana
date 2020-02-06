@@ -43,7 +43,6 @@ func New(title string, options ...Option) *Table {
 	empty := ""
 
 	panel.Builder.IsNew = false
-	panel.Builder.Span = 6
 	panel.Builder.TablePanel.Styles = []sdk.ColumnStyle{
 		{
 			Alias:   &empty,
@@ -62,6 +61,7 @@ func New(title string, options ...Option) *Table {
 func defaults() []Option {
 	return []Option{
 		Editable(),
+		Span(6),
 		TimeSeriesToRows(),
 	}
 }
