@@ -1,6 +1,8 @@
 package grabana
 
 import (
+	"encoding/json"
+
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
@@ -66,6 +68,16 @@ func defaultTimePicker() DashboardBuilderOption {
 			TimeOptions:      []string{"5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"},
 		}
 	}
+}
+
+// MarshalJSON implements the encoding/json.Marshaler interface.
+//
+// This method can be used to render the dashboard into a JSON file
+// which your configuration management tool of choice can then feed into
+// Grafana's dashboard via its provisioning support.
+// See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+func (builder *DashboardBuilder) MarshalJSON() ([]byte, error) {
+	return json.Marshal(builder.board)
 }
 
 // VariableAsConst adds a templated variable, defined as a set of constant
