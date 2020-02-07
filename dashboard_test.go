@@ -1,10 +1,18 @@
 package grabana
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func requireJSON(t *testing.T, payload []byte) {
+	var receiver map[string]interface{}
+	if err := json.Unmarshal(payload, &receiver); err != nil {
+		t.Fatalf("invalid json: %s", err)
+	}
+}
 
 func TestNewDashboardsCanBeCreated(t *testing.T) {
 	req := require.New(t)
@@ -19,6 +27,16 @@ func TestNewDashboardsCanBeCreated(t *testing.T) {
 	req.NotEmpty(panel.board.Timepicker.TimeOptions)
 	req.NotEmpty(panel.board.Time.From)
 	req.NotEmpty(panel.board.Time.To)
+}
+
+func TestDashboardCanBeMarshalledIntoJSON(t *testing.T) {
+	req := require.New(t)
+
+	builder := NewDashboardBuilder("Awesome dashboard")
+	dashboardJSON, err := builder.MarshalJSON()
+
+	req.NoError(err)
+	requireJSON(t, dashboardJSON)
 }
 
 func TestDashboardCanBeMadeEditable(t *testing.T) {
