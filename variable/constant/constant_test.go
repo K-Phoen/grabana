@@ -53,6 +53,7 @@ func TestDefaultValueCanBeSet(t *testing.T) {
 	panel := New("const", Default("99th"))
 
 	req.Equal("99th", panel.Builder.Current.Text)
+	req.Equal("99th", panel.Builder.Current.Value)
 }
 
 func TestLabelCanBeHidden(t *testing.T) {

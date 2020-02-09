@@ -43,7 +43,8 @@ func Values(values ValuesList) Option {
 func Default(value string) Option {
 	return func(interval *Interval) {
 		interval.Builder.Current = sdk.Current{
-			Text: value,
+			Text:  value,
+			Value: value,
 		}
 	}
 }

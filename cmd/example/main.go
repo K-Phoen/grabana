@@ -84,7 +84,7 @@ func main() {
 				"95th": "95",
 				"99th": "99",
 			}),
-			constant.Default("80th"),
+			constant.Default("80"),
 		),
 		grabana.VariableAsCustom(
 			"vX",
