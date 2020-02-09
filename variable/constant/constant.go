@@ -1,6 +1,8 @@
 package constant
 
 import (
+	"strings"
+
 	"github.com/grafana-tools/sdk"
 )
 
@@ -10,9 +12,30 @@ type Option func(constant *Constant)
 // ValuesMap represent a "label" to "value" map of options for a constant variable.
 type ValuesMap map[string]string
 
+func (values ValuesMap) asQuery() string {
+	valuesList := make([]string, 0, len(values))
+
+	for _, value := range values {
+		valuesList = append(valuesList, value)
+	}
+
+	return strings.Join(valuesList, ",")
+}
+
+func (values ValuesMap) labelFor(value string) string {
+	for label, val := range values {
+		if val == value {
+			return label
+		}
+	}
+
+	return value
+}
+
 // Constant represents a "constant" templated variable.
 type Constant struct {
 	Builder sdk.TemplateVar
+	values  ValuesMap
 }
 
 // New creates a new "constant" templated variable.
@@ -39,6 +62,9 @@ func Values(values ValuesMap) Option {
 				Value: value,
 			})
 		}
+
+		constant.values = values
+		constant.Builder.Query = values.asQuery()
 	}
 }
 
@@ -46,7 +72,8 @@ func Values(values ValuesMap) Option {
 func Default(value string) Option {
 	return func(constant *Constant) {
 		constant.Builder.Current = sdk.Current{
-			Text: value,
+			Text:  constant.values.labelFor(value),
+			Value: value,
 		}
 	}
 }
