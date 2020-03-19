@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/K-Phoen/grabana/variable/interval"
 	"gopkg.in/yaml.v2"
 )
 
@@ -26,11 +27,21 @@ type dashboardYaml struct {
 	Editable        bool
 	SharedCrosshair bool `yaml:"shared_crosshair"`
 	Tags            []string
-	AutoRefresh     string          `yaml:"auto_refresh"`
-	TagsAnnotation  []TagAnnotation `yaml:"tags_annotations"`
+	AutoRefresh     string `yaml:"auto_refresh"`
+
+	TagsAnnotation []TagAnnotation `yaml:"tags_annotations"`
+	Variables      []dashboardVariable
+}
+
+type dashboardVariable struct {
+	Type   string
+	Name   string
+	Label  string
+	Values []string
 }
 
 func (dashboard *dashboardYaml) toDashboardBuilder() (DashboardBuilder, error) {
+	emptyDashboard := DashboardBuilder{}
 	opts := []DashboardBuilderOption{
 		dashboard.editable(),
 		dashboard.sharedCrossHair(),
@@ -46,6 +57,15 @@ func (dashboard *dashboardYaml) toDashboardBuilder() (DashboardBuilder, error) {
 
 	for _, tagAnnotation := range dashboard.TagsAnnotation {
 		opts = append(opts, TagsAnnotation(tagAnnotation))
+	}
+
+	for _, variable := range dashboard.Variables {
+		opt, err := variable.toOption()
+		if err != nil {
+			return emptyDashboard, err
+		}
+
+		opts = append(opts, opt)
 	}
 
 	return NewDashboardBuilder(dashboard.Title, opts...), nil
@@ -65,4 +85,25 @@ func (dashboard *dashboardYaml) editable() DashboardBuilderOption {
 	}
 
 	return ReadOnly()
+}
+
+func (variable *dashboardVariable) toOption() (DashboardBuilderOption, error) {
+	switch variable.Type {
+	case "interval":
+		return variable.asInterval(), nil
+	}
+
+	return nil, fmt.Errorf("unknown dashboard variable type '%s'", variable.Type)
+}
+
+func (variable *dashboardVariable) asInterval() DashboardBuilderOption {
+	opts := []interval.Option{
+		interval.Values(variable.Values),
+	}
+
+	if variable.Label != "" {
+		opts = append(opts, interval.Label(variable.Label))
+	}
+
+	return VariableAsInterval(variable.Name, opts...)
 }
