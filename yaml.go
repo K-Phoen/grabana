@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
 	"gopkg.in/yaml.v2"
@@ -37,8 +38,14 @@ type dashboardVariable struct {
 	Name  string
 	Label string
 
-	// used for "interval" and "const"
+	// used for "interval", "const" and "custom"
+	Default string
+
+	// used for "interval"
 	Values []string
+
+	// used for "const" and "custom"
+	ValuesMap map[string]string `yaml:"values_map"`
 
 	// used for "query"
 	Datasource string
@@ -98,6 +105,8 @@ func (variable *dashboardVariable) toOption() (DashboardBuilderOption, error) {
 		return variable.asInterval(), nil
 	case "query":
 		return variable.asQuery(), nil
+	case "const":
+		return variable.asConst(), nil
 	}
 
 	return nil, fmt.Errorf("unknown dashboard variable type '%s'", variable.Type)
@@ -110,6 +119,9 @@ func (variable *dashboardVariable) asInterval() DashboardBuilderOption {
 
 	if variable.Label != "" {
 		opts = append(opts, interval.Label(variable.Label))
+	}
+	if variable.Default != "" {
+		opts = append(opts, interval.Default(variable.Default))
 	}
 
 	return VariableAsInterval(variable.Name, opts...)
@@ -128,4 +140,19 @@ func (variable *dashboardVariable) asQuery() DashboardBuilderOption {
 	}
 
 	return VariableAsQuery(variable.Name, opts...)
+}
+
+func (variable *dashboardVariable) asConst() DashboardBuilderOption {
+	opts := []constant.Option{
+		constant.Values(variable.ValuesMap),
+	}
+
+	if variable.Default != "" {
+		opts = append(opts, constant.Default(variable.Default))
+	}
+	if variable.Label != "" {
+		opts = append(opts, constant.Label(variable.Label))
+	}
+
+	return VariableAsConst(variable.Name, opts...)
 }

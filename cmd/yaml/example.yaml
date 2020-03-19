@@ -21,3 +21,15 @@ variables:
     label: HTTP status
     datasource: prometheus-default
     request: "label_values(prometheus_http_requests_total, code)"
+  - type: const
+    name: percentile
+    label: Percentile
+    default: 80
+    values_map:
+      50th: "50"
+      75th: "75"
+      80th: "80"
+      85th: "85"
+      90th: "90"
+      95th: "95"
+      99th: "99"
