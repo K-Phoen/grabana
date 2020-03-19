@@ -16,7 +16,7 @@ import (
 type TagAnnotation struct {
 	Name       string
 	Datasource string
-	IconColor  string
+	IconColor  string `yaml:"color"`
 	Tags       []string
 }
 

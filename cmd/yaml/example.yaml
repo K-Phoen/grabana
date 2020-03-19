@@ -1,5 +1,12 @@
 title: Awesome dashboard
+
 editable: true
 shared_crosshair: true
 tags: [generated, yaml]
 auto_refresh: 10s
+
+tags_annotations:
+  - name: Deployments
+    datasource: '-- Grafana --'
+    color: '#5794F2'
+    tags: ['deploy', 'production']

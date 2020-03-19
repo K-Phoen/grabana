@@ -22,11 +22,12 @@ func UnmarshalYAML(input io.Reader) (DashboardBuilder, error) {
 }
 
 type dashboardYaml struct {
-	Title           string   `yaml:"title"`
-	Editable        bool     `yaml:"editable"`
-	SharedCrosshair bool     `yaml:"shared_crosshair"`
-	Tags            []string `yaml:"tags"`
-	AutoRefresh     string   `yaml:"auto_refresh"`
+	Title           string
+	Editable        bool
+	SharedCrosshair bool `yaml:"shared_crosshair"`
+	Tags            []string
+	AutoRefresh     string          `yaml:"auto_refresh"`
+	TagsAnnotation  []TagAnnotation `yaml:"tags_annotations"`
 }
 
 func (dashboard *dashboardYaml) toDashboardBuilder() (DashboardBuilder, error) {
@@ -41,6 +42,10 @@ func (dashboard *dashboardYaml) toDashboardBuilder() (DashboardBuilder, error) {
 
 	if dashboard.AutoRefresh != "" {
 		opts = append(opts, AutoRefresh(dashboard.AutoRefresh))
+	}
+
+	for _, tagAnnotation := range dashboard.TagsAnnotation {
+		opts = append(opts, TagsAnnotation(tagAnnotation))
 	}
 
 	return NewDashboardBuilder(dashboard.Title, opts...), nil
