@@ -33,3 +33,9 @@ variables:
       90th: "90"
       95th: "95"
       99th: "99"
+  - type: custom
+    name: vX
+    default: v2
+    values_map:
+      v1: v1
+      v2: v2

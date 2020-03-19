@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/K-Phoen/grabana/variable/constant"
+	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
 	"gopkg.in/yaml.v2"
@@ -107,6 +108,8 @@ func (variable *dashboardVariable) toOption() (DashboardBuilderOption, error) {
 		return variable.asQuery(), nil
 	case "const":
 		return variable.asConst(), nil
+	case "custom":
+		return variable.asCustom(), nil
 	}
 
 	return nil, fmt.Errorf("unknown dashboard variable type '%s'", variable.Type)
@@ -155,4 +158,19 @@ func (variable *dashboardVariable) asConst() DashboardBuilderOption {
 	}
 
 	return VariableAsConst(variable.Name, opts...)
+}
+
+func (variable *dashboardVariable) asCustom() DashboardBuilderOption {
+	opts := []custom.Option{
+		custom.Values(variable.ValuesMap),
+	}
+
+	if variable.Default != "" {
+		opts = append(opts, custom.Default(variable.Default))
+	}
+	if variable.Label != "" {
+		opts = append(opts, custom.Label(variable.Label))
+	}
+
+	return VariableAsCustom(variable.Name, opts...)
 }
