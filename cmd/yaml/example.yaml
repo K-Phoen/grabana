@@ -1,0 +1,5 @@
+title: Awesome dashboard
+editable: true
+shared_crosshair: true
+tags: [generated, yaml]
+autorefresh: 10s
