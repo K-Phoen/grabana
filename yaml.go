@@ -26,11 +26,12 @@ type dashboardYaml struct {
 	Editable        bool     `yaml:"editable"`
 	SharedCrosshair bool     `yaml:"shared_crosshair"`
 	Tags            []string `yaml:"tags"`
-	AutoRefresh     string   `yaml:"autorefresh"`
+	AutoRefresh     string   `yaml:"auto_refresh"`
 }
 
 func (dashboard *dashboardYaml) toDashboardBuilder() (DashboardBuilder, error) {
 	opts := []DashboardBuilderOption{
+		dashboard.editable(),
 		dashboard.sharedCrossHair(),
 	}
 
@@ -51,4 +52,12 @@ func (dashboard *dashboardYaml) sharedCrossHair() DashboardBuilderOption {
 	}
 
 	return DefaultTooltip()
+}
+
+func (dashboard *dashboardYaml) editable() DashboardBuilderOption {
+	if dashboard.Editable {
+		return Editable()
+	}
+
+	return ReadOnly()
 }
