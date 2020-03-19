@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/K-Phoen/grabana/graph"
+	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/interval"
@@ -32,6 +35,8 @@ type dashboardYaml struct {
 
 	TagsAnnotation []TagAnnotation `yaml:"tags_annotations"`
 	Variables      []dashboardVariable
+
+	Rows []dashboardRow
 }
 
 type dashboardVariable struct {
@@ -74,6 +79,15 @@ func (dashboard *dashboardYaml) toDashboardBuilder() (DashboardBuilder, error) {
 
 	for _, variable := range dashboard.Variables {
 		opt, err := variable.toOption()
+		if err != nil {
+			return emptyDashboard, err
+		}
+
+		opts = append(opts, opt)
+	}
+
+	for _, row := range dashboard.Rows {
+		opt, err := row.toOption()
 		if err != nil {
 			return emptyDashboard, err
 		}
@@ -173,4 +187,100 @@ func (variable *dashboardVariable) asCustom() DashboardBuilderOption {
 	}
 
 	return VariableAsCustom(variable.Name, opts...)
+}
+
+type dashboardRow struct {
+	Name   string
+	Panels []dashboardPanel
+}
+
+func (r dashboardRow) toOption() (DashboardBuilderOption, error) {
+	opts := []row.Option{}
+
+	for _, panel := range r.Panels {
+		opt, err := panel.toOption()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
+	}
+
+	return Row(r.Name, opts...), nil
+}
+
+type dashboardPanel struct {
+	Graph *dashboardGraph
+}
+
+func (panel dashboardPanel) toOption() (row.Option, error) {
+	if panel.Graph != nil {
+		return panel.Graph.toOption()
+	}
+
+	return nil, fmt.Errorf("panel not configured")
+}
+
+type dashboardGraph struct {
+	Title      string
+	Span       float32
+	Height     string
+	Datasource string
+	Targets    []target
+}
+
+func (graphPanel dashboardGraph) toOption() (row.Option, error) {
+	opts := []graph.Option{}
+
+	if graphPanel.Span != 0 {
+		opts = append(opts, graph.Span(graphPanel.Span))
+	}
+	if graphPanel.Height != "" {
+		opts = append(opts, graph.Height(graphPanel.Height))
+	}
+	if graphPanel.Datasource != "" {
+		opts = append(opts, graph.DataSource(graphPanel.Datasource))
+	}
+
+	for _, t := range graphPanel.Targets {
+		opt, err := graphPanel.target(t)
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
+	}
+
+	return row.WithGraph(graphPanel.Title, opts...), nil
+}
+
+func (graphPanel *dashboardGraph) target(t target) (graph.Option, error) {
+	if t.Prometheus != nil {
+		return graph.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
+	}
+
+	return nil, fmt.Errorf("target not configured")
+}
+
+type target struct {
+	Prometheus *prometheusTarget
+}
+
+type prometheusTarget struct {
+	Query  string
+	Legend string
+	Ref    string
+}
+
+func (t prometheusTarget) toOptions() []prometheus.Option {
+	var opts []prometheus.Option
+
+	if t.Legend != "" {
+		opts = append(opts, prometheus.Legend(t.Legend))
+	}
+	if t.Ref != "" {
+		opts = append(opts, prometheus.Legend(t.Ref))
+	}
+
+	return opts
 }
