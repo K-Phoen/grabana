@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/K-Phoen/grabana/variable/interval"
+	"github.com/K-Phoen/grabana/variable/query"
 	"gopkg.in/yaml.v2"
 )
 
@@ -16,8 +17,6 @@ func UnmarshalYAML(input io.Reader) (DashboardBuilder, error) {
 	if err := decoder.Decode(parsed); err != nil {
 		return DashboardBuilder{}, err
 	}
-
-	fmt.Printf("parsed: %#v\n", parsed)
 
 	return parsed.toDashboardBuilder()
 }
@@ -34,10 +33,16 @@ type dashboardYaml struct {
 }
 
 type dashboardVariable struct {
-	Type   string
-	Name   string
-	Label  string
+	Type  string
+	Name  string
+	Label string
+
+	// used for "interval" and "const"
 	Values []string
+
+	// used for "query"
+	Datasource string
+	Request    string
 }
 
 func (dashboard *dashboardYaml) toDashboardBuilder() (DashboardBuilder, error) {
@@ -91,6 +96,8 @@ func (variable *dashboardVariable) toOption() (DashboardBuilderOption, error) {
 	switch variable.Type {
 	case "interval":
 		return variable.asInterval(), nil
+	case "query":
+		return variable.asQuery(), nil
 	}
 
 	return nil, fmt.Errorf("unknown dashboard variable type '%s'", variable.Type)
@@ -106,4 +113,19 @@ func (variable *dashboardVariable) asInterval() DashboardBuilderOption {
 	}
 
 	return VariableAsInterval(variable.Name, opts...)
+}
+
+func (variable *dashboardVariable) asQuery() DashboardBuilderOption {
+	opts := []query.Option{
+		query.Request(variable.Request),
+	}
+
+	if variable.Datasource != "" {
+		opts = append(opts, query.DataSource(variable.Datasource))
+	}
+	if variable.Label != "" {
+		opts = append(opts, query.Label(variable.Label))
+	}
+
+	return VariableAsQuery(variable.Name, opts...)
 }
