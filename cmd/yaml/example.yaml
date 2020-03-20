@@ -80,3 +80,12 @@ rows:
           unit: bytes
           thresholds: ["26000000", "28000000"]
           color: ["value"]
+
+  - name: "Some text, because it might be useful"
+    panels:
+      - text:
+          title: Some awesome text?
+          markdown: "Markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n${percentile}"
+      - text:
+          title: Some awesome html?
+          markdown: "Some awesome html?"

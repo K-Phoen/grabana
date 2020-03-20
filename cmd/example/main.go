@@ -153,7 +153,7 @@ func main() {
 			),
 			row.WithText(
 				"Some awesome html?",
-				text.HTML("<b>lalalala</b>"),
+				text.HTML("Some awesome html?"),
 			),
 		),
 	)

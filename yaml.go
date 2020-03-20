@@ -9,6 +9,7 @@ import (
 	"github.com/K-Phoen/grabana/singlestat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/target/prometheus"
+	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/interval"
@@ -215,6 +216,7 @@ type dashboardPanel struct {
 	Graph      *dashboardGraph
 	Table      *dashboardTable
 	SingleStat *dashboardSingleStat `yaml:"single_stat"`
+	Text       *dashboardText
 }
 
 func (panel dashboardPanel) toOption() (row.Option, error) {
@@ -226,6 +228,9 @@ func (panel dashboardPanel) toOption() (row.Option, error) {
 	}
 	if panel.SingleStat != nil {
 		return panel.SingleStat.toOption()
+	}
+	if panel.Text != nil {
+		return panel.Text.toOption()
 	}
 
 	return nil, fmt.Errorf("panel not configured")
@@ -381,11 +386,12 @@ func (singleStatPanel dashboardSingleStat) toOption() (row.Option, error) {
 	}
 
 	for _, colorTarget := range singleStatPanel.Color {
-		if colorTarget == "value" {
+		switch colorTarget {
+		case "value":
 			opts = append(opts, singlestat.ColorValue())
-		} else if colorTarget == "background" {
+		case "background":
 			opts = append(opts, singlestat.ColorBackground())
-		} else {
+		default:
 			return nil, fmt.Errorf("invalid coloring target '%s'", colorTarget)
 		}
 	}
@@ -408,4 +414,31 @@ func (singleStatPanel dashboardSingleStat) target(t target) (singlestat.Option, 
 	}
 
 	return nil, fmt.Errorf("target not configured")
+}
+
+type dashboardText struct {
+	Title    string
+	Span     float32
+	Height   string
+	HTML     string
+	Markdown string
+}
+
+func (textPanel dashboardText) toOption() (row.Option, error) {
+	opts := []text.Option{}
+
+	if textPanel.Span != 0 {
+		opts = append(opts, text.Span(textPanel.Span))
+	}
+	if textPanel.Height != "" {
+		opts = append(opts, text.Height(textPanel.Height))
+	}
+	if textPanel.Markdown != "" {
+		opts = append(opts, text.Markdown(textPanel.Markdown))
+	}
+	if textPanel.HTML != "" {
+		opts = append(opts, text.HTML(textPanel.HTML))
+	}
+
+	return row.WithText(textPanel.Title, opts...), nil
 }
