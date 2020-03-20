@@ -71,3 +71,12 @@ rows:
               type: avg
             - label: Current
               type: current
+      - single_stat:
+          title: Heap Allocations
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "go_memstats_heap_alloc_bytes"
+          unit: bytes
+          thresholds: ["26000000", "28000000"]
+          color: ["value"]
