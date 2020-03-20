@@ -6,6 +6,7 @@ import (
 
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
@@ -211,11 +212,15 @@ func (r dashboardRow) toOption() (DashboardBuilderOption, error) {
 
 type dashboardPanel struct {
 	Graph *dashboardGraph
+	Table *dashboardTable
 }
 
 func (panel dashboardPanel) toOption() (row.Option, error) {
 	if panel.Graph != nil {
 		return panel.Graph.toOption()
+	}
+	if panel.Table != nil {
+		return panel.Table.toOption()
 	}
 
 	return nil, fmt.Errorf("panel not configured")
@@ -283,4 +288,55 @@ func (t prometheusTarget) toOptions() []prometheus.Option {
 	}
 
 	return opts
+}
+
+type dashboardTable struct {
+	Title                  string
+	Span                   float32
+	Height                 string
+	Datasource             string
+	Targets                []target
+	HiddenColumns          []string            `yaml:"hidden_columns"`
+	TimeSeriesAggregations []table.Aggregation `yaml:"time_series_aggregations"`
+}
+
+func (tablePanel dashboardTable) toOption() (row.Option, error) {
+	opts := []table.Option{}
+
+	if tablePanel.Span != 0 {
+		opts = append(opts, table.Span(tablePanel.Span))
+	}
+	if tablePanel.Height != "" {
+		opts = append(opts, table.Height(tablePanel.Height))
+	}
+	if tablePanel.Datasource != "" {
+		opts = append(opts, table.DataSource(tablePanel.Datasource))
+	}
+
+	for _, t := range tablePanel.Targets {
+		opt, err := tablePanel.target(t)
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
+	}
+
+	for _, column := range tablePanel.HiddenColumns {
+		opts = append(opts, table.HideColumn(column))
+	}
+
+	if len(tablePanel.TimeSeriesAggregations) != 0 {
+		opts = append(opts, table.AsTimeSeriesAggregations(tablePanel.TimeSeriesAggregations))
+	}
+
+	return row.WithTable(tablePanel.Title, opts...), nil
+}
+
+func (tablePanel *dashboardTable) target(t target) (table.Option, error) {
+	if t.Prometheus != nil {
+		return table.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
+	}
+
+	return nil, fmt.Errorf("target not configured")
 }

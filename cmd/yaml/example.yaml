@@ -59,3 +59,15 @@ rows:
             - prometheus:
                 query: "go_memstats_heap_alloc_bytes"
                 ref: A
+      - table:
+          title: Threads
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "go_threads"
+          hidden_columns: ["Time"]
+          time_series_aggregations:
+            - label: AVG
+              type: avg
+            - label: Current
+              type: current
