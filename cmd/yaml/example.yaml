@@ -58,6 +58,7 @@ rows:
           targets:
             - prometheus:
                 query: "go_memstats_heap_alloc_bytes"
+                legend: "{{job}}"
                 ref: A
       - table:
           title: Threads
@@ -76,7 +77,7 @@ rows:
           datasource: prometheus-default
           targets:
             - prometheus:
-                query: "go_memstats_heap_alloc_bytes"
+                query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
           unit: bytes
           thresholds: ["26000000", "28000000"]
           color: ["value"]

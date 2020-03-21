@@ -294,7 +294,7 @@ func (t prometheusTarget) toOptions() []prometheus.Option {
 		opts = append(opts, prometheus.Legend(t.Legend))
 	}
 	if t.Ref != "" {
-		opts = append(opts, prometheus.Legend(t.Ref))
+		opts = append(opts, prometheus.Ref(t.Ref))
 	}
 
 	return opts
