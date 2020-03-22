@@ -23,6 +23,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		generalOptions(),
 		tagAnnotations(),
 		textPanel(),
+		graphPanel(),
 	}
 
 	for _, testCase := range testCases {
@@ -148,9 +149,13 @@ rows:
   - name: Test row
     panels:
       - text:
+          height: 400px
+          span: 6
           title: Some markdown?
           markdown: "*markdown*"
       - text:
+          height: 400px
+          span: 6
           title: Some html?
           html: "Some <b>awesome</b> html"
 `
@@ -192,6 +197,7 @@ rows:
 					"showHeader": false,
 					"sort": {"col": 0, "desc": false},
 					"span": 6,
+					"height": "400px",
 					"styles": null,
 					"title": "Some markdown?",
 					"transparent": false
@@ -211,6 +217,7 @@ rows:
 					"showHeader": false,
 					"sort": {"col": 0, "desc": false},
 					"span": 6,
+					"height": "400px",
 					"styles": null,
 					"title": "Some html?",
 					"transparent": false
@@ -229,6 +236,135 @@ rows:
 
 	return testCase{
 		name:                "single row with text panels",
+		yaml:                yaml,
+		expectedGrafanaJSON: json,
+	}
+}
+
+func graphPanel() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Heap allocations
+          height: 400px
+          span: 4
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "go_memstats_heap_alloc_bytes"
+                legend: "{{job}}"
+                ref: A
+`
+	json := `{
+	"slug": "",
+	"title": "Awesome dashboard",
+	"originalTitle": "",
+	"tags": null,
+	"style": "dark",
+	"timezone": "",
+	"editable": false,
+	"hideControls": false,
+	"sharedCrosshair": false,
+	"templating": {"list": null},
+	"annotations": {"list": null},
+	"links": null,
+	"panels": null,
+	"rows": [
+		{
+			"title": "Test row",
+			"collapse": false,
+			"editable": true,
+			"height": "250px",
+			"repeat": null,
+			"showTitle": true,
+			"panels": [
+				{
+					"type": "graph",
+					"datasource": "prometheus-default",
+					"editable": true,
+					"error": false,
+					"height": "400px",
+					"gridPos": {},
+					"id": 3,
+					"isNew": false,
+					"renderer": "flot",
+					"span": 4,
+					"fill": 1,
+					"title": "Heap allocations",
+					"aliasColors": {},
+					"bars": false,
+					"points": false,
+					"stack": false,
+					"steppedLine": false,
+					"lines": true,
+					"linewidth": 1,
+					"pointradius": 5,
+					"percentage": false,
+					"nullPointMode": "null as zero",
+					"legend": {
+						"alignAsTable": false,
+						"avg": false,
+						"current": false,
+						"hideEmpty": true,
+						"hideZero": true,
+						"max": false,
+						"min": false,
+						"rightSide": false,
+						"show": true,
+						"total": false,
+						"values": false
+					},
+					"targets": [
+						{
+							"refId": "A",
+							"expr": "go_memstats_heap_alloc_bytes",
+							"legendFormat": "{{job}}",
+							"format": "time_series"
+						}
+					],
+					"tooltip": {
+						"shared": true,
+						"value_type": "",
+						"sort": 2
+					},
+					"x-axis": true,
+					"y-axis": true,
+					"xaxis": {
+						"format": "time",
+						"logBase": 1,
+						"show": true
+					},
+					"yaxes": [
+						{
+							"format": "short",
+							"logBase": 1,
+							"show": true
+						},
+						{
+							"format": "short",
+							"logBase": 1,
+							"show": false
+						}
+					],
+					"transparent": false
+				}
+			]
+		}
+	],
+	"time": {"from": "now-3h", "to": "now"},
+	"timepicker": {
+		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
+		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
+	},
+	"schemaVersion": 0,
+	"version": 0
+}`
+
+	return testCase{
+		name:                "single row with single graph panel",
 		yaml:                yaml,
 		expectedGrafanaJSON: json,
 	}

@@ -48,8 +48,8 @@ func (d *dashboardModel) toDashboardBuilder() (dashboard.Builder, error) {
 		opts = append(opts, opt)
 	}
 
-	for _, row := range d.Rows {
-		opt, err := row.toOption()
+	for _, r := range d.Rows {
+		opt, err := r.toOption()
 		if err != nil {
 			return emptyDashboard, err
 		}
