@@ -1,6 +1,7 @@
 package constant
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/grafana-tools/sdk"
@@ -18,6 +19,8 @@ func (values ValuesMap) asQuery() string {
 	for _, value := range values {
 		valuesList = append(valuesList, value)
 	}
+
+	sort.Strings(valuesList)
 
 	return strings.Join(valuesList, ",")
 }

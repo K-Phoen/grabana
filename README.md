@@ -19,7 +19,7 @@ for you.
 Dashboard configuration:
 
 ```go
-dashboard := grabana.NewDashboardBuilder(
+builder := dashboard.New(
     "Awesome dashboard",
     grabana.AutoRefresh("5s"),
     grabana.Tags([]string{"generated"}),
@@ -45,7 +45,7 @@ Dashboard creation:
 
 ```go
 ctx := context.Background()
-client := grabana.NewClient(&http.Client{}, os.Args[1], os.Args[2])
+client := grabana.NewClient(&http.Client{}, grafanaHost, grafanaAPIToken)
 
 // create the folder holding the dashboard for the service
 folder, err := client.GetFolderByTitle(ctx, "Test Folder")
@@ -63,7 +63,7 @@ if folder == nil {
     fmt.Printf("Folder created (id: %d, uid: %s)\n", folder.ID, folder.UID)
 }
 
-if _, err := client.UpsertDashboard(ctx, folder, dashboard); err != nil {
+if _, err := client.UpsertDashboard(ctx, folder, builder); err != nil {
     fmt.Printf("Could not create dashboard: %s\n", err)
     os.Exit(1)
 }

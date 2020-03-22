@@ -146,6 +146,6 @@ func IncludeAll() Option {
 // DefaultAll selects "All" values by default.
 func DefaultAll() Option {
 	return func(query *Query) {
-		query.Builder.Current = sdk.Current{Text: "All", Value: "$_all"}
+		query.Builder.Current = sdk.Current{Text: "All", Value: "$__all"}
 	}
 }

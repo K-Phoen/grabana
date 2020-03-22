@@ -1,0 +1,92 @@
+title: Awesome dashboard
+
+editable: true
+shared_crosshair: true
+tags: [generated, yaml]
+auto_refresh: 10s
+
+tags_annotations:
+  - name: Deployments
+    datasource: "-- Grafana --"
+    color: "#5794F2"
+    tags: ["deploy", "production"]
+
+variables:
+  - interval:
+      name: interval
+      label: Interval
+      values: ["30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"]
+  - query:
+      name: status
+      label: HTTP status
+      datasource: prometheus-default
+      request: "label_values(prometheus_http_requests_total, code)"
+  - const:
+      name: percentile
+      label: Percentile
+      default: 80
+      values_map:
+        50th: "50"
+        75th: "75"
+        80th: "80"
+        85th: "85"
+        90th: "90"
+        95th: "95"
+        99th: "99"
+  - custom:
+      name: vX
+      default: v2
+      values_map:
+        v1: v1
+        v2: v2
+
+rows:
+  - name: Prometheus
+    panels:
+      - graph:
+          title: HTTP Rate
+          height: 400px
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "rate(promhttp_metric_handler_requests_total[$interval])"
+                legend: "{{handler}} - {{ code }}"
+      - graph:
+          title: Heap allocations
+          height: 400px
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "go_memstats_heap_alloc_bytes"
+                legend: "{{job}}"
+                ref: A
+      - table:
+          title: Threads
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "go_threads"
+          hidden_columns: ["Time"]
+          time_series_aggregations:
+            - label: AVG
+              type: avg
+            - label: Current
+              type: current
+      - single_stat:
+          title: Heap Allocations
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
+          unit: bytes
+          thresholds: ["26000000", "28000000"]
+          color: ["value"]
+
+  - name: "Some text, because it might be useful"
+    panels:
+      - text:
+          title: Some awesome text?
+          markdown: "Markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n${percentile}"
+      - text:
+          title: Some awesome html?
+          html: "Some <b>awesome</b> html?"

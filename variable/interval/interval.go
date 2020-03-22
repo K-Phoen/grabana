@@ -1,6 +1,7 @@
 package interval
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/grafana-tools/sdk"
@@ -35,6 +36,8 @@ func New(name string, options ...Option) *Interval {
 // Values sets the possible values for the variable.
 func Values(values ValuesList) Option {
 	return func(interval *Interval) {
+		sort.Strings(values)
+
 		interval.Builder.Query = strings.Join(values, ",")
 	}
 }

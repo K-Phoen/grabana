@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/K-Phoen/grabana/alert"
-
+	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -155,13 +155,13 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 }
 
 // UpsertDashboard creates or replaces a dashboard, in the given folder.
-func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, builder DashboardBuilder) (*Dashboard, error) {
+func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, builder dashboard.Builder) (*Dashboard, error) {
 	buf, err := json.Marshal(struct {
 		Dashboard *sdk.Board `json:"dashboard"`
 		FolderID  uint       `json:"folderId"`
 		Overwrite bool       `json:"overwrite"`
 	}{
-		Dashboard: builder.board,
+		Dashboard: builder.Internal(),
 		FolderID:  folder.ID,
 		Overwrite: true,
 	})
@@ -185,12 +185,12 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		return nil, fmt.Errorf("could not create dashboard: %s", body)
 	}
 
-	var dashboard Dashboard
-	if err := decodeJSON(resp.Body, &dashboard); err != nil {
+	var model Dashboard
+	if err := decodeJSON(resp.Body, &model); err != nil {
 		return nil, err
 	}
 
-	return &dashboard, nil
+	return &model, nil
 }
 
 func (client Client) postJSON(ctx context.Context, path string, body []byte) (*http.Response, error) {

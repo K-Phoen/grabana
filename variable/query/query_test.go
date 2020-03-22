@@ -63,7 +63,7 @@ func TestAnAllValuesCanBeTheDefault(t *testing.T) {
 	panel := New("", DefaultAll())
 
 	req.Equal("All", panel.Builder.Current.Text)
-	req.Equal("$_all", panel.Builder.Current.Value)
+	req.Equal("$__all", panel.Builder.Current.Value)
 }
 
 func TestValuesCanBeFilteredByRegex(t *testing.T) {

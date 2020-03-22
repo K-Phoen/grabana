@@ -31,7 +31,7 @@ func TestValuesCanBeSet(t *testing.T) {
 
 	panel := New("", Values(values))
 
-	req.Equal("30s,1m,5m,10m,30m,1h,6h,12h", panel.Builder.Query)
+	req.Equal("10m,12h,1h,1m,30m,30s,5m,6h", panel.Builder.Query)
 }
 
 func TestDefaultValueCanBeSet(t *testing.T) {

@@ -11,6 +11,5 @@ github.com/rainycape/unidecode
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/require
-github.com/stretchr/testify/suite
 # gopkg.in/yaml.v2 v2.2.2
 gopkg.in/yaml.v2

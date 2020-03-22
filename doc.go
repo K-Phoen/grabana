@@ -5,7 +5,7 @@ If you are looking for a way to version your dashboards configuration or
 automate tedious and error-prone creation of dashboards, this library is meant
 for you.
 
-	dashboard := grabana.NewDashboardBuilder(
+	builder := dashboard.New(
 		"Awesome dashboard",
 		grabana.VariableAsInterval(
 			"interval",

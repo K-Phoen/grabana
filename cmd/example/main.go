@@ -9,6 +9,7 @@ import (
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
+	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/singlestat"
@@ -52,27 +53,27 @@ func main() {
 		os.Exit(1)
 	}
 
-	dashboard := grabana.NewDashboardBuilder(
+	builder := dashboard.New(
 		"Awesome dashboard",
-		grabana.AutoRefresh("5s"),
-		grabana.Tags([]string{"generated"}),
-		grabana.TagsAnnotation(grabana.TagAnnotation{
+		dashboard.AutoRefresh("5s"),
+		dashboard.Tags([]string{"generated"}),
+		dashboard.TagsAnnotation(dashboard.TagAnnotation{
 			Name:       "Deployments",
 			Datasource: "-- Grafana --",
 			IconColor:  "#5794F2",
 			Tags:       []string{"deploy", "production"},
 		}),
-		grabana.VariableAsInterval(
+		dashboard.VariableAsInterval(
 			"interval",
 			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
 		),
-		grabana.VariableAsQuery(
+		dashboard.VariableAsQuery(
 			"status",
 			query.DataSource("prometheus-default"),
 			query.Request("label_values(prometheus_http_requests_total, code)"),
 			query.Sort(query.NumericalAsc),
 		),
-		grabana.VariableAsConst(
+		dashboard.VariableAsConst(
 			"percentile",
 			constant.Label("Percentile"),
 			constant.Values(map[string]string{
@@ -86,7 +87,7 @@ func main() {
 			}),
 			constant.Default("80"),
 		),
-		grabana.VariableAsCustom(
+		dashboard.VariableAsCustom(
 			"vX",
 			custom.Multi(),
 			custom.IncludeAll(),
@@ -96,7 +97,7 @@ func main() {
 			}),
 			custom.Default("v2"),
 		),
-		grabana.Row(
+		dashboard.Row(
 			"Prometheus",
 			row.WithGraph(
 				"HTTP Rate",
@@ -145,7 +146,7 @@ func main() {
 				singlestat.Thresholds([2]string{"26000000", "28000000"}),
 			),
 		),
-		grabana.Row(
+		dashboard.Row(
 			"Some text, because it might be useful",
 			row.WithText(
 				"Some awesome text?",
@@ -153,11 +154,11 @@ func main() {
 			),
 			row.WithText(
 				"Some awesome html?",
-				text.HTML("<b>lalalala</b>"),
+				text.HTML("Some awesome html?"),
 			),
 		),
 	)
-	if _, err := client.UpsertDashboard(ctx, folder, dashboard); err != nil {
+	if _, err := client.UpsertDashboard(ctx, folder, builder); err != nil {
 		fmt.Printf("Could not create dashboard: %s\n", err)
 		os.Exit(1)
 	}
