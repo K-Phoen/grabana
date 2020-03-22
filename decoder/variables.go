@@ -109,6 +109,9 @@ type variableQuery struct {
 
 	Datasource string
 	Request    string
+
+	IncludeAll bool `yaml:"include_all"`
+	DefaultAll bool `yaml:"default_all"`
 }
 
 func (variable *variableQuery) toOption() dashboard.Option {
@@ -121,6 +124,12 @@ func (variable *variableQuery) toOption() dashboard.Option {
 	}
 	if variable.Label != "" {
 		opts = append(opts, query.Label(variable.Label))
+	}
+	if variable.IncludeAll {
+		opts = append(opts, query.IncludeAll())
+	}
+	if variable.DefaultAll {
+		opts = append(opts, query.DefaultAll())
 	}
 
 	return dashboard.VariableAsQuery(variable.Name, opts...)

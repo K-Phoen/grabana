@@ -258,6 +258,8 @@ variables:
       name: status
       label: HTTP status
       datasource: prometheus-default
+      include_all: true
+      default_all: true
       request: "label_values(prometheus_http_requests_total, code)"
   - const:
       name: percentile
@@ -311,8 +313,14 @@ variables:
 				"type": "query",
 				"datasource": "prometheus-default",
 				"refresh": 1,
-				"options": null,
-				"includeAll": false,
+				"options": [
+					{
+						"text": "All",
+						"value": "$__all",
+						"selected": false
+					}
+				],
+				"includeAll": true,
 				"allFormat": "",
 				"allValue": "",
 				"multi": false,
@@ -320,8 +328,8 @@ variables:
 				"query": "label_values(prometheus_http_requests_total, code)",
 				"regex": "",
 				"current": {
-					"text": "",
-					"value": null
+					"text": "All",
+					"value": "$__all"
 				},
 				"label": "HTTP status",
 				"hide": 0,
