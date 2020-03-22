@@ -109,6 +109,22 @@ rows:
 	require.Equal(t, ErrTargetNotConfigured, err)
 }
 
+func TestUnmarshalYAMLWithNoTInvalidSparklineModeSingleStat(t *testing.T) {
+	payload := `
+rows:
+  - name: Prometheus
+    panels:
+      - single_stat:
+          title: Threads
+          sparkline: unknown-mode
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidSparkLineMode, err)
+}
+
 func TestUnmarshalYAMLWithSingleStatAndInvalidColoringTarget(t *testing.T) {
 	payload := `
 rows:
@@ -270,10 +286,9 @@ variables:
   - custom:
       name: vX
       label: vX
-      default: v2
+      default: v1
       values_map:
         v1: v1
-        v2: v2
 `
 	json := `{
 	"slug": "",
@@ -372,11 +387,6 @@ variables:
 						"text": "v1",
 						"value": "v1",
 						"selected": false
-					},
-					{
-						"text": "v2",
-						"value": "v2",
-						"selected": false
 					}
 				],
 				"includeAll": false,
@@ -384,11 +394,11 @@ variables:
 				"allValue": "",
 				"multi": false,
 				"multiFormat": "",
-				"query": "v1,v2",
+				"query": "v1",
 				"regex": "",
 				"current": {
-					"text": "v2",
-					"value": "v2"
+					"text": "v1",
+					"value": "v1"
 				},
 				"label": "vX",
 				"hide": 0,
@@ -659,6 +669,7 @@ rows:
             - prometheus:
                 query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
           unit: bytes
+          sparkline: bottom
           thresholds: ["26000000", "28000000"]
           color: ["value", "background"]
           colors: ["green", "yellow", "red"]
@@ -728,6 +739,7 @@ rows:
 					],
 					"nullPointMode": "",
 					"sparkline": {
+						"show": true,
 						"fillColor": "rgba(31, 118, 189, 0.18)",
 						"lineColor": "rgb(31, 120, 193)"
 					},

@@ -8,6 +8,7 @@ import (
 )
 
 var ErrInvalidColoringTarget = fmt.Errorf("invalid coloring target")
+var ErrInvalidSparkLineMode = fmt.Errorf("invalid sparkline mode")
 
 type dashboardSingleStat struct {
 	Title      string
@@ -15,6 +16,7 @@ type dashboardSingleStat struct {
 	Height     string
 	Datasource string
 	Unit       string
+	SparkLine  string `yaml:"sparkline"`
 	Targets    []target
 	Thresholds [2]string
 	Colors     [3]string
@@ -41,6 +43,16 @@ func (singleStatPanel dashboardSingleStat) toOption() (row.Option, error) {
 	}
 	if singleStatPanel.Colors[0] != "" {
 		opts = append(opts, singlestat.Colors(singleStatPanel.Colors))
+	}
+
+	switch singleStatPanel.SparkLine {
+	case "bottom":
+		opts = append(opts, singlestat.SparkLine())
+	case "full":
+		opts = append(opts, singlestat.FullSparkLine())
+	case "":
+	default:
+		return nil, ErrInvalidSparkLineMode
 	}
 
 	for _, colorTarget := range singleStatPanel.Color {
