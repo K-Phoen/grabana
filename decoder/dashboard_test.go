@@ -2,7 +2,6 @@ package decoder
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -47,11 +46,106 @@ func TestUnmarshalYAML(t *testing.T) {
 			json, err := builder.MarshalJSON()
 			req.NoError(err)
 
-			fmt.Printf("json:\n%s\n", json)
-
 			req.JSONEq(tc.expectedGrafanaJSON, string(json))
 		})
 	}
+}
+
+func TestUnmarshalYAMLWithInvalidPanel(t *testing.T) {
+	payload := `
+rows:
+  - name: Prometheus
+    panels:
+      - {}`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrPanelNotConfigured, err)
+}
+
+func TestUnmarshalYAMLWithInvalidVariable(t *testing.T) {
+	payload := `
+variables:
+  - {}`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrVariableNotConfigured, err)
+}
+
+func TestUnmarshalYAMLWithNoTargetTable(t *testing.T) {
+	payload := `
+rows:
+  - name: Prometheus
+    panels:
+      - table:
+          title: Threads
+          targets:
+            - {}
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrTargetNotConfigured, err)
+}
+
+func TestUnmarshalYAMLWithNoTargetSingleStat(t *testing.T) {
+	payload := `
+rows:
+  - name: Prometheus
+    panels:
+      - single_stat:
+          title: Threads
+          targets:
+            - {}
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrTargetNotConfigured, err)
+}
+
+func TestUnmarshalYAMLWithSingleStatAndInvalidColoringTarget(t *testing.T) {
+	payload := `
+rows:
+  - name: Prometheus
+    panels:
+      - single_stat:
+          title: Heap Allocations
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
+          unit: bytes
+          thresholds: ["26000000", "28000000"]
+          color: ["value", "invalid target"]
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidColoringTarget, err)
+}
+
+func TestUnmarshalYAMLWithNoTargetSingleGraph(t *testing.T) {
+	payload := `
+rows:
+  - name: Prometheus
+    panels:
+      - graph:
+          title: Threads
+          targets:
+            - {}
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrTargetNotConfigured, err)
 }
 
 func generalOptions() testCase {

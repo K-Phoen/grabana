@@ -7,6 +7,8 @@ import (
 	"github.com/K-Phoen/grabana/row"
 )
 
+var ErrPanelNotConfigured = fmt.Errorf("panel not configured")
+
 type dashboardModel struct {
 	Title           string
 	Editable        bool
@@ -97,5 +99,5 @@ func (panel dashboardPanel) toOption() (row.Option, error) {
 		return panel.Text.toOption(), nil
 	}
 
-	return nil, fmt.Errorf("panel not configured")
+	return nil, ErrPanelNotConfigured
 }

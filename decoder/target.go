@@ -1,8 +1,12 @@
 package decoder
 
 import (
+	"fmt"
+
 	"github.com/K-Phoen/grabana/target/prometheus"
 )
+
+var ErrTargetNotConfigured = fmt.Errorf("target not configured")
 
 type target struct {
 	Prometheus *prometheusTarget

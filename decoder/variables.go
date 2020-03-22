@@ -11,6 +11,8 @@ import (
 	"github.com/K-Phoen/grabana/variable/query"
 )
 
+var ErrVariableNotConfigured = fmt.Errorf("variable not configured")
+
 type dashboardVariable struct {
 	Interval *variableInterval
 	Custom   *variableCustom
@@ -32,7 +34,7 @@ func (variable *dashboardVariable) toOption() (dashboard.Option, error) {
 		return variable.Custom.toOption(), nil
 	}
 
-	return nil, fmt.Errorf("unconfigured variable")
+	return nil, ErrVariableNotConfigured
 }
 
 type variableInterval struct {

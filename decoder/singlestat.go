@@ -7,6 +7,8 @@ import (
 	"github.com/K-Phoen/grabana/singlestat"
 )
 
+var ErrInvalidColoringTarget = fmt.Errorf("invalid coloring target")
+
 type dashboardSingleStat struct {
 	Title      string
 	Span       float32
@@ -48,7 +50,7 @@ func (singleStatPanel dashboardSingleStat) toOption() (row.Option, error) {
 		case "background":
 			opts = append(opts, singlestat.ColorBackground())
 		default:
-			return nil, fmt.Errorf("invalid coloring target '%s'", colorTarget)
+			return nil, ErrInvalidColoringTarget
 		}
 	}
 
@@ -69,5 +71,5 @@ func (singleStatPanel dashboardSingleStat) target(t target) (singlestat.Option, 
 		return singlestat.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
 
-	return nil, fmt.Errorf("target not configured")
+	return nil, ErrTargetNotConfigured
 }

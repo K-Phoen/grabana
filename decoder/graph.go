@@ -1,8 +1,6 @@
 package decoder
 
 import (
-	"fmt"
-
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
 )
@@ -45,5 +43,5 @@ func (graphPanel *dashboardGraph) target(t target) (graph.Option, error) {
 		return graph.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
 
-	return nil, fmt.Errorf("target not configured")
+	return nil, ErrTargetNotConfigured
 }

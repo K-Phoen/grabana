@@ -1,8 +1,6 @@
 package decoder
 
 import (
-	"fmt"
-
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/table"
 )
@@ -55,5 +53,5 @@ func (tablePanel *dashboardTable) target(t target) (table.Option, error) {
 		return table.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
 
-	return nil, fmt.Errorf("target not configured")
+	return nil, ErrTargetNotConfigured
 }
