@@ -26,10 +26,12 @@ func TestUnmarshalYAML(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
+		tc := testCase
+
+		t.Run(tc.name, func(t *testing.T) {
 			req := require.New(t)
 
-			builder, err := UnmarshalYAML(bytes.NewBufferString(testCase.yaml))
+			builder, err := UnmarshalYAML(bytes.NewBufferString(tc.yaml))
 			req.NoError(err)
 
 			json, err := builder.MarshalJSON()
@@ -37,7 +39,7 @@ func TestUnmarshalYAML(t *testing.T) {
 
 			fmt.Printf("json:\n%s\n", json)
 
-			req.JSONEq(testCase.expectedGrafanaJSON, string(json))
+			req.JSONEq(tc.expectedGrafanaJSON, string(json))
 		})
 	}
 }
