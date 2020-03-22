@@ -3,48 +3,46 @@ package decoder
 import (
 	"fmt"
 
+	"github.com/K-Phoen/grabana/variable/interval"
+
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
-	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
 )
 
 type dashboardVariable struct {
-	Type  string
-	Name  string
-	Label string
-
-	// used for "interval", "const" and "custom"
-	Default string
-
-	// used for "interval"
-	Values []string
-
-	// used for "const" and "custom"
-	ValuesMap map[string]string `yaml:"values_map"`
-
-	// used for "query"
-	Datasource string
-	Request    string
+	Interval *variableInterval
+	Custom   *variableCustom
+	Query    *variableQuery
+	Const    *variableConst
 }
 
 func (variable *dashboardVariable) toOption() (dashboard.Option, error) {
-	switch variable.Type {
-	case "interval":
-		return variable.asInterval(), nil
-	case "query":
-		return variable.asQuery(), nil
-	case "const":
-		return variable.asConst(), nil
-	case "custom":
-		return variable.asCustom(), nil
+	if variable.Query != nil {
+		return variable.Query.toOption(), nil
+	}
+	if variable.Interval != nil {
+		return variable.Interval.toOption(), nil
+	}
+	if variable.Const != nil {
+		return variable.Const.toOption(), nil
+	}
+	if variable.Custom != nil {
+		return variable.Custom.toOption(), nil
 	}
 
-	return nil, fmt.Errorf("unknown dashboard variable type '%s'", variable.Type)
+	return nil, fmt.Errorf("unconfigured variable")
 }
 
-func (variable *dashboardVariable) asInterval() dashboard.Option {
+type variableInterval struct {
+	Name    string
+	Label   string
+	Default string
+	Values  []string
+}
+
+func (variable *variableInterval) toOption() dashboard.Option {
 	opts := []interval.Option{
 		interval.Values(variable.Values),
 	}
@@ -59,22 +57,36 @@ func (variable *dashboardVariable) asInterval() dashboard.Option {
 	return dashboard.VariableAsInterval(variable.Name, opts...)
 }
 
-func (variable *dashboardVariable) asQuery() dashboard.Option {
-	opts := []query.Option{
-		query.Request(variable.Request),
-	}
-
-	if variable.Datasource != "" {
-		opts = append(opts, query.DataSource(variable.Datasource))
-	}
-	if variable.Label != "" {
-		opts = append(opts, query.Label(variable.Label))
-	}
-
-	return dashboard.VariableAsQuery(variable.Name, opts...)
+type variableCustom struct {
+	Name      string
+	Label     string
+	Default   string
+	ValuesMap map[string]string `yaml:"values_map"`
 }
 
-func (variable *dashboardVariable) asConst() dashboard.Option {
+func (variable *variableCustom) toOption() dashboard.Option {
+	opts := []custom.Option{
+		custom.Values(variable.ValuesMap),
+	}
+
+	if variable.Default != "" {
+		opts = append(opts, custom.Default(variable.Default))
+	}
+	if variable.Label != "" {
+		opts = append(opts, custom.Label(variable.Label))
+	}
+
+	return dashboard.VariableAsCustom(variable.Name, opts...)
+}
+
+type variableConst struct {
+	Name      string
+	Label     string
+	Default   string
+	ValuesMap map[string]string `yaml:"values_map"`
+}
+
+func (variable *variableConst) toOption() dashboard.Option {
 	opts := []constant.Option{
 		constant.Values(variable.ValuesMap),
 	}
@@ -89,17 +101,25 @@ func (variable *dashboardVariable) asConst() dashboard.Option {
 	return dashboard.VariableAsConst(variable.Name, opts...)
 }
 
-func (variable *dashboardVariable) asCustom() dashboard.Option {
-	opts := []custom.Option{
-		custom.Values(variable.ValuesMap),
+type variableQuery struct {
+	Name  string
+	Label string
+
+	Datasource string
+	Request    string
+}
+
+func (variable *variableQuery) toOption() dashboard.Option {
+	opts := []query.Option{
+		query.Request(variable.Request),
 	}
 
-	if variable.Default != "" {
-		opts = append(opts, custom.Default(variable.Default))
+	if variable.Datasource != "" {
+		opts = append(opts, query.DataSource(variable.Datasource))
 	}
 	if variable.Label != "" {
-		opts = append(opts, custom.Label(variable.Label))
+		opts = append(opts, query.Label(variable.Label))
 	}
 
-	return dashboard.VariableAsCustom(variable.Name, opts...)
+	return dashboard.VariableAsQuery(variable.Name, opts...)
 }

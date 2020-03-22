@@ -28,6 +28,7 @@ func TestUnmarshalYAML(t *testing.T) {
 	}{
 		generalOptions(),
 		tagAnnotations(),
+		variables(),
 		textPanel(),
 		graphPanel(),
 		singleStatPanel(),
@@ -145,6 +146,169 @@ tags_annotations:
 
 	return testCase{
 		name:                "tag annotations",
+		yaml:                yaml,
+		expectedGrafanaJSON: json,
+	}
+}
+
+func variables() testCase {
+	yaml := `title: Awesome dashboard
+
+variables:
+  - interval:
+      name: interval
+      label: Interval
+      default: 30s
+      values: ["30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"]
+  - query:
+      name: status
+      label: HTTP status
+      datasource: prometheus-default
+      request: "label_values(prometheus_http_requests_total, code)"
+  - const:
+      name: percentile
+      label: Percentile
+      default: 50
+      values_map:
+        50th: "50"
+  - custom:
+      name: vX
+      label: vX
+      default: v2
+      values_map:
+        v1: v1
+        v2: v2
+`
+	json := `{
+	"slug": "",
+	"title": "Awesome dashboard",
+	"originalTitle": "",
+	"tags": null,
+	"style": "dark",
+	"timezone": "",
+	"editable": false,
+	"hideControls": false,
+	"sharedCrosshair": false,
+	"templating": {
+		"list": [
+			{
+				"name": "interval",
+				"type": "interval",
+				"datasource": null,
+				"refresh": false,
+				"options": null,
+				"includeAll": false,
+				"allFormat": "",
+				"allValue": "",
+				"multi": false,
+				"multiFormat": "",
+				"query": "10m,12h,1h,1m,30m,30s,5m,6h",
+				"regex": "",
+				"current": {
+					"text": "30s",
+					"value": "30s"
+				},
+				"label": "Interval",
+				"hide": 0,
+				"sort": 0
+			},
+			{
+				"name": "status",
+				"type": "query",
+				"datasource": "prometheus-default",
+				"refresh": 1,
+				"options": null,
+				"includeAll": false,
+				"allFormat": "",
+				"allValue": "",
+				"multi": false,
+				"multiFormat": "",
+				"query": "label_values(prometheus_http_requests_total, code)",
+				"regex": "",
+				"current": {
+					"text": "",
+					"value": null
+				},
+				"label": "HTTP status",
+				"hide": 0,
+				"sort": 0
+			},
+			{
+				"name": "percentile",
+				"type": "constant",
+				"datasource": null,
+				"refresh": false,
+				"options": [
+					{
+						"selected": false,
+						"text": "50th",
+						"value": "50"
+					}
+				],
+				"includeAll": false,
+				"allFormat": "",
+				"allValue": "",
+				"multi": false,
+				"multiFormat": "",
+				"query": "50",
+				"regex": "",
+				"current": {
+					"text": "50th",
+					"value": "50"
+				},
+				"label": "Percentile",
+				"hide": 0,
+				"sort": 0
+			},
+			{
+				"name": "vX",
+				"type": "custom",
+				"datasource": null,
+				"refresh": false,
+				"options": [
+					{
+						"text": "v1",
+						"value": "v1",
+						"selected": false
+					},
+					{
+						"text": "v2",
+						"value": "v2",
+						"selected": false
+					}
+				],
+				"includeAll": false,
+				"allFormat": "",
+				"allValue": "",
+				"multi": false,
+				"multiFormat": "",
+				"query": "v1,v2",
+				"regex": "",
+				"current": {
+					"text": "v2",
+					"value": "v2"
+				},
+				"label": "vX",
+				"hide": 0,
+				"sort": 0
+			}
+		]
+	},
+	"annotations": {"list": null},
+	"links": null,
+	"panels": null,
+	"rows": [],
+	"time": {"from": "now-3h", "to": "now"},
+	"timepicker": {
+		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
+		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
+	},
+	"schemaVersion": 0,
+	"version": 0
+}`
+
+	return testCase{
+		name:                "variables",
 		yaml:                yaml,
 		expectedGrafanaJSON: json,
 	}
