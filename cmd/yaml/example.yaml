@@ -89,4 +89,4 @@ rows:
           markdown: "Markdown syntax help: [commonmark.org/help](https://commonmark.org/help/)\n${percentile}"
       - text:
           title: Some awesome html?
-          markdown: "Some awesome html?"
+          html: "Some <b>awesome</b> html?"
