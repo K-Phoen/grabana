@@ -30,6 +30,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		tagAnnotations(),
 		textPanel(),
 		graphPanel(),
+		singleStatPanel(),
 	}
 
 	for _, testCase := range testCases {
@@ -356,6 +357,130 @@ rows:
 						}
 					],
 					"transparent": false
+				}
+			]
+		}
+	],
+	"time": {"from": "now-3h", "to": "now"},
+	"timepicker": {
+		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
+		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
+	},
+	"schemaVersion": 0,
+	"version": 0
+}`
+
+	return testCase{
+		name:                "single row with single graph panel",
+		yaml:                yaml,
+		expectedGrafanaJSON: json,
+	}
+}
+
+func singleStatPanel() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Test row
+    panels:
+      - single_stat:
+          title: Heap Allocations
+          height: 400px
+          span: 4
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
+          unit: bytes
+          thresholds: ["26000000", "28000000"]
+          color: ["value", "background"]
+          colors: ["green", "yellow", "red"]
+`
+	json := `{
+	"slug": "",
+	"title": "Awesome dashboard",
+	"originalTitle": "",
+	"tags": null,
+	"style": "dark",
+	"timezone": "",
+	"editable": false,
+	"hideControls": false,
+	"sharedCrosshair": false,
+	"templating": {"list": null},
+	"annotations": {"list": null},
+	"links": null,
+	"panels": null,
+	"rows": [
+		{
+			"title": "Test row",
+			"collapse": false,
+			"editable": true,
+			"height": "250px",
+			"repeat": null,
+			"showTitle": true,
+			"panels": [
+				{
+					"datasource": "prometheus-default",
+					"editable": true,
+					"error": false,
+					"gridPos": {},
+					"id": 4,
+					"isNew": false,
+					"renderer": "flot",
+					"span": 4,
+					"height": "400px",
+					"title": "Heap Allocations",
+					"transparent": false,
+					"type": "singlestat",
+					"colors": [
+						"green",
+						"yellow",
+						"red"
+					],
+					"colorValue": true,
+					"colorBackground": true,
+					"decimals": 0,
+					"format": "bytes",
+					"gauge": {
+						"maxValue": 0,
+						"minValue": 0,
+						"show": false,
+						"thresholdLabels": false,
+						"thresholdMarkers": false
+					},
+					"mappingType": 1,
+					"mappingTypes": [
+						{
+							"name": "value to text",
+							"value": 1
+						},
+						{
+							"name": "range to text",
+							"value": 2
+						}
+					],
+					"nullPointMode": "",
+					"sparkline": {
+						"fillColor": "rgba(31, 118, 189, 0.18)",
+						"lineColor": "rgb(31, 120, 193)"
+					},
+					"targets": [
+						{
+							"refId": "",
+							"expr": "go_memstats_heap_alloc_bytes{job=\"prometheus\"}",
+							"format": "time_series"
+						}
+					],
+					"thresholds": "26000000,28000000",
+					"valueFontSize": "100%",
+					"valueMaps": [
+						{
+							"op": "=",
+							"text": "N/A",
+							"value": "null"
+						}
+					],
+					"valueName": "avg"
 				}
 			]
 		}
