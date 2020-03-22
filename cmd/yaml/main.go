@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/K-Phoen/grabana"
+	"github.com/K-Phoen/grabana/decoder"
 )
 
 func main() {
@@ -23,14 +24,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	dashboard, err := grabana.UnmarshalYAML(bytes.NewBuffer(content))
+	dashboard, err := decoder.UnmarshalYAML(bytes.NewBuffer(content))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Could not parse file: %s\n", err)
 		os.Exit(1)
 	}
-
-	json, _ := dashboard.MarshalJSON()
-	fmt.Printf("Dashboard JSON: %s\n", json)
 
 	ctx := context.Background()
 	client := grabana.NewClient(&http.Client{}, os.Args[2], os.Args[3])

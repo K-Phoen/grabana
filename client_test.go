@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	builder "github.com/K-Phoen/grabana/dashboard"
 	"github.com/stretchr/testify/require"
 )
 
@@ -208,7 +209,7 @@ func TestGetAlertChannelByNameCanFail(t *testing.T) {
 
 func TestDashboardsCanBeCreated(t *testing.T) {
 	req := require.New(t)
-	dashboard := NewDashboardBuilder("Dashboard name")
+	dashboard := builder.New("Dashboard name")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `{
   "id":      1,
@@ -231,7 +232,7 @@ func TestDashboardsCanBeCreated(t *testing.T) {
 
 func TestDashboardsCreationCanFail(t *testing.T) {
 	req := require.New(t)
-	dashboard := NewDashboardBuilder("Dashboard name")
+	dashboard := builder.New("Dashboard name")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, `{

@@ -1,4 +1,4 @@
-package grabana
+package dashboard
 
 import (
 	"encoding/json"
@@ -17,7 +17,7 @@ func requireJSON(t *testing.T, payload []byte) {
 func TestNewDashboardsCanBeCreated(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("My dashboard")
+	panel := New("My dashboard")
 
 	req.Equal(uint(0), panel.board.ID)
 	req.Equal("My dashboard", panel.board.Title)
@@ -32,7 +32,7 @@ func TestNewDashboardsCanBeCreated(t *testing.T) {
 func TestDashboardCanBeMarshalledIntoJSON(t *testing.T) {
 	req := require.New(t)
 
-	builder := NewDashboardBuilder("Awesome dashboard")
+	builder := New("Awesome dashboard")
 	dashboardJSON, err := builder.MarshalJSON()
 
 	req.NoError(err)
@@ -42,7 +42,7 @@ func TestDashboardCanBeMarshalledIntoJSON(t *testing.T) {
 func TestDashboardCanBeMadeEditable(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", Editable())
+	panel := New("", Editable())
 
 	req.True(panel.board.Editable)
 }
@@ -50,7 +50,7 @@ func TestDashboardCanBeMadeEditable(t *testing.T) {
 func TestDashboardCanBeMadeReadOnly(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", ReadOnly())
+	panel := New("", ReadOnly())
 
 	req.False(panel.board.Editable)
 }
@@ -58,7 +58,7 @@ func TestDashboardCanBeMadeReadOnly(t *testing.T) {
 func TestDashboardCanHaveASharedCrossHair(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", SharedCrossHair())
+	panel := New("", SharedCrossHair())
 
 	req.True(panel.board.SharedCrosshair)
 }
@@ -66,7 +66,7 @@ func TestDashboardCanHaveASharedCrossHair(t *testing.T) {
 func TestDashboardCanHaveADefaultTooltip(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", DefaultTooltip())
+	panel := New("", DefaultTooltip())
 
 	req.False(panel.board.SharedCrosshair)
 }
@@ -74,7 +74,7 @@ func TestDashboardCanHaveADefaultTooltip(t *testing.T) {
 func TestDashboardCanBeAutoRefreshed(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", AutoRefresh("5s"))
+	panel := New("", AutoRefresh("5s"))
 
 	req.True(panel.board.Refresh.Flag)
 	req.Equal("5s", panel.board.Refresh.Value)
@@ -84,7 +84,7 @@ func TestDashboardCanHaveTags(t *testing.T) {
 	req := require.New(t)
 	tags := []string{"generated", "grabana"}
 
-	panel := NewDashboardBuilder("", Tags(tags))
+	panel := New("", Tags(tags))
 
 	req.Len(panel.board.Tags, 2)
 	req.ElementsMatch(tags, panel.board.Tags)
@@ -93,7 +93,7 @@ func TestDashboardCanHaveTags(t *testing.T) {
 func TestDashboardCanHaveVariablesAsConstants(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", VariableAsConst("percentile"))
+	panel := New("", VariableAsConst("percentile"))
 
 	req.Len(panel.board.Templating.List, 1)
 }
@@ -101,7 +101,7 @@ func TestDashboardCanHaveVariablesAsConstants(t *testing.T) {
 func TestDashboardCanHaveVariablesAsCustom(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", VariableAsCustom("vX"))
+	panel := New("", VariableAsCustom("vX"))
 
 	req.Len(panel.board.Templating.List, 1)
 }
@@ -109,7 +109,7 @@ func TestDashboardCanHaveVariablesAsCustom(t *testing.T) {
 func TestDashboardCanHaveVariablesAsInterval(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", VariableAsInterval("interval"))
+	panel := New("", VariableAsInterval("interval"))
 
 	req.Len(panel.board.Templating.List, 1)
 }
@@ -117,7 +117,7 @@ func TestDashboardCanHaveVariablesAsInterval(t *testing.T) {
 func TestDashboardCanHaveVariablesAsQuery(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", VariableAsQuery("status"))
+	panel := New("", VariableAsQuery("status"))
 
 	req.Len(panel.board.Templating.List, 1)
 }
@@ -125,7 +125,7 @@ func TestDashboardCanHaveVariablesAsQuery(t *testing.T) {
 func TestDashboardCanHaveRows(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", Row("Prometheus"))
+	panel := New("", Row("Prometheus"))
 
 	req.Len(panel.board.Rows, 1)
 }
@@ -133,7 +133,7 @@ func TestDashboardCanHaveRows(t *testing.T) {
 func TestDashboardCanHaveAnnotationsFromTags(t *testing.T) {
 	req := require.New(t)
 
-	panel := NewDashboardBuilder("", TagsAnnotation(TagAnnotation{}))
+	panel := New("", TagsAnnotation(TagAnnotation{}))
 
 	req.Len(panel.board.Annotations.List, 1)
 }
