@@ -14,6 +14,12 @@ type testCase struct {
 	expectedGrafanaJSON string
 }
 
+func TestUnmarshalYAMLWithInvalidInput(t *testing.T) {
+	_, err := UnmarshalYAML(bytes.NewBufferString(""))
+
+	require.Error(t, err)
+}
+
 func TestUnmarshalYAML(t *testing.T) {
 	testCases := []struct {
 		name                string
