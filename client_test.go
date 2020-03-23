@@ -249,3 +249,33 @@ func TestDashboardsCreationCanFail(t *testing.T) {
 	req.Error(err)
 	req.Nil(board)
 }
+
+func TestDeleteDashboard(t *testing.T) {
+	req := require.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, `{"title": "Production Overview"}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL, "")
+
+	err := client.DeleteDashboard(context.TODO(), "some uid")
+
+	req.NoError(err)
+}
+
+func TestDeleteDashboardCanFail(t *testing.T) {
+	req := require.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		fmt.Fprintln(w, `{"message": "oh noes"}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL, "")
+
+	err := client.DeleteDashboard(context.TODO(), "some uid")
+
+	req.Error(err)
+}

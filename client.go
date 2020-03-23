@@ -193,6 +193,38 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 	return &model, nil
 }
 
+// DeleteDashboard deletes a dashboard given its UID.
+func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
+	resp, err := client.delete(ctx, "/api/dashboards/uid/"+uid)
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		return fmt.Errorf("could not delete dashboard: %s", body)
+	}
+
+	return nil
+}
+
+func (client Client) delete(ctx context.Context, path string) (*http.Response, error) {
+	request, err := http.NewRequestWithContext(ctx, http.MethodDelete, client.url(path), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", client.apiToken))
+
+	return client.http.Do(request)
+}
+
 func (client Client) postJSON(ctx context.Context, path string, body []byte) (*http.Response, error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, client.url(path), bytes.NewReader(body))
 	if err != nil {
