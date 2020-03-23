@@ -54,6 +54,22 @@ func NewClient(http *http.Client, host string, apiToken string) *Client {
 	}
 }
 
+// FindOrCreateFolder returns the folder by its name or creates it if it doesn't exist.
+func (client *Client) FindOrCreateFolder(ctx context.Context, name string) (*Folder, error) {
+	folder, err := client.GetFolderByTitle(ctx, name)
+	if err != nil && err != ErrFolderNotFound {
+		return nil, fmt.Errorf("could not find or create folder: %w", err)
+	}
+	if folder == nil {
+		folder, err = client.CreateFolder(ctx, name)
+		if err != nil {
+			return nil, fmt.Errorf("could not find create folder: %w", err)
+		}
+	}
+
+	return folder, nil
+}
+
 // CreateFolder creates a dashboard folder.
 // See https://grafana.com/docs/grafana/latest/reference/dashboard_folders/
 func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, error) {
