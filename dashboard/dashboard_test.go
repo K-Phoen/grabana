@@ -47,6 +47,22 @@ func TestDashboardCanBeMadeEditable(t *testing.T) {
 	req.True(panel.board.Editable)
 }
 
+func TestDashboardIDCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", ID(42))
+
+	req.Equal(uint(42), panel.board.ID)
+}
+
+func TestDashboardUIDCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", UID("foo"))
+
+	req.Equal("foo", panel.board.UID)
+}
+
 func TestDashboardCanBeMadeReadOnly(t *testing.T) {
 	req := require.New(t)
 
