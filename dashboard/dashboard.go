@@ -96,6 +96,20 @@ func VariableAsConst(name string, options ...constant.Option) Option {
 	}
 }
 
+// ID sets the ID used by the dashboard.
+func ID(id uint) Option {
+	return func(builder *Builder) {
+		builder.board.ID = id
+	}
+}
+
+// UID sets the UID used by the dashboard.
+func UID(uid string) Option {
+	return func(builder *Builder) {
+		builder.board.UID = uid
+	}
+}
+
 // VariableAsCustom adds a templated variable, defined as a set of custom
 // values.
 // See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types
