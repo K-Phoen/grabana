@@ -536,6 +536,10 @@ rows:
           height: 400px
           span: 4
           datasource: prometheus-default
+          axes:
+            left: { unit: short, min: 0, max: 100, label: Requests }
+            right: { hidden: true }
+            bottom: { hidden: true }
           targets:
             - prometheus:
                 query: "go_memstats_heap_alloc_bytes"
@@ -617,13 +621,16 @@ rows:
 					"x-axis": true,
 					"y-axis": true,
 					"xaxis": {
-						"format": "time",
+						"format": "short",
 						"logBase": 1,
-						"show": true
+						"show": false
 					},
 					"yaxes": [
 						{
 							"format": "short",
+							"label": "Requests",
+							"min": 0,
+							"max": 100,
 							"logBase": 1,
 							"show": true
 						},
