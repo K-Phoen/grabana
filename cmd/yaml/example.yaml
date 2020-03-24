@@ -51,6 +51,9 @@ rows:
             - prometheus:
                 query: "rate(promhttp_metric_handler_requests_total[$interval])"
                 legend: "{{handler}} - {{ code }}"
+          axes:
+            left: { unit: short, min: 0, label: Requests }
+            right: { hidden: true }
       - graph:
           title: Heap allocations
           height: 400px
