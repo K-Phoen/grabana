@@ -164,6 +164,56 @@ rows:
 	require.Equal(t, ErrTargetNotConfigured, err)
 }
 
+func TestUnmarshalYAMLWithNoAlertThresholdGraph(t *testing.T) {
+	payload := `
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Heap allocations
+          alert:
+            title: Too many heap allocations
+            evaluate_every: 1m
+            for: 1m
+            if:
+              - operand: and
+                value: {func: avg, ref: A, from: 1m, to: now}
+
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrNoAlertThresholdDefined, err)
+}
+
+func TestUnmarshalYAMLWithInvalidAlertValueFunctionGraph(t *testing.T) {
+	payload := `
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Heap allocations
+          alert:
+            title: Too many heap allocations
+            evaluate_every: 1m
+            for: 1m
+            if:
+              - operand: and
+                value: {func: BLOOPER, ref: A, from: 1m, to: now}
+                threshold: {above: 23000000}
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidAlertValueFunc, err)
+}
+
 func generalOptions() testCase {
 	yaml := `title: Awesome dashboard
 
@@ -536,6 +586,18 @@ rows:
           height: 400px
           span: 4
           datasource: prometheus-default
+          alert:
+            title: Too many heap allocations
+            evaluate_every: 1m
+            for: 1m
+            notify: 1
+            message: "Wow, a we're allocating a lot."
+            on_no_data: alerting
+            on_execution_error: alerting
+            if:
+              - operand: and
+                value: {func: avg, ref: A, from: 1m, to: now}
+                threshold: {above: 23000000}
           axes:
             left: { unit: short, min: 0, max: 100, label: Requests }
             right: { hidden: true }
@@ -583,6 +645,39 @@ rows:
 					"fill": 1,
 					"title": "Heap allocations",
 					"aliasColors": {},
+					"alert": {
+						"conditions": [
+							{
+								"evaluator": {
+									"params": [23000000],
+									"type": "gt"
+								},
+								"operator": {"type": "and"},
+								"query": {"params": ["A", "1m", "now"]},
+								"reducer": {"type": "avg"},
+								"type": "query"
+							}
+						],
+						"executionErrorState": "alerting",
+						"for": "1m",
+						"frequency": "1m",
+						"handler": 1,
+						"message": "Wow, a we're allocating a lot.",
+						"name": "Too many heap allocations",
+						"noDataState": "alerting",
+						"notifications": [
+							{
+								"disableResolveMessage": false,
+								"frequency": "",
+								"id": 1,
+								"isDefault": false,
+								"name": "",
+								"sendReminder": false,
+								"settings": null,
+								"type": ""
+							}
+						]
+					},
 					"bars": false,
 					"points": false,
 					"stack": false,
