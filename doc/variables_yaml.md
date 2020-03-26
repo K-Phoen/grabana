@@ -4,7 +4,7 @@
 > hard-coding things like server, application and sensor name in your metric
 > queries you can use variables in their place. Variables are shown as
 > dropdown select boxes at the top of the dashboard. These dropdowns
-> make it easy to change the data being displayed in your dashboard.
+> allow changing the data being displayed in your dashboard.
 >
 > — https://grafana.com/docs/grafana/latest/reference/templating/
 
