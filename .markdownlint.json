@@ -1,0 +1,8 @@
+{
+  "default": true,
+  "no-inline-html": false,
+  "no-hard-tabs": false,
+  "no-trailing-punctuation": false,
+  "no-bare-urls": false,
+  "line-length": false
+}
