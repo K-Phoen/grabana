@@ -71,6 +71,12 @@ if _, err := client.UpsertDashboard(ctx, folder, builder); err != nil {
 
 For a more complete example, see the [`example`](./cmd/example/) directory.
 
+## Going further
+
+Check out [the documentation](doc/index.md) to discover what Grabana can do for
+you.
+
+
 ## License
 
 This library is under the [MIT](LICENSE) license.
