@@ -175,11 +175,11 @@ func (a graphAlert) toOptions() ([]alert.Option, error) {
 }
 
 type alertThreshold struct {
-	HasNoValue   bool
+	HasNoValue   bool `yaml:"has_no_value"`
 	Above        *float64
 	Below        *float64
-	OutsideRange [2]float64
-	WithinRange  [2]float64
+	OutsideRange [2]float64 `yaml:"outside_range"`
+	WithinRange  [2]float64 `yaml:"within_range"`
 }
 
 func (threshold alertThreshold) toOption() (alert.ConditionOption, error) {
