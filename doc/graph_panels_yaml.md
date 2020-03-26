@@ -1,7 +1,7 @@
 # Graph panels
 
-> The main panel in Grafana is simply named Graph. It provides a very rich set
-> of graphing options.
+> The main panel in Grafana is named Graph. It provides a very rich set of
+> graphing options.
 >
 > — https://grafana.com/docs/grafana/latest/features/panels/graph/
 
@@ -48,6 +48,10 @@ rows:
               # valid `func` values are: avg, sum, count, last, min, max, median, diff, percent_diff
               value: {func: avg, ref: A, from: 1m, to: now}
               threshold: {above: 23000000}
+              # threshold: {has_no_value: true}
+              # threshold: {below: 23000000}
+              # threshold: {outside_range: [23000000, 26000000]}
+              # threshold: {within_range: [23000000, 26000000]}
 ```
 
 ## That was it!

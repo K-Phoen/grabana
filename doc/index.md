@@ -15,3 +15,4 @@
 * [Text panels](text_panels_yaml.md)
 * [Table panels](table_panels_yaml.md)
 * [Graph panels](graph_panels_yaml.md)
+* [Singlestat panels](singlestat_panels_yaml.md)
