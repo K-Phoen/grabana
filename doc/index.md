@@ -7,5 +7,8 @@
 
 ## Dashboards as YAML
 
-* [Example](../cmd/yaml/example.yaml)
 * [Unmarshalling a YAML file](unmarshalling_yaml.md)
+* [Realistic example](../cmd/yaml/example.yaml)
+* [Dashboard options](dashboard_options_yaml.md)
+* [Variables](variables_yaml.md)
+* [Annotations](annotations_yaml.md)
