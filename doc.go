@@ -1,23 +1,23 @@
 /*
 Package grabana provides a developer-friendly way of creating Grafana dashboards.
 
-If you are looking for a way to version your dashboards configuration or
-automate tedious and error-prone creation of dashboards, this library is meant
-for you.
+Whether you prefer writing **code or YAML**, if you are looking for a way to
+version your dashboards configuration or automate tedious and error-prone
+creation of dashboards, this library is meant for you.
 
 	builder := dashboard.New(
 		"Awesome dashboard",
-		grabana.VariableAsInterval(
+		dashboard.VariableAsInterval(
 			"interval",
 			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
 		),
-		grabana.VariableAsQuery(
+		dashboard.VariableAsQuery(
 			"status",
 			query.DataSource("prometheus-default"),
 			query.Request("label_values(prometheus_http_requests_total, code)"),
 			query.Sort(query.NumericalAsc),
 		),
-		grabana.Row(
+		dashboard.Row(
 			"Prometheus",
 			row.WithGraph(
 				"HTTP Rate",
@@ -41,7 +41,7 @@ for you.
 				singlestat.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
 			),
 		),
-		grabana.Row(
+		dashboard.Row(
 			"Some text, because it might be useful",
 			row.WithText(
 				"Some awesome html?",
