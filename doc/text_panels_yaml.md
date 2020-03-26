@@ -6,7 +6,6 @@
 > — https://grafana.com/docs/grafana/latest/features/panels/text/
 
 ```yaml
-
 rows:
   - name: "Text panels row"
     panels:

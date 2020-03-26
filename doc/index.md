@@ -13,3 +13,4 @@
 * [Variables](variables_yaml.md)
 * [Annotations](annotations_yaml.md)
 * [Text panels](text_panels_yaml.md)
+* [Table panels](table_panels_yaml.md)
