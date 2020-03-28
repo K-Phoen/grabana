@@ -10,20 +10,20 @@ import (
 var ErrInvalidColoringTarget = fmt.Errorf("invalid coloring target")
 var ErrInvalidSparkLineMode = fmt.Errorf("invalid sparkline mode")
 
-type dashboardSingleStat struct {
+type DashboardSingleStat struct {
 	Title      string
-	Span       float32
-	Height     string
-	Datasource string
+	Span       float32 `yaml:",omitempty"`
+	Height     string  `yaml:",omitempty"`
+	Datasource string  `yaml:",omitempty"`
 	Unit       string
 	SparkLine  string `yaml:"sparkline"`
-	Targets    []target
+	Targets    []Target
 	Thresholds [2]string
 	Colors     [3]string
 	Color      []string
 }
 
-func (singleStatPanel dashboardSingleStat) toOption() (row.Option, error) {
+func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	opts := []singlestat.Option{}
 
 	if singleStatPanel.Span != 0 {
@@ -78,7 +78,7 @@ func (singleStatPanel dashboardSingleStat) toOption() (row.Option, error) {
 	return row.WithSingleStat(singleStatPanel.Title, opts...), nil
 }
 
-func (singleStatPanel dashboardSingleStat) target(t target) (singlestat.Option, error) {
+func (singleStatPanel DashboardSingleStat) target(t Target) (singlestat.Option, error) {
 	if t.Prometheus != nil {
 		return singlestat.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}

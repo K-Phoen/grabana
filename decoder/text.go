@@ -5,15 +5,15 @@ import (
 	"github.com/K-Phoen/grabana/text"
 )
 
-type dashboardText struct {
+type DashboardText struct {
 	Title    string
-	Span     float32
-	Height   string
-	HTML     string
-	Markdown string
+	Span     float32 `yaml:",omitempty"`
+	Height   string  `yaml:",omitempty"`
+	HTML     string  `yaml:",omitempty"`
+	Markdown string  `yaml:",omitempty"`
 }
 
-func (textPanel dashboardText) toOption() row.Option {
+func (textPanel DashboardText) toOption() row.Option {
 	opts := []text.Option{}
 
 	if textPanel.Span != 0 {

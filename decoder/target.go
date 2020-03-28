@@ -8,17 +8,17 @@ import (
 
 var ErrTargetNotConfigured = fmt.Errorf("target not configured")
 
-type target struct {
-	Prometheus *prometheusTarget
+type Target struct {
+	Prometheus *PrometheusTarget
 }
 
-type prometheusTarget struct {
+type PrometheusTarget struct {
 	Query  string
 	Legend string
 	Ref    string
 }
 
-func (t prometheusTarget) toOptions() []prometheus.Option {
+func (t PrometheusTarget) toOptions() []prometheus.Option {
 	var opts []prometheus.Option
 
 	if t.Legend != "" {

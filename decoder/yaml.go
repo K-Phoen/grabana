@@ -11,7 +11,7 @@ func UnmarshalYAML(input io.Reader) (builder.Builder, error) {
 	decoder := yaml.NewDecoder(input)
 	decoder.SetStrict(true)
 
-	parsed := &dashboardModel{}
+	parsed := &DashboardModel{}
 	if err := decoder.Decode(parsed); err != nil {
 		return builder.Builder{}, err
 	}

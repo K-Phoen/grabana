@@ -5,17 +5,17 @@ import (
 	"github.com/K-Phoen/grabana/table"
 )
 
-type dashboardTable struct {
+type DashboardTable struct {
 	Title                  string
-	Span                   float32
-	Height                 string
-	Datasource             string
-	Targets                []target
+	Span                   float32 `yaml:",omitempty"`
+	Height                 string  `yaml:",omitempty"`
+	Datasource             string  `yaml:",omitempty"`
+	Targets                []Target
 	HiddenColumns          []string            `yaml:"hidden_columns"`
 	TimeSeriesAggregations []table.Aggregation `yaml:"time_series_aggregations"`
 }
 
-func (tablePanel dashboardTable) toOption() (row.Option, error) {
+func (tablePanel DashboardTable) toOption() (row.Option, error) {
 	opts := []table.Option{}
 
 	if tablePanel.Span != 0 {
@@ -48,7 +48,7 @@ func (tablePanel dashboardTable) toOption() (row.Option, error) {
 	return row.WithTable(tablePanel.Title, opts...), nil
 }
 
-func (tablePanel *dashboardTable) target(t target) (table.Option, error) {
+func (tablePanel *DashboardTable) target(t Target) (table.Option, error) {
 	if t.Prometheus != nil {
 		return table.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
