@@ -5,12 +5,12 @@ import (
 	"github.com/K-Phoen/grabana/row"
 )
 
-type dashboardRow struct {
+type DashboardRow struct {
 	Name   string
-	Panels []dashboardPanel
+	Panels []DashboardPanel
 }
 
-func (r dashboardRow) toOption() (dashboard.Option, error) {
+func (r DashboardRow) toOption() (dashboard.Option, error) {
 	opts := []row.Option{}
 
 	for _, panel := range r.Panels {

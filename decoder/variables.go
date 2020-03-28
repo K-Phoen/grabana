@@ -13,14 +13,14 @@ import (
 
 var ErrVariableNotConfigured = fmt.Errorf("variable not configured")
 
-type dashboardVariable struct {
-	Interval *variableInterval
-	Custom   *variableCustom
-	Query    *variableQuery
-	Const    *variableConst
+type DashboardVariable struct {
+	Interval *VariableInterval `yaml:",omitempty"`
+	Custom   *VariableCustom   `yaml:",omitempty"`
+	Query    *VariableQuery    `yaml:",omitempty"`
+	Const    *VariableConst    `yaml:",omitempty"`
 }
 
-func (variable *dashboardVariable) toOption() (dashboard.Option, error) {
+func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
 	if variable.Query != nil {
 		return variable.Query.toOption(), nil
 	}
@@ -37,14 +37,14 @@ func (variable *dashboardVariable) toOption() (dashboard.Option, error) {
 	return nil, ErrVariableNotConfigured
 }
 
-type variableInterval struct {
+type VariableInterval struct {
 	Name    string
 	Label   string
 	Default string
 	Values  []string
 }
 
-func (variable *variableInterval) toOption() dashboard.Option {
+func (variable *VariableInterval) toOption() dashboard.Option {
 	opts := []interval.Option{
 		interval.Values(variable.Values),
 	}
@@ -59,14 +59,14 @@ func (variable *variableInterval) toOption() dashboard.Option {
 	return dashboard.VariableAsInterval(variable.Name, opts...)
 }
 
-type variableCustom struct {
+type VariableCustom struct {
 	Name      string
 	Label     string
 	Default   string
 	ValuesMap map[string]string `yaml:"values_map"`
 }
 
-func (variable *variableCustom) toOption() dashboard.Option {
+func (variable *VariableCustom) toOption() dashboard.Option {
 	opts := []custom.Option{
 		custom.Values(variable.ValuesMap),
 	}
@@ -81,14 +81,14 @@ func (variable *variableCustom) toOption() dashboard.Option {
 	return dashboard.VariableAsCustom(variable.Name, opts...)
 }
 
-type variableConst struct {
+type VariableConst struct {
 	Name      string
 	Label     string
 	Default   string
 	ValuesMap map[string]string `yaml:"values_map"`
 }
 
-func (variable *variableConst) toOption() dashboard.Option {
+func (variable *VariableConst) toOption() dashboard.Option {
 	opts := []constant.Option{
 		constant.Values(variable.ValuesMap),
 	}
@@ -103,7 +103,7 @@ func (variable *variableConst) toOption() dashboard.Option {
 	return dashboard.VariableAsConst(variable.Name, opts...)
 }
 
-type variableQuery struct {
+type VariableQuery struct {
 	Name  string
 	Label string
 
@@ -114,7 +114,7 @@ type variableQuery struct {
 	DefaultAll bool `yaml:"default_all"`
 }
 
-func (variable *variableQuery) toOption() dashboard.Option {
+func (variable *VariableQuery) toOption() dashboard.Option {
 	opts := []query.Option{
 		query.Request(variable.Request),
 	}
