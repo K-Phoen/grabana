@@ -20,7 +20,7 @@ type DashboardGraph struct {
 	Datasource string  `yaml:",omitempty"`
 	Targets    []Target
 	Axes       *GraphAxes  `yaml:",omitempty"`
-	Legend     []string    `yaml:",omitempty"`
+	Legend     []string    `yaml:",omitempty,flow"`
 	Alert      *GraphAlert `yaml:",omitempty"`
 }
 
