@@ -21,8 +21,10 @@ rows:
             - prometheus:
                 query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
           unit: bytes
+          # valid values are: min, max, avg, current, total, first, delta, diff, range
+          value_type: avg
           thresholds: ["26000000", "28000000"]
-          # valie values are: value, background
+          # valid values are: value, background
           color: ["value"]
           # valid values are: bottom, full
           sparkline: bottom

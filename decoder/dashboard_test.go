@@ -109,7 +109,7 @@ rows:
 	require.Equal(t, ErrTargetNotConfigured, err)
 }
 
-func TestUnmarshalYAMLWithNoTInvalidSparklineModeSingleStat(t *testing.T) {
+func TestUnmarshalYAMLWithInvalidSparklineModeSingleStat(t *testing.T) {
 	payload := `
 rows:
   - name: Prometheus
@@ -145,6 +145,25 @@ rows:
 
 	require.Error(t, err)
 	require.Equal(t, ErrInvalidColoringTarget, err)
+}
+func TestUnmarshalYAMLWithSingleStatAndInvalidValueType(t *testing.T) {
+	payload := `
+rows:
+  - name: Prometheus
+    panels:
+      - single_stat:
+          title: Heap Allocations
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
+          value_type: invalid
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidSingleStatValueType, err)
 }
 
 func TestUnmarshalYAMLWithNoTargetSingleGraph(t *testing.T) {
@@ -771,6 +790,7 @@ rows:
             - prometheus:
                 query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
           unit: bytes
+          value_type: current
           sparkline: bottom
           thresholds: ["26000000", "28000000"]
           color: ["value", "background"]
@@ -861,7 +881,7 @@ rows:
 							"value": "null"
 						}
 					],
-					"valueName": "avg"
+					"valueName": "current"
 				}
 			]
 		}

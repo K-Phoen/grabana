@@ -9,6 +9,7 @@ import (
 
 var ErrInvalidColoringTarget = fmt.Errorf("invalid coloring target")
 var ErrInvalidSparkLineMode = fmt.Errorf("invalid sparkline mode")
+var ErrInvalidSingleStatValueType = fmt.Errorf("invalid single stat value type")
 
 type DashboardSingleStat struct {
 	Title      string
@@ -16,11 +17,12 @@ type DashboardSingleStat struct {
 	Height     string  `yaml:",omitempty"`
 	Datasource string  `yaml:",omitempty"`
 	Unit       string
+	ValueType  string `yaml:"value_type"`
 	SparkLine  string `yaml:"sparkline"`
 	Targets    []Target
 	Thresholds [2]string
 	Colors     [3]string
-	Color      []string
+	Color      []string `yaml:",omitempty"`
 }
 
 func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
@@ -53,6 +55,30 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	case "":
 	default:
 		return nil, ErrInvalidSparkLineMode
+	}
+
+	switch singleStatPanel.ValueType {
+	case "min":
+		opts = append(opts, singlestat.ValueType(singlestat.Min))
+	case "max":
+		opts = append(opts, singlestat.ValueType(singlestat.Max))
+	case "avg":
+		opts = append(opts, singlestat.ValueType(singlestat.Avg))
+	case "current":
+		opts = append(opts, singlestat.ValueType(singlestat.Current))
+	case "total":
+		opts = append(opts, singlestat.ValueType(singlestat.Total))
+	case "first":
+		opts = append(opts, singlestat.ValueType(singlestat.First))
+	case "delta":
+		opts = append(opts, singlestat.ValueType(singlestat.Delta))
+	case "diff":
+		opts = append(opts, singlestat.ValueType(singlestat.Diff))
+	case "range":
+		opts = append(opts, singlestat.ValueType(singlestat.Range))
+	case "":
+	default:
+		return nil, ErrInvalidSingleStatValueType
 	}
 
 	for _, colorTarget := range singleStatPanel.Color {

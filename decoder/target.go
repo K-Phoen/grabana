@@ -14,8 +14,8 @@ type Target struct {
 
 type PrometheusTarget struct {
 	Query  string
-	Legend string
-	Ref    string
+	Legend string `yaml:",omitempty"`
+	Ref    string `yaml:",omitempty"`
 }
 
 func (t PrometheusTarget) toOptions() []prometheus.Option {
