@@ -57,28 +57,13 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 		return nil, ErrInvalidSparkLineMode
 	}
 
-	switch singleStatPanel.ValueType {
-	case "min":
-		opts = append(opts, singlestat.ValueType(singlestat.Min))
-	case "max":
-		opts = append(opts, singlestat.ValueType(singlestat.Max))
-	case "avg":
-		opts = append(opts, singlestat.ValueType(singlestat.Avg))
-	case "current":
-		opts = append(opts, singlestat.ValueType(singlestat.Current))
-	case "total":
-		opts = append(opts, singlestat.ValueType(singlestat.Total))
-	case "first":
-		opts = append(opts, singlestat.ValueType(singlestat.First))
-	case "delta":
-		opts = append(opts, singlestat.ValueType(singlestat.Delta))
-	case "diff":
-		opts = append(opts, singlestat.ValueType(singlestat.Diff))
-	case "range":
-		opts = append(opts, singlestat.ValueType(singlestat.Range))
-	case "":
-	default:
-		return nil, ErrInvalidSingleStatValueType
+	if singleStatPanel.ValueType != "" {
+		opt, err := singleStatPanel.valueType()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
 	}
 
 	for _, colorTarget := range singleStatPanel.Color {
@@ -102,6 +87,31 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	}
 
 	return row.WithSingleStat(singleStatPanel.Title, opts...), nil
+}
+
+func (singleStatPanel DashboardSingleStat) valueType() (singlestat.Option, error) {
+	switch singleStatPanel.ValueType {
+	case "min":
+		return singlestat.ValueType(singlestat.Min), nil
+	case "max":
+		return singlestat.ValueType(singlestat.Max), nil
+	case "avg":
+		return singlestat.ValueType(singlestat.Avg), nil
+	case "current":
+		return singlestat.ValueType(singlestat.Current), nil
+	case "total":
+		return singlestat.ValueType(singlestat.Total), nil
+	case "first":
+		return singlestat.ValueType(singlestat.First), nil
+	case "delta":
+		return singlestat.ValueType(singlestat.Delta), nil
+	case "diff":
+		return singlestat.ValueType(singlestat.Diff), nil
+	case "range":
+		return singlestat.ValueType(singlestat.Range), nil
+	default:
+		return nil, ErrInvalidSingleStatValueType
+	}
 }
 
 func (singleStatPanel DashboardSingleStat) target(t Target) (singlestat.Option, error) {

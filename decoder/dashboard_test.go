@@ -20,11 +20,7 @@ func TestUnmarshalYAMLWithInvalidInput(t *testing.T) {
 }
 
 func TestUnmarshalYAML(t *testing.T) {
-	testCases := []struct {
-		name                string
-		yaml                string
-		expectedGrafanaJSON string
-	}{
+	testCases := []testCase{
 		generalOptions(),
 		tagAnnotations(),
 		variables(),
@@ -146,6 +142,7 @@ rows:
 	require.Error(t, err)
 	require.Equal(t, ErrInvalidColoringTarget, err)
 }
+
 func TestUnmarshalYAMLWithSingleStatAndInvalidValueType(t *testing.T) {
 	payload := `
 rows:
