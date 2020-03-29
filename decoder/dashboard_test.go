@@ -205,6 +205,24 @@ rows:
 	require.Equal(t, ErrNoAlertThresholdDefined, err)
 }
 
+func TestUnmarshalYAMLWithInvalidLegendGraph(t *testing.T) {
+	payload := `
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Heap allocations
+          legend: [invalid_attribute]
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidLegendAttribute, err)
+}
+
 func TestUnmarshalYAMLWithInvalidAlertValueFunctionGraph(t *testing.T) {
 	payload := `
 rows:

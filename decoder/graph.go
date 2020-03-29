@@ -11,6 +11,7 @@ import (
 
 var ErrNoAlertThresholdDefined = fmt.Errorf("no threshold defined")
 var ErrInvalidAlertValueFunc = fmt.Errorf("invalid alert value function")
+var ErrInvalidLegendAttribute = fmt.Errorf("invalid legend attribute")
 
 type DashboardGraph struct {
 	Title      string
@@ -100,6 +101,8 @@ func (graphPanel *DashboardGraph) legend() ([]graph.LegendOption, error) {
 			opt = graph.NoNullSeries
 		case "no_zero_series":
 			opt = graph.NoZeroSeries
+		default:
+			return nil, ErrInvalidLegendAttribute
 		}
 
 		opts = append(opts, opt)
