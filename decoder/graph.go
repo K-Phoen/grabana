@@ -75,7 +75,7 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 }
 
 func (graphPanel *DashboardGraph) legend() ([]graph.LegendOption, error) {
-	var opts []graph.LegendOption
+	opts := make([]graph.LegendOption, 0, len(graphPanel.Legend))
 
 	for _, attribute := range graphPanel.Legend {
 		var opt graph.LegendOption
