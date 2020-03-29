@@ -41,7 +41,7 @@ type VariableInterval struct {
 	Name    string
 	Label   string
 	Default string
-	Values  []string
+	Values  []string `yaml:",flow"`
 }
 
 func (variable *VariableInterval) toOption() dashboard.Option {
