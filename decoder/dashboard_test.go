@@ -205,6 +205,24 @@ rows:
 	require.Equal(t, ErrNoAlertThresholdDefined, err)
 }
 
+func TestUnmarshalYAMLWithInvalidLegendGraph(t *testing.T) {
+	payload := `
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Heap allocations
+          legend: [invalid_attribute]
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidLegendAttribute, err)
+}
+
 func TestUnmarshalYAMLWithInvalidAlertValueFunctionGraph(t *testing.T) {
 	payload := `
 rows:
@@ -602,6 +620,7 @@ rows:
           height: 400px
           span: 4
           datasource: prometheus-default
+          legend: [avg, current, min, max, as_table, no_null_series, no_zero_series]
           alert:
             title: Too many heap allocations
             evaluate_every: 1m
@@ -704,17 +723,17 @@ rows:
 					"percentage": false,
 					"nullPointMode": "null as zero",
 					"legend": {
-						"alignAsTable": false,
-						"avg": false,
-						"current": false,
+						"alignAsTable": true,
+						"avg": true,
+						"current": true,
 						"hideEmpty": true,
 						"hideZero": true,
-						"max": false,
-						"min": false,
+						"max": true,
+						"min": true,
 						"rightSide": false,
 						"show": true,
 						"total": false,
-						"values": false
+						"values": true
 					},
 					"targets": [
 						{

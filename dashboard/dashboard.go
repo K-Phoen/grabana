@@ -16,8 +16,8 @@ import (
 type TagAnnotation struct {
 	Name       string
 	Datasource string
-	IconColor  string `yaml:"color"`
-	Tags       []string
+	IconColor  string   `yaml:"color"`
+	Tags       []string `yaml:",flow"`
 }
 
 // Option represents an option that can be used to configure a

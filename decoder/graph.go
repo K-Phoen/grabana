@@ -11,6 +11,7 @@ import (
 
 var ErrNoAlertThresholdDefined = fmt.Errorf("no threshold defined")
 var ErrInvalidAlertValueFunc = fmt.Errorf("invalid alert value function")
+var ErrInvalidLegendAttribute = fmt.Errorf("invalid legend attribute")
 
 type DashboardGraph struct {
 	Title      string
@@ -19,6 +20,7 @@ type DashboardGraph struct {
 	Datasource string  `yaml:",omitempty"`
 	Targets    []Target
 	Axes       *GraphAxes  `yaml:",omitempty"`
+	Legend     []string    `yaml:",omitempty"`
 	Alert      *GraphAlert `yaml:",omitempty"`
 }
 
@@ -43,6 +45,14 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	if graphPanel.Axes != nil && graphPanel.Axes.Bottom != nil {
 		opts = append(opts, graph.XAxis(graphPanel.Axes.Bottom.toOptions()...))
 	}
+	if len(graphPanel.Legend) != 0 {
+		legendOpts, err := graphPanel.legend()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, graph.Legend(legendOpts...))
+	}
 	if graphPanel.Alert != nil {
 		alertOpts, err := graphPanel.Alert.toOptions()
 		if err != nil {
@@ -64,6 +74,43 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	return row.WithGraph(graphPanel.Title, opts...), nil
 }
 
+func (graphPanel *DashboardGraph) legend() ([]graph.LegendOption, error) {
+	opts := make([]graph.LegendOption, 0, len(graphPanel.Legend))
+
+	for _, attribute := range graphPanel.Legend {
+		var opt graph.LegendOption
+
+		switch attribute {
+		case "hide":
+			opt = graph.Hide
+		case "as_table":
+			opt = graph.AsTable
+		case "to_the_right":
+			opt = graph.ToTheRight
+		case "min":
+			opt = graph.Min
+		case "max":
+			opt = graph.Max
+		case "avg":
+			opt = graph.Avg
+		case "current":
+			opt = graph.Current
+		case "total":
+			opt = graph.Total
+		case "no_null_series":
+			opt = graph.NoNullSeries
+		case "no_zero_series":
+			opt = graph.NoZeroSeries
+		default:
+			return nil, ErrInvalidLegendAttribute
+		}
+
+		opts = append(opts, opt)
+	}
+
+	return opts, nil
+}
+
 func (graphPanel *DashboardGraph) target(t Target) (graph.Option, error) {
 	if t.Prometheus != nil {
 		return graph.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
@@ -73,12 +120,12 @@ func (graphPanel *DashboardGraph) target(t Target) (graph.Option, error) {
 }
 
 type GraphAxis struct {
-	Hidden  *bool
-	Label   string
-	Unit    *string
-	Min     *float64
-	Max     *float64
-	LogBase int `yaml:"log_base"`
+	Hidden  *bool    `yaml:",omitempty"`
+	Label   string   `yaml:",omitempty"`
+	Unit    *string  `yaml:",omitempty"`
+	Min     *float64 `yaml:",omitempty"`
+	Max     *float64 `yaml:",omitempty"`
+	LogBase int      `yaml:"log_base"`
 }
 
 func (a GraphAxis) toOptions() []axis.Option {
@@ -99,14 +146,17 @@ func (a GraphAxis) toOptions() []axis.Option {
 	if a.Max != nil {
 		opts = append(opts, axis.Max(*a.Max))
 	}
+	if a.LogBase != 0 {
+		opts = append(opts, axis.LogBase(a.LogBase))
+	}
 
 	return opts
 }
 
 type GraphAxes struct {
-	Left   *GraphAxis
-	Right  *GraphAxis
-	Bottom *GraphAxis
+	Left   *GraphAxis `yaml:",omitempty"`
+	Right  *GraphAxis `yaml:",omitempty"`
+	Bottom *GraphAxis `yaml:",omitempty"`
 }
 
 type GraphAlert struct {
