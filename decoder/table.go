@@ -11,7 +11,7 @@ type DashboardTable struct {
 	Height                 string  `yaml:",omitempty"`
 	Datasource             string  `yaml:",omitempty"`
 	Targets                []Target
-	HiddenColumns          []string            `yaml:"hidden_columns"`
+	HiddenColumns          []string            `yaml:"hidden_columns,flow"`
 	TimeSeriesAggregations []table.Aggregation `yaml:"time_series_aggregations"`
 }
 
