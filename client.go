@@ -40,18 +40,36 @@ type Folder struct {
 
 // Client represents a Grafana HTTP client.
 type Client struct {
-	http     *http.Client
-	host     string
-	apiToken string
+	http                         *http.Client
+	host                         string
+	apiToken, username, password string
 }
 
-// NewClient creates a new Grafana HTTP client.
+// NewClient creates a new Grafana HTTP client, using an API token.
 func NewClient(http *http.Client, host string, apiToken string) *Client {
 	return &Client{
 		http:     http,
 		host:     host,
 		apiToken: apiToken,
 	}
+}
+
+// NewClientBasicAuth creates a new Grafana HTTP client, using basic authentication.
+func NewClientBasicAuth(http *http.Client, host string, username, password string) *Client {
+	return &Client{
+		http:     http,
+		host:     host,
+		username: username,
+		password: password,
+	}
+}
+
+func (client *Client) addAuthorization(request *http.Request) {
+	if client.apiToken != "" {
+		request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", client.apiToken))
+		return
+	}
+	request.SetBasicAuth(client.username, client.password)
 }
 
 // FindOrCreateFolder returns the folder by its name or creates it if it doesn't exist.
@@ -236,7 +254,7 @@ func (client Client) delete(ctx context.Context, path string) (*http.Response, e
 		return nil, err
 	}
 
-	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", client.apiToken))
+	client.addAuthorization(request)
 
 	return client.http.Do(request)
 }
@@ -248,7 +266,7 @@ func (client Client) postJSON(ctx context.Context, path string, body []byte) (*h
 	}
 
 	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", client.apiToken))
+	client.addAuthorization(request)
 
 	return client.http.Do(request)
 }
@@ -259,7 +277,7 @@ func (client Client) get(ctx context.Context, path string) (*http.Response, erro
 		return nil, err
 	}
 
-	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", client.apiToken))
+	client.addAuthorization(request)
 
 	return client.http.Do(request)
 }
