@@ -21,13 +21,19 @@ package sdk
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
+
+// DefaultFolderId is the id of the general folder
+// that is pre-created and cannot be removed.
+const DefaultFolderId = 0
 
 // BoardProperties keeps metadata of a dashboard.
 type BoardProperties struct {
@@ -47,35 +53,49 @@ type BoardProperties struct {
 	Version    int       `json:"version"`
 }
 
-// GetDashboard loads a dashboard from Grafana instance along with metadata for a dashboard.
+// GetDashboardByUID loads a dashboard and its metadata from Grafana by dashboard uid.
+//
+// Reflects GET /api/dashboards/uid/:uid API call.
+func (r *Client) GetDashboardByUID(ctx context.Context, uid string) (Board, BoardProperties, error) {
+	return r.getDashboard(ctx, "uid/"+uid)
+}
+
+// GetDashboardBySlug loads a dashboard and its metadata from Grafana by dashboard slug.
+//
 // For dashboards from a filesystem set "file/" prefix for slug. By default dashboards from
 // a database assumed. Database dashboards may have "db/" prefix or may have not, it will
 // be appended automatically.
 //
 // Reflects GET /api/dashboards/db/:slug API call.
-func (r *Client) GetDashboard(slug string) (Board, BoardProperties, error) {
+// Deprecated: since Grafana v5 you should use uids. Use GetDashboardByUID() for that.
+func (r *Client) GetDashboardBySlug(ctx context.Context, slug string) (Board, BoardProperties, error) {
+	path := setPrefix(slug)
+	return r.getDashboard(ctx, path)
+}
+
+// getDashboard loads a dashboard from Grafana instance along with metadata for a dashboard.
+// For dashboards from a filesystem set "file/" prefix for slug. By default dashboards from
+// a database assumed. Database dashboards may have "db/" prefix or may have not, it will
+// be appended automatically.
+//
+// Reflects GET /api/dashboards/db/:slug API call.
+func (r *Client) getDashboard(ctx context.Context, path string) (Board, BoardProperties, error) {
+	raw, bp, err := r.getRawDashboard(ctx, path)
+	if err != nil {
+		return Board{}, BoardProperties{}, errors.Wrap(err, "get raw dashboard")
+	}
 	var (
-		raw    []byte
 		result struct {
 			Meta  BoardProperties `json:"meta"`
 			Board Board           `json:"dashboard"`
 		}
-		code int
-		err  error
 	)
-	slug, _ = setPrefix(slug)
-	if raw, code, err = r.get(fmt.Sprintf("api/dashboards/%s", slug), nil); err != nil {
-		return Board{}, BoardProperties{}, err
-	}
-	if code != 200 {
-		return Board{}, BoardProperties{}, fmt.Errorf("HTTP error %d: returns %s", code, raw)
-	}
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.UseNumber()
-	if err := dec.Decode(&result); err != nil {
-		return Board{}, BoardProperties{}, fmt.Errorf("unmarshal board with meta: %s\n%s", err, raw)
+	if err := dec.Decode(&result.Board); err != nil {
+		return Board{}, BoardProperties{}, errors.Wrap(err, "unmarshal board")
 	}
-	return result.Board, result.Meta, err
+	return result.Board, bp, err
 }
 
 // GetRawDashboard loads a dashboard JSON from Grafana instance along with metadata for a dashboard.
@@ -90,7 +110,8 @@ func (r *Client) GetDashboard(slug string) (Board, BoardProperties, error) {
 // be appended automatically.
 //
 // Reflects GET /api/dashboards/db/:slug API call.
-func (r *Client) GetRawDashboard(slug string) ([]byte, BoardProperties, error) {
+// Deprecated: since Grafana v5 you should use uids. Use GetRawDashboardByUID() for that.
+func (r *Client) getRawDashboard(ctx context.Context, path string) ([]byte, BoardProperties, error) {
 	var (
 		raw    []byte
 		result struct {
@@ -100,8 +121,7 @@ func (r *Client) GetRawDashboard(slug string) ([]byte, BoardProperties, error) {
 		code int
 		err  error
 	)
-	slug, _ = setPrefix(slug)
-	if raw, code, err = r.get(fmt.Sprintf("api/dashboards/%s", slug), nil); err != nil {
+	if raw, code, err = r.get(ctx, fmt.Sprintf("api/dashboards/%s", path), nil); err != nil {
 		return nil, BoardProperties{}, err
 	}
 	if code != 200 {
@@ -110,14 +130,35 @@ func (r *Client) GetRawDashboard(slug string) ([]byte, BoardProperties, error) {
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.UseNumber()
 	if err := dec.Decode(&result); err != nil {
-		return nil, BoardProperties{}, fmt.Errorf("unmarshal board with meta: %s\n%s", err, raw)
+		return nil, BoardProperties{}, errors.Wrap(err, "unmarshal board")
 	}
 	return []byte(result.Board), result.Meta, err
+}
+
+// GetRawDashboardByUID loads a dashboard and its metadata from Grafana by dashboard uid.
+//
+// Reflects GET /api/dashboards/uid/:uid API call.
+func (r *Client) GetRawDashboardByUID(ctx context.Context, uid string) ([]byte, BoardProperties, error) {
+	return r.getRawDashboard(ctx, "uid/"+uid)
+}
+
+// GetRawDashboardBySlug loads a dashboard and its metadata from Grafana by dashboard slug.
+//
+// For dashboards from a filesystem set "file/" prefix for slug. By default dashboards from
+// a database assumed. Database dashboards may have "db/" prefix or may have not, it will
+// be appended automatically.
+//
+// Reflects GET /api/dashboards/db/:slug API call.
+// Deprecated: since Grafana v5 you should use uids. Use GetRawDashboardByUID() for that.
+func (r *Client) GetRawDashboardBySlug(ctx context.Context, slug string) ([]byte, BoardProperties, error) {
+	path := setPrefix(slug)
+	return r.getRawDashboard(ctx, path)
 }
 
 // FoundBoard keeps result of search with metadata of a dashboard.
 type FoundBoard struct {
 	ID        uint     `json:"id"`
+	UID       string   `json:"uid"`
 	Title     string   `json:"title"`
 	URI       string   `json:"uri"`
 	Type      string   `json:"type"`
@@ -129,7 +170,7 @@ type FoundBoard struct {
 // only starred dashboards and only for tags (logical OR applied to multiple tags).
 //
 // Reflects GET /api/search API call.
-func (r *Client) SearchDashboards(query string, starred bool, tags ...string) ([]FoundBoard, error) {
+func (r *Client) SearchDashboards(ctx context.Context, query string, starred bool, tags ...string) ([]FoundBoard, error) {
 	var (
 		raw    []byte
 		boards []FoundBoard
@@ -147,7 +188,7 @@ func (r *Client) SearchDashboards(query string, starred bool, tags ...string) ([
 	for _, tag := range tags {
 		q.Add("tag", tag)
 	}
-	if raw, code, err = r.get("api/search", q); err != nil {
+	if raw, code, err = r.get(ctx, "api/search", q); err != nil {
 		return nil, err
 	}
 	if code != 200 {
@@ -155,6 +196,13 @@ func (r *Client) SearchDashboards(query string, starred bool, tags ...string) ([
 	}
 	err = json.Unmarshal(raw, &boards)
 	return boards, err
+}
+
+// SetDashboardParams contains the extra parameteres
+// that affects where and how the dashboard will be stored
+type SetDashboardParams struct {
+	FolderID  int
+	Overwrite bool
 }
 
 // SetDashboard updates existing dashboard or creates a new one.
@@ -165,11 +213,12 @@ func (r *Client) SearchDashboards(query string, starred bool, tags ...string) ([
 // may be only loaded with HTTP API but not created or updated.
 //
 // Reflects POST /api/dashboards/db API call.
-func (r *Client) SetDashboard(board Board, overwrite bool) (StatusMessage, error) {
+func (r *Client) SetDashboard(ctx context.Context, board Board, params SetDashboardParams) (StatusMessage, error) {
 	var (
 		isBoardFromDB bool
 		newBoard      struct {
 			Dashboard Board `json:"dashboard"`
+			FolderID  int   `json:"folderId"`
 			Overwrite bool  `json:"overwrite"`
 		}
 		raw  []byte
@@ -181,14 +230,15 @@ func (r *Client) SetDashboard(board Board, overwrite bool) (StatusMessage, error
 		return StatusMessage{}, errors.New("only database dashboard (with 'db/' prefix in a slug) can be set")
 	}
 	newBoard.Dashboard = board
-	newBoard.Overwrite = overwrite
-	if !overwrite {
+	newBoard.FolderID = params.FolderID
+	newBoard.Overwrite = params.Overwrite
+	if !params.Overwrite {
 		newBoard.Dashboard.ID = 0
 	}
 	if raw, err = json.Marshal(newBoard); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, code, err = r.post("api/dashboards/db", nil, raw); err != nil {
+	if raw, code, err = r.post(ctx, "api/dashboards/db", nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -206,7 +256,7 @@ func (r *Client) SetDashboard(board Board, overwrite bool) (StatusMessage, error
 // may be only loaded with HTTP API but not created or updated.
 //
 // Reflects POST /api/dashboards/db API call.
-func (r *Client) SetRawDashboard(raw []byte) (StatusMessage, error) {
+func (r *Client) SetRawDashboard(ctx context.Context, raw []byte) (StatusMessage, error) {
 	var (
 		rawResp []byte
 		resp    StatusMessage
@@ -224,7 +274,7 @@ func (r *Client) SetRawDashboard(raw []byte) (StatusMessage, error) {
 	buf.WriteString(`{"dashboard":`)
 	buf.Write(raw)
 	buf.WriteString(`, "overwrite": true}`)
-	if rawResp, code, err = r.post("api/dashboards/db", nil, buf.Bytes()); err != nil {
+	if rawResp, code, err = r.post(ctx, "api/dashboards/db", nil, buf.Bytes()); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(rawResp, &resp); err != nil {
@@ -241,7 +291,7 @@ func (r *Client) SetRawDashboard(raw []byte) (StatusMessage, error) {
 // may be only loaded with HTTP API but not deteled.
 //
 // Reflects DELETE /api/dashboards/db/:slug API call.
-func (r *Client) DeleteDashboard(slug string) (StatusMessage, error) {
+func (r *Client) DeleteDashboard(ctx context.Context, slug string) (StatusMessage, error) {
 	var (
 		isBoardFromDB bool
 		raw           []byte
@@ -251,7 +301,7 @@ func (r *Client) DeleteDashboard(slug string) (StatusMessage, error) {
 	if slug, isBoardFromDB = cleanPrefix(slug); !isBoardFromDB {
 		return StatusMessage{}, errors.New("only database dashboards (with 'db/' prefix in a slug) can be removed")
 	}
-	if raw, _, err = r.delete(fmt.Sprintf("api/dashboards/db/%s", slug)); err != nil {
+	if raw, _, err = r.delete(ctx, fmt.Sprintf("api/dashboards/db/%s", slug)); err != nil {
 		return StatusMessage{}, err
 	}
 	err = json.Unmarshal(raw, &reply)
@@ -259,14 +309,14 @@ func (r *Client) DeleteDashboard(slug string) (StatusMessage, error) {
 }
 
 // implicitly use dashboards from Grafana DB not from a file system
-func setPrefix(slug string) (string, bool) {
+func setPrefix(slug string) string {
 	if strings.HasPrefix(slug, "db") {
-		return slug, true
+		return slug
 	}
 	if strings.HasPrefix(slug, "file") {
-		return slug, false
+		return slug
 	}
-	return fmt.Sprintf("db/%s", slug), true
+	return fmt.Sprintf("db/%s", slug)
 }
 
 // assume we use database dashboard by default

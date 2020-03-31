@@ -21,6 +21,7 @@ package sdk
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -70,27 +71,27 @@ func NewClient(apiURL, apiKeyOrBasicAuth string, client *http.Client) *Client {
 	return &Client{baseURL: baseURL.String(), basicAuth: basicAuth, key: key, client: client}
 }
 
-func (r *Client) get(query string, params url.Values) ([]byte, int, error) {
-	return r.doRequest("GET", query, params, nil)
+func (r *Client) get(ctx context.Context, query string, params url.Values) ([]byte, int, error) {
+	return r.doRequest(ctx, "GET", query, params, nil)
 }
 
-func (r *Client) patch(query string, params url.Values, body []byte) ([]byte, int, error) {
-	return r.doRequest("PATCH", query, params, bytes.NewBuffer(body))
+func (r *Client) patch(ctx context.Context, query string, params url.Values, body []byte) ([]byte, int, error) {
+	return r.doRequest(ctx, "PATCH", query, params, bytes.NewBuffer(body))
 }
 
-func (r *Client) put(query string, params url.Values, body []byte) ([]byte, int, error) {
-	return r.doRequest("PUT", query, params, bytes.NewBuffer(body))
+func (r *Client) put(ctx context.Context, query string, params url.Values, body []byte) ([]byte, int, error) {
+	return r.doRequest(ctx, "PUT", query, params, bytes.NewBuffer(body))
 }
 
-func (r *Client) post(query string, params url.Values, body []byte) ([]byte, int, error) {
-	return r.doRequest("POST", query, params, bytes.NewBuffer(body))
+func (r *Client) post(ctx context.Context, query string, params url.Values, body []byte) ([]byte, int, error) {
+	return r.doRequest(ctx, "POST", query, params, bytes.NewBuffer(body))
 }
 
-func (r *Client) delete(query string) ([]byte, int, error) {
-	return r.doRequest("DELETE", query, nil, nil)
+func (r *Client) delete(ctx context.Context, query string) ([]byte, int, error) {
+	return r.doRequest(ctx, "DELETE", query, nil, nil)
 }
 
-func (r *Client) doRequest(method, query string, params url.Values, buf io.Reader) ([]byte, int, error) {
+func (r *Client) doRequest(ctx context.Context, method, query string, params url.Values, buf io.Reader) ([]byte, int, error) {
 	u, _ := url.Parse(r.baseURL)
 	u.Path = path.Join(u.Path, query)
 	if params != nil {
@@ -100,6 +101,7 @@ func (r *Client) doRequest(method, query string, params url.Values, buf io.Reade
 	if err != nil {
 		return nil, 0, err
 	}
+	req = req.WithContext(ctx)
 	if !r.basicAuth {
 		req.Header.Set("Authorization", r.key)
 	}

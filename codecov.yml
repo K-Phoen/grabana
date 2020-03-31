@@ -21,3 +21,4 @@ comment:
 
 ignore:
   - "cmd/"
+  - "vendor/"

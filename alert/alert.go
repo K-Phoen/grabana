@@ -125,7 +125,7 @@ func OnNoData(mode NoDataMode) Option {
 func If(operator Operator, opts ...ConditionOption) Option {
 	return func(alert *Alert) {
 		cond := newCondition(opts...)
-		cond.builder.Operator = conditionOperator{Type: string(operator)}
+		cond.builder.Operator = sdk.AlertOperator{Type: string(operator)}
 
 		alert.Builder.Conditions = append(alert.Builder.Conditions, *cond.builder)
 	}

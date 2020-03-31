@@ -21,6 +21,7 @@ package sdk
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -28,7 +29,7 @@ import (
 
 // CreateOrg creates a new organization.
 // It reflects POST /api/orgs API call.
-func (r *Client) CreateOrg(org Org) (StatusMessage, error) {
+func (r *Client) CreateOrg(ctx context.Context, org Org) (StatusMessage, error) {
 	var (
 		raw  []byte
 		resp StatusMessage
@@ -37,7 +38,7 @@ func (r *Client) CreateOrg(org Org) (StatusMessage, error) {
 	if raw, err = json.Marshal(org); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.post("api/orgs", nil, raw); err != nil {
+	if raw, _, err = r.post(ctx, "api/orgs", nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -48,14 +49,14 @@ func (r *Client) CreateOrg(org Org) (StatusMessage, error) {
 
 // GetAllOrgs returns all organizations.
 // It reflects GET /api/orgs API call.
-func (r *Client) GetAllOrgs() ([]Org, error) {
+func (r *Client) GetAllOrgs(ctx context.Context) ([]Org, error) {
 	var (
 		raw  []byte
 		orgs []Org
 		code int
 		err  error
 	)
-	if raw, code, err = r.get("api/orgs", nil); err != nil {
+	if raw, code, err = r.get(ctx, "api/orgs", nil); err != nil {
 		return orgs, err
 	}
 
@@ -72,14 +73,14 @@ func (r *Client) GetAllOrgs() ([]Org, error) {
 
 // GetActualOrg gets current organization.
 // It reflects GET /api/org API call.
-func (r *Client) GetActualOrg() (Org, error) {
+func (r *Client) GetActualOrg(ctx context.Context) (Org, error) {
 	var (
 		raw  []byte
 		org  Org
 		code int
 		err  error
 	)
-	if raw, code, err = r.get("api/org", nil); err != nil {
+	if raw, code, err = r.get(ctx, "api/org", nil); err != nil {
 		return org, err
 	}
 	if code != http.StatusOK {
@@ -95,14 +96,14 @@ func (r *Client) GetActualOrg() (Org, error) {
 
 // GetOrgById gets organization by organization Id.
 // It reflects GET /api/orgs/:orgId API call.
-func (r *Client) GetOrgById(oid uint) (Org, error) {
+func (r *Client) GetOrgById(ctx context.Context, oid uint) (Org, error) {
 	var (
 		raw  []byte
 		org  Org
 		code int
 		err  error
 	)
-	if raw, code, err = r.get(fmt.Sprintf("api/orgs/%d", oid), nil); err != nil {
+	if raw, code, err = r.get(ctx, fmt.Sprintf("api/orgs/%d", oid), nil); err != nil {
 		return org, err
 	}
 
@@ -119,14 +120,14 @@ func (r *Client) GetOrgById(oid uint) (Org, error) {
 
 // GetOrgByOrgName gets organization by organization name.
 // It reflects GET /api/orgs/name/:orgName API call.
-func (r *Client) GetOrgByOrgName(name string) (Org, error) {
+func (r *Client) GetOrgByOrgName(ctx context.Context, name string) (Org, error) {
 	var (
 		raw  []byte
 		org  Org
 		code int
 		err  error
 	)
-	if raw, code, err = r.get(fmt.Sprintf("api/orgs/name/%s", name), nil); err != nil {
+	if raw, code, err = r.get(ctx, fmt.Sprintf("api/orgs/name/%s", name), nil); err != nil {
 		return org, err
 	}
 
@@ -143,7 +144,7 @@ func (r *Client) GetOrgByOrgName(name string) (Org, error) {
 
 // UpdateActualOrg updates current organization.
 // It reflects PUT /api/org API call.
-func (r *Client) UpdateActualOrg(org Org) (StatusMessage, error) {
+func (r *Client) UpdateActualOrg(ctx context.Context, org Org) (StatusMessage, error) {
 	var (
 		raw  []byte
 		resp StatusMessage
@@ -152,7 +153,7 @@ func (r *Client) UpdateActualOrg(org Org) (StatusMessage, error) {
 	if raw, err = json.Marshal(org); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.put("api/org", nil, raw); err != nil {
+	if raw, _, err = r.put(ctx, "api/org", nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -163,7 +164,7 @@ func (r *Client) UpdateActualOrg(org Org) (StatusMessage, error) {
 
 // UpdateOrg updates the organization identified by oid.
 // It reflects PUT /api/orgs/:orgId API call.
-func (r *Client) UpdateOrg(org Org, oid uint) (StatusMessage, error) {
+func (r *Client) UpdateOrg(ctx context.Context, org Org, oid uint) (StatusMessage, error) {
 	var (
 		raw  []byte
 		resp StatusMessage
@@ -172,7 +173,7 @@ func (r *Client) UpdateOrg(org Org, oid uint) (StatusMessage, error) {
 	if raw, err = json.Marshal(org); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.put(fmt.Sprintf("api/orgs/%d", oid), nil, raw); err != nil {
+	if raw, _, err = r.put(ctx, fmt.Sprintf("api/orgs/%d", oid), nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -183,13 +184,13 @@ func (r *Client) UpdateOrg(org Org, oid uint) (StatusMessage, error) {
 
 // DeleteOrg deletes the organization identified by the oid.
 // Reflects DELETE /api/orgs/:orgId API call.
-func (r *Client) DeleteOrg(oid uint) (StatusMessage, error) {
+func (r *Client) DeleteOrg(ctx context.Context, oid uint) (StatusMessage, error) {
 	var (
 		raw  []byte
 		resp StatusMessage
 		err  error
 	)
-	if raw, _, err = r.delete(fmt.Sprintf("api/orgs/%d", oid)); err != nil {
+	if raw, _, err = r.delete(ctx, fmt.Sprintf("api/orgs/%d", oid)); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -200,14 +201,14 @@ func (r *Client) DeleteOrg(oid uint) (StatusMessage, error) {
 
 // GetActualOrgUsers get all users within the actual organisation.
 // Reflects GET /api/org/users API call.
-func (r *Client) GetActualOrgUsers() ([]OrgUser, error) {
+func (r *Client) GetActualOrgUsers(ctx context.Context) ([]OrgUser, error) {
 	var (
 		raw   []byte
 		users []OrgUser
 		code  int
 		err   error
 	)
-	if raw, code, err = r.get("api/org/users", nil); err != nil {
+	if raw, code, err = r.get(ctx, "api/org/users", nil); err != nil {
 		return nil, err
 	}
 	if code != http.StatusOK {
@@ -223,14 +224,14 @@ func (r *Client) GetActualOrgUsers() ([]OrgUser, error) {
 
 // GetOrgUsers gets the users for the organization specified by oid.
 // Reflects GET /api/orgs/:orgId/users API call.
-func (r *Client) GetOrgUsers(oid uint) ([]OrgUser, error) {
+func (r *Client) GetOrgUsers(ctx context.Context, oid uint) ([]OrgUser, error) {
 	var (
 		raw   []byte
 		users []OrgUser
 		code  int
 		err   error
 	)
-	if raw, code, err = r.get(fmt.Sprintf("api/orgs/%d/users", oid), nil); err != nil {
+	if raw, code, err = r.get(ctx, fmt.Sprintf("api/orgs/%d/users", oid), nil); err != nil {
 		return nil, err
 	}
 	if code != http.StatusOK {
@@ -246,7 +247,7 @@ func (r *Client) GetOrgUsers(oid uint) ([]OrgUser, error) {
 
 // AddActualOrgUser adds a global user to the current organization.
 // Reflects POST /api/org/users API call.
-func (r *Client) AddActualOrgUser(userRole UserRole) (StatusMessage, error) {
+func (r *Client) AddActualOrgUser(ctx context.Context, userRole UserRole) (StatusMessage, error) {
 	var (
 		raw  []byte
 		resp StatusMessage
@@ -255,7 +256,7 @@ func (r *Client) AddActualOrgUser(userRole UserRole) (StatusMessage, error) {
 	if raw, err = json.Marshal(userRole); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.post("api/org/users", nil, raw); err != nil {
+	if raw, _, err = r.post(ctx, "api/org/users", nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -264,9 +265,9 @@ func (r *Client) AddActualOrgUser(userRole UserRole) (StatusMessage, error) {
 	return resp, nil
 }
 
-// UpdateUser updates the existing user.
+// UpdateActualOrgUser updates the existing user.
 // Reflects POST /api/org/users/:userId API call.
-func (r *Client) UpdateActualOrgUser(user UserRole, uid uint) (StatusMessage, error) {
+func (r *Client) UpdateActualOrgUser(ctx context.Context, user UserRole, uid uint) (StatusMessage, error) {
 	var (
 		raw  []byte
 		resp StatusMessage
@@ -275,7 +276,7 @@ func (r *Client) UpdateActualOrgUser(user UserRole, uid uint) (StatusMessage, er
 	if raw, err = json.Marshal(user); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.post(fmt.Sprintf("api/org/users/%d", uid), nil, raw); err != nil {
+	if raw, _, err = r.post(ctx, fmt.Sprintf("api/org/users/%d", uid), nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -286,22 +287,22 @@ func (r *Client) UpdateActualOrgUser(user UserRole, uid uint) (StatusMessage, er
 
 // DeleteActualOrgUser delete user in actual organization.
 // Reflects DELETE /api/org/users/:userId API call.
-func (r *Client) DeleteActualOrgUser(uid uint) (StatusMessage, error) {
+func (r *Client) DeleteActualOrgUser(ctx context.Context, uid uint) (StatusMessage, error) {
 	var (
 		raw   []byte
 		reply StatusMessage
 		err   error
 	)
-	if raw, _, err = r.delete(fmt.Sprintf("api/org/users/%d", uid)); err != nil {
+	if raw, _, err = r.delete(ctx, fmt.Sprintf("api/org/users/%d", uid)); err != nil {
 		return StatusMessage{}, err
 	}
 	err = json.Unmarshal(raw, &reply)
 	return reply, err
 }
 
-// AddUserToOrg add user to organization with oid.
+// AddOrgUser add user to organization with oid.
 // Reflects POST /api/orgs/:orgId/users API call.
-func (r *Client) AddOrgUser(user UserRole, oid uint) (StatusMessage, error) {
+func (r *Client) AddOrgUser(ctx context.Context, user UserRole, oid uint) (StatusMessage, error) {
 	var (
 		raw   []byte
 		reply StatusMessage
@@ -310,7 +311,7 @@ func (r *Client) AddOrgUser(user UserRole, oid uint) (StatusMessage, error) {
 	if raw, err = json.Marshal(user); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.post(fmt.Sprintf("api/orgs/%d/users", oid), nil, raw); err != nil {
+	if raw, _, err = r.post(ctx, fmt.Sprintf("api/orgs/%d/users", oid), nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	err = json.Unmarshal(raw, &reply)
@@ -319,7 +320,7 @@ func (r *Client) AddOrgUser(user UserRole, oid uint) (StatusMessage, error) {
 
 // UpdateOrgUser updates the user specified by uid within the organization specified by oid.
 // Reflects PATCH /api/orgs/:orgId/users/:userId API call.
-func (r *Client) UpdateOrgUser(user UserRole, oid, uid uint) (StatusMessage, error) {
+func (r *Client) UpdateOrgUser(ctx context.Context, user UserRole, oid, uid uint) (StatusMessage, error) {
 	var (
 		raw   []byte
 		reply StatusMessage
@@ -328,7 +329,7 @@ func (r *Client) UpdateOrgUser(user UserRole, oid, uid uint) (StatusMessage, err
 	if raw, err = json.Marshal(user); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.patch(fmt.Sprintf("api/orgs/%d/users/%d", oid, uid), nil, raw); err != nil {
+	if raw, _, err = r.patch(ctx, fmt.Sprintf("api/orgs/%d/users/%d", oid, uid), nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	err = json.Unmarshal(raw, &reply)
@@ -337,13 +338,13 @@ func (r *Client) UpdateOrgUser(user UserRole, oid, uid uint) (StatusMessage, err
 
 // DeleteOrgUser deletes the user specified by uid within the organization specified by oid.
 // Reflects DELETE /api/orgs/:orgId/users/:userId API call.
-func (r *Client) DeleteOrgUser(oid, uid uint) (StatusMessage, error) {
+func (r *Client) DeleteOrgUser(ctx context.Context, oid, uid uint) (StatusMessage, error) {
 	var (
 		raw   []byte
 		reply StatusMessage
 		err   error
 	)
-	if raw, _, err = r.delete(fmt.Sprintf("api/orgs/%d/users/%d", oid, uid)); err != nil {
+	if raw, _, err = r.delete(ctx, fmt.Sprintf("api/orgs/%d/users/%d", oid, uid)); err != nil {
 		return StatusMessage{}, err
 	}
 	err = json.Unmarshal(raw, &reply)
@@ -352,7 +353,7 @@ func (r *Client) DeleteOrgUser(oid, uid uint) (StatusMessage, error) {
 
 // UpdateActualOrgPreferences updates preferences of the actual organization.
 // Reflects PUT /api/org/preferences API call.
-func (r *Client) UpdateActualOrgPreferences(prefs Preferences) (StatusMessage, error) {
+func (r *Client) UpdateActualOrgPreferences(ctx context.Context, prefs Preferences) (StatusMessage, error) {
 	var (
 		raw  []byte
 		resp StatusMessage
@@ -361,7 +362,7 @@ func (r *Client) UpdateActualOrgPreferences(prefs Preferences) (StatusMessage, e
 	if raw, err = json.Marshal(prefs); err != nil {
 		return StatusMessage{}, err
 	}
-	if raw, _, err = r.put("api/org/preferences/", nil, raw); err != nil {
+	if raw, _, err = r.put(ctx, "api/org/preferences/", nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(raw, &resp); err != nil {
@@ -372,14 +373,14 @@ func (r *Client) UpdateActualOrgPreferences(prefs Preferences) (StatusMessage, e
 
 // GetActualOrgPreferences gets preferences of the actual organization.
 // It reflects GET /api/org/preferences API call.
-func (r *Client) GetActualOrgPreferences() (Preferences, error) {
+func (r *Client) GetActualOrgPreferences(ctx context.Context) (Preferences, error) {
 	var (
 		raw  []byte
 		pref Preferences
 		code int
 		err  error
 	)
-	if raw, code, err = r.get("/api/org/preferences", nil); err != nil {
+	if raw, code, err = r.get(ctx, "/api/org/preferences", nil); err != nil {
 		return pref, err
 	}
 
