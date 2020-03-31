@@ -63,21 +63,6 @@ const (
 	NoZeroSeries
 )
 
-type legend struct {
-	AlignAsTable bool  `json:"alignAsTable"`
-	Avg          bool  `json:"avg"`
-	Current      bool  `json:"current"`
-	HideEmpty    bool  `json:"hideEmpty"`
-	HideZero     bool  `json:"hideZero"`
-	Max          bool  `json:"max"`
-	Min          bool  `json:"min"`
-	RightSide    bool  `json:"rightSide"`
-	Show         bool  `json:"show"`
-	SideWidth    *uint `json:"sideWidth,omitempty"`
-	Total        bool  `json:"total"`
-	Values       bool  `json:"values"`
-}
-
 // Graph represents a graph panel.
 type Graph struct {
 	Builder *sdk.Panel
@@ -264,7 +249,7 @@ func Null(mode NullValue) Option {
 // Legend defines what should be shown in the legend.
 func Legend(opts ...LegendOption) Option {
 	return func(graph *Graph) {
-		legend := legend{Show: true}
+		legend := sdk.Legend{Show: true}
 
 		for _, opt := range opts {
 			switch opt {

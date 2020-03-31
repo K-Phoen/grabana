@@ -21,6 +21,7 @@ package sdk
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
@@ -28,14 +29,14 @@ import (
 
 // GetActualUser gets an actual user.
 // Reflects GET /api/user API call.
-func (r *Client) GetActualUser() (User, error) {
+func (r *Client) GetActualUser(ctx context.Context) (User, error) {
 	var (
 		raw  []byte
 		user User
 		code int
 		err  error
 	)
-	if raw, code, err = r.get("api/user", nil); err != nil {
+	if raw, code, err = r.get(ctx, "api/user", nil); err != nil {
 		return user, err
 	}
 	if code != 200 {
@@ -51,14 +52,14 @@ func (r *Client) GetActualUser() (User, error) {
 
 // GetUser gets an user by ID.
 // Reflects GET /api/users/:id API call.
-func (r *Client) GetUser(id uint) (User, error) {
+func (r *Client) GetUser(ctx context.Context, id uint) (User, error) {
 	var (
 		raw  []byte
 		user User
 		code int
 		err  error
 	)
-	if raw, code, err = r.get(fmt.Sprintf("api/users/%d", id), nil); err != nil {
+	if raw, code, err = r.get(ctx, fmt.Sprintf("api/users/%d", id), nil); err != nil {
 		return user, err
 	}
 	if code != 200 {
@@ -74,7 +75,7 @@ func (r *Client) GetUser(id uint) (User, error) {
 
 // GetAllUsers gets all users.
 // Reflects GET /api/users API call.
-func (r *Client) GetAllUsers() ([]User, error) {
+func (r *Client) GetAllUsers(ctx context.Context) ([]User, error) {
 	var (
 		raw   []byte
 		users []User
@@ -84,7 +85,7 @@ func (r *Client) GetAllUsers() ([]User, error) {
 
 	params := url.Values{}
 	params.Set("perpage", "99999")
-	if raw, code, err = r.get("api/users", params); err != nil {
+	if raw, code, err = r.get(ctx, "api/users", params); err != nil {
 		return users, err
 	}
 	if code != 200 {
@@ -106,7 +107,7 @@ func (r *Client) GetAllUsers() ([]User, error) {
 // http://docs.grafana.org/http_api/user/#search-users-with-paging
 //
 // Reflects GET /api/users/search API call.
-func (r *Client) SearchUsersWithPaging(query *string, perpage, page *int) (PageUsers, error) {
+func (r *Client) SearchUsersWithPaging(ctx context.Context, query *string, perpage, page *int) (PageUsers, error) {
 	var (
 		raw       []byte
 		pageUsers PageUsers
@@ -130,7 +131,7 @@ func (r *Client) SearchUsersWithPaging(query *string, perpage, page *int) (PageU
 		params["query"] = []string{*query}
 	}
 
-	if raw, code, err = r.get("api/users/search", params); err != nil {
+	if raw, code, err = r.get(ctx, "api/users/search", params); err != nil {
 		return pageUsers, err
 	}
 	if code != 200 {

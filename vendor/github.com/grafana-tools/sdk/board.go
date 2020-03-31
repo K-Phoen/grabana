@@ -172,17 +172,20 @@ func NewBoard(title string) *Board {
 		Timezone:     "browser",
 		Editable:     true,
 		HideControls: false,
-		Rows:         []*Row{}}
+		Rows:         []*Row{},
+	}
 }
 
 func (b *Board) RemoveTags(tags ...string) {
-	tagFound := make(map[string]int, len(b.Tags))
-	for i, tag := range b.Tags {
-		tagFound[tag] = i
-	}
-	for _, removeTag := range tags {
-		if i, ok := tagFound[removeTag]; ok {
-			b.Tags = append(b.Tags[:i], b.Tags[i+1:]...)
+	// order might change after removing the tags
+	for _, toRemoveTag := range tags {
+		tagLen := len(b.Tags)
+		for i, tag := range b.Tags {
+			if tag == toRemoveTag {
+				b.Tags[tagLen-1], b.Tags[i] = b.Tags[i], b.Tags[tagLen-1]
+				b.Tags = b.Tags[:tagLen-1]
+				break
+			}
 		}
 	}
 }
@@ -197,6 +200,7 @@ func (b *Board) AddTags(tags ...string) {
 			continue
 		}
 		b.Tags = append(b.Tags, tag)
+		tagFound[tag] = true
 	}
 }
 
