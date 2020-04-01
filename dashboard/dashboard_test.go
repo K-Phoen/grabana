@@ -96,6 +96,23 @@ func TestDashboardCanBeAutoRefreshed(t *testing.T) {
 	req.Equal("5s", panel.board.Refresh.Value)
 }
 
+func TestDashboardCanHaveTime(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Time("now-6h", "now"))
+
+	req.Equal("now-6h", panel.board.Time.From)
+	req.Equal("now", panel.board.Time.To)
+}
+
+func TestDashboardCanHaveTimezone(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Timezone("utc"))
+
+	req.Equal("utc", panel.board.Timezone)
+}
+
 func TestDashboardCanHaveTags(t *testing.T) {
 	req := require.New(t)
 	tags := []string{"generated", "grabana"}

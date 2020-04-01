@@ -203,3 +203,18 @@ func AutoRefresh(interval string) Option {
 		builder.board.Refresh = &sdk.BoolString{Flag: true, Value: interval}
 	}
 }
+
+// Time defines the default time range for the dashboard, e.g. from "now-6h" to
+// "now".
+func Time(from, to string) Option {
+	return func(builder *Builder) {
+		builder.board.Time = sdk.Time{From: from, To: to}
+	}
+}
+
+// Timezone defines the default timezone for the dashboard, e.g. "utc".
+func Timezone(timezone string) Option {
+	return func(builder *Builder) {
+		builder.board.Timezone = timezone
+	}
+}
