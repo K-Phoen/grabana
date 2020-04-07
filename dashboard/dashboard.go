@@ -24,6 +24,20 @@ type TagAnnotation struct {
 // dashboard.
 type Option func(dashboard *Builder)
 
+// TimezoneOption represents a possible value for the dashboard's timezone
+// configuration.
+type TimezoneOption string
+
+// DefaultTimezone sets the dashboard's timezone to the default one used by
+// Grafana.
+const DefaultTimezone TimezoneOption = ""
+
+// UTC sets the dashboard's timezone to UTC.
+const UTC TimezoneOption = "utc"
+
+// Browser sets the dashboard's timezone to the browser's one.
+const Browser TimezoneOption = "browser"
+
 // Builder is the main builder used to configure dashboards.
 type Builder struct {
 	board *sdk.Board
@@ -33,7 +47,6 @@ type Builder struct {
 func New(title string, options ...Option) Builder {
 	board := sdk.NewBoard(title)
 	board.ID = 0
-	board.Timezone = ""
 
 	builder := &Builder{board: board}
 
@@ -47,17 +60,9 @@ func New(title string, options ...Option) Builder {
 func defaults() []Option {
 	return []Option{
 		defaultTimePicker(),
-		defaultTime(),
+		Timezone(DefaultTimezone),
+		Time("now-3h", "now"),
 		SharedCrossHair(),
-	}
-}
-
-func defaultTime() Option {
-	return func(builder *Builder) {
-		builder.board.Time = sdk.Time{
-			From: "now-3h",
-			To:   "now",
-		}
 	}
 }
 
@@ -201,5 +206,20 @@ func Tags(tags []string) Option {
 func AutoRefresh(interval string) Option {
 	return func(builder *Builder) {
 		builder.board.Refresh = &sdk.BoolString{Flag: true, Value: interval}
+	}
+}
+
+// Time defines the default time range for the dashboard, e.g. from "now-6h" to
+// "now".
+func Time(from, to string) Option {
+	return func(builder *Builder) {
+		builder.board.Time = sdk.Time{From: from, To: to}
+	}
+}
+
+// Timezone defines the default timezone for the dashboard, e.g. "utc".
+func Timezone(timezone TimezoneOption) Option {
+	return func(builder *Builder) {
+		builder.board.Timezone = string(timezone)
 	}
 }
