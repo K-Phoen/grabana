@@ -21,13 +21,13 @@ Dashboard configuration:
 ```go
 builder := dashboard.New(
     "Awesome dashboard",
-    grabana.AutoRefresh("5s"),
-    grabana.Tags([]string{"generated"}),
-    grabana.VariableAsInterval(
+    dashboard.AutoRefresh("5s"),
+    dashboard.Tags([]string{"generated"}),
+    dashboard.VariableAsInterval(
         "interval",
         interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
     ),
-    grabana.Row(
+    dashboard.Row(
         "Prometheus",
         row.WithGraph(
             "HTTP Rate",
@@ -45,7 +45,7 @@ Dashboard creation:
 
 ```go
 ctx := context.Background()
-client := grabana.NewClient(&http.Client{}, grafanaHost, grafanaAPIToken)
+client := grabana.NewClient(&http.Client{}, grafanaHost, grabana.WithAPIToken("such secret, much wow"))
 
 // create the folder holding the dashboard for the service
 folder, err := client.FindOrCreateFolder(ctx, "Test Folder")
@@ -93,7 +93,7 @@ rows:
                 legend: "{{handler}} - {{ code }}"
 ```
 
-Dashboard creation:
+Dashboard creation (or [automatically as a Kubernetes Resource, using DARK](https://github.com/K-Phoen/dark)):
 
 ```go
 content, err := ioutil.ReadFile("dashboard.yaml")
@@ -109,7 +109,7 @@ if err != nil {
 }
 
 ctx := context.Background()
-client := grabana.NewClient(&http.Client{}, grafanaHost, grafanaAPIToken)
+client := grabana.NewClient(&http.Client{}, grafanaHost, grabana.WithAPIToken("such secret, much wow"))
 
 // create the folder holding the dashboard for the service
 folder, err := client.FindOrCreateFolder(ctx, "Test Folder")
