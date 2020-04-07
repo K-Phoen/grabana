@@ -108,7 +108,7 @@ func TestDashboardCanHaveTime(t *testing.T) {
 func TestDashboardCanHaveTimezone(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Timezone("utc"))
+	panel := New("", Timezone(UTC))
 
 	req.Equal("utc", panel.board.Timezone)
 }
