@@ -12,6 +12,45 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestApiTokenCanBeGiven(t *testing.T) {
+	req := require.New(t)
+	token := "foooo"
+
+	serverCalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serverCalled = true
+
+		req.Equal("Bearer "+token, r.Header.Get("Authorization"))
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL, WithAPIToken(token))
+
+	_, _ = client.CreateFolder(context.TODO(), "not relevant")
+
+	req.True(serverCalled)
+}
+
+func TestBasicAuthCanBeSet(t *testing.T) {
+	req := require.New(t)
+	user := "joe"
+	pass := "la frite"
+
+	serverCalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serverCalled = true
+
+		req.Equal("Basic am9lOmxhIGZyaXRl", r.Header.Get("Authorization"))
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL, WithBasicAuth(user, pass))
+
+	_, _ = client.CreateFolder(context.TODO(), "not relevant")
+
+	req.True(serverCalled)
+}
+
 func TestFoldersCanBeCreated(t *testing.T) {
 	req := require.New(t)
 	folderName := "Test folder"
@@ -24,7 +63,7 @@ func TestFoldersCanBeCreated(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	folder, err := client.CreateFolder(context.TODO(), folderName)
 
@@ -43,7 +82,7 @@ func TestFoldersCreationCanFail(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	folder, err := client.CreateFolder(context.TODO(), "")
 
@@ -75,7 +114,7 @@ func TestAFolderCanBeFoundByTitle(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	folder, err := client.GetFolderByTitle(context.TODO(), strings.ToLower(folderName))
 
@@ -101,7 +140,7 @@ func TestAnExplicitErrorIsReturnedIfTheFolderIsNotFound(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	folder, err := client.GetFolderByTitle(context.TODO(), "folder that do not exist")
 
@@ -118,7 +157,7 @@ func TestGetFolderByTitleCanFail(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	folder, err := client.GetFolderByTitle(context.TODO(), "folder that do not exist")
 
@@ -153,7 +192,7 @@ func TestAnAlertChannelCanBeFoundByName(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	channel, err := client.GetAlertChannelByName(context.TODO(), strings.ToLower(name))
 
@@ -182,7 +221,7 @@ func TestAnExplicitErrorIsReturnedIfTheChannelIsNotFound(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	channel, err := client.GetAlertChannelByName(context.TODO(), "channel that do not exist")
 
@@ -199,7 +238,7 @@ func TestGetAlertChannelByNameCanFail(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	folder, err := client.GetAlertChannelByName(context.TODO(), "channel that do not exist")
 
@@ -222,7 +261,7 @@ func TestDashboardsCanBeCreated(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	board, err := client.UpsertDashboard(context.TODO(), &Folder{}, dashboard)
 
@@ -242,7 +281,7 @@ func TestDashboardsCreationCanFail(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	board, err := client.UpsertDashboard(context.TODO(), &Folder{}, dashboard)
 
@@ -258,7 +297,7 @@ func TestDeleteDashboard(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	err := client.DeleteDashboard(context.TODO(), "some uid")
 
@@ -273,7 +312,7 @@ func TestDeleteDashboardCanFail(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	client := NewClient(http.DefaultClient, ts.URL, "")
+	client := NewClient(http.DefaultClient, ts.URL)
 
 	err := client.DeleteDashboard(context.TODO(), "some uid")
 
