@@ -8,6 +8,8 @@ editable: true
 shared_crosshair: true
 tags: [generated, yaml]
 auto_refresh: 10s
+
+timezone: utc # valid values are: utc, browser, default
 ```
 
 ## That was it!

@@ -8,6 +8,7 @@ import (
 )
 
 var ErrPanelNotConfigured = fmt.Errorf("panel not configured")
+var ErrInvalidTimezone = fmt.Errorf("invalid timezone")
 
 type DashboardModel struct {
 	Title           string
@@ -15,6 +16,8 @@ type DashboardModel struct {
 	SharedCrosshair bool `yaml:"shared_crosshair"`
 	Tags            []string
 	AutoRefresh     string `yaml:"auto_refresh"`
+
+	Timezone string
 
 	TagsAnnotation []dashboard.TagAnnotation `yaml:"tags_annotations"`
 	Variables      []DashboardVariable
@@ -39,6 +42,18 @@ func (d *DashboardModel) toDashboardBuilder() (dashboard.Builder, error) {
 
 	for _, tagAnnotation := range d.TagsAnnotation {
 		opts = append(opts, dashboard.TagsAnnotation(tagAnnotation))
+	}
+
+	switch d.Timezone {
+	case "":
+	case "default":
+		opts = append(opts, dashboard.Timezone(dashboard.DefaultTimezone))
+	case "utc":
+		opts = append(opts, dashboard.Timezone(dashboard.UTC))
+	case "browser":
+		opts = append(opts, dashboard.Timezone(dashboard.Browser))
+	default:
+		return emptyDashboard, ErrInvalidTimezone
 	}
 
 	for _, variable := range d.Variables {
