@@ -17,6 +17,7 @@ type DashboardModel struct {
 	Tags            []string
 	AutoRefresh     string `yaml:"auto_refresh"`
 
+	Time     [2]string
 	Timezone string
 
 	TagsAnnotation []dashboard.TagAnnotation `yaml:"tags_annotations"`
@@ -42,6 +43,10 @@ func (d *DashboardModel) toDashboardBuilder() (dashboard.Builder, error) {
 
 	for _, tagAnnotation := range d.TagsAnnotation {
 		opts = append(opts, dashboard.TagsAnnotation(tagAnnotation))
+	}
+
+	if d.Time[0] != "" && d.Time[1] != "" {
+		opts = append(opts, dashboard.Time(d.Time[0], d.Time[1]))
 	}
 
 	switch d.Timezone {
