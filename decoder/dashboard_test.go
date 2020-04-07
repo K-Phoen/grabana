@@ -47,6 +47,15 @@ func TestUnmarshalYAML(t *testing.T) {
 	}
 }
 
+func TestUnmarshalYAMLWithInvalidTimezone(t *testing.T) {
+	payload := `timezone: invalid`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidTimezone, err)
+}
+
 func TestUnmarshalYAMLWithInvalidPanel(t *testing.T) {
 	payload := `
 rows:
@@ -255,6 +264,9 @@ editable: true
 shared_crosshair: true
 tags: [generated, yaml]
 auto_refresh: 10s
+
+time: ["now-6h", "now"]
+timezone: utc
 `
 	json := `{
 	"slug": "",
@@ -262,7 +274,7 @@ auto_refresh: 10s
 	"originalTitle": "",
 	"tags": ["generated", "yaml"],
 	"style": "dark",
-	"timezone": "",
+	"timezone": "utc",
 	"editable": true,
 	"hideControls": false,
 	"sharedCrosshair": true,
@@ -272,7 +284,7 @@ auto_refresh: 10s
 	"panels": null,
 	"rows": [],
 	"refresh": "10s",
-	"time": {"from": "now-3h", "to": "now"},
+	"time": {"from": "now-6h", "to": "now"},
 	"timepicker": {
 		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
 		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
