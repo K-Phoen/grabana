@@ -29,7 +29,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	client := grabana.NewClient(&http.Client{}, os.Args[1], os.Args[2])
+	client := grabana.NewClient(&http.Client{}, os.Args[1], grabana.WithAPIToken(os.Args[2]))
 
 	// create the folder holding the dashboard for the service
 	folder, err := client.GetFolderByTitle(ctx, "Test Folder")

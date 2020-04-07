@@ -38,38 +38,54 @@ type Folder struct {
 	Title string `json:"title"`
 }
 
+// Option represents an option that can be used to configure a client.
+type Option func(client *Client)
+
+type requestModifier func(request *http.Request)
+
 // Client represents a Grafana HTTP client.
 type Client struct {
-	http                         *http.Client
-	host                         string
-	apiToken, username, password string
+	http             *http.Client
+	host             string
+	requestModifiers []requestModifier
 }
 
 // NewClient creates a new Grafana HTTP client, using an API token.
-func NewClient(http *http.Client, host string, apiToken string) *Client {
-	return &Client{
-		http:     http,
-		host:     host,
-		apiToken: apiToken,
+func NewClient(http *http.Client, host string, options ...Option) *Client {
+	client := &Client{
+		http: http,
+		host: host,
+	}
+
+	for _, opt := range options {
+		opt(client)
+	}
+
+	return client
+}
+
+// WithAPIToken sets up the client to use the given token to authenticate.
+func WithAPIToken(token string) Option {
+	return func(client *Client) {
+		client.requestModifiers = append(client.requestModifiers, func(request *http.Request) {
+			request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+		})
 	}
 }
 
-// NewClientBasicAuth creates a new Grafana HTTP client, using basic authentication.
-func NewClientBasicAuth(http *http.Client, host string, username, password string) *Client {
-	return &Client{
-		http:     http,
-		host:     host,
-		username: username,
-		password: password,
+// WithBasicAuth sets up the client to use the given credentials to authenticate.
+func WithBasicAuth(username string, password string) Option {
+	return func(client *Client) {
+		client.requestModifiers = append(client.requestModifiers, func(request *http.Request) {
+			request.SetBasicAuth(username, password)
+		})
 	}
 }
 
-func (client *Client) addAuthorization(request *http.Request) {
-	if client.apiToken != "" {
-		request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", client.apiToken))
-		return
+func (client *Client) modifyRequest(request *http.Request) {
+	for _, modifier := range client.requestModifiers {
+		modifier(request)
 	}
-	request.SetBasicAuth(client.username, client.password)
 }
 
 // FindOrCreateFolder returns the folder by its name or creates it if it doesn't exist.
@@ -254,7 +270,7 @@ func (client Client) delete(ctx context.Context, path string) (*http.Response, e
 		return nil, err
 	}
 
-	client.addAuthorization(request)
+	client.modifyRequest(request)
 
 	return client.http.Do(request)
 }
@@ -266,7 +282,7 @@ func (client Client) postJSON(ctx context.Context, path string, body []byte) (*h
 	}
 
 	request.Header.Add("Content-Type", "application/json")
-	client.addAuthorization(request)
+	client.modifyRequest(request)
 
 	return client.http.Do(request)
 }
@@ -277,7 +293,7 @@ func (client Client) get(ctx context.Context, path string) (*http.Response, erro
 		return nil, err
 	}
 
-	client.addAuthorization(request)
+	client.modifyRequest(request)
 
 	return client.http.Do(request)
 }
