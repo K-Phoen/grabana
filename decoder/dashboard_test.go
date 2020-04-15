@@ -637,7 +637,7 @@ rows:
             title: Too many heap allocations
             evaluate_every: 1m
             for: 1m
-            notify: 1
+            notify: P-N3fxuZz
             message: "Wow, a we're allocating a lot."
             on_no_data: alerting
             on_execution_error: alerting
@@ -716,7 +716,7 @@ rows:
 							{
 								"disableResolveMessage": false,
 								"frequency": "",
-								"id": 1,
+								"uid": "P-N3fxuZz",
 								"isDefault": false,
 								"name": "",
 								"sendReminder": false,

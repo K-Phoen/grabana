@@ -38,11 +38,11 @@ func TestNotificationCanBeSet(t *testing.T) {
 func TestNotificationCanBeSetByChannelID(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", NotifyChannel(1))
+	a := New("", NotifyChannel("P-N3fxuZz"))
 
 	req.Len(a.Builder.Notifications, 1)
-	req.Empty(a.Builder.Notifications[0].UID)
-	req.Equal(int64(1), a.Builder.Notifications[0].ID)
+	req.Equal("P-N3fxuZz", a.Builder.Notifications[0].UID)
+	req.Empty(a.Builder.Notifications[0].ID)
 }
 
 func TestForIntervalCanBeSet(t *testing.T) {

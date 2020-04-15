@@ -164,7 +164,7 @@ type GraphAlert struct {
 	EvaluateEvery    string `yaml:"evaluate_every"`
 	For              string
 	If               []AlertCondition
-	Notify           *int64
+	Notify           string
 	Message          string
 	OnNoData         string `yaml:"on_no_data"`
 	OnExecutionError string `yaml:"on_execution_error"`
@@ -208,8 +208,8 @@ func (a GraphAlert) toOptions() ([]alert.Option, error) {
 
 		opts = append(opts, alert.OnExecutionError(mode))
 	}
-	if a.Notify != nil {
-		opts = append(opts, alert.NotifyChannel(*a.Notify))
+	if a.Notify != "" {
+		opts = append(opts, alert.NotifyChannel(a.Notify))
 	}
 	if a.Message != "" {
 		opts = append(opts, alert.Message(a.Message))
