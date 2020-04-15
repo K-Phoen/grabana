@@ -72,11 +72,11 @@ func Notify(channel *Channel) Option {
 	}
 }
 
-// NotifyChannel adds a notification for this alert given a channel ID.
-func NotifyChannel(channel int64) Option {
+// NotifyChannel adds a notification for this alert given a channel UID.
+func NotifyChannel(channelUID string) Option {
 	return func(alert *Alert) {
 		alert.Builder.Notifications = append(alert.Builder.Notifications, sdk.AlertNotification{
-			ID: channel,
+			UID: channelUID,
 		})
 	}
 }
