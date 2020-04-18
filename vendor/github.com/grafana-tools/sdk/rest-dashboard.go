@@ -327,5 +327,5 @@ func cleanPrefix(slug string) (string, bool) {
 	if strings.HasPrefix(slug, "file") {
 		return slug[3:], false
 	}
-	return fmt.Sprintf("%s", slug), true
+	return slug, true
 }

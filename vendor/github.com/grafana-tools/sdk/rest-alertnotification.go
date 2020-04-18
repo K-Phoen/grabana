@@ -90,7 +90,7 @@ func (c *Client) CreateAlertNotification(ctx context.Context, an AlertNotificati
 	if raw, err = json.Marshal(an); err != nil {
 		return -1, err
 	}
-	if raw, code, err = c.post(ctx, fmt.Sprintf("api/alert-notifications"), nil, raw); err != nil {
+	if raw, code, err = c.post(ctx, "api/alert-notifications", nil, raw); err != nil {
 		return -1, err
 	}
 	if code != 200 {

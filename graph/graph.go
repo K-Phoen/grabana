@@ -4,6 +4,7 @@ import (
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/target/prometheus"
+	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -124,6 +125,13 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+	}
+}
+
+// WithStackdriverTarget adds a stackdriver query to the graph.
+func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
+	return func(graph *Graph) {
+		graph.Builder.AddTarget(target.Builder)
 	}
 }
 
