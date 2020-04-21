@@ -98,6 +98,24 @@ rows:
           thresholds: ["26000000", "28000000"]
           color: ["value"]
 
+  - name: Stackdriver
+    panels:
+      - graph:
+          title: Pubsub Ack msg count
+          datasource: voi-stage-stackdriver
+          targets:
+            - stackdriver:
+                ref: A
+                legend: Ack-ed messages
+                type: delta
+                metric: pubsub.googleapis.com/subscription/ack_message_count
+                aggregation: mean
+                alignment: {method: delta, period: stackdriver-auto}
+                filters:
+                  eq:
+                    resource.label.subscription_id: "awesome_subscription_id"
+                    resource.type: pubsub_subscription
+
   - name: "Some text, because it might be useful"
     panels:
       - text:

@@ -115,6 +115,14 @@ func (graphPanel *DashboardGraph) target(t Target) (graph.Option, error) {
 	if t.Prometheus != nil {
 		return graph.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
+	if t.Stackdriver != nil {
+		stackdriverTarget, err := t.Stackdriver.toTarget()
+		if err != nil {
+			return nil, err
+		}
+
+		return graph.WithStackdriverTarget(stackdriverTarget), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

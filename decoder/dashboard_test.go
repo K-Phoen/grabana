@@ -28,6 +28,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		graphPanel(),
 		singleStatPanel(),
 		tablePanel(),
+		graphPanelWithStackdriverTarget(),
 	}
 
 	for _, testCase := range testCases {
@@ -255,6 +256,48 @@ rows:
 
 	require.Error(t, err)
 	require.Equal(t, ErrInvalidAlertValueFunc, err)
+}
+
+func TestUnmarshalYAMLWithInvalidStackdriverAggregation(t *testing.T) {
+	payload := `
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Pubsub Ack msg count
+          datasource: stackdriver-default
+          targets:
+            - stackdriver:
+                type: delta
+                metric: pubsub.googleapis.com/subscription/ack_message_count
+                aggregation: invalid
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidStackdriverAggregation, err)
+}
+
+func TestUnmarshalYAMLWithInvalidStackdriverAlignmentMethod(t *testing.T) {
+	payload := `
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Pubsub Ack msg count
+          datasource: stackdriver-default
+          targets:
+            - stackdriver:
+                type: delta
+                metric: pubsub.googleapis.com/subscription/ack_message_count
+                alignment: {method: invalid, period: stackdriver-auto}
+`
+
+	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
+
+	require.Error(t, err)
+	require.Equal(t, ErrInvalidStackdriverAlignment, err)
 }
 
 func generalOptions() testCase {
@@ -798,6 +841,280 @@ rows:
 
 	return testCase{
 		name:                "single row with single graph panel",
+		yaml:                yaml,
+		expectedGrafanaJSON: json,
+	}
+}
+
+func graphPanelWithStackdriverTarget() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Pubsub Ack msg count
+          datasource: voi-stage-stackdriver
+          targets:
+            - stackdriver:
+                ref: A
+                legend: Ack-ed messages
+                type: delta
+                metric: pubsub.googleapis.com/subscription/ack_message_count
+                aggregation: mean
+                alignment: {method: delta, period: stackdriver-auto}
+                filters:
+                  eq:
+                    resource.type: pubsub_subscription
+`
+	json := `{
+	"slug": "",
+	"title": "Awesome dashboard",
+	"originalTitle": "",
+	"tags": null,
+	"style": "dark",
+	"timezone": "",
+	"editable": false,
+	"hideControls": false,
+	"sharedCrosshair": false,
+	"templating": {"list": null},
+	"annotations": {"list": null},
+	"links": null,
+	"panels": null,
+	"rows": [
+		{
+			"title": "Test row",
+			"collapse": false,
+			"editable": true,
+			"height": "250px",
+			"repeat": null,
+			"showTitle": true,
+			"panels": [
+				{
+					"type": "graph",
+					"datasource": "voi-stage-stackdriver",
+					"editable": true,
+					"error": false,
+					"gridPos": {},
+					"id": 6,
+					"isNew": false,
+					"renderer": "flot",
+					"span": 6,
+					"fill": 1,
+					"title": "Pubsub Ack msg count",
+					"aliasColors": {},
+					"bars": false,
+					"points": false,
+					"stack": false,
+					"steppedLine": false,
+					"lines": true,
+					"linewidth": 1,
+					"pointradius": 5,
+					"percentage": false,
+					"nullPointMode": "null as zero",
+					"legend": {
+						"alignAsTable": false,
+						"avg": false,
+						"current": false,
+						"hideEmpty": true,
+						"hideZero": true,
+						"max": false,
+						"min": false,
+						"rightSide": false,
+						"show": true,
+						"total": false,
+						"values": false
+					},
+					"targets": [
+						{
+							"aliasBy": "Ack-ed messages",
+							"alignOptions": [
+								{
+								  "expanded": true,
+								  "label": "Alignment options",
+								  "options": [
+									{
+									  "label": "delta",
+									  "metricKinds": [
+										"CUMULATIVE",
+										"DELTA"
+									  ],
+									  "text": "delta",
+									  "value": "ALIGN_DELTA",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY",
+										"DISTRIBUTION"
+									  ]
+									},
+									{
+									  "label": "rate",
+									  "metricKinds": [
+										"CUMULATIVE",
+										"DELTA"
+									  ],
+									  "text": "rate",
+									  "value": "ALIGN_RATE",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY"
+									  ]
+									},
+									{
+									  "label": "min",
+									  "metricKinds": [
+										"GAUGE",
+										"DELTA"
+									  ],
+									  "text": "min",
+									  "value": "ALIGN_MIN",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY"
+									  ]
+									},
+									{
+									  "label": "max",
+									  "metricKinds": [
+										"GAUGE",
+										"DELTA"
+									  ],
+									  "text": "max",
+									  "value": "ALIGN_MAX",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY"
+									  ]
+									},
+									{
+									  "label": "mean",
+									  "metricKinds": [
+										"GAUGE",
+										"DELTA"
+									  ],
+									  "text": "mean",
+									  "value": "ALIGN_MEAN",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY"
+									  ]
+									},
+									{
+									  "label": "count",
+									  "metricKinds": [
+										"GAUGE",
+										"DELTA"
+									  ],
+									  "text": "count",
+									  "value": "ALIGN_COUNT",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY",
+										"BOOL"
+									  ]
+									},
+									{
+									  "label": "sum",
+									  "metricKinds": [
+										"GAUGE",
+										"DELTA"
+									  ],
+									  "text": "sum",
+									  "value": "ALIGN_SUM",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY",
+										"DISTRIBUTION"
+									  ]
+									},
+									{
+									  "label": "stddev",
+									  "metricKinds": [
+										"GAUGE",
+										"DELTA"
+									  ],
+									  "text": "stddev",
+									  "value": "ALIGN_STDDEV",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY"
+									  ]
+									},
+									{
+									  "label": "percent change",
+									  "metricKinds": [
+										"GAUGE",
+										"DELTA"
+									  ],
+									  "text": "percent change",
+									  "value": "ALIGN_PERCENT_CHANGE",
+									  "valueTypes": [
+										"INT64",
+										"DOUBLE",
+										"MONEY"
+									  ]
+									}
+								  ]
+								}
+							  ],
+							"refId": "A",
+							"metricKind": "DELTA",
+							"metricType": "pubsub.googleapis.com/subscription/ack_message_count",
+							"perSeriesAligner": "ALIGN_DELTA",
+							"alignmentPeriod": "stackdriver-auto",
+							"crossSeriesReducer": "REDUCE_MEAN",
+							"filters": ["resource.type", "=", "pubsub_subscription"],
+							"valueType": "INT64"
+						}
+					],
+					"tooltip": {
+						"shared": true,
+						"value_type": "",
+						"sort": 2
+					},
+					"x-axis": true,
+					"y-axis": true,
+					"xaxis": {
+						"format": "time",
+						"logBase": 1,
+						"show": true
+					},
+					"yaxes": [
+						{
+							"format": "short",
+							"logBase": 1,
+							"show": true
+						},
+						{
+							"format": "short",
+							"logBase": 1,
+							"show": false
+						}
+					],
+					"transparent": false
+				}
+			]
+		}
+	],
+	"time": {"from": "now-3h", "to": "now"},
+	"timepicker": {
+		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
+		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
+	},
+	"schemaVersion": 0,
+	"version": 0
+}`
+
+	return testCase{
+		name:                "single row with single graph panel and stackdriver target",
 		yaml:                yaml,
 		expectedGrafanaJSON: json,
 	}
