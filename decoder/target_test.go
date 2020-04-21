@@ -93,3 +93,117 @@ func TestValidStackdriverAggregations(t *testing.T) {
 		})
 	}
 }
+
+func TestValidStackdriverTargetTypes(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected string
+	}{
+		{input: "delta", expected: "DELTA"},
+		{input: "gauge", expected: "GAUGE"},
+		{input: "cumulative", expected: "CUMULATIVE"},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.input, func(t *testing.T) {
+			req := require.New(t)
+
+			targetPanel, err := StackdriverTarget{Type: tc.input}.toTarget()
+
+			req.NoError(err)
+
+			req.Equal(tc.expected, targetPanel.Builder.MetricKind)
+		})
+	}
+}
+
+func TestInvalidStackdriverTargetType(t *testing.T) {
+	req := require.New(t)
+
+	_, err := StackdriverTarget{Type: "invalid"}.toTarget()
+
+	req.Error(err)
+	req.Equal(ErrInvalidStackdriverType, err)
+}
+
+func TestStackdriverEqFilters(t *testing.T) {
+	req := require.New(t)
+
+	inputFilter := StackdriverFilters{Eq: map[string]string{
+		"foo": "bar",
+	}}
+
+	options := inputFilter.toOptions()
+
+	req.Len(options, 1)
+
+	target := stackdriver.Delta("")
+	stackdriver.Filter(options...)(target)
+
+	req.Len(target.Builder.Filters, 3)
+	req.Equal("foo", target.Builder.Filters[0])
+	req.Equal("=", target.Builder.Filters[1])
+	req.Equal("bar", target.Builder.Filters[2])
+}
+
+func TestStackdriverNeqFilters(t *testing.T) {
+	req := require.New(t)
+
+	inputFilter := StackdriverFilters{Neq: map[string]string{
+		"neq": "val",
+	}}
+
+	options := inputFilter.toOptions()
+
+	req.Len(options, 1)
+
+	target := stackdriver.Delta("")
+	stackdriver.Filter(options...)(target)
+
+	req.Len(target.Builder.Filters, 3)
+	req.Equal("neq", target.Builder.Filters[0])
+	req.Equal("!=", target.Builder.Filters[1])
+	req.Equal("val", target.Builder.Filters[2])
+}
+
+func TestStackdriverMatchesFilters(t *testing.T) {
+	req := require.New(t)
+
+	inputFilter := StackdriverFilters{Matches: map[string]string{
+		"matches": "regex",
+	}}
+
+	options := inputFilter.toOptions()
+
+	req.Len(options, 1)
+
+	target := stackdriver.Delta("")
+	stackdriver.Filter(options...)(target)
+
+	req.Len(target.Builder.Filters, 3)
+	req.Equal("matches", target.Builder.Filters[0])
+	req.Equal("=~", target.Builder.Filters[1])
+	req.Equal("regex", target.Builder.Filters[2])
+}
+
+func TestStackdriverNotMatchesFilters(t *testing.T) {
+	req := require.New(t)
+
+	inputFilter := StackdriverFilters{NotMatches: map[string]string{
+		"notmatches": "regex",
+	}}
+
+	options := inputFilter.toOptions()
+
+	req.Len(options, 1)
+
+	target := stackdriver.Delta("")
+	stackdriver.Filter(options...)(target)
+
+	req.Len(target.Builder.Filters, 3)
+	req.Equal("notmatches", target.Builder.Filters[0])
+	req.Equal("!=~", target.Builder.Filters[1])
+	req.Equal("regex", target.Builder.Filters[2])
+}

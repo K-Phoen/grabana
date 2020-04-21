@@ -138,7 +138,7 @@ func (t StackdriverTarget) aggregation() (stackdriver.Option, error) {
 }
 
 func (filters StackdriverFilters) toOptions() []stackdriver.FilterOption {
-	var opts []stackdriver.FilterOption
+	opts := []stackdriver.FilterOption{}
 
 	for key, value := range filters.Eq {
 		opts = append(opts, stackdriver.Eq(key, value))
