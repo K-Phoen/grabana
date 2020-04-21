@@ -33,7 +33,7 @@ type BoolString struct {
 }
 
 func (s *BoolString) UnmarshalJSON(raw []byte) error {
-	if raw == nil || bytes.Compare(raw, []byte(`"null"`)) == 0 {
+	if raw == nil || bytes.Equal(raw, []byte(`"null"`)) {
 		return nil
 	}
 	var (
@@ -41,11 +41,11 @@ func (s *BoolString) UnmarshalJSON(raw []byte) error {
 		err error
 	)
 	if raw[0] != '"' {
-		if bytes.Compare(raw, []byte("true")) == 0 {
+		if bytes.Equal(raw, []byte("true")) {
 			s.Flag = true
 			return nil
 		}
-		if bytes.Compare(raw, []byte("false")) == 0 {
+		if bytes.Equal(raw, []byte("false")) {
 			return nil
 		}
 		return errors.New("bad boolean value provided")
@@ -74,7 +74,7 @@ type BoolInt struct {
 }
 
 func (s *BoolInt) UnmarshalJSON(raw []byte) error {
-	if raw == nil || bytes.Compare(raw, []byte(`"null"`)) == 0 {
+	if raw == nil || bytes.Equal(raw, []byte(`"null"`)) {
 		return nil
 	}
 	var (
@@ -82,11 +82,11 @@ func (s *BoolInt) UnmarshalJSON(raw []byte) error {
 		err error
 	)
 	if tmp, err = strconv.ParseInt(string(raw), 10, 64); err != nil {
-		if bytes.Compare(raw, []byte("true")) == 0 {
+		if bytes.Equal(raw, []byte("true")) {
 			s.Flag = true
 			return nil
 		}
-		if bytes.Compare(raw, []byte("false")) == 0 {
+		if bytes.Equal(raw, []byte("false")) {
 			return nil
 		}
 		return errors.New("bad value provided")

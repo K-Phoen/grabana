@@ -101,12 +101,14 @@ datasources. State of support for misc API parts noted below.
 There is no exact roadmap.  The integration tests are being run against the
 following Grafana versions:
 
+* [6.7.1](./travis.yml)
 * [6.6.2](/.travis.yml)
 * [6.5.3](/.travis.yml)
 * [6.4.5](/.travis.yml)
 
 With the following Go versions:
 
+* 1.14.x
 * 1.13.x
 * 1.12.x
 * 1.11.x
