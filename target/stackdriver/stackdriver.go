@@ -16,6 +16,7 @@ type Aligner string
 const AlignNone Aligner = "ALIGN_NONE"
 const AlignDelta Aligner = "ALIGN_DELTA"
 const AlignRate Aligner = "ALIGN_RATE"
+const AlignInterpolate Aligner = "ALIGN_INTERPOLATE"
 const AlignNextOlder Aligner = "ALIGN_NEXT_OLDER"
 const AlignMin Aligner = "ALIGN_MIN"
 const AlignMax Aligner = "ALIGN_MAX"
