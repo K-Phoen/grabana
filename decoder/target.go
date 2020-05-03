@@ -13,8 +13,8 @@ var ErrInvalidStackdriverAggregation = fmt.Errorf("invalid stackdriver aggregati
 var ErrInvalidStackdriverAlignment = fmt.Errorf("invalid stackdriver alignment method")
 
 type Target struct {
-	Prometheus  *PrometheusTarget
-	Stackdriver *StackdriverTarget
+	Prometheus  *PrometheusTarget  `yaml:",omitempty"`
+	Stackdriver *StackdriverTarget `yaml:",omitempty"`
 }
 
 type PrometheusTarget struct {
