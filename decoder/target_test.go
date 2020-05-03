@@ -16,6 +16,7 @@ func TestValidStackdriverAlignmentMethods(t *testing.T) {
 		{input: "none", expected: stackdriver.AlignNone},
 		{input: "delta", expected: stackdriver.AlignDelta},
 		{input: "rate", expected: stackdriver.AlignRate},
+		{input: "interpolate", expected: stackdriver.AlignInterpolate},
 		{input: "next_older", expected: stackdriver.AlignNextOlder},
 		{input: "min", expected: stackdriver.AlignMin},
 		{input: "max", expected: stackdriver.AlignMax},

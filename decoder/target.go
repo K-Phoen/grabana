@@ -164,6 +164,8 @@ func (t StackdriverAlignment) toOption() (stackdriver.Option, error) {
 		return stackdriver.Alignment(stackdriver.AlignDelta, t.Period), nil
 	case "rate":
 		return stackdriver.Alignment(stackdriver.AlignRate, t.Period), nil
+	case "interpolate":
+		return stackdriver.Alignment(stackdriver.AlignInterpolate, t.Period), nil
 	case "next_older":
 		return stackdriver.Alignment(stackdriver.AlignNextOlder, t.Period), nil
 	case "min":
