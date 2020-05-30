@@ -66,7 +66,6 @@ func New(name string, options ...Option) *Alert {
 func Notify(channel *Channel) Option {
 	return func(alert *Alert) {
 		alert.Builder.Notifications = append(alert.Builder.Notifications, sdk.AlertNotification{
-			ID:  int64(channel.ID),
 			UID: channel.UID,
 		})
 	}
