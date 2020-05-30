@@ -32,7 +32,7 @@ func TestNotificationCanBeSet(t *testing.T) {
 
 	req.Len(a.Builder.Notifications, 1)
 	req.Equal("channel", a.Builder.Notifications[0].UID)
-	req.Equal(int64(1), a.Builder.Notifications[0].ID)
+	req.Empty(a.Builder.Notifications[0].ID)
 }
 
 func TestNotificationCanBeSetByChannelID(t *testing.T) {
