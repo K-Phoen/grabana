@@ -32,6 +32,7 @@ rows:
               query: "go_memstats_heap_alloc_bytes"
               legend: "{{job}}"
               ref: A
+              #hidden: true # useful for queries only referenced in alerts
         # Valid values are: hide, as_table, to_the_right, min, max, avg, current, total, no_null_series, no_zero_series
         legend: [avg, current, no_null_series, no_zero_series]
         alert:
