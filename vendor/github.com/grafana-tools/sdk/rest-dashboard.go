@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
@@ -170,7 +171,24 @@ type FoundBoard struct {
 // only starred dashboards and only for tags (logical OR applied to multiple tags).
 //
 // Reflects GET /api/search API call.
+// Deprecated: This interface does not allow for API extension and is out of date.
+// Please use Search(SearchType(SearchTypeDashboard))
 func (r *Client) SearchDashboards(ctx context.Context, query string, starred bool, tags ...string) ([]FoundBoard, error) {
+	params := []SearchParam{
+		SearchType(SearchTypeDashboard),
+		SearchQuery(query),
+		SearchStarred(starred),
+	}
+	for _, tag := range tags {
+		params = append(params, SearchTag(tag))
+	}
+	return r.Search(ctx, params...)
+}
+
+// Search searches folders and dashboards with query params specified.
+//
+// Reflects GET /api/search API call.
+func (r *Client) Search(ctx context.Context, params ...SearchParam) ([]FoundBoard, error) {
 	var (
 		raw    []byte
 		boards []FoundBoard
@@ -179,14 +197,8 @@ func (r *Client) SearchDashboards(ctx context.Context, query string, starred boo
 	)
 	u := url.URL{}
 	q := u.Query()
-	if query != "" {
-		q.Set("query", query)
-	}
-	if starred {
-		q.Set("starred", "true")
-	}
-	for _, tag := range tags {
-		q.Add("tag", tag)
+	for _, p := range params {
+		p(&q)
 	}
 	if raw, code, err = r.get(ctx, "api/search", q); err != nil {
 		return nil, err
@@ -306,6 +318,95 @@ func (r *Client) DeleteDashboard(ctx context.Context, slug string) (StatusMessag
 	}
 	err = json.Unmarshal(raw, &reply)
 	return reply, err
+}
+
+type (
+	// SearchParam is a type for specifying Search params.
+	SearchParam func(*url.Values)
+	// SearchParamType is a type accepted by SearchType func.
+	SearchParamType string
+)
+
+// Search entities to be used with SearchType().
+const (
+	SearchTypeFolder    SearchParamType = "dash-folder"
+	SearchTypeDashboard SearchParamType = "dash-db"
+)
+
+// SearchQuery specifies Search search query.
+// Empty query is silently ignored.
+// Specifying it multiple times is futile, only last one will be sent.
+func SearchQuery(query string) SearchParam {
+	return func(v *url.Values) {
+		if query != "" {
+			v.Set("query", query)
+		}
+	}
+}
+
+// SearchTag specifies Search tag to search for.
+// Empty tag is silently ignored.
+// Can be specified multiple times, logical OR is applied.
+func SearchTag(tag string) SearchParam {
+	return func(v *url.Values) {
+		if tag != "" {
+			v.Add("tag", tag)
+		}
+	}
+}
+
+// SearchType specifies Search type to search for.
+// Specifying it multiple times is futile, only last one will be sent.
+func SearchType(searchType SearchParamType) SearchParam {
+	return func(v *url.Values) {
+		v.Set("type", string(searchType))
+	}
+}
+
+// SearchDashboardID specifies Search dashboard id's to search for.
+// Can be specified multiple times, logical OR is applied.
+func SearchDashboardID(dashboardID int) SearchParam {
+	return func(v *url.Values) {
+		v.Add("dashboardIds", strconv.Itoa(dashboardID))
+	}
+}
+
+// SearchFolderID specifies Search folder id's to search for.
+// Can be specified multiple times, logical OR is applied.
+func SearchFolderID(folderID int) SearchParam {
+	return func(v *url.Values) {
+		v.Add("folderIds", strconv.Itoa(folderID))
+	}
+}
+
+// SearchStarred specifies if Search should search for starred dashboards only.
+// Specifying it multiple times is futile, only last one will be sent.
+func SearchStarred(starred bool) SearchParam {
+	return func(v *url.Values) {
+		v.Set("starred", strconv.FormatBool(starred))
+	}
+}
+
+// SearchLimit specifies maximum number of results from Search query.
+// As of grafana 6.7 it has to be <= 5000. 0 stands for absence of parameter in a query.
+// Specifying it multiple times is futile, only last one will be sent.
+func SearchLimit(limit uint) SearchParam {
+	return func(v *url.Values) {
+		if limit > 0 {
+			v.Set("limit", strconv.FormatUint(uint64(limit), 10))
+		}
+	}
+}
+
+// SearchPage specifies Search page number to be queried for.
+// Zero page is silently ignored, page numbers start from one.
+// Specifying it multiple times is futile, only last one will be sent.
+func SearchPage(page uint) SearchParam {
+	return func(v *url.Values) {
+		if page > 0 {
+			v.Set("page", strconv.FormatUint(uint64(page), 10))
+		}
+	}
 }
 
 // implicitly use dashboards from Grafana DB not from a file system
