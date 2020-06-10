@@ -45,11 +45,13 @@ library is useful per se.
 	row1.Add(graph)
 	grafanaURL := "http://grafana.host"
 	c := sdk.NewClient(grafanaURL, "grafana-api-key", sdk.DefaultHTTPClient)
-	response, err := c.SetDashboard(board, false)
-	err != nil {
+	response, err := c.SetDashboard(context.TODO() ,*board, sdk.SetDashboardParams{
+		Overwrite: false,
+	})
+	if err != nil {
 		fmt.Printf("error on uploading dashboard %s", board.Title)
 	} else {
-		fmt.Printf("dashboard URL: %v", grafanaURL+*resp.URL)
+		fmt.Printf("dashboard URL: %v", grafanaURL+*response.URL)
 	}
 ```
 

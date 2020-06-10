@@ -148,7 +148,7 @@ func TestPointRadiusCanBeConfigured(t *testing.T) {
 
 	panel := New("", PointRadius(3))
 
-	req.Equal(3, panel.Builder.Pointradius)
+	req.Equal(float32(3), panel.Builder.Pointradius)
 }
 
 func TestNullValueModeCanBeConfigured(t *testing.T) {
