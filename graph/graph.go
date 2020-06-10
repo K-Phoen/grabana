@@ -117,6 +117,7 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	return func(graph *Graph) {
 		graph.Builder.AddTarget(&sdk.Target{
 			RefID:          target.Ref,
+			Hide:           target.Hidden,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
 			Interval:       target.Interval,
@@ -241,7 +242,7 @@ func Staircase() Option {
 }
 
 // PointRadius adjusts the size of points when Points are selected as Draw Mode.
-func PointRadius(value int) Option {
+func PointRadius(value float32) Option {
 	return func(graph *Graph) {
 		graph.Builder.Pointradius = value
 	}

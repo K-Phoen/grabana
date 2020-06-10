@@ -51,6 +51,14 @@ func TestRefCanBeConfigured(t *testing.T) {
 	req.Equal("A", target.Builder.RefID)
 }
 
+func TestTargetCanBeHidden(t *testing.T) {
+	req := require.New(t)
+
+	target := stackdriver.Delta("", stackdriver.Hide())
+
+	req.True(target.Builder.Hide)
+}
+
 func TestAggregationCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 	reducers := []stackdriver.Reducer{

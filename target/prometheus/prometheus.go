@@ -6,6 +6,7 @@ type Option func(target *Prometheus)
 // Prometheus represents a prometheus query.
 type Prometheus struct {
 	Ref            string
+	Hidden         bool
 	Expr           string
 	IntervalFactor int
 	Interval       string
@@ -40,5 +41,13 @@ func Legend(legend string) Option {
 func Ref(ref string) Option {
 	return func(prometheus *Prometheus) {
 		prometheus.Ref = ref
+	}
+}
+
+// Hide the query. Grafana does not send hidden queries to the data source,
+// but they can still be referenced in alerts.
+func Hide() Option {
+	return func(prometheus *Prometheus) {
+		prometheus.Hidden = true
 	}
 }

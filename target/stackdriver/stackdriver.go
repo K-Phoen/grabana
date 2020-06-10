@@ -109,6 +109,14 @@ func Ref(ref string) Option {
 	}
 }
 
+// Hide the query. Grafana does not send hidden queries to the data source,
+// but they can still be referenced in alerts.
+func Hide() Option {
+	return func(stackdriver *Stackdriver) {
+		stackdriver.Builder.Hide = true
+	}
+}
+
 // Legend sets the legend format.
 // See https://grafana.com/docs/grafana/latest/features/datasources/stackdriver/#alias-patterns for more
 // information on allowed patterns.
