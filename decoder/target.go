@@ -21,13 +21,20 @@ type PrometheusTarget struct {
 	Query  string
 	Legend string `yaml:",omitempty"`
 	Ref    string `yaml:",omitempty"`
+	Hidden bool   `yaml:",omitempty"`
 }
 
 func (t PrometheusTarget) toOptions() []prometheus.Option {
-	return []prometheus.Option{
+	opts := []prometheus.Option{
 		prometheus.Legend(t.Legend),
 		prometheus.Ref(t.Ref),
 	}
+
+	if t.Hidden {
+		opts = append(opts, prometheus.Hide())
+	}
+
+	return opts
 }
 
 type StackdriverTarget struct {
@@ -38,6 +45,7 @@ type StackdriverTarget struct {
 	Alignment   *StackdriverAlignment `yaml:",omitempty"`
 	Legend      string                `yaml:",omitempty"`
 	Ref         string                `yaml:",omitempty"`
+	Hidden      bool                  `yaml:",omitempty"`
 }
 
 type StackdriverFilters struct {
@@ -74,6 +82,10 @@ func (t StackdriverTarget) toOptions() ([]stackdriver.Option, error) {
 	opts := []stackdriver.Option{
 		stackdriver.Legend(t.Legend),
 		stackdriver.Ref(t.Ref),
+	}
+
+	if t.Hidden {
+		opts = append(opts, stackdriver.Hide())
 	}
 
 	filters := t.Filters.toOptions()

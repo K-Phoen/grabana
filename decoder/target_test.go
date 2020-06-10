@@ -208,3 +208,12 @@ func TestStackdriverNotMatchesFilters(t *testing.T) {
 	req.Equal("!=~", target.Builder.Filters[1])
 	req.Equal("regex", target.Builder.Filters[2])
 }
+
+func TestStackdriverHiddenTarget(t *testing.T) {
+	req := require.New(t)
+
+	target, err := StackdriverTarget{Type: "delta", Hidden: true}.toTarget()
+
+	req.NoError(err)
+	req.True(target.Builder.Hide)
+}
