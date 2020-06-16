@@ -173,6 +173,7 @@ type GraphAlert struct {
 	For              string
 	If               []AlertCondition
 	Notify           string
+	Notifications    []string
 	Message          string
 	OnNoData         string `yaml:"on_no_data"`
 	OnExecutionError string `yaml:"on_execution_error"`
@@ -221,6 +222,10 @@ func (a GraphAlert) toOptions() ([]alert.Option, error) {
 	}
 	if a.Message != "" {
 		opts = append(opts, alert.Message(a.Message))
+	}
+
+	for _, channel := range a.Notifications {
+		opts = append(opts, alert.NotifyChannel(channel))
 	}
 
 	for _, condition := range a.If {
