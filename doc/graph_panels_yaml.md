@@ -39,8 +39,10 @@ rows:
           title: Too many heap allocations
           evaluate_every: 1m
           for: 1m
-          # ID of the notification channel
-          notify: 1
+          # UID of the notification channel
+          notify: "P-N3fxuZz"
+          # UIDs of the notification channels
+          #notifications: ["P-N3fxuZz"]
           message: "Wow, a we're allocating a lot."
           # Valid values are: no_data, alerting, keep_state, ok
           on_no_data: alerting
