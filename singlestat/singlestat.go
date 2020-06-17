@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/K-Phoen/grabana/target/prometheus"
+	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/grafana-tools/sdk"
 )
 
@@ -162,6 +163,13 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+	}
+}
+
+// WithStackdriverTarget adds a stackdriver query to the graph.
+func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.AddTarget(target.Builder)
 	}
 }
 

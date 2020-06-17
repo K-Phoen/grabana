@@ -118,6 +118,14 @@ func (singleStatPanel DashboardSingleStat) target(t Target) (singlestat.Option, 
 	if t.Prometheus != nil {
 		return singlestat.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
+	if t.Stackdriver != nil {
+		stackdriverTarget, err := t.Stackdriver.toTarget()
+		if err != nil {
+			return nil, err
+		}
+
+		return singlestat.WithStackdriverTarget(stackdriverTarget), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }
