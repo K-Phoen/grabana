@@ -181,3 +181,11 @@ func TestFiltersCanBeConfigured(t *testing.T) {
 		})
 	}
 }
+
+func TestTargetSupportsGroupBys(t *testing.T) {
+	req := require.New(t)
+
+	target := stackdriver.Delta("", stackdriver.GroupBys("field", "other"))
+
+	req.ElementsMatch(target.Builder.GroupBys, []string{"field", "other"})
+}
