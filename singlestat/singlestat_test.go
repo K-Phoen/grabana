@@ -3,6 +3,7 @@ package singlestat
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
 )
 
@@ -38,6 +39,14 @@ func TestSingleStatPanelCanHavePrometheusTargets(t *testing.T) {
 	panel := New("", WithPrometheusTarget(
 		"rate(prometheus_http_requests_total[30s])",
 	))
+
+	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
+}
+
+func TestSingleStatPanelCanHaveStackdriverTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", WithStackdriverTarget(stackdriver.Gauge("pubsub.googleapis.com/subscription/ack_message_count")))
 
 	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
 }
