@@ -217,3 +217,12 @@ func TestStackdriverHiddenTarget(t *testing.T) {
 	req.NoError(err)
 	req.True(target.Builder.Hide)
 }
+
+func TestStackdriverGroupBy(t *testing.T) {
+	req := require.New(t)
+
+	target, err := StackdriverTarget{Type: "delta", GroupBy: []string{"field", "other"}}.toTarget()
+
+	req.NoError(err)
+	req.ElementsMatch(target.Builder.GroupBys, []string{"field", "other"})
+}

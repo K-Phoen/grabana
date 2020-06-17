@@ -46,6 +46,7 @@ type StackdriverTarget struct {
 	Legend      string                `yaml:",omitempty"`
 	Ref         string                `yaml:",omitempty"`
 	Hidden      bool                  `yaml:",omitempty"`
+	GroupBy     []string              `yaml:",omitempty"`
 }
 
 type StackdriverFilters struct {
@@ -91,6 +92,10 @@ func (t StackdriverTarget) toOptions() ([]stackdriver.Option, error) {
 	filters := t.Filters.toOptions()
 	if len(filters) != 0 {
 		opts = append(opts, stackdriver.Filter(filters...))
+	}
+
+	if len(t.GroupBy) != 0 {
+		opts = append(opts, stackdriver.GroupBys(t.GroupBy...))
 	}
 
 	if t.Aggregation != "" {
