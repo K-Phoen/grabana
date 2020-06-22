@@ -85,3 +85,11 @@ func TestAnOptionToIncludeAllCanBeAdded(t *testing.T) {
 
 	req.True(panel.Builder.IncludeAll)
 }
+
+func TestAllValueCanBeOverriden(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", AllValue(".*"))
+
+	req.Equal(".*", panel.Builder.AllValue)
+}
