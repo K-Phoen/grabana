@@ -35,6 +35,19 @@ func TestNotificationCanBeSet(t *testing.T) {
 	req.Empty(a.Builder.Notifications[0].ID)
 }
 
+func TestNotificationCanBeSetInBulk(t *testing.T) {
+	req := require.New(t)
+	channel := &Channel{ID: 1, UID: "channel"}
+	otherChannel := &Channel{ID: 2, UID: "other-channel"}
+
+	a := New("", NotifyChannels(channel, otherChannel))
+
+	req.Len(a.Builder.Notifications, 2)
+	req.ElementsMatch([]string{"channel", "other-channel"}, []string{a.Builder.Notifications[0].UID, a.Builder.Notifications[1].UID})
+	req.Empty(a.Builder.Notifications[0].ID)
+	req.Empty(a.Builder.Notifications[1].ID)
+}
+
 func TestNotificationCanBeSetByChannelID(t *testing.T) {
 	req := require.New(t)
 

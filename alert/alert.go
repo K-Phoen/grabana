@@ -71,6 +71,18 @@ func Notify(channel *Channel) Option {
 	}
 }
 
+// NotifyChannels appends the given notification channels to the list of
+// channels for this alert.
+func NotifyChannels(channels ...*Channel) Option {
+	return func(alert *Alert) {
+		for _, channel := range channels {
+			alert.Builder.Notifications = append(alert.Builder.Notifications, sdk.AlertNotification{
+				UID: channel.UID,
+			})
+		}
+	}
+}
+
 // NotifyChannel adds a notification for this alert given a channel UID.
 func NotifyChannel(channelUID string) Option {
 	return func(alert *Alert) {
