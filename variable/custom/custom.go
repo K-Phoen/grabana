@@ -119,3 +119,10 @@ func IncludeAll() Option {
 		})
 	}
 }
+
+// AllValue define the value used when selecting the "All" option.
+func AllValue(value string) Option {
+	return func(custom *Custom) {
+		custom.Builder.AllValue = value
+	}
+}
