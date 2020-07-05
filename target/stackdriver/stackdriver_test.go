@@ -43,6 +43,15 @@ func TestLegendCanBeConfigured(t *testing.T) {
 	req.Equal(legend, target.Builder.AliasBy)
 }
 
+func TestProjectCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+	project := "some-gcp-project-id"
+
+	target := stackdriver.Delta("", stackdriver.Project(project))
+
+	req.Equal(project, target.Builder.ProjectName)
+}
+
 func TestRefCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 

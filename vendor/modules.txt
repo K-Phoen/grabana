@@ -2,7 +2,7 @@
 github.com/davecgh/go-spew/spew
 # github.com/gosimple/slug v1.9.0
 github.com/gosimple/slug
-# github.com/grafana-tools/sdk v0.0.0-20200610203821-a982d46f0598
+# github.com/grafana-tools/sdk v0.0.0-20200707194905-904dd74ea1f1
 github.com/grafana-tools/sdk
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
