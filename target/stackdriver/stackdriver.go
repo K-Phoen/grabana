@@ -126,6 +126,13 @@ func Legend(legend string) Option {
 	}
 }
 
+// Project defines the GCP project to use for this target.
+func Project(project string) Option {
+	return func(stackdriver *Stackdriver) {
+		stackdriver.Builder.ProjectName = project
+	}
+}
+
 // Aggregation defines how the time series will be aggregated.
 func Aggregation(reducer Reducer) Option {
 	return func(stackdriver *Stackdriver) {
