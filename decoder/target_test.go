@@ -226,3 +226,12 @@ func TestStackdriverGroupBy(t *testing.T) {
 	req.NoError(err)
 	req.ElementsMatch(target.Builder.GroupBys, []string{"field", "other"})
 }
+
+func TestStackdriverProject(t *testing.T) {
+	req := require.New(t)
+
+	target, err := StackdriverTarget{Type: "delta", Project: "gcp-project"}.toTarget()
+
+	req.NoError(err)
+	req.Equal("gcp-project", target.Builder.ProjectName)
+}

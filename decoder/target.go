@@ -38,6 +38,7 @@ func (t PrometheusTarget) toOptions() []prometheus.Option {
 }
 
 type StackdriverTarget struct {
+	Project     string
 	Type        string
 	Metric      string
 	Filters     StackdriverFilters    `yaml:",omitempty"`
@@ -87,6 +88,10 @@ func (t StackdriverTarget) toOptions() ([]stackdriver.Option, error) {
 
 	if t.Hidden {
 		opts = append(opts, stackdriver.Hide())
+	}
+
+	if t.Project != "" {
+		opts = append(opts, stackdriver.Project(t.Project))
 	}
 
 	filters := t.Filters.toOptions()
