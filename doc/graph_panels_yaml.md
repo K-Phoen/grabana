@@ -48,6 +48,9 @@ rows:
           on_no_data: alerting
           # Valid values are: alerting, keep_state
           on_execution_error: alerting
+          tags:
+            # user defined tags
+            severity: warning
           if:
             - operand: and
               # valid `func` values are: avg, sum, count, last, min, max, median, diff, percent_diff

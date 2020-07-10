@@ -177,6 +177,7 @@ type GraphAlert struct {
 	Message          string
 	OnNoData         string `yaml:"on_no_data"`
 	OnExecutionError string `yaml:"on_execution_error"`
+	Tags             map[string]string
 }
 
 func (a GraphAlert) toOptions() ([]alert.Option, error) {
@@ -222,6 +223,9 @@ func (a GraphAlert) toOptions() ([]alert.Option, error) {
 	}
 	if a.Message != "" {
 		opts = append(opts, alert.Message(a.Message))
+	}
+	if len(a.Tags) != 0 {
+		opts = append(opts, alert.Tags(a.Tags))
 	}
 
 	for _, channel := range a.Notifications {

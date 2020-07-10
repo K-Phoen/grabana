@@ -110,6 +110,7 @@ type (
 		Type      string         `json:"type,omitempty"`
 	}
 	Alert struct {
+		AlertRuleTags       map[string]string   `json:"alertRuleTags,omitempty"`
 		Conditions          []AlertCondition    `json:"conditions,omitempty"`
 		ExecutionErrorState string              `json:"executionErrorState,omitempty"`
 		Frequency           string              `json:"frequency,omitempty"`
