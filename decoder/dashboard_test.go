@@ -684,6 +684,8 @@ rows:
             message: "Wow, a we're allocating a lot."
             on_no_data: alerting
             on_execution_error: alerting
+            tags:
+              severity: super-critical-stop-the-world-now
             if:
               - operand: and
                 value: {func: avg, ref: A, from: 1m, to: now}
@@ -749,6 +751,7 @@ rows:
 							}
 						],
 						"executionErrorState": "alerting",
+						"alertRuleTags": {"severity": "super-critical-stop-the-world-now"},
 						"for": "1m",
 						"frequency": "1m",
 						"handler": 1,

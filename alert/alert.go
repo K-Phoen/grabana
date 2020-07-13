@@ -141,3 +141,11 @@ func If(operator Operator, opts ...ConditionOption) Option {
 		alert.Builder.Conditions = append(alert.Builder.Conditions, *cond.builder)
 	}
 }
+
+// Tags defines a set of tags that will be forwarded to the notifications
+// channels when the alert will tbe triggered.
+func Tags(tags map[string]string) Option {
+	return func(alert *Alert) {
+		alert.Builder.AlertRuleTags = tags
+	}
+}

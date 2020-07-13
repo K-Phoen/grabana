@@ -98,3 +98,14 @@ func TestConditionsCanBeSet(t *testing.T) {
 	req.Len(a.Builder.Conditions, 1)
 	req.Equal(string(And), a.Builder.Conditions[0].Operator.Type)
 }
+
+func TestTagsCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	a := New("", Tags(map[string]string{
+		"severity": "warning",
+	}))
+
+	req.Len(a.Builder.AlertRuleTags, 1)
+	req.Equal("warning", a.Builder.AlertRuleTags["severity"])
+}
