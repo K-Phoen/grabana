@@ -118,7 +118,7 @@ if err != nil {
     os.Exit(1)
 }
 
-if _, err := client.UpsertDashboard(ctx, folder, builder); err != nil {
+if _, err := client.UpsertDashboard(ctx, folder, dashboard); err != nil {
     fmt.Printf("Could not create dashboard: %s\n", err)
     os.Exit(1)
 }
