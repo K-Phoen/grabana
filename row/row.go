@@ -82,3 +82,10 @@ func HideTitle() Option {
 		row.builder.ShowTitle = false
 	}
 }
+
+// WithRepeat adds repeat for given variable.
+func WithRepeat(repeat string) Option {
+	return func(row *Row) {
+		row.builder.Repeat = &repeat
+	}
+}
