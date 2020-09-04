@@ -83,9 +83,9 @@ func HideTitle() Option {
 	}
 }
 
-// WithRepeat adds repeat for given variable.
-func WithRepeat(repeat string) Option {
+// RepeatFor will repeat the row for all values of the given variable.
+func RepeatFor(variable string) Option {
 	return func(row *Row) {
-		row.builder.Repeat = &repeat
+		row.builder.Repeat = &variable
 	}
 }

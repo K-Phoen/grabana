@@ -8,6 +8,7 @@
 ```yaml
 rows:
   - name: "Graph panels row"
+    #repeat_for: variable # repeat the row for all values of the variable
     panels:
       - graph:
         title: HTTP Rate
