@@ -70,3 +70,12 @@ func TestRowsCanHaveSingleStatPanels(t *testing.T) {
 
 	req.Len(panel.builder.Panels, 1)
 }
+
+func TestRowsCanHaveRepeatedPanels(t *testing.T) {
+	req := require.New(t)
+	board := sdk.NewBoard("")
+
+	panel := New(board, "", WithRepeat("repeated"))
+
+	req.Equal("repeated", *panel.builder.Repeat)
+}
