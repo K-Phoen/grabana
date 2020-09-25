@@ -42,3 +42,33 @@ func TestValidValueTypes(t *testing.T) {
 		})
 	}
 }
+
+func TestSparkLineModes(t *testing.T) {
+	testCases := []struct {
+		input string
+		err   error
+	}{
+		{input: "", err: nil},
+		{input: "bottom", err: nil},
+		{input: "full", err: nil},
+		{input: "invalid", err: ErrInvalidSparkLineMode},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.input, func(t *testing.T) {
+			req := require.New(t)
+
+			panel := DashboardSingleStat{SparkLine: tc.input}
+
+			_, err := panel.toOption()
+
+			if tc.err == nil {
+				req.NoError(err)
+			} else {
+				req.Equal(tc.err, err)
+			}
+		})
+	}
+}
