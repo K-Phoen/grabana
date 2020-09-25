@@ -3,6 +3,8 @@ package decoder
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/target/prometheus"
+
 	"github.com/K-Phoen/grabana/target/stackdriver"
 
 	"github.com/stretchr/testify/require"
@@ -234,4 +236,13 @@ func TestStackdriverProject(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("gcp-project", target.Builder.ProjectName)
+}
+
+func TestPrometheusHiddenTarget(t *testing.T) {
+	req := require.New(t)
+
+	opts := PrometheusTarget{Hidden: true}.toOptions()
+	target := prometheus.New("query", opts...)
+
+	req.True(target.Hidden)
 }
