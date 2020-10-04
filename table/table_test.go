@@ -16,22 +16,6 @@ func TestNewTablePanelsCanBeCreated(t *testing.T) {
 	req.Equal(float32(6), panel.Builder.Span)
 }
 
-func TestTablePanelCanBeMadeEditable(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Editable())
-
-	req.True(panel.Builder.Editable)
-}
-
-func TestTablePanelCanBeMadeReadOnly(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", ReadOnly())
-
-	req.False(panel.Builder.Editable)
-}
-
 func TestTablePanelWidthCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 

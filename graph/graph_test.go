@@ -18,22 +18,6 @@ func TestNewGraphPanelsCanBeCreated(t *testing.T) {
 	req.Equal(float32(6), panel.Builder.Span)
 }
 
-func TestGraphPanelCanBeMadeEditable(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Editable())
-
-	req.True(panel.Builder.Editable)
-}
-
-func TestGraphPanelCanBeMadeReadOnly(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", ReadOnly())
-
-	req.False(panel.Builder.Editable)
-}
-
 func TestGraphPanelCanHavePrometheusTargets(t *testing.T) {
 	req := require.New(t)
 

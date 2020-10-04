@@ -111,7 +111,6 @@ func New(title string, options ...Option) *SingleStat {
 
 func defaults() []Option {
 	return []Option{
-		Editable(),
 		Span(6),
 		ValueFontSize("100%"),
 		ValueType(Avg),
@@ -124,20 +123,6 @@ func defaults() []Option {
 		}),
 		SparkLineColor("rgb(31, 120, 193)"),
 		SparkLineFillColor("rgba(31, 118, 189, 0.18)"),
-	}
-}
-
-// Editable marks the graph as editable.
-func Editable() Option {
-	return func(singleStat *SingleStat) {
-		singleStat.Builder.Editable = true
-	}
-}
-
-// ReadOnly marks the graph as non-editable.
-func ReadOnly() Option {
-	return func(singleStat *SingleStat) {
-		singleStat.Builder.Editable = false
 	}
 }
 

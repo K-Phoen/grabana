@@ -17,22 +17,6 @@ func TestNewSingleStatPanelsCanBeCreated(t *testing.T) {
 	req.Equal(float32(6), panel.Builder.Span)
 }
 
-func TestSingleStatPanelCanBeMadeEditable(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Editable())
-
-	req.True(panel.Builder.Editable)
-}
-
-func TestSingleStatPanelCanBeMadeReadOnly(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", ReadOnly())
-
-	req.False(panel.Builder.Editable)
-}
-
 func TestSingleStatPanelCanHavePrometheusTargets(t *testing.T) {
 	req := require.New(t)
 
