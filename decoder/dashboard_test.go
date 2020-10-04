@@ -346,6 +346,8 @@ timezone: utc
 func tagAnnotations() testCase {
 	yaml := `title: Awesome dashboard
 
+timezone: default
+
 tags_annotations:
   - name: Deployments
     datasource: "-- Grafana --"
@@ -403,6 +405,8 @@ tags_annotations:
 func variables() testCase {
 	yaml := `title: Awesome dashboard
 
+timezone: browser
+
 variables:
   - interval:
       name: interval
@@ -435,7 +439,7 @@ variables:
 	"originalTitle": "",
 	"tags": null,
 	"style": "dark",
-	"timezone": "",
+	"timezone": "browser",
 	"editable": false,
 	"hideControls": false,
 	"sharedCrosshair": false,
