@@ -12,7 +12,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 
 	"github.com/K-Phoen/grabana/decoder"

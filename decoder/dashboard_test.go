@@ -730,7 +730,7 @@ rows:
 				{
 					"type": "graph",
 					"datasource": "prometheus-default",
-					"editable": true,
+					"editable": false,
 					"error": false,
 					"height": "400px",
 					"gridPos": {},
@@ -900,7 +900,7 @@ rows:
 				{
 					"type": "graph",
 					"datasource": "voi-stage-stackdriver",
-					"editable": true,
+					"editable": false,
 					"error": false,
 					"gridPos": {},
 					"id": 6,
@@ -1173,7 +1173,7 @@ rows:
 			"panels": [
 				{
 					"datasource": "prometheus-default",
-					"editable": true,
+					"editable": false,
 					"error": false,
 					"gridPos": {},
 					"id": 4,
@@ -1300,7 +1300,7 @@ rows:
 			"panels": [
 				{
 					"datasource": "prometheus-default",
-					"editable": true,
+					"editable": false,
 					"error": false,
 					"gridPos": {},
 					"height": "400px",

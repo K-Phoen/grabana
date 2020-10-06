@@ -87,7 +87,6 @@ func New(title string, options ...Option) *Graph {
 
 func defaults() []Option {
 	return []Option{
-		Editable(),
 		Draw(Lines),
 		Span(6),
 		Fill(1),
@@ -133,20 +132,6 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 	return func(graph *Graph) {
 		graph.Builder.AddTarget(target.Builder)
-	}
-}
-
-// Editable marks the graph as editable.
-func Editable() Option {
-	return func(graph *Graph) {
-		graph.Builder.Editable = true
-	}
-}
-
-// ReadOnly marks the graph as non-editable.
-func ReadOnly() Option {
-	return func(graph *Graph) {
-		graph.Builder.Editable = false
 	}
 }
 
