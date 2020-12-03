@@ -3,21 +3,22 @@ package decoder
 import (
 	"fmt"
 
-	"github.com/K-Phoen/grabana/variable/interval"
-
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
+	"github.com/K-Phoen/grabana/variable/datasource"
+	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
 )
 
 var ErrVariableNotConfigured = fmt.Errorf("variable not configured")
 
 type DashboardVariable struct {
-	Interval *VariableInterval `yaml:",omitempty"`
-	Custom   *VariableCustom   `yaml:",omitempty"`
-	Query    *VariableQuery    `yaml:",omitempty"`
-	Const    *VariableConst    `yaml:",omitempty"`
+	Interval   *VariableInterval   `yaml:",omitempty"`
+	Custom     *VariableCustom     `yaml:",omitempty"`
+	Query      *VariableQuery      `yaml:",omitempty"`
+	Const      *VariableConst      `yaml:",omitempty"`
+	Datasource *VariableDatasource `yaml:",omitempty"`
 }
 
 func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
@@ -32,6 +33,9 @@ func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
 	}
 	if variable.Custom != nil {
 		return variable.Custom.toOption(), nil
+	}
+	if variable.Datasource != nil {
+		return variable.Datasource.toOption(), nil
 	}
 
 	return nil, ErrVariableNotConfigured
@@ -133,4 +137,28 @@ func (variable *VariableQuery) toOption() dashboard.Option {
 	}
 
 	return dashboard.VariableAsQuery(variable.Name, opts...)
+}
+
+type VariableDatasource struct {
+	Name  string
+	Label string
+
+	Type string
+
+	IncludeAll bool `yaml:"include_all"`
+}
+
+func (variable *VariableDatasource) toOption() dashboard.Option {
+	opts := []datasource.Option{
+		datasource.Type(variable.Type),
+	}
+
+	if variable.Label != "" {
+		opts = append(opts, datasource.Label(variable.Label))
+	}
+	if variable.IncludeAll {
+		opts = append(opts, datasource.IncludeAll())
+	}
+
+	return dashboard.VariableAsDatasource(variable.Name, opts...)
 }
