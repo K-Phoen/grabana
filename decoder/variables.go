@@ -114,6 +114,7 @@ type VariableQuery struct {
 	Datasource string
 	Request    string
 
+	Regex      string
 	IncludeAll bool `yaml:"include_all"`
 	DefaultAll bool `yaml:"default_all"`
 }
@@ -128,6 +129,9 @@ func (variable *VariableQuery) toOption() dashboard.Option {
 	}
 	if variable.Label != "" {
 		opts = append(opts, query.Label(variable.Label))
+	}
+	if variable.Regex != "" {
+		opts = append(opts, query.Regex(variable.Regex))
 	}
 	if variable.IncludeAll {
 		opts = append(opts, query.IncludeAll())
@@ -145,6 +149,7 @@ type VariableDatasource struct {
 
 	Type string
 
+	Regex      string
 	IncludeAll bool `yaml:"include_all"`
 }
 
@@ -155,6 +160,9 @@ func (variable *VariableDatasource) toOption() dashboard.Option {
 
 	if variable.Label != "" {
 		opts = append(opts, datasource.Label(variable.Label))
+	}
+	if variable.Regex != "" {
+		opts = append(opts, datasource.Regex(variable.Regex))
 	}
 	if variable.IncludeAll {
 		opts = append(opts, datasource.IncludeAll())
