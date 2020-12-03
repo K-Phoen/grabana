@@ -173,6 +173,13 @@ func Height(height string) Option {
 	}
 }
 
+// Transparent makes the background transparent.
+func Transparent() Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.Transparent = true
+	}
+}
+
 // Unit sets the unit of the data displayed on this axis.
 func Unit(unit string) Option {
 	return func(singleStat *SingleStat) {

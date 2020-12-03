@@ -14,14 +14,15 @@ var ErrInvalidAlertValueFunc = fmt.Errorf("invalid alert value function")
 var ErrInvalidLegendAttribute = fmt.Errorf("invalid legend attribute")
 
 type DashboardGraph struct {
-	Title      string
-	Span       float32 `yaml:",omitempty"`
-	Height     string  `yaml:",omitempty"`
-	Datasource string  `yaml:",omitempty"`
-	Targets    []Target
-	Axes       *GraphAxes  `yaml:",omitempty"`
-	Legend     []string    `yaml:",omitempty,flow"`
-	Alert      *GraphAlert `yaml:",omitempty"`
+	Title       string
+	Span        float32 `yaml:",omitempty"`
+	Height      string  `yaml:",omitempty"`
+	Transparent bool    `yaml:",omitempty"`
+	Datasource  string  `yaml:",omitempty"`
+	Targets     []Target
+	Axes        *GraphAxes  `yaml:",omitempty"`
+	Legend      []string    `yaml:",omitempty,flow"`
+	Alert       *GraphAlert `yaml:",omitempty"`
 }
 
 func (graphPanel DashboardGraph) toOption() (row.Option, error) {
@@ -32,6 +33,9 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	}
 	if graphPanel.Height != "" {
 		opts = append(opts, graph.Height(graphPanel.Height))
+	}
+	if graphPanel.Transparent {
+		opts = append(opts, graph.Transparent())
 	}
 	if graphPanel.Datasource != "" {
 		opts = append(opts, graph.DataSource(graphPanel.Datasource))
