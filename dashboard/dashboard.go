@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
+	"github.com/K-Phoen/grabana/variable/datasource"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
 	"github.com/grafana-tools/sdk"
@@ -141,6 +142,16 @@ func VariableAsInterval(name string, options ...interval.Option) Option {
 func VariableAsQuery(name string, options ...query.Option) Option {
 	return func(builder *Builder) {
 		templatedVar := query.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+	}
+}
+
+// VariableAsDatasource adds a templated variable, defined as a datasource.
+// See https://grafana.com/docs/grafana/latest/variables/variable-types/add-data-source-variable/
+func VariableAsDatasource(name string, options ...datasource.Option) Option {
+	return func(builder *Builder) {
+		templatedVar := datasource.New(name, options...)
 
 		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
 	}

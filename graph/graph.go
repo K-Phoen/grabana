@@ -157,6 +157,13 @@ func Height(height string) Option {
 	}
 }
 
+// Transparent makes the background transparent.
+func Transparent() Option {
+	return func(graph *Graph) {
+		graph.Builder.Transparent = true
+	}
+}
+
 // LeftYAxis configures the left Y axis.
 func LeftYAxis(opts ...axis.Option) Option {
 	return func(graph *Graph) {

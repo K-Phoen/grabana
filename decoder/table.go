@@ -9,6 +9,7 @@ type DashboardTable struct {
 	Title                  string
 	Span                   float32 `yaml:",omitempty"`
 	Height                 string  `yaml:",omitempty"`
+	Transparent            bool    `yaml:",omitempty"`
 	Datasource             string  `yaml:",omitempty"`
 	Targets                []Target
 	HiddenColumns          []string            `yaml:"hidden_columns,flow"`
@@ -23,6 +24,9 @@ func (tablePanel DashboardTable) toOption() (row.Option, error) {
 	}
 	if tablePanel.Height != "" {
 		opts = append(opts, table.Height(tablePanel.Height))
+	}
+	if tablePanel.Transparent {
+		opts = append(opts, table.Transparent())
 	}
 	if tablePanel.Datasource != "" {
 		opts = append(opts, table.DataSource(tablePanel.Datasource))

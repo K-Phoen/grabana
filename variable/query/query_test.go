@@ -107,3 +107,11 @@ func TestRequestCanBeSet(t *testing.T) {
 
 	req.Equal(request, panel.Builder.Query)
 }
+
+func TestCustomAllValueCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", AllValue(".*"))
+
+	req.Equal(".*", panel.Builder.AllValue)
+}

@@ -53,3 +53,11 @@ func TestTextPanelHeightCanBeConfigured(t *testing.T) {
 
 	req.Equal("400px", *panel.Builder.Height)
 }
+
+func TestTextPanelBackgroundCanBeTransparent(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Transparent())
+
+	req.True(panel.Builder.Transparent)
+}

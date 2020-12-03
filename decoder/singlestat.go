@@ -12,17 +12,18 @@ var ErrInvalidSparkLineMode = fmt.Errorf("invalid sparkline mode")
 var ErrInvalidSingleStatValueType = fmt.Errorf("invalid single stat value type")
 
 type DashboardSingleStat struct {
-	Title      string
-	Span       float32 `yaml:",omitempty"`
-	Height     string  `yaml:",omitempty"`
-	Datasource string  `yaml:",omitempty"`
-	Unit       string
-	ValueType  string `yaml:"value_type"`
-	SparkLine  string `yaml:"sparkline"`
-	Targets    []Target
-	Thresholds [2]string
-	Colors     [3]string
-	Color      []string `yaml:",omitempty"`
+	Title       string
+	Span        float32 `yaml:",omitempty"`
+	Height      string  `yaml:",omitempty"`
+	Transparent bool    `yaml:",omitempty"`
+	Datasource  string  `yaml:",omitempty"`
+	Unit        string
+	ValueType   string `yaml:"value_type"`
+	SparkLine   string `yaml:"sparkline"`
+	Targets     []Target
+	Thresholds  [2]string
+	Colors      [3]string
+	Color       []string `yaml:",omitempty"`
 }
 
 func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
@@ -33,6 +34,9 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	}
 	if singleStatPanel.Height != "" {
 		opts = append(opts, singlestat.Height(singleStatPanel.Height))
+	}
+	if singleStatPanel.Transparent {
+		opts = append(opts, singlestat.Transparent())
 	}
 	if singleStatPanel.Datasource != "" {
 		opts = append(opts, singlestat.DataSource(singleStatPanel.Datasource))

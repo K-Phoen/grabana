@@ -3,21 +3,22 @@ package decoder
 import (
 	"fmt"
 
-	"github.com/K-Phoen/grabana/variable/interval"
-
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
+	"github.com/K-Phoen/grabana/variable/datasource"
+	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
 )
 
 var ErrVariableNotConfigured = fmt.Errorf("variable not configured")
 
 type DashboardVariable struct {
-	Interval *VariableInterval `yaml:",omitempty"`
-	Custom   *VariableCustom   `yaml:",omitempty"`
-	Query    *VariableQuery    `yaml:",omitempty"`
-	Const    *VariableConst    `yaml:",omitempty"`
+	Interval   *VariableInterval   `yaml:",omitempty"`
+	Custom     *VariableCustom     `yaml:",omitempty"`
+	Query      *VariableQuery      `yaml:",omitempty"`
+	Const      *VariableConst      `yaml:",omitempty"`
+	Datasource *VariableDatasource `yaml:",omitempty"`
 }
 
 func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
@@ -32,6 +33,9 @@ func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
 	}
 	if variable.Custom != nil {
 		return variable.Custom.toOption(), nil
+	}
+	if variable.Datasource != nil {
+		return variable.Datasource.toOption(), nil
 	}
 
 	return nil, ErrVariableNotConfigured
@@ -110,8 +114,10 @@ type VariableQuery struct {
 	Datasource string
 	Request    string
 
-	IncludeAll bool `yaml:"include_all"`
-	DefaultAll bool `yaml:"default_all"`
+	Regex      string
+	IncludeAll bool   `yaml:"include_all"`
+	DefaultAll bool   `yaml:"default_all"`
+	AllValue   string `yaml:"all_value,omitempty"`
 }
 
 func (variable *VariableQuery) toOption() dashboard.Option {
@@ -125,6 +131,12 @@ func (variable *VariableQuery) toOption() dashboard.Option {
 	if variable.Label != "" {
 		opts = append(opts, query.Label(variable.Label))
 	}
+	if variable.Regex != "" {
+		opts = append(opts, query.Regex(variable.Regex))
+	}
+	if variable.AllValue != "" {
+		opts = append(opts, query.AllValue(variable.AllValue))
+	}
 	if variable.IncludeAll {
 		opts = append(opts, query.IncludeAll())
 	}
@@ -133,4 +145,32 @@ func (variable *VariableQuery) toOption() dashboard.Option {
 	}
 
 	return dashboard.VariableAsQuery(variable.Name, opts...)
+}
+
+type VariableDatasource struct {
+	Name  string
+	Label string
+
+	Type string
+
+	Regex      string
+	IncludeAll bool `yaml:"include_all"`
+}
+
+func (variable *VariableDatasource) toOption() dashboard.Option {
+	opts := []datasource.Option{
+		datasource.Type(variable.Type),
+	}
+
+	if variable.Label != "" {
+		opts = append(opts, datasource.Label(variable.Label))
+	}
+	if variable.Regex != "" {
+		opts = append(opts, datasource.Regex(variable.Regex))
+	}
+	if variable.IncludeAll {
+		opts = append(opts, datasource.IncludeAll())
+	}
+
+	return dashboard.VariableAsDatasource(variable.Name, opts...)
 }

@@ -168,3 +168,10 @@ func Height(height string) Option {
 		table.Builder.Height = &height
 	}
 }
+
+// Transparent makes the background transparent.
+func Transparent() Option {
+	return func(table *Table) {
+		table.Builder.Transparent = true
+	}
+}

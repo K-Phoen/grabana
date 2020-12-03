@@ -6,11 +6,12 @@ import (
 )
 
 type DashboardText struct {
-	Title    string
-	Span     float32 `yaml:",omitempty"`
-	Height   string  `yaml:",omitempty"`
-	HTML     string  `yaml:",omitempty"`
-	Markdown string  `yaml:",omitempty"`
+	Title       string
+	Span        float32 `yaml:",omitempty"`
+	Height      string  `yaml:",omitempty"`
+	Transparent bool    `yaml:",omitempty"`
+	HTML        string  `yaml:",omitempty"`
+	Markdown    string  `yaml:",omitempty"`
 }
 
 func (textPanel DashboardText) toOption() row.Option {
@@ -27,6 +28,9 @@ func (textPanel DashboardText) toOption() row.Option {
 	}
 	if textPanel.HTML != "" {
 		opts = append(opts, text.HTML(textPanel.HTML))
+	}
+	if textPanel.Transparent {
+		opts = append(opts, text.Transparent())
 	}
 
 	return row.WithText(textPanel.Title, opts...)

@@ -56,3 +56,10 @@ func Height(height string) Option {
 		text.Builder.Height = &height
 	}
 }
+
+// Transparent makes the background transparent.
+func Transparent() Option {
+	return func(text *Text) {
+		text.Builder.Transparent = true
+	}
+}
