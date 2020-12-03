@@ -115,8 +115,9 @@ type VariableQuery struct {
 	Request    string
 
 	Regex      string
-	IncludeAll bool `yaml:"include_all"`
-	DefaultAll bool `yaml:"default_all"`
+	IncludeAll bool   `yaml:"include_all"`
+	DefaultAll bool   `yaml:"default_all"`
+	AllValue   string `yaml:"all_value,omitempty"`
 }
 
 func (variable *VariableQuery) toOption() dashboard.Option {
@@ -132,6 +133,9 @@ func (variable *VariableQuery) toOption() dashboard.Option {
 	}
 	if variable.Regex != "" {
 		opts = append(opts, query.Regex(variable.Regex))
+	}
+	if variable.AllValue != "" {
+		opts = append(opts, query.AllValue(variable.AllValue))
 	}
 	if variable.IncludeAll {
 		opts = append(opts, query.IncludeAll())

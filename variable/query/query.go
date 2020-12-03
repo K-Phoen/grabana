@@ -149,3 +149,10 @@ func DefaultAll() Option {
 		query.Builder.Current = sdk.Current{Text: "All", Value: "$__all"}
 	}
 }
+
+// AllValue defines a custom "all" value.
+func AllValue(value string) Option {
+	return func(query *Query) {
+		query.Builder.AllValue = value
+	}
+}
