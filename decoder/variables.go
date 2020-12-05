@@ -64,10 +64,12 @@ func (variable *VariableInterval) toOption() dashboard.Option {
 }
 
 type VariableCustom struct {
-	Name      string
-	Label     string
-	Default   string
-	ValuesMap map[string]string `yaml:"values_map"`
+	Name       string
+	Label      string
+	Default    string
+	ValuesMap  map[string]string `yaml:"values_map"`
+	IncludeAll bool              `yaml:"include_all"`
+	AllValue   string            `yaml:"all_value,omitempty"`
 }
 
 func (variable *VariableCustom) toOption() dashboard.Option {
@@ -80,6 +82,12 @@ func (variable *VariableCustom) toOption() dashboard.Option {
 	}
 	if variable.Label != "" {
 		opts = append(opts, custom.Label(variable.Label))
+	}
+	if variable.AllValue != "" {
+		opts = append(opts, custom.AllValue(variable.AllValue))
+	}
+	if variable.IncludeAll {
+		opts = append(opts, custom.IncludeAll())
 	}
 
 	return dashboard.VariableAsCustom(variable.Name, opts...)
