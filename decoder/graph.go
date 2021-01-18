@@ -14,15 +14,16 @@ var ErrInvalidAlertValueFunc = fmt.Errorf("invalid alert value function")
 var ErrInvalidLegendAttribute = fmt.Errorf("invalid legend attribute")
 
 type DashboardGraph struct {
-	Title       string
-	Span        float32 `yaml:",omitempty"`
-	Height      string  `yaml:",omitempty"`
-	Transparent bool    `yaml:",omitempty"`
-	Datasource  string  `yaml:",omitempty"`
-	Targets     []Target
-	Axes        *GraphAxes  `yaml:",omitempty"`
-	Legend      []string    `yaml:",omitempty,flow"`
-	Alert       *GraphAlert `yaml:",omitempty"`
+	Title         string
+	Span          float32 `yaml:",omitempty"`
+	Height        string  `yaml:",omitempty"`
+	Transparent   bool    `yaml:",omitempty"`
+	Datasource    string  `yaml:",omitempty"`
+	Targets       []Target
+	Axes          *GraphAxes          `yaml:",omitempty"`
+	Legend        []string            `yaml:",omitempty,flow"`
+	Alert         *GraphAlert         `yaml:",omitempty"`
+	Visualization *GraphVisualization `yaml:",omitempty"`
 }
 
 func (graphPanel DashboardGraph) toOption() (row.Option, error) {
@@ -65,6 +66,9 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 
 		opts = append(opts, graph.Alert(graphPanel.Alert.Title, alertOpts...))
 	}
+	if graphPanel.Visualization != nil {
+		opts = append(opts, graphPanel.Visualization.toOptions()...)
+	}
 
 	for _, t := range graphPanel.Targets {
 		opt, err := graphPanel.target(t)
@@ -76,6 +80,38 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	}
 
 	return row.WithGraph(graphPanel.Title, opts...), nil
+}
+
+type GraphVisualization struct {
+	NullValue string `yaml:",omitempty"`
+	Staircase bool   `yaml:",omitempty"`
+}
+
+func (graphViz *GraphVisualization) toOptions() []graph.Option {
+	if graphViz == nil {
+		return nil
+	}
+
+	var opts []graph.Option
+	if graphViz.NullValue != "" {
+		mode := graph.AsZero
+		switch graphViz.NullValue {
+		case "null as zero":
+			mode = graph.AsZero
+		case "null":
+			mode = graph.AsNull
+		case "connected":
+			mode = graph.Connected
+		}
+
+		opts = append(opts, graph.Null(mode))
+	}
+
+	if graphViz.Staircase {
+		opts = append(opts, graph.Staircase())
+	}
+
+	return opts
 }
 
 func (graphPanel *DashboardGraph) legend() ([]graph.LegendOption, error) {
