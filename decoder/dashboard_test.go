@@ -627,7 +627,20 @@ rows:
 					"height": "400px",
 					"styles": null,
 					"title": "Some markdown?",
-					"transparent": false
+					"transparent": false,
+					"options": {
+						"content": "",
+						"mode": ""
+					},
+					"fieldConfig": {
+						"defaults": {
+							"unit": "",
+							"threshold": {
+								"mode": "",
+								"steps": null
+							}
+						}
+					}
 				},
 				{
 					"type": "text",
@@ -647,7 +660,20 @@ rows:
 					"height": "400px",
 					"styles": null,
 					"title": "Some html?",
-					"transparent": false
+					"transparent": false,
+					"options": {
+						"content": "",
+						"mode": ""
+					},
+					"fieldConfig": {
+						"defaults": {
+							"unit": "",
+							"threshold": {
+								"mode": "",
+								"steps": null
+							}
+						}
+					}
 				}
 			]
 		}
