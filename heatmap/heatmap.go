@@ -169,8 +169,7 @@ func Transparent() Option {
 func Legend(opts ...LegendOption) Option {
 	return func(heatmap *Heatmap) {
 		for _, opt := range opts {
-			switch opt {
-			case Hide:
+			if opt == Hide {
 				heatmap.Builder.HeatmapPanel.Legend.Show = false
 			}
 		}

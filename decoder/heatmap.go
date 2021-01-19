@@ -51,7 +51,7 @@ func (tooltip *HeatmapTooltip) toOptions() []heatmap.Option {
 }
 
 func (heatmapPanel DashboardHeatmap) toOption() (row.Option, error) {
-	var opts []heatmap.Option
+	opts := []heatmap.Option{}
 
 	if heatmapPanel.Span != 0 {
 		opts = append(opts, heatmap.Span(heatmapPanel.Span))
