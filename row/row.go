@@ -2,6 +2,7 @@ package row
 
 import (
 	"github.com/K-Phoen/grabana/graph"
+	"github.com/K-Phoen/grabana/heatmap"
 	"github.com/K-Phoen/grabana/singlestat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/text"
@@ -66,6 +67,15 @@ func WithText(title string, options ...text.Option) Option {
 		textPanel := text.New(title, options...)
 
 		row.builder.Add(textPanel.Builder)
+	}
+}
+
+// WithHeatmap adds a "heatmap" panel in the row.
+func WithHeatmap(title string, options ...heatmap.Option) Option {
+	return func(row *Row) {
+		heatmapPanel := heatmap.New(title, options...)
+
+		row.builder.Add(heatmapPanel.Builder)
 	}
 }
 

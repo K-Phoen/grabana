@@ -72,7 +72,7 @@ func TestUnitCanBeConfigured(t *testing.T) {
 
 	panel := New("", Unit("bytes"))
 
-	req.Equal("bytes", panel.Builder.Format)
+	req.Equal("bytes", panel.Builder.SinglestatPanel.Format)
 }
 
 func TestSparkLineCanBeDisplayed(t *testing.T) {
@@ -80,8 +80,8 @@ func TestSparkLineCanBeDisplayed(t *testing.T) {
 
 	panel := New("", SparkLine())
 
-	req.True(panel.Builder.SparkLine.Show)
-	req.False(panel.Builder.SparkLine.Full)
+	req.True(panel.Builder.SinglestatPanel.SparkLine.Show)
+	req.False(panel.Builder.SinglestatPanel.SparkLine.Full)
 }
 
 func TestFullSparkLineCanBeDisplayed(t *testing.T) {
@@ -89,8 +89,8 @@ func TestFullSparkLineCanBeDisplayed(t *testing.T) {
 
 	panel := New("", FullSparkLine())
 
-	req.True(panel.Builder.SparkLine.Show)
-	req.True(panel.Builder.SparkLine.Full)
+	req.True(panel.Builder.SinglestatPanel.SparkLine.Show)
+	req.True(panel.Builder.SinglestatPanel.SparkLine.Full)
 }
 
 func TestSparkLineColorCanBeSet(t *testing.T) {
@@ -99,7 +99,7 @@ func TestSparkLineColorCanBeSet(t *testing.T) {
 
 	panel := New("", SparkLineColor(color))
 
-	req.Equal(color, *panel.Builder.SparkLine.LineColor)
+	req.Equal(color, *panel.Builder.SinglestatPanel.SparkLine.LineColor)
 }
 
 func TestSparkLineFillColorCanBeSet(t *testing.T) {
@@ -108,7 +108,7 @@ func TestSparkLineFillColorCanBeSet(t *testing.T) {
 
 	panel := New("", SparkLineFillColor(color))
 
-	req.Equal(color, *panel.Builder.SparkLine.FillColor)
+	req.Equal(color, *panel.Builder.SinglestatPanel.SparkLine.FillColor)
 }
 
 func TestSparkLineYMinCanBeSet(t *testing.T) {
@@ -116,7 +116,7 @@ func TestSparkLineYMinCanBeSet(t *testing.T) {
 
 	panel := New("", SparkLineYMin(0))
 
-	req.Equal(float64(0), *panel.Builder.SparkLine.YMin)
+	req.Equal(float64(0), *panel.Builder.SinglestatPanel.SparkLine.YMin)
 }
 
 func TestSparkLineYMaxCanBeSet(t *testing.T) {
@@ -124,7 +124,7 @@ func TestSparkLineYMaxCanBeSet(t *testing.T) {
 
 	panel := New("", SparkLineYMax(0))
 
-	req.Equal(float64(0), *panel.Builder.SparkLine.YMax)
+	req.Equal(float64(0), *panel.Builder.SinglestatPanel.SparkLine.YMax)
 }
 
 func TestValueTypeCanBeSet(t *testing.T) {
@@ -132,7 +132,7 @@ func TestValueTypeCanBeSet(t *testing.T) {
 
 	panel := New("", ValueType(Current))
 
-	req.Equal(string(Current), panel.Builder.ValueName)
+	req.Equal(string(Current), panel.Builder.SinglestatPanel.ValueName)
 }
 
 func TestValueFontSizeCanBeSet(t *testing.T) {
@@ -140,7 +140,7 @@ func TestValueFontSizeCanBeSet(t *testing.T) {
 
 	panel := New("", ValueFontSize("120%"))
 
-	req.Equal("120%", panel.Builder.ValueFontSize)
+	req.Equal("120%", panel.Builder.SinglestatPanel.ValueFontSize)
 }
 
 func TestPrefixCanBeSet(t *testing.T) {
@@ -148,7 +148,7 @@ func TestPrefixCanBeSet(t *testing.T) {
 
 	panel := New("", Prefix("joe"))
 
-	req.Equal("joe", *panel.Builder.Prefix)
+	req.Equal("joe", *panel.Builder.SinglestatPanel.Prefix)
 }
 
 func TestPrefixFontSizeCanBeSet(t *testing.T) {
@@ -156,7 +156,7 @@ func TestPrefixFontSizeCanBeSet(t *testing.T) {
 
 	panel := New("", PrefixFontSize("120%"))
 
-	req.Equal("120%", *panel.Builder.PrefixFontSize)
+	req.Equal("120%", *panel.Builder.SinglestatPanel.PrefixFontSize)
 }
 
 func TestPostfixCanBeSet(t *testing.T) {
@@ -164,7 +164,7 @@ func TestPostfixCanBeSet(t *testing.T) {
 
 	panel := New("", Postfix("joe"))
 
-	req.Equal("joe", *panel.Builder.Postfix)
+	req.Equal("joe", *panel.Builder.SinglestatPanel.Postfix)
 }
 
 func TestPostfixFontSizeCanBeSet(t *testing.T) {
@@ -172,7 +172,7 @@ func TestPostfixFontSizeCanBeSet(t *testing.T) {
 
 	panel := New("", PostfixFontSize("120%"))
 
-	req.Equal("120%", *panel.Builder.PostfixFontSize)
+	req.Equal("120%", *panel.Builder.SinglestatPanel.PostfixFontSize)
 }
 
 func TestValueCanBeColored(t *testing.T) {
@@ -180,7 +180,7 @@ func TestValueCanBeColored(t *testing.T) {
 
 	panel := New("", ColorValue())
 
-	req.True(panel.Builder.ColorValue)
+	req.True(panel.Builder.SinglestatPanel.ColorValue)
 }
 
 func TestBackgroundCanBeColored(t *testing.T) {
@@ -188,7 +188,7 @@ func TestBackgroundCanBeColored(t *testing.T) {
 
 	panel := New("", ColorBackground())
 
-	req.True(panel.Builder.ColorBackground)
+	req.True(panel.Builder.SinglestatPanel.ColorBackground)
 }
 
 func TestThresholdsCanBeSet(t *testing.T) {
@@ -205,7 +205,7 @@ func TestThresholdColorsCanBeSet(t *testing.T) {
 
 	panel := New("", Colors(colors))
 
-	req.Equal([]string{colors[0], colors[1], colors[2]}, panel.Builder.Colors)
+	req.Equal([]string{colors[0], colors[1], colors[2]}, panel.Builder.SinglestatPanel.Colors)
 }
 
 func TestRangeToTextMappingsCanBeConfigured(t *testing.T) {
@@ -227,5 +227,5 @@ func TestRangeToTextMappingsCanBeConfigured(t *testing.T) {
 		},
 	}))
 
-	req.Len(panel.Builder.RangeMaps, 3)
+	req.Len(panel.Builder.SinglestatPanel.RangeMaps, 3)
 }

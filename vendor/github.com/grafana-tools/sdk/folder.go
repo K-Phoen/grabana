@@ -26,13 +26,13 @@ type Folder struct {
 	UID       string `json:"uid"`
 	Title     string `json:"title"`
 	URL       string `json:"url"`
-	HasAcl    bool   `json:"has_acl"`
-	CanSave   bool   `json:"can_save"`
-	CanEdit   bool   `json:"can_edit"`
-	CanAdmin  bool   `json:"can_admin"`
-	CreatedBy string `json:"created_by"`
+	HasAcl    bool   `json:"hasAcl"`
+	CanSave   bool   `json:"canSave"`
+	CanEdit   bool   `json:"canEdit"`
+	CanAdmin  bool   `json:"canAdmin"`
+	CreatedBy string `json:"createdBy"`
 	Created   string `json:"created"`
-	UpdatedBy string `json:"updated_by"`
+	UpdatedBy string `json:"updatedBy"`
 	Updated   string `json:"updated"`
 	Version   int    `json:"version"`
 	Overwrite bool   `json:"overwrite"`

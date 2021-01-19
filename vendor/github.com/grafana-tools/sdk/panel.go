@@ -34,7 +34,10 @@ const (
 	PluginlistType
 	AlertlistType
 	SinglestatType
+	StatType
 	RowType
+	BarGaugeType
+	HeatmapType
 )
 
 const MixedSource = "-- Mixed --"
@@ -49,10 +52,13 @@ type (
 		*TablePanel
 		*TextPanel
 		*SinglestatPanel
+		*StatPanel
 		*DashlistPanel
 		*PluginlistPanel
 		*RowPanel
 		*AlertlistPanel
+		*BarGaugePanel
+		*HeatmapPanel
 		*CustomPanel
 	}
 	panelType   int8
@@ -70,7 +76,7 @@ type (
 		HideTimeOverride *bool     `json:"hideTimeOverride,omitempty"`
 		ID               uint      `json:"id"`
 		IsNew            bool      `json:"isNew"`
-		Links            []link    `json:"links,omitempty"`    // general
+		Links            []Link    `json:"links,omitempty"`    // general
 		MinSpan          *float32  `json:"minSpan,omitempty"`  // templating options
 		OfType           panelType `json:"-"`                  // it required for defining type of the panel
 		Renderer         *string   `json:"renderer,omitempty"` // display styles
@@ -82,8 +88,9 @@ type (
 			Text     string `json:"text"`
 			Value    string `json:"value"`
 		} `json:"scopedVars,omitempty"`
-		Span        float32 `json:"span"`  // general
-		Title       string  `json:"title"` // general
+		Span        float32 `json:"span"`                  // general
+		Title       string  `json:"title"`                 // general
+		Description *string `json:"description,omitempty"` // general
 		Transparent bool    `json:"transparent"`
 		Type        string  `json:"type"`
 		Alert       *Alert  `json:"alert,omitempty"`
@@ -127,7 +134,6 @@ type (
 		DashLength  *uint       `json:"dashLength,omitempty"`
 		Dashes      *bool       `json:"dashes,omitempty"`
 		Decimals    *uint       `json:"decimals,omitempty"`
-		Description *string     `json:"description,omitempty"`
 		Fill        int         `json:"fill"`
 		//		Grid        grid        `json:"grid"` obsoleted in 4.1 by xaxis and yaxis
 
@@ -154,6 +160,33 @@ type (
 		YFormats        []string         `json:"y_formats,omitempty"`
 		Xaxis           Axis             `json:"xaxis"` // was added in Grafana 4.x?
 		Yaxes           []Axis           `json:"yaxes"` // was added in Grafana 4.x?
+	}
+	FieldConfig struct {
+		Defaults struct {
+			Unit      string `json:"unit"`
+			Threshold struct {
+				Mode  string `json:"mode"`
+				Steps []struct {
+					Color string `json:"color"`
+					Value string `json:"value"`
+				} `json:"steps"`
+			} `json:"threshold"`
+		} `json:"defaults"`
+	}
+	Options struct {
+		Orientation   string `json:"orientation"`
+		TextMode      string `json:"textMode"`
+		ColorMode     string `json:"colorMode"`
+		GraphMode     string `json:"graphMode"`
+		JustifyMode   string `json:"justifyMode"`
+		DisplayMode   string `json:"displayMode"`
+		Content       string `json:"content"`
+		Mode          string `json:"mode"`
+		ReduceOptions struct {
+			Values bool     `json:"values"`
+			Fields string   `json:"fields"`
+			Calcs  []string `json:"calcs"`
+		} `json:"reduceOptions"`
 	}
 	Threshold struct {
 		// the alert threshold value, we do not omitempty, since 0 is a valid
@@ -188,13 +221,18 @@ type (
 		Scroll    bool          `json:"scroll"` // from grafana 3.x
 	}
 	TextPanel struct {
-		Content    string        `json:"content"`
-		Mode       string        `json:"mode"`
-		PageSize   uint          `json:"pageSize"`
-		Scroll     bool          `json:"scroll"`
-		ShowHeader bool          `json:"showHeader"`
-		Sort       Sort          `json:"sort"`
-		Styles     []ColumnStyle `json:"styles"`
+		Content     string        `json:"content"`
+		Mode        string        `json:"mode"`
+		PageSize    uint          `json:"pageSize"`
+		Scroll      bool          `json:"scroll"`
+		ShowHeader  bool          `json:"showHeader"`
+		Sort        Sort          `json:"sort"`
+		Styles      []ColumnStyle `json:"styles"`
+		FieldConfig FieldConfig   `json:"fieldConfig"`
+		Options     struct {
+			Content string `json:"content"`
+			Mode    string `json:"mode"`
+		} `json:"options"`
 	}
 	SinglestatPanel struct {
 		Colors          []string    `json:"colors"`
@@ -219,11 +257,40 @@ type (
 		ValueMaps       []ValueMap  `json:"valueMaps"`
 		ValueName       string      `json:"valueName"`
 	}
+	StatPanel struct {
+		Colors          []string    `json:"colors"`
+		ColorValue      bool        `json:"colorValue"`
+		ColorBackground bool        `json:"colorBackground"`
+		Decimals        int         `json:"decimals"`
+		Format          string      `json:"format"`
+		Gauge           Gauge       `json:"gauge,omitempty"`
+		MappingType     *uint       `json:"mappingType,omitempty"`
+		MappingTypes    []*MapType  `json:"mappingTypes,omitempty"`
+		MaxDataPoints   *IntString  `json:"maxDataPoints,omitempty"`
+		NullPointMode   string      `json:"nullPointMode"`
+		Postfix         *string     `json:"postfix,omitempty"`
+		PostfixFontSize *string     `json:"postfixFontSize,omitempty"`
+		Prefix          *string     `json:"prefix,omitempty"`
+		PrefixFontSize  *string     `json:"prefixFontSize,omitempty"`
+		RangeMaps       []*RangeMap `json:"rangeMaps,omitempty"`
+		SparkLine       SparkLine   `json:"sparkline,omitempty"`
+		Targets         []Target    `json:"targets,omitempty"`
+		Thresholds      string      `json:"thresholds"`
+		ValueFontSize   string      `json:"valueFontSize"`
+		ValueMaps       []ValueMap  `json:"valueMaps"`
+		ValueName       string      `json:"valueName"`
+		Options         Options     `json:"options"`
+	}
 	DashlistPanel struct {
-		Mode  string   `json:"mode"`
-		Limit uint     `json:"limit"`
-		Query string   `json:"query"`
-		Tags  []string `json:"tags"`
+		Mode     string   `json:"mode"`
+		Query    string   `json:"query"`
+		Tags     []string `json:"tags"`
+		FolderID int      `json:"folderId"`
+		Limit    int      `json:"limit"`
+		Headings bool     `json:"headings"`
+		Recent   bool     `json:"recent"`
+		Search   bool     `json:"search"`
+		Starred  bool     `json:"starred"`
 	}
 	PluginlistPanel struct {
 		Limit int `json:"limit,omitempty"`
@@ -237,9 +304,59 @@ type (
 		NameFilter            string   `json:"nameFilter,omitempty"`
 		DashboardTags         []string `json:"dashboardTags,omitempty"`
 	}
+	BarGaugePanel struct {
+		Options     Options     `json:"options"`
+		Targets     []Target    `json:"targets,omitempty"`
+		FieldConfig FieldConfig `json:"fieldConfig"`
+	}
 	RowPanel struct {
 		Panels    []Panel `json:"panels"`
 		Collapsed bool    `json:"collapsed"`
+	}
+	HeatmapPanel struct {
+		Cards struct {
+			CardPadding *float64 `json:"cardPadding"`
+			CardRound   *float64 `json:"cardRound"`
+		} `json:"cards"`
+		Color struct {
+			CardColor   string   `json:"cardColor"`
+			ColorScale  string   `json:"colorScale"`
+			ColorScheme string   `json:"colorScheme"`
+			Exponent    float64  `json:"exponent"`
+			Min         *float64 `json:"min,omitempty"`
+			Max         *float64 `json:"max,omitempty"`
+			Mode        string   `json:"mode"`
+		} `json:"color"`
+		DataFormat      string `json:"dataFormat"`
+		HideZeroBuckets bool   `json:"hideZeroBuckets"`
+		HighlightCards  bool   `json:"highlightCards"`
+		Legend          struct {
+			Show bool `json:"show"`
+		} `json:"legend"`
+		ReverseYBuckets bool     `json:"reverseYBuckets"`
+		Targets         []Target `json:"targets,omitempty"`
+		Tooltip         struct {
+			Show          bool `json:"show"`
+			ShowHistogram bool `json:"showHistogram"`
+		} `json:"tooltip"`
+		TooltipDecimals int `json:"tooltipDecimals"`
+		XAxis           struct {
+			Show bool `json:"show"`
+		} `json:"xAxis"`
+		XBucketNumber *float64 `json:"xBucketNumber"`
+		XBucketSize   *float64 `json:"XBucketSize"`
+		YAxis         struct {
+			Decimals    *int     `json:"decimals"`
+			Format      string   `json:"format"`
+			LogBase     int      `json:"logBase"`
+			Show        bool     `json:"show"`
+			Max         *float64 `json:"max"`
+			Min         *float64 `json:"min"`
+			SplitFactor *float64 `json:"splitFactor"`
+		} `json:"yAxis"`
+		YBucketBound  string   `json:"yBucketBound"`
+		YBucketNumber *float64 `json:"yBucketNumber"`
+		YBucketSize   *float64 `json:"yBucketSize"`
 	}
 	CustomPanel map[string]interface{}
 )
@@ -331,7 +448,7 @@ type (
 	}
 )
 
-// for a singlestat
+// for a stat
 type (
 	ValueMap struct {
 		Op       string `json:"op"`
@@ -361,6 +478,26 @@ type Target struct {
 	Datasource string `json:"datasource,omitempty"`
 	Hide       bool   `json:"hide,omitempty"`
 
+	// For PostgreSQL
+	Table        string `json:"table,omitempty"`
+	TimeColumn   string `json:"timeColumn,omitempty"`
+	MetricColumn string `json:"metricColumn,omitempty"`
+	RawSql       string `json:"rawSql,omitempty"`
+	Select       [][]struct {
+		Params []string `json:"params,omitempty"`
+		Type   string   `json:"type,omitempty"`
+	} `json:"select,omitempty"`
+	Where []struct {
+		Type     string   `json:"type,omitempty"`
+		Name     string   `json:"name,omitempty"`
+		Params   []string `json:"params,omitempty"`
+		Datatype string   `json:"datatype,omitempty"`
+	} `json:"where,omitempty"`
+	Group []struct {
+		Type   string   `json:"type,omitempty"`
+		Params []string `json:"params,omitempty"`
+	} `json:"group,omitempty"`
+
 	// For Prometheus
 	Expr           string `json:"expr,omitempty"`
 	IntervalFactor int    `json:"intervalFactor,omitempty"`
@@ -369,6 +506,9 @@ type Target struct {
 	LegendFormat   string `json:"legendFormat,omitempty"`
 	Instant        bool   `json:"instant,omitempty"`
 	Format         string `json:"format,omitempty"`
+
+	// For InfluxDB
+	Measurement string `json:"measurement,omitempty"`
 
 	// For Elasticsearch
 	DsType  *string `json:"dsType,omitempty"`
@@ -535,7 +675,23 @@ func NewSinglestat(title string) *Panel {
 		SinglestatPanel: &SinglestatPanel{}}
 }
 
-// NewPluginlist initializes panel with a singlestat panel.
+// NewStat initializes panel with a stat panel.
+func NewStat(title string) *Panel {
+	if title == "" {
+		title = "Panel Title"
+	}
+	render := "flot"
+	return &Panel{
+		CommonPanel: CommonPanel{
+			OfType:   StatType,
+			Title:    title,
+			Type:     "stat",
+			Renderer: &render,
+			IsNew:    true},
+		StatPanel: &StatPanel{}}
+}
+
+// NewPluginlist initializes panel with a stat panel.
 func NewPluginlist(title string) *Panel {
 	if title == "" {
 		title = "Panel Title"
@@ -566,7 +722,22 @@ func NewAlertlist(title string) *Panel {
 		AlertlistPanel: &AlertlistPanel{}}
 }
 
-// NewCustom initializes panel with a singlestat panel.
+func NewHeatmap(title string) *Panel {
+	if title == "" {
+		title = "Panel Title"
+	}
+	render := "flot"
+	return &Panel{
+		CommonPanel: CommonPanel{
+			OfType:   HeatmapType,
+			Title:    title,
+			Type:     "heatmap",
+			Renderer: &render,
+			IsNew:    true},
+		HeatmapPanel: &HeatmapPanel{}}
+}
+
+// NewCustom initializes panel with a stat panel.
 func NewCustom(title string) *Panel {
 	if title == "" {
 		title = "Panel Title"
@@ -589,8 +760,14 @@ func (p *Panel) ResetTargets() {
 		p.GraphPanel.Targets = nil
 	case SinglestatType:
 		p.SinglestatPanel.Targets = nil
+	case StatType:
+		p.StatPanel.Targets = nil
 	case TableType:
 		p.TablePanel.Targets = nil
+	case BarGaugeType:
+		p.BarGaugePanel.Targets = nil
+	case HeatmapType:
+		p.HeatmapPanel.Targets = nil
 	}
 }
 
@@ -604,8 +781,12 @@ func (p *Panel) AddTarget(t *Target) {
 		p.GraphPanel.Targets = append(p.GraphPanel.Targets, *t)
 	case SinglestatType:
 		p.SinglestatPanel.Targets = append(p.SinglestatPanel.Targets, *t)
+	case StatType:
+		p.StatPanel.Targets = append(p.StatPanel.Targets, *t)
 	case TableType:
 		p.TablePanel.Targets = append(p.TablePanel.Targets, *t)
+	case HeatmapType:
+		p.HeatmapPanel.Targets = append(p.HeatmapPanel.Targets, *t)
 	}
 	// TODO check for existing refID
 }
@@ -627,8 +808,12 @@ func (p *Panel) SetTarget(t *Target) {
 		setTarget(t, &p.GraphPanel.Targets)
 	case SinglestatType:
 		setTarget(t, &p.SinglestatPanel.Targets)
+	case StatType:
+		setTarget(t, &p.StatPanel.Targets)
 	case TableType:
 		setTarget(t, &p.TablePanel.Targets)
+	case HeatmapType:
+		setTarget(t, &p.HeatmapPanel.Targets)
 	}
 }
 
@@ -654,8 +839,12 @@ func (p *Panel) RepeatDatasourcesForEachTarget(dsNames ...string) {
 		repeatDS(dsNames, &p.GraphPanel.Targets)
 	case SinglestatType:
 		repeatDS(dsNames, &p.SinglestatPanel.Targets)
+	case StatType:
+		repeatDS(dsNames, &p.StatPanel.Targets)
 	case TableType:
 		repeatDS(dsNames, &p.TablePanel.Targets)
+	case HeatmapType:
+		repeatDS(dsNames, &p.HeatmapPanel.Targets)
 	}
 }
 
@@ -684,8 +873,12 @@ func (p *Panel) RepeatTargetsForDatasources(dsNames ...string) {
 		repeatTarget(dsNames, &p.GraphPanel.Targets)
 	case SinglestatType:
 		repeatTarget(dsNames, &p.SinglestatPanel.Targets)
+	case StatType:
+		repeatTarget(dsNames, &p.StatPanel.Targets)
 	case TableType:
 		repeatTarget(dsNames, &p.TablePanel.Targets)
+	case HeatmapType:
+		repeatTarget(dsNames, &p.HeatmapPanel.Targets)
 	}
 }
 
@@ -697,8 +890,14 @@ func (p *Panel) GetTargets() *[]Target {
 		return &p.GraphPanel.Targets
 	case SinglestatType:
 		return &p.SinglestatPanel.Targets
+	case StatType:
+		return &p.StatPanel.Targets
 	case TableType:
 		return &p.TablePanel.Targets
+	case BarGaugeType:
+		return &p.BarGaugePanel.Targets
+	case HeatmapType:
+		return &p.HeatmapPanel.Targets
 	default:
 		return nil
 	}
@@ -738,11 +937,35 @@ func (p *Panel) UnmarshalJSON(b []byte) (err error) {
 			if err = json.Unmarshal(b, &singlestat); err == nil {
 				p.SinglestatPanel = &singlestat
 			}
+		case "stat":
+			var stat StatPanel
+			p.OfType = StatType
+			if err = json.Unmarshal(b, &stat); err == nil {
+				p.StatPanel = &stat
+			}
 		case "dashlist":
 			var dashlist DashlistPanel
 			p.OfType = DashlistType
 			if err = json.Unmarshal(b, &dashlist); err == nil {
 				p.DashlistPanel = &dashlist
+			}
+		case "bargauge":
+			var bargauge BarGaugePanel
+			p.OfType = BarGaugeType
+			if err = json.Unmarshal(b, &bargauge); err == nil {
+				p.BarGaugePanel = &bargauge
+			}
+		case "heatmap":
+			var heatmap HeatmapPanel
+			p.OfType = HeatmapType
+			if err = json.Unmarshal(b, &heatmap); err == nil {
+				p.HeatmapPanel = &heatmap
+			}
+		case "row":
+			var rowpanel RowPanel
+			p.OfType = RowType
+			if err = json.Unmarshal(b, &rowpanel); err == nil {
+				p.RowPanel = &rowpanel
 			}
 		default:
 			var custom = make(CustomPanel)
@@ -781,12 +1004,24 @@ func (p *Panel) MarshalJSON() ([]byte, error) {
 			SinglestatPanel
 		}{p.CommonPanel, *p.SinglestatPanel}
 		return json.Marshal(outSinglestat)
+	case StatType:
+		var outSinglestat = struct {
+			CommonPanel
+			StatPanel
+		}{p.CommonPanel, *p.StatPanel}
+		return json.Marshal(outSinglestat)
 	case DashlistType:
 		var outDashlist = struct {
 			CommonPanel
 			DashlistPanel
 		}{p.CommonPanel, *p.DashlistPanel}
 		return json.Marshal(outDashlist)
+	case BarGaugeType:
+		var outBarGauge = struct {
+			CommonPanel
+			BarGaugePanel
+		}{p.CommonPanel, *p.BarGaugePanel}
+		return json.Marshal(outBarGauge)
 	case PluginlistType:
 		var outPluginlist = struct {
 			CommonPanel
@@ -805,6 +1040,12 @@ func (p *Panel) MarshalJSON() ([]byte, error) {
 			RowPanel
 		}{p.CommonPanel, *p.RowPanel}
 		return json.Marshal(outRow)
+	case HeatmapType:
+		var outHeatmap = struct {
+			CommonPanel
+			HeatmapPanel
+		}{p.CommonPanel, *p.HeatmapPanel}
+		return json.Marshal(outHeatmap)
 	case CustomType:
 		var outCustom = struct {
 			CommonPanel

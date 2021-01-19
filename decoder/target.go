@@ -18,10 +18,13 @@ type Target struct {
 }
 
 type PrometheusTarget struct {
-	Query  string
-	Legend string `yaml:",omitempty"`
-	Ref    string `yaml:",omitempty"`
-	Hidden bool   `yaml:",omitempty"`
+	Query          string
+	Legend         string `yaml:",omitempty"`
+	Ref            string `yaml:",omitempty"`
+	Hidden         bool   `yaml:",omitempty"`
+	Format         string `yaml:",omitempty"`
+	Instant        bool   `yaml:",omitempty"`
+	IntervalFactor *int   `yaml:"interval_factor,omitempty"`
 }
 
 func (t PrometheusTarget) toOptions() []prometheus.Option {
@@ -32,6 +35,22 @@ func (t PrometheusTarget) toOptions() []prometheus.Option {
 
 	if t.Hidden {
 		opts = append(opts, prometheus.Hide())
+	}
+	if t.Instant {
+		opts = append(opts, prometheus.Instant())
+	}
+	if t.IntervalFactor != nil {
+		opts = append(opts, prometheus.IntervalFactor(*t.IntervalFactor))
+	}
+	if t.Format != "" {
+		switch t.Format {
+		case "heatmap":
+			opts = append(opts, prometheus.Format(prometheus.FormatHeatmap))
+		case "table":
+			opts = append(opts, prometheus.Format(prometheus.FormatTable))
+		case "time_series":
+			opts = append(opts, prometheus.Format(prometheus.FormatTimeSeries))
+		}
 	}
 
 	return opts

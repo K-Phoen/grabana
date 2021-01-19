@@ -156,7 +156,7 @@ func TestLegendCanBeHidden(t *testing.T) {
 
 	panel := New("", Legend(Hide))
 
-	req.False(panel.Builder.Legend.Show)
+	req.False(panel.Builder.GraphPanel.Legend.Show)
 }
 
 func TestLegendCanBeShownToTheRight(t *testing.T) {
@@ -164,7 +164,7 @@ func TestLegendCanBeShownToTheRight(t *testing.T) {
 
 	panel := New("", Legend(ToTheRight))
 
-	req.True(panel.Builder.Legend.RightSide)
+	req.True(panel.Builder.GraphPanel.Legend.RightSide)
 }
 
 func TestLegendCanBeDisplayedAsATable(t *testing.T) {
@@ -172,7 +172,7 @@ func TestLegendCanBeDisplayedAsATable(t *testing.T) {
 
 	panel := New("", Legend(AsTable))
 
-	req.True(panel.Builder.Legend.AlignAsTable)
+	req.True(panel.Builder.GraphPanel.Legend.AlignAsTable)
 }
 
 func TestLegendCanShowAvg(t *testing.T) {
@@ -180,8 +180,8 @@ func TestLegendCanShowAvg(t *testing.T) {
 
 	panel := New("", Legend(Avg))
 
-	req.True(panel.Builder.Legend.Avg)
-	req.True(panel.Builder.Legend.Values)
+	req.True(panel.Builder.GraphPanel.Legend.Avg)
+	req.True(panel.Builder.GraphPanel.Legend.Values)
 }
 
 func TestLegendCanShowMin(t *testing.T) {
@@ -189,8 +189,8 @@ func TestLegendCanShowMin(t *testing.T) {
 
 	panel := New("", Legend(Min))
 
-	req.True(panel.Builder.Legend.Min)
-	req.True(panel.Builder.Legend.Values)
+	req.True(panel.Builder.GraphPanel.Legend.Min)
+	req.True(panel.Builder.GraphPanel.Legend.Values)
 }
 
 func TestLegendCanShowMax(t *testing.T) {
@@ -198,8 +198,8 @@ func TestLegendCanShowMax(t *testing.T) {
 
 	panel := New("", Legend(Max))
 
-	req.True(panel.Builder.Legend.Max)
-	req.True(panel.Builder.Legend.Values)
+	req.True(panel.Builder.GraphPanel.Legend.Max)
+	req.True(panel.Builder.GraphPanel.Legend.Values)
 }
 
 func TestLegendCanShowCurrent(t *testing.T) {
@@ -207,8 +207,8 @@ func TestLegendCanShowCurrent(t *testing.T) {
 
 	panel := New("", Legend(Current))
 
-	req.True(panel.Builder.Legend.Current)
-	req.True(panel.Builder.Legend.Values)
+	req.True(panel.Builder.GraphPanel.Legend.Current)
+	req.True(panel.Builder.GraphPanel.Legend.Values)
 }
 
 func TestLegendCanShowTotal(t *testing.T) {
@@ -216,8 +216,8 @@ func TestLegendCanShowTotal(t *testing.T) {
 
 	panel := New("", Legend(Total))
 
-	req.True(panel.Builder.Legend.Total)
-	req.True(panel.Builder.Legend.Values)
+	req.True(panel.Builder.GraphPanel.Legend.Total)
+	req.True(panel.Builder.GraphPanel.Legend.Values)
 }
 
 func TestLegendCanHideZeroSeries(t *testing.T) {
@@ -225,7 +225,7 @@ func TestLegendCanHideZeroSeries(t *testing.T) {
 
 	panel := New("", Legend(NoZeroSeries))
 
-	req.True(panel.Builder.Legend.HideZero)
+	req.True(panel.Builder.GraphPanel.Legend.HideZero)
 }
 
 func TestLegendCanHideNullSeries(t *testing.T) {
@@ -233,5 +233,5 @@ func TestLegendCanHideNullSeries(t *testing.T) {
 
 	panel := New("", Legend(NoNullSeries))
 
-	req.True(panel.Builder.Legend.HideEmpty)
+	req.True(panel.Builder.GraphPanel.Legend.HideEmpty)
 }

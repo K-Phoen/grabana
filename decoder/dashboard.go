@@ -103,6 +103,7 @@ type DashboardPanel struct {
 	Table      *DashboardTable      `yaml:",omitempty"`
 	SingleStat *DashboardSingleStat `yaml:"single_stat,omitempty"`
 	Text       *DashboardText       `yaml:",omitempty"`
+	Heatmap    *DashboardHeatmap    `yaml:",omitempty"`
 }
 
 func (panel DashboardPanel) toOption() (row.Option, error) {
@@ -117,6 +118,9 @@ func (panel DashboardPanel) toOption() (row.Option, error) {
 	}
 	if panel.Text != nil {
 		return panel.Text.toOption(), nil
+	}
+	if panel.Heatmap != nil {
+		return panel.Heatmap.toOption()
 	}
 
 	return nil, ErrPanelNotConfigured
