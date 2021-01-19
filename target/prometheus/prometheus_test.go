@@ -42,3 +42,27 @@ func TestTargetCanBeHidden(t *testing.T) {
 
 	req.True(target.Hidden)
 }
+
+func TestTargetCanBeSetAsInstant(t *testing.T) {
+	req := require.New(t)
+
+	target := prometheus.New("", prometheus.Instant())
+
+	req.True(target.Instant)
+}
+
+func TestFormatCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	target := prometheus.New("", prometheus.Format(prometheus.FormatTimeSeries))
+
+	req.Equal("time_series", target.Format)
+}
+
+func TestIntervalFactorCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	target := prometheus.New("", prometheus.IntervalFactor(1/10))
+
+	req.Equal(1/10, target.IntervalFactor)
+}

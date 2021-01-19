@@ -344,7 +344,7 @@ type (
 			Show bool `json:"show"`
 		} `json:"xAxis"`
 		XBucketNumber *float64 `json:"xBucketNumber"`
-		XBucketSize   *float64 `json:"XBucketSize"`
+		XBucketSize   *float64 `json:"xBucketSize"`
 		YAxis         struct {
 			Decimals    *int     `json:"decimals"`
 			Format      string   `json:"format"`

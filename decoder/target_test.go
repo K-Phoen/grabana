@@ -246,3 +246,30 @@ func TestPrometheusHiddenTarget(t *testing.T) {
 
 	req.True(target.Hidden)
 }
+
+func TestPrometheusInstantTarget(t *testing.T) {
+	req := require.New(t)
+
+	opts := PrometheusTarget{Instant: true}.toOptions()
+	target := prometheus.New("query", opts...)
+
+	req.True(target.Instant)
+}
+
+func TestPrometheusComplexTarget(t *testing.T) {
+	req := require.New(t)
+	validFormats := []string{
+		"heatmap",
+		"table",
+		"time_series",
+	}
+
+	intervalFactor := 1 / 10
+	for _, format := range validFormats {
+		opts := PrometheusTarget{IntervalFactor: &intervalFactor, Format: format}.toOptions()
+		target := prometheus.New("query", opts...)
+
+		req.Equal(format, target.Format)
+		req.Equal(1/10, target.IntervalFactor)
+	}
+}
