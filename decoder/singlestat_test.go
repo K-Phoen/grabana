@@ -38,7 +38,7 @@ func TestValidValueTypes(t *testing.T) {
 			singleStat := singlestat.New("test")
 			opt(singleStat)
 
-			req.Equal(tc.input, singleStat.Builder.ValueName)
+			req.Equal(tc.input, singleStat.Builder.SinglestatPanel.ValueName)
 		})
 	}
 }

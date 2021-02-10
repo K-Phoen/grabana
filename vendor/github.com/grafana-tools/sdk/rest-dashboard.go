@@ -38,20 +38,23 @@ const DefaultFolderId = 0
 
 // BoardProperties keeps metadata of a dashboard.
 type BoardProperties struct {
-	IsStarred  bool      `json:"isStarred,omitempty"`
-	IsHome     bool      `json:"isHome,omitempty"`
-	IsSnapshot bool      `json:"isSnapshot,omitempty"`
-	Type       string    `json:"type,omitempty"`
-	CanSave    bool      `json:"canSave"`
-	CanEdit    bool      `json:"canEdit"`
-	CanStar    bool      `json:"canStar"`
-	Slug       string    `json:"slug"`
-	Expires    time.Time `json:"expires"`
-	Created    time.Time `json:"created"`
-	Updated    time.Time `json:"updated"`
-	UpdatedBy  string    `json:"updatedBy"`
-	CreatedBy  string    `json:"createdBy"`
-	Version    int       `json:"version"`
+	IsStarred   bool      `json:"isStarred,omitempty"`
+	IsHome      bool      `json:"isHome,omitempty"`
+	IsSnapshot  bool      `json:"isSnapshot,omitempty"`
+	Type        string    `json:"type,omitempty"`
+	CanSave     bool      `json:"canSave"`
+	CanEdit     bool      `json:"canEdit"`
+	CanStar     bool      `json:"canStar"`
+	Slug        string    `json:"slug"`
+	Expires     time.Time `json:"expires"`
+	Created     time.Time `json:"created"`
+	Updated     time.Time `json:"updated"`
+	UpdatedBy   string    `json:"updatedBy"`
+	CreatedBy   string    `json:"createdBy"`
+	Version     int       `json:"version"`
+	FolderID    int       `json:"folderId"`
+	FolderTitle string    `json:"folderTitle"`
+	FolderURL   string    `json:"folderUrl"`
 }
 
 // GetDashboardByUID loads a dashboard and its metadata from Grafana by dashboard uid.
@@ -158,13 +161,19 @@ func (r *Client) GetRawDashboardBySlug(ctx context.Context, slug string) ([]byte
 
 // FoundBoard keeps result of search with metadata of a dashboard.
 type FoundBoard struct {
-	ID        uint     `json:"id"`
-	UID       string   `json:"uid"`
-	Title     string   `json:"title"`
-	URI       string   `json:"uri"`
-	Type      string   `json:"type"`
-	Tags      []string `json:"tags"`
-	IsStarred bool     `json:"isStarred"`
+	ID          uint     `json:"id"`
+	UID         string   `json:"uid"`
+	Title       string   `json:"title"`
+	URI         string   `json:"uri"`
+	URL         string   `json:"url"`
+	Slug        string   `json:"slug"`
+	Type        string   `json:"type"`
+	Tags        []string `json:"tags"`
+	IsStarred   bool     `json:"isStarred"`
+	FolderID    int      `json:"folderId"`
+	FolderUID   string   `json:"folderUid"`
+	FolderTitle string   `json:"folderTitle"`
+	FolderURL   string   `json:"folderUrl"`
 }
 
 // SearchDashboards search dashboards by substring of their title. It allows restrict the result set with
@@ -414,7 +423,7 @@ func setPrefix(slug string) string {
 	if strings.HasPrefix(slug, "db") {
 		return slug
 	}
-	if strings.HasPrefix(slug, "file") {
+	if strings.HasPrefix(slug, "file/") {
 		return slug
 	}
 	return fmt.Sprintf("db/%s", slug)

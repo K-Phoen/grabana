@@ -371,15 +371,20 @@ tags_annotations:
 		"list": [{
 			"datasource": "-- Grafana --",
 			"enable": true,
+			"expr": "",
 			"iconColor": "#5794F2",
 			"iconSize": 0,
 			"name": "Deployments",
 			"query": "",
 			"showLine": false,
+			"step":"",
 			"lineColor": "",
 			"tags": ["deploy", "production"],
 			"tagsField": "",
+			"tagKeys":"",
 			"textField": "",
+			"textFormat":"",
+			"titleFormat":"",
 			"type": "tags"
 		}]
 	},
@@ -616,9 +621,16 @@ rows:
 					"editable": false,
 					"error": false,
 					"gridPos": {},
+					"fieldConfig": {
+						"defaults": { 
+							"threshold": {"mode": "", "steps": null}, 
+						"unit":""
+						}
+					},
 					"id": 1,
 					"isNew": false,
 					"pageSize": 0,
+					"options": {"content": "", "mode" :""},
 					"scroll": false,
 					"renderer": "flot",
 					"showHeader": false,
@@ -636,10 +648,17 @@ rows:
 					"editable": false,
 					"error": false,
 					"gridPos": {},
+					"fieldConfig": {
+						"defaults": { 
+							"threshold": {"mode": "", "steps": null}, 
+						"unit":""
+						}
+					},
 					"id": 2,
 					"isNew": false,
 					"scroll": false,
 					"pageSize": 0,
+					"options": {"content": "", "mode" :""},
 					"renderer": "flot",
 					"showHeader": false,
 					"sort": {"col": 0, "desc": false},

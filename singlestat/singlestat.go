@@ -82,8 +82,8 @@ func New(title string, options ...Option) *SingleStat {
 
 	panel.Builder.IsNew = false
 	mappingType := uint(valueToTextMapping)
-	panel.Builder.MappingType = &mappingType
-	panel.Builder.MappingTypes = []*sdk.MapType{
+	panel.Builder.SinglestatPanel.MappingType = &mappingType
+	panel.Builder.SinglestatPanel.MappingTypes = []*sdk.MapType{
 		{
 			Name:  &valueToText,
 			Value: &valueToTextMapping,
@@ -93,7 +93,7 @@ func New(title string, options ...Option) *SingleStat {
 			Value: &rangeToTextMapping,
 		},
 	}
-	panel.Builder.SparkLine = struct {
+	panel.Builder.SinglestatPanel.SparkLine = struct {
 		FillColor *string  `json:"fillColor,omitempty"`
 		Full      bool     `json:"full,omitempty"`
 		LineColor *string  `json:"lineColor,omitempty"`
@@ -183,7 +183,7 @@ func Transparent() Option {
 // Unit sets the unit of the data displayed on this axis.
 func Unit(unit string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.Format = unit
+		singleStat.Builder.SinglestatPanel.Format = unit
 	}
 }
 
@@ -191,8 +191,8 @@ func Unit(unit string) Option {
 // single stat.
 func SparkLine() Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.SparkLine.Show = true
-		singleStat.Builder.SparkLine.Full = false
+		singleStat.Builder.SinglestatPanel.SparkLine.Show = true
+		singleStat.Builder.SinglestatPanel.SparkLine.Full = false
 	}
 }
 
@@ -200,92 +200,92 @@ func SparkLine() Option {
 // addition to the single stat.
 func FullSparkLine() Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.SparkLine.Show = true
-		singleStat.Builder.SparkLine.Full = true
+		singleStat.Builder.SinglestatPanel.SparkLine.Show = true
+		singleStat.Builder.SinglestatPanel.SparkLine.Full = true
 	}
 }
 
 // SparkLineColor sets the line color of the spark line.
 func SparkLineColor(color string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.SparkLine.LineColor = &color
+		singleStat.Builder.SinglestatPanel.SparkLine.LineColor = &color
 	}
 }
 
 // SparkLineFillColor sets the color the spark line will be filled with.
 func SparkLineFillColor(color string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.SparkLine.FillColor = &color
+		singleStat.Builder.SinglestatPanel.SparkLine.FillColor = &color
 	}
 }
 
 // SparkLineYMin defines the smallest value expected on the Y axis of the spark line.
 func SparkLineYMin(value float64) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.SparkLine.YMin = &value
+		singleStat.Builder.SinglestatPanel.SparkLine.YMin = &value
 	}
 }
 
 // SparkLineYMax defines the largest value expected on the Y axis of the spark line.
 func SparkLineYMax(value float64) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.SparkLine.YMax = &value
+		singleStat.Builder.SinglestatPanel.SparkLine.YMax = &value
 	}
 }
 
 // ValueType configures how the series will be reduced to a single value.
 func ValueType(valueType StatType) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.ValueName = string(valueType)
+		singleStat.Builder.SinglestatPanel.ValueName = string(valueType)
 	}
 }
 
 // ValueFontSize sets the font size used to display the value (eg: "100%").
 func ValueFontSize(size string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.ValueFontSize = size
+		singleStat.Builder.SinglestatPanel.ValueFontSize = size
 	}
 }
 
 // Prefix sets the text used as prefix of the value.
 func Prefix(prefix string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.Prefix = &prefix
+		singleStat.Builder.SinglestatPanel.Prefix = &prefix
 	}
 }
 
 // PrefixFontSize sets the size used for the prefix text (eg: "110%").
 func PrefixFontSize(size string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.PrefixFontSize = &size
+		singleStat.Builder.SinglestatPanel.PrefixFontSize = &size
 	}
 }
 
 // Postfix sets the text used as postfix of the value.
 func Postfix(postfix string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.Postfix = &postfix
+		singleStat.Builder.SinglestatPanel.Postfix = &postfix
 	}
 }
 
 // PostfixFontSize sets the size used for the postfix text (eg: "110%")
 func PostfixFontSize(size string) Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.PostfixFontSize = &size
+		singleStat.Builder.SinglestatPanel.PostfixFontSize = &size
 	}
 }
 
 // ColorValue will show the threshold's colors on the value itself.
 func ColorValue() Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.ColorValue = true
+		singleStat.Builder.SinglestatPanel.ColorValue = true
 	}
 }
 
 // ColorBackground will show the threshold's colors in the background.
 func ColorBackground() Option {
 	return func(singleStat *SingleStat) {
-		singleStat.Builder.ColorBackground = true
+		singleStat.Builder.SinglestatPanel.ColorBackground = true
 	}
 }
 
@@ -322,8 +322,8 @@ func ValuesToText(mapping []ValueMap) Option {
 		}
 
 		mappingType := uint(valueToTextMapping)
-		singleStat.Builder.MappingType = &mappingType
-		singleStat.Builder.ValueMaps = valueMap
+		singleStat.Builder.SinglestatPanel.MappingType = &mappingType
+		singleStat.Builder.SinglestatPanel.ValueMaps = valueMap
 	}
 }
 
@@ -342,7 +342,7 @@ func RangesToText(mapping []RangeMap) Option {
 		}
 
 		mappingType := uint(rangeToTextMapping)
-		singleStat.Builder.MappingType = &mappingType
-		singleStat.Builder.RangeMaps = rangeMap
+		singleStat.Builder.SinglestatPanel.MappingType = &mappingType
+		singleStat.Builder.SinglestatPanel.RangeMaps = rangeMap
 	}
 }
