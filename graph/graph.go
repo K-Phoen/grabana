@@ -75,8 +75,8 @@ func New(title string, options ...Option) *Graph {
 
 	panel.Builder.AliasColors = make(map[string]interface{})
 	panel.Builder.IsNew = false
-	panel.Builder.Tooltip.Sort = 2
-	panel.Builder.Tooltip.Shared = true
+	panel.Builder.GraphPanel.Tooltip.Sort = 2
+	panel.Builder.GraphPanel.Tooltip.Shared = true
 
 	for _, opt := range append(defaults(), options...) {
 		opt(panel)
@@ -282,6 +282,6 @@ func Legend(opts ...LegendOption) Option {
 			}
 		}
 
-		graph.Builder.Legend = legend
+		graph.Builder.GraphPanel.Legend = legend
 	}
 }

@@ -94,7 +94,9 @@ before_install:
  - go get github.com/mattn/goveralls
  # Run Grafana
  - "docker pull grafana/grafana:$GRAFANA_VERSION"
- - "docker run --rm -d -p 3000:3000 grafana/grafana:$GRAFANA_VERSION"
+ - "docker network create grafana"
+ - "docker run -d -p 9222:9222 --network grafana --rm --name headless-shell --shm-size 2G chromedp/headless-shell"
+ - "docker run --network grafana -e GF_AUTH_ANONYMOUS_ENABLED=true --rm -d -p 3000:3000 grafana/grafana:$GRAFANA_VERSION"
 
 before_script:
  - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $GOPATH/bin

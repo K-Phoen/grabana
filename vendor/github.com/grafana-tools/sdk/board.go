@@ -61,7 +61,7 @@ type (
 		Refresh       *BoolString `json:"refresh,omitempty"`
 		SchemaVersion uint        `json:"schemaVersion"`
 		Version       uint        `json:"version"`
-		Links         []link      `json:"links"`
+		Links         []Link      `json:"links"`
 		Time          Time        `json:"time"`
 		Timepicker    Timepicker  `json:"timepicker"`
 		GraphTooltip  int         `json:"graphTooltip,omitempty"`
@@ -107,41 +107,45 @@ type (
 	// for templateVar
 	Current struct {
 		Tags  []*string   `json:"tags,omitempty"`
-		Text  string      `json:"text"`
+		Text  interface{} `json:"text"`
 		Value interface{} `json:"value"` // TODO select more precise type
 	}
 	Annotation struct {
-		Name       string   `json:"name"`
-		Datasource *string  `json:"datasource"`
-		ShowLine   bool     `json:"showLine"`
-		IconColor  string   `json:"iconColor"`
-		LineColor  string   `json:"lineColor"`
-		IconSize   uint     `json:"iconSize"`
-		Enable     bool     `json:"enable"`
-		Query      string   `json:"query"`
-		TextField  string   `json:"textField"`
-		TagsField  string   `json:"tagsField"`
-		Tags       []string `json:"tags"`
-		Type       string   `json:"type"`
+		Name        string   `json:"name"`
+		Datasource  *string  `json:"datasource"`
+		ShowLine    bool     `json:"showLine"`
+		IconColor   string   `json:"iconColor"`
+		LineColor   string   `json:"lineColor"`
+		IconSize    uint     `json:"iconSize"`
+		Enable      bool     `json:"enable"`
+		Query       string   `json:"query"`
+		Expr        string   `json:"expr"`
+		Step        string   `json:"step"`
+		TextField   string   `json:"textField"`
+		TextFormat  string   `json:"textFormat"`
+		TitleFormat string   `json:"titleFormat"`
+		TagsField   string   `json:"tagsField"`
+		Tags        []string `json:"tags"`
+		TagKeys     string   `json:"tagKeys"`
+		Type        string   `json:"type"`
+	}
+	// Link represents link to another dashboard or external weblink
+	Link struct {
+		Title       string   `json:"title"`
+		Type        string   `json:"type"`
+		AsDropdown  *bool    `json:"asDropdown,omitempty"`
+		DashURI     *string  `json:"dashUri,omitempty"`
+		Dashboard   *string  `json:"dashboard,omitempty"`
+		Icon        *string  `json:"icon,omitempty"`
+		IncludeVars bool     `json:"includeVars"`
+		KeepTime    *bool    `json:"keepTime,omitempty"`
+		Params      *string  `json:"params,omitempty"`
+		Tags        []string `json:"tags,omitempty"`
+		TargetBlank *bool    `json:"targetBlank,omitempty"`
+		Tooltip     *string  `json:"tooltip,omitempty"`
+		URL         *string  `json:"url,omitempty"`
 	}
 )
-
-// link represents link to another dashboard or external weblink
-type link struct {
-	Title       string   `json:"title"`
-	Type        string   `json:"type"`
-	AsDropdown  *bool    `json:"asDropdown,omitempty"`
-	DashURI     *string  `json:"dashUri,omitempty"`
-	Dashboard   *string  `json:"dashboard,omitempty"`
-	Icon        *string  `json:"icon,omitempty"`
-	IncludeVars bool     `json:"includeVars"`
-	KeepTime    *bool    `json:"keepTime,omitempty"`
-	Params      *string  `json:"params,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
-	TargetBlank *bool    `json:"targetBlank,omitempty"`
-	Tooltip     *string  `json:"tooltip,omitempty"`
-	URL         *string  `json:"url,omitempty"`
-}
 
 // Height of rows maybe passed as number (ex 200) or
 // as string (ex "200px") or empty string
@@ -173,6 +177,10 @@ func NewBoard(title string) *Board {
 		HideControls: false,
 		Rows:         []*Row{},
 	}
+}
+
+func (b *Board) AddLink(link Link) {
+	b.Links = append(b.Links, link)
 }
 
 func (b *Board) RemoveTags(tags ...string) {

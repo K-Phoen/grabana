@@ -29,6 +29,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		singleStatPanel(),
 		tablePanel(),
 		graphPanelWithStackdriverTarget(),
+		heatmapPanel(),
 	}
 
 	for _, testCase := range testCases {
@@ -371,15 +372,20 @@ tags_annotations:
 		"list": [{
 			"datasource": "-- Grafana --",
 			"enable": true,
+			"expr": "",
 			"iconColor": "#5794F2",
 			"iconSize": 0,
 			"name": "Deployments",
 			"query": "",
 			"showLine": false,
+			"step": "",
+			"tagKeys": "",
 			"lineColor": "",
 			"tags": ["deploy", "production"],
 			"tagsField": "",
 			"textField": "",
+			"textFormat": "",
+			"titleFormat": "",
 			"type": "tags"
 		}]
 	},
@@ -578,6 +584,7 @@ rows:
       - text:
           height: 400px
           span: 6
+          transparent: true
           title: Some markdown?
           markdown: "*markdown*"
       - text:
@@ -627,7 +634,20 @@ rows:
 					"height": "400px",
 					"styles": null,
 					"title": "Some markdown?",
-					"transparent": false
+					"transparent": true,
+					"options": {
+						"content": "",
+						"mode": ""
+					},
+					"fieldConfig": {
+						"defaults": {
+							"unit": "",
+							"threshold": {
+								"mode": "",
+								"steps": null
+							}
+						}
+					}
 				},
 				{
 					"type": "text",
@@ -647,7 +667,20 @@ rows:
 					"height": "400px",
 					"styles": null,
 					"title": "Some html?",
-					"transparent": false
+					"transparent": false,
+					"options": {
+						"content": "",
+						"mode": ""
+					},
+					"fieldConfig": {
+						"defaults": {
+							"unit": "",
+							"threshold": {
+								"mode": "",
+								"steps": null
+							}
+						}
+					}
 				}
 			]
 		}
@@ -678,6 +711,7 @@ rows:
           title: Heap allocations
           height: 400px
           span: 4
+          transparent: true
           datasource: prometheus-default
           legend: [avg, current, min, max, as_table, no_null_series, no_zero_series]
           alert:
@@ -832,7 +866,7 @@ rows:
 							"show": false
 						}
 					],
-					"transparent": false
+					"transparent": true
 				}
 			]
 		}
@@ -1137,6 +1171,7 @@ rows:
           title: Heap Allocations
           height: 400px
           span: 4
+          transparent: true
           datasource: prometheus-default
           targets:
             - prometheus:
@@ -1182,7 +1217,7 @@ rows:
 					"span": 4,
 					"height": "400px",
 					"title": "Heap Allocations",
-					"transparent": false,
+					"transparent": true,
 					"type": "singlestat",
 					"colors": [
 						"green",
@@ -1264,6 +1299,7 @@ rows:
           title: Threads
           height: 400px
           span: 4
+          transparent: true
           datasource: prometheus-default
           targets:
             - prometheus:
@@ -1309,7 +1345,7 @@ rows:
 					"renderer": "flot",
 					"span": 4,
 					"title": "Threads",
-					"transparent": false,
+					"transparent": true,
 					"type": "table",
 					"columns": [
 						{
@@ -1357,6 +1393,135 @@ rows:
 
 	return testCase{
 		name:                "single row with single graph panel",
+		yaml:                yaml,
+		expectedGrafanaJSON: json,
+	}
+}
+
+func heatmapPanel() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Test row
+    panels:
+    - heatmap:
+        title: Reconciliation Performance
+        span: 12
+        datasource: $datasource
+        data_format: time_series_buckets
+        hide_zero_buckets: false
+        highlight_cards: true
+        targets:
+        - prometheus:
+            query: sum(increase(argocd_app_reconcile_bucket{namespace=~"$namespace"}[$interval])) by (le)
+            legend: '{{le}}'
+            ref: A
+            format: heatmap
+            interval_factor: 10
+        tooltip:
+          show: true
+          showhistogram: true
+          decimals: 0
+`
+	json := `{
+	"slug": "",
+	"title": "Awesome dashboard",
+	"originalTitle": "",
+	"tags": null,
+	"style": "dark",
+	"timezone": "",
+	"editable": false,
+	"hideControls": false,
+	"sharedCrosshair": false,
+	"templating": {"list": null},
+	"annotations": {"list": null},
+	"links": null,
+	"panels": null,
+	"rows": [
+		{
+			"title": "Test row",
+			"collapse": false,
+			"editable": true,
+			"height": "250px",
+			"repeat": null,
+			"showTitle": true,
+			"panels": [
+				{
+					"datasource": "$datasource",
+					"dataFormat": "tsbuckets",
+					"editable": false,
+					"error": false,
+					"gridPos": {},
+					"id": 7,
+					"isNew": false,
+					"renderer": "flot",
+					"span": 12,
+					"title": "Reconciliation Performance",
+					"transparent": false,
+					"type": "heatmap",
+					"targets": [
+						{
+							"refId": "A",
+							"expr": "sum(increase(argocd_app_reconcile_bucket{namespace=~\"$namespace\"}[$interval])) by (le)",
+							"format": "heatmap",
+							"intervalFactor": 10,
+							"legendFormat": "{{le}}"
+						}
+					],
+					"cards": {
+						"cardRound": null,
+						"cardPadding": null
+					},
+					"color": {
+						"cardColor": "#b4ff00",
+						"colorScale": "sqrt",
+						"colorScheme": "interpolateSpectral",
+						"exponent": 0.5,
+						"mode": "spectrum"
+					},
+					"xAxis": {
+						"show": true
+					},
+					"yAxis": {
+						"show": true,
+						"format": "short",
+						"logBase": 1,
+						"max": null,
+						"min": null,
+						"splitFactor": null,
+						"decimals": null
+					},
+					"tooltip": {
+						"show": true,
+						"showHistogram": true
+					},
+					"legend": {
+						"show": true
+					},
+					"tooltipDecimals": 0,
+					"hideZeroBuckets": false,
+					"highlightCards": true,
+					"xBucketNumber": null,
+					"xBucketSize": null,
+					"yBucketBound": "auto",
+					"yBucketNumber": null,
+					"yBucketSize": null,
+					"reverseYBuckets": false
+				}
+			]
+		}
+	],
+	"time": {"from": "now-3h", "to": "now"},
+	"timepicker": {
+		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
+		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
+	},
+	"schemaVersion": 0,
+	"version": 0
+}`
+
+	return testCase{
+		name:                "single row with heatmap panel",
 		yaml:                yaml,
 		expectedGrafanaJSON: json,
 	}
