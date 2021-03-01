@@ -111,18 +111,23 @@ type (
 		Value interface{} `json:"value"` // TODO select more precise type
 	}
 	Annotation struct {
-		Name       string   `json:"name"`
-		Datasource *string  `json:"datasource"`
-		ShowLine   bool     `json:"showLine"`
-		IconColor  string   `json:"iconColor"`
-		LineColor  string   `json:"lineColor"`
-		IconSize   uint     `json:"iconSize"`
-		Enable     bool     `json:"enable"`
-		Query      string   `json:"query"`
-		TextField  string   `json:"textField"`
-		TagsField  string   `json:"tagsField"`
-		Tags       []string `json:"tags"`
-		Type       string   `json:"type"`
+		Name        string   `json:"name"`
+		Datasource  *string  `json:"datasource"`
+		ShowLine    bool     `json:"showLine"`
+		IconColor   string   `json:"iconColor"`
+		LineColor   string   `json:"lineColor"`
+		IconSize    uint     `json:"iconSize"`
+		Enable      bool     `json:"enable"`
+		Query       string   `json:"query"`
+		Expr        string   `json:"expr"`
+		Step        string   `json:"step"`
+		TextField   string   `json:"textField"`
+		TextFormat  string   `json:"textFormat"`
+		TitleFormat string   `json:"titleFormat"`
+		TagsField   string   `json:"tagsField"`
+		Tags        []string `json:"tags"`
+		TagKeys     string   `json:"tagKeys"`
+		Type        string   `json:"type"`
 	}
 	// Link represents link to another dashboard or external weblink
 	Link struct {

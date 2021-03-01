@@ -372,15 +372,20 @@ tags_annotations:
 		"list": [{
 			"datasource": "-- Grafana --",
 			"enable": true,
+			"expr": "",
 			"iconColor": "#5794F2",
 			"iconSize": 0,
 			"name": "Deployments",
 			"query": "",
 			"showLine": false,
+			"step": "",
+			"tagKeys": "",
 			"lineColor": "",
 			"tags": ["deploy", "production"],
 			"tagsField": "",
 			"textField": "",
+			"textFormat": "",
+			"titleFormat": "",
 			"type": "tags"
 		}]
 	},

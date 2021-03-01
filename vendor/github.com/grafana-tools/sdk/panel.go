@@ -344,14 +344,14 @@ type (
 			Show bool `json:"show"`
 		} `json:"xAxis"`
 		XBucketNumber *float64 `json:"xBucketNumber"`
-		XBucketSize   *float64 `json:"xBucketSize"`
+		XBucketSize   *string  `json:"xBucketSize"`
 		YAxis         struct {
 			Decimals    *int     `json:"decimals"`
 			Format      string   `json:"format"`
 			LogBase     int      `json:"logBase"`
 			Show        bool     `json:"show"`
-			Max         *float64 `json:"max"`
-			Min         *float64 `json:"min"`
+			Max         *string  `json:"max"`
+			Min         *string  `json:"min"`
 			SplitFactor *float64 `json:"splitFactor"`
 		} `json:"yAxis"`
 		YBucketBound  string   `json:"yBucketBound"`
@@ -434,17 +434,21 @@ type (
 		Value    string `json:"value"`
 	}
 	ColumnStyle struct {
-		Alias       *string    `json:"alias"`
-		DateFormat  *string    `json:"dateFormat,omitempty"`
-		Pattern     string     `json:"pattern"`
-		Type        string     `json:"type"`
-		ColorMode   *string    `json:"colorMode,omitempty"`
-		Colors      *[]string  `json:"colors,omitempty"`
-		Decimals    *uint      `json:"decimals,omitempty"`
-		Thresholds  *[]string  `json:"thresholds,omitempty"`
-		Unit        *string    `json:"unit,omitempty"`
-		MappingType int        `json:"mappingType,omitempty"`
-		ValueMaps   []ValueMap `json:"valueMaps,omitempty"`
+		Alias           *string    `json:"alias"`
+		DateFormat      *string    `json:"dateFormat,omitempty"`
+		Pattern         string     `json:"pattern"`
+		Type            string     `json:"type"`
+		ColorMode       *string    `json:"colorMode,omitempty"`
+		Colors          *[]string  `json:"colors,omitempty"`
+		Decimals        *uint      `json:"decimals,omitempty"`
+		Thresholds      *[]string  `json:"thresholds,omitempty"`
+		Unit            *string    `json:"unit,omitempty"`
+		MappingType     int        `json:"mappingType,omitempty"`
+		ValueMaps       []ValueMap `json:"valueMaps,omitempty"`
+		Link            bool       `json:"link,omitempty"`
+		LinkTooltip     *string    `json:"linkTooltip,omitempty"`
+		LinkUrl         *string    `json:"linkUrl,omitempty"`
+		LinkTargetBlank bool       `json:"linkTargetBlank,omitempty"`
 	}
 )
 
