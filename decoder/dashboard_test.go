@@ -584,6 +584,7 @@ rows:
       - text:
           height: 400px
           span: 6
+          transparent: true
           title: Some markdown?
           markdown: "*markdown*"
       - text:
@@ -633,7 +634,7 @@ rows:
 					"height": "400px",
 					"styles": null,
 					"title": "Some markdown?",
-					"transparent": false,
+					"transparent": true,
 					"options": {
 						"content": "",
 						"mode": ""
@@ -710,6 +711,7 @@ rows:
           title: Heap allocations
           height: 400px
           span: 4
+          transparent: true
           datasource: prometheus-default
           legend: [avg, current, min, max, as_table, no_null_series, no_zero_series]
           alert:
@@ -864,7 +866,7 @@ rows:
 							"show": false
 						}
 					],
-					"transparent": false
+					"transparent": true
 				}
 			]
 		}
@@ -1169,6 +1171,7 @@ rows:
           title: Heap Allocations
           height: 400px
           span: 4
+          transparent: true
           datasource: prometheus-default
           targets:
             - prometheus:
@@ -1214,7 +1217,7 @@ rows:
 					"span": 4,
 					"height": "400px",
 					"title": "Heap Allocations",
-					"transparent": false,
+					"transparent": true,
 					"type": "singlestat",
 					"colors": [
 						"green",
@@ -1296,6 +1299,7 @@ rows:
           title: Threads
           height: 400px
           span: 4
+          transparent: true
           datasource: prometheus-default
           targets:
             - prometheus:
@@ -1341,7 +1345,7 @@ rows:
 					"renderer": "flot",
 					"span": 4,
 					"title": "Threads",
-					"transparent": false,
+					"transparent": true,
 					"type": "table",
 					"columns": [
 						{
