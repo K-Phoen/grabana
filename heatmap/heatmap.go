@@ -79,8 +79,8 @@ func New(title string, options ...Option) *Heatmap {
 		Format      string   `json:"format"`
 		LogBase     int      `json:"logBase"`
 		Show        bool     `json:"show"`
-		Max         *float64 `json:"max"`
-		Min         *float64 `json:"min"`
+		Max         *string  `json:"max"`
+		Min         *string  `json:"min"`
 		SplitFactor *float64 `json:"splitFactor"`
 	}{
 		Format:  "short",
