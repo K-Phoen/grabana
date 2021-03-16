@@ -21,6 +21,7 @@ func TestValidValueTypes(t *testing.T) {
 		{input: "delta"},
 		{input: "diff"},
 		{input: "range"},
+		{input: "name"},
 	}
 
 	for _, testCase := range testCases {
