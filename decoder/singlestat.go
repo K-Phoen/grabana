@@ -113,6 +113,8 @@ func (singleStatPanel DashboardSingleStat) valueType() (singlestat.Option, error
 		return singlestat.ValueType(singlestat.Diff), nil
 	case "range":
 		return singlestat.ValueType(singlestat.Range), nil
+	case "name":
+		return singlestat.ValueType(singlestat.Name), nil
 	default:
 		return nil, ErrInvalidSingleStatValueType
 	}

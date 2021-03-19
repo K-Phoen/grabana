@@ -47,6 +47,9 @@ const (
 	// Range will return the difference between ‘min’ and ‘max’. Useful to
 	// show the range of change for a gauge..
 	Range StatType = "range"
+
+	// Name will return the name value in the series.
+	Name StatType = "name"
 )
 
 // ValueMap allows to map a value into explicit text.
