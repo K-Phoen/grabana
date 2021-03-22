@@ -19,6 +19,7 @@ type DashboardSingleStat struct {
 	Transparent bool    `yaml:",omitempty"`
 	Datasource  string  `yaml:",omitempty"`
 	Unit        string
+	Decimals    *int   `yaml:",omitempty"`
 	ValueType   string `yaml:"value_type"`
 	SparkLine   string `yaml:"sparkline"`
 	Targets     []Target
@@ -47,6 +48,9 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	}
 	if singleStatPanel.Unit != "" {
 		opts = append(opts, singlestat.Unit(singleStatPanel.Unit))
+	}
+	if singleStatPanel.Decimals != nil {
+		opts = append(opts, singlestat.Decimals(*singleStatPanel.Decimals))
 	}
 	if singleStatPanel.Thresholds[0] != "" {
 		opts = append(opts, singlestat.Thresholds(singleStatPanel.Thresholds))
