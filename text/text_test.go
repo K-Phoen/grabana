@@ -61,3 +61,12 @@ func TestTextPanelBackgroundCanBeTransparent(t *testing.T) {
 
 	req.True(panel.Builder.Transparent)
 }
+
+func TestTextPanelDescriptionCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Description("lala"))
+
+	req.NotNil(panel.Builder.Description)
+	req.Equal("lala", *panel.Builder.Description)
+}

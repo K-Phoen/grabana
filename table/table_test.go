@@ -114,10 +114,19 @@ func TestDataCanBeTransformedAsTimeSeriesAggregations(t *testing.T) {
 	req.Equal(string(AVG), panel.Builder.TablePanel.Columns[0].Value)
 }
 
-func TestTextPanelBackgroundCanBeTransparent(t *testing.T) {
+func TestTablePanelBackgroundCanBeTransparent(t *testing.T) {
 	req := require.New(t)
 
 	panel := New("", Transparent())
 
 	req.True(panel.Builder.Transparent)
+}
+
+func TestTablePanelDescriptionCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Description("lala"))
+
+	req.NotNil(panel.Builder.Description)
+	req.Equal("lala", *panel.Builder.Description)
 }
