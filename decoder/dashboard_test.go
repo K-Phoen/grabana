@@ -582,6 +582,7 @@ rows:
   - name: Test row
     panels:
       - text:
+          description: Some description
           height: 400px
           span: 6
           transparent: true
@@ -634,6 +635,7 @@ rows:
 					"height": "400px",
 					"styles": null,
 					"title": "Some markdown?",
+					"description": "Some description",
 					"transparent": true,
 					"options": {
 						"content": "",
@@ -709,6 +711,7 @@ rows:
     panels:
       - graph:
           title: Heap allocations
+          description: Some description
           height: 400px
           span: 4
           transparent: true
@@ -774,6 +777,7 @@ rows:
 					"span": 4,
 					"fill": 1,
 					"title": "Heap allocations",
+					"description": "Some description",
 					"aliasColors": {},
 					"alert": {
 						"conditions": [
@@ -1169,6 +1173,7 @@ rows:
     panels:
       - single_stat:
           title: Heap Allocations
+          description: Some description
           height: 400px
           span: 4
           transparent: true
@@ -1217,6 +1222,7 @@ rows:
 					"span": 4,
 					"height": "400px",
 					"title": "Heap Allocations",
+					"description": "Some description",
 					"transparent": true,
 					"type": "singlestat",
 					"colors": [
@@ -1297,6 +1303,7 @@ rows:
     panels:
       - table:
           title: Threads
+          description: Threads here
           height: 400px
           span: 4
           transparent: true
@@ -1345,6 +1352,7 @@ rows:
 					"renderer": "flot",
 					"span": 4,
 					"title": "Threads",
+					"description": "Threads here",
 					"transparent": true,
 					"type": "table",
 					"columns": [
@@ -1406,6 +1414,7 @@ rows:
     panels:
     - heatmap:
         title: Reconciliation Performance
+        description: Does it perform?
         span: 12
         datasource: $datasource
         data_format: time_series_buckets
@@ -1457,6 +1466,7 @@ rows:
 					"renderer": "flot",
 					"span": 12,
 					"title": "Reconciliation Performance",
+					"description": "Does it perform?",
 					"transparent": false,
 					"type": "heatmap",
 					"targets": [

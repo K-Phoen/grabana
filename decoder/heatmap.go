@@ -12,6 +12,7 @@ var ErrInvalidDataFormat = fmt.Errorf("invalid data format")
 
 type DashboardHeatmap struct {
 	Title           string
+	Description     string  `yaml:",omitempty"`
 	Span            float32 `yaml:",omitempty"`
 	Height          string  `yaml:",omitempty"`
 	Transparent     bool    `yaml:",omitempty"`
@@ -53,6 +54,9 @@ func (tooltip *HeatmapTooltip) toOptions() []heatmap.Option {
 func (heatmapPanel DashboardHeatmap) toOption() (row.Option, error) {
 	opts := []heatmap.Option{}
 
+	if heatmapPanel.Description != "" {
+		opts = append(opts, heatmap.Description(heatmapPanel.Description))
+	}
 	if heatmapPanel.Span != 0 {
 		opts = append(opts, heatmap.Span(heatmapPanel.Span))
 	}

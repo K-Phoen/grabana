@@ -7,6 +7,7 @@ import (
 
 type DashboardTable struct {
 	Title                  string
+	Description            string  `yaml:",omitempty"`
 	Span                   float32 `yaml:",omitempty"`
 	Height                 string  `yaml:",omitempty"`
 	Transparent            bool    `yaml:",omitempty"`
@@ -19,6 +20,9 @@ type DashboardTable struct {
 func (tablePanel DashboardTable) toOption() (row.Option, error) {
 	opts := []table.Option{}
 
+	if tablePanel.Description != "" {
+		opts = append(opts, table.Description(tablePanel.Description))
+	}
 	if tablePanel.Span != 0 {
 		opts = append(opts, table.Span(tablePanel.Span))
 	}

@@ -10,6 +10,7 @@ func TestHeatmapCanBeDecoded(t *testing.T) {
 	req := require.New(t)
 
 	panel := DashboardHeatmap{
+		Description:     "awesome description",
 		Span:            12,
 		Height:          "300px",
 		Transparent:     true,

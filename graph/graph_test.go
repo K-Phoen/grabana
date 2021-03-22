@@ -52,12 +52,21 @@ func TestGraphPanelHeightCanBeConfigured(t *testing.T) {
 	req.Equal("400px", *panel.Builder.Height)
 }
 
-func TestTextPanelBackgroundCanBeTransparent(t *testing.T) {
+func TestGraphPanelBackgroundCanBeTransparent(t *testing.T) {
 	req := require.New(t)
 
 	panel := New("", Transparent())
 
 	req.True(panel.Builder.Transparent)
+}
+
+func TestGraphPanelDescriptionCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Description("lala"))
+
+	req.NotNil(panel.Builder.Description)
+	req.Equal("lala", *panel.Builder.Description)
 }
 
 func TestGraphPanelDataSourceCanBeConfigured(t *testing.T) {

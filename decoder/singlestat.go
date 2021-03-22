@@ -13,6 +13,7 @@ var ErrInvalidSingleStatValueType = fmt.Errorf("invalid single stat value type")
 
 type DashboardSingleStat struct {
 	Title       string
+	Description string  `yaml:",omitempty"`
 	Span        float32 `yaml:",omitempty"`
 	Height      string  `yaml:",omitempty"`
 	Transparent bool    `yaml:",omitempty"`
@@ -29,6 +30,9 @@ type DashboardSingleStat struct {
 func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	opts := []singlestat.Option{}
 
+	if singleStatPanel.Description != "" {
+		opts = append(opts, singlestat.Description(singleStatPanel.Description))
+	}
 	if singleStatPanel.Span != 0 {
 		opts = append(opts, singlestat.Span(singleStatPanel.Span))
 	}

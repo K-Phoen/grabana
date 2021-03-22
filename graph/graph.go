@@ -157,6 +157,13 @@ func Height(height string) Option {
 	}
 }
 
+// Description annotates the current visualization with a human-readable description.
+func Description(content string) Option {
+	return func(graph *Graph) {
+		graph.Builder.Description = &content
+	}
+}
+
 // Transparent makes the background transparent.
 func Transparent() Option {
 	return func(graph *Graph) {
