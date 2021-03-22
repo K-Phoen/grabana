@@ -7,7 +7,7 @@ import (
 
 type DashboardRow struct {
 	Name   string
-	Repeat string `yaml:"repeat_for"`
+	Repeat string `yaml:"repeat_for,omitempty"`
 	Panels []DashboardPanel
 }
 

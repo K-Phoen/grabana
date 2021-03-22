@@ -15,6 +15,7 @@ var ErrInvalidLegendAttribute = fmt.Errorf("invalid legend attribute")
 
 type DashboardGraph struct {
 	Title         string
+	Description   string  `yaml:",omitempty"`
 	Span          float32 `yaml:",omitempty"`
 	Height        string  `yaml:",omitempty"`
 	Transparent   bool    `yaml:",omitempty"`
@@ -29,6 +30,9 @@ type DashboardGraph struct {
 func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	opts := []graph.Option{}
 
+	if graphPanel.Description != "" {
+		opts = append(opts, graph.Description(graphPanel.Description))
+	}
 	if graphPanel.Span != 0 {
 		opts = append(opts, graph.Span(graphPanel.Span))
 	}
