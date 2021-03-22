@@ -191,3 +191,45 @@ func (v *FloatString) MarshalJSON() ([]byte, error) {
 
 	return []byte(`"null"`), nil
 }
+
+// StringSliceString represents special type for json values that could be
+// strings or slice of strings: "something" or ["something"].
+type StringSliceString struct {
+	Value []string
+	Valid bool
+}
+
+// UnmarshalJSON implements custom unmarshalling for StringSliceString type.
+func (v *StringSliceString) UnmarshalJSON(raw []byte) error {
+	if raw == nil || bytes.Equal(raw, []byte(`"null"`)) {
+		return nil
+	}
+
+	// First try with string.
+	var str string
+	if err := json.Unmarshal(raw, &str); err == nil {
+		v.Value = []string{str}
+		v.Valid = true
+		return nil
+	}
+
+	// Lastly try with string slice.
+	var strSlice []string
+	err := json.Unmarshal(raw, &strSlice)
+	if err != nil {
+		return err
+	}
+
+	v.Value = strSlice
+	v.Valid = true
+	return nil
+}
+
+// MarshalJSON implements custom marshalling for StringSliceString type.
+func (v *StringSliceString) MarshalJSON() ([]byte, error) {
+	if !v.Valid {
+		return []byte(`"null"`), nil
+	}
+
+	return json.Marshal(v.Value)
+}

@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/graph"
+	"github.com/K-Phoen/grabana/graph/series"
 	"github.com/K-Phoen/grabana/row"
 )
 
@@ -86,9 +87,43 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	return row.WithGraph(graphPanel.Title, opts...), nil
 }
 
+type GraphSeriesOverride struct {
+	Alias     string
+	Color     string `yaml:",omitempty"`
+	Dashes    *bool  `yaml:",omitempty"`
+	Lines     *bool  `yaml:",omitempty"`
+	Fill      *int   `yaml:",omitempty"`
+	LineWidth *int   `yaml:"line_width,omitempty"`
+}
+
+func (override *GraphSeriesOverride) toOption() graph.Option {
+	overrideOpts := []series.OverrideOption{
+		series.Alias(override.Alias),
+	}
+
+	if override.Color != "" {
+		overrideOpts = append(overrideOpts, series.Color(override.Color))
+	}
+	if override.Dashes != nil {
+		overrideOpts = append(overrideOpts, series.Dashes(*override.Dashes))
+	}
+	if override.Lines != nil {
+		overrideOpts = append(overrideOpts, series.Dashes(*override.Lines))
+	}
+	if override.Fill != nil {
+		overrideOpts = append(overrideOpts, series.Fill(*override.Fill))
+	}
+	if override.LineWidth != nil {
+		overrideOpts = append(overrideOpts, series.LineWidth(*override.LineWidth))
+	}
+
+	return graph.SeriesOverride(overrideOpts...)
+}
+
 type GraphVisualization struct {
-	NullValue string `yaml:",omitempty"`
-	Staircase bool   `yaml:",omitempty"`
+	NullValue string                `yaml:",omitempty"`
+	Staircase bool                  `yaml:",omitempty"`
+	Overrides []GraphSeriesOverride `yaml:"overrides,omitempty"`
 }
 
 func (graphViz *GraphVisualization) toOptions() []graph.Option {
@@ -113,6 +148,10 @@ func (graphViz *GraphVisualization) toOptions() []graph.Option {
 
 	if graphViz.Staircase {
 		opts = append(opts, graph.Staircase())
+	}
+
+	for _, override := range graphViz.Overrides {
+		opts = append(opts, override.toOption())
 	}
 
 	return opts

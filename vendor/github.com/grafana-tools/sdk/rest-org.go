@@ -394,3 +394,43 @@ func (r *Client) GetActualOrgPreferences(ctx context.Context) (Preferences, erro
 	}
 	return pref, err
 }
+
+// UpdateActualOrgAddress updates current organization's address.
+// It reflects PUT /api/org/address API call.
+func (r *Client) UpdateActualOrgAddress(ctx context.Context, address Address) (StatusMessage, error) {
+	var (
+		raw  []byte
+		resp StatusMessage
+		err  error
+	)
+	if raw, err = json.Marshal(address); err != nil {
+		return StatusMessage{}, err
+	}
+	if raw, _, err = r.put(ctx, "api/org/address", nil, raw); err != nil {
+		return StatusMessage{}, err
+	}
+	if err = json.Unmarshal(raw, &resp); err != nil {
+		return StatusMessage{}, err
+	}
+	return resp, nil
+}
+
+// UpdateOrgAddress updates the address of the organization identified by oid.
+// It reflects PUT /api/orgs/:orgId/address API call.
+func (r *Client) UpdateOrgAddress(ctx context.Context, address Address, oid uint) (StatusMessage, error) {
+	var (
+		raw  []byte
+		resp StatusMessage
+		err  error
+	)
+	if raw, err = json.Marshal(address); err != nil {
+		return StatusMessage{}, err
+	}
+	if raw, _, err = r.put(ctx, fmt.Sprintf("api/orgs/%d/address", oid), nil, raw); err != nil {
+		return StatusMessage{}, err
+	}
+	if err = json.Unmarshal(raw, &resp); err != nil {
+		return StatusMessage{}, err
+	}
+	return resp, nil
+}

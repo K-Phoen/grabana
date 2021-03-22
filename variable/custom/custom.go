@@ -25,14 +25,14 @@ func (values ValuesMap) asQuery() string {
 	return strings.Join(valuesList, ",")
 }
 
-func (values ValuesMap) labelFor(value string) string {
+func (values ValuesMap) labelFor(value string) *sdk.StringSliceString {
 	for label, val := range values {
 		if val == value {
-			return label
+			return &sdk.StringSliceString{Value: []string{label}, Valid: true}
 		}
 	}
 
-	return value
+	return &sdk.StringSliceString{Value: []string{value}, Valid: true}
 }
 
 // Custom represents a "custom" templated variable.
