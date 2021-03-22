@@ -190,6 +190,13 @@ func Unit(unit string) Option {
 	}
 }
 
+// Decimals sets the number of decimals that should be displayed.
+func Decimals(count int) Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.SinglestatPanel.Decimals = count
+	}
+}
+
 // SparkLine displays the spark line summary of the series in addition to the
 // single stat.
 func SparkLine() Option {

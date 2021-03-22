@@ -84,6 +84,14 @@ func TestUnitCanBeConfigured(t *testing.T) {
 	req.Equal("bytes", panel.Builder.SinglestatPanel.Format)
 }
 
+func TestDecimalsCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Decimals(3))
+
+	req.Equal(3, panel.Builder.SinglestatPanel.Decimals)
+}
+
 func TestSparkLineCanBeDisplayed(t *testing.T) {
 	req := require.New(t)
 
