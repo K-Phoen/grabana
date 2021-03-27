@@ -60,7 +60,7 @@ if _, err := client.UpsertDashboard(ctx, folder, builder); err != nil {
 }
 ```
 
-For a more complete example, see the [`example`](./cmd/example/) directory.
+For a more complete example, see the [`example`](cmd/builder-example/) directory.
 
 ## Dashboard as YAML
 
