@@ -3,6 +3,7 @@ package graph
 import (
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
+	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/grafana-tools/sdk"
@@ -125,6 +126,15 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+	}
+}
+
+// WithGraphiteTarget adds a Graphite target to the table.
+func WithGraphiteTarget(query string, options ...graphite.Option) Option {
+	target := graphite.New(query, options...)
+
+	return func(graph *Graph) {
+		graph.Builder.AddTarget(target.Builder)
 	}
 }
 

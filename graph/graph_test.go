@@ -28,6 +28,14 @@ func TestGraphPanelCanHavePrometheusTargets(t *testing.T) {
 	req.Len(panel.Builder.GraphPanel.Targets, 1)
 }
 
+func TestGraphPanelPanelCanHaveGraphiteTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", WithGraphiteTarget("stats_counts.statsd.packets_received"))
+
+	req.Len(panel.Builder.GraphPanel.Targets, 1)
+}
+
 func TestGraphPanelCanHaveStackdriverTargets(t *testing.T) {
 	req := require.New(t)
 

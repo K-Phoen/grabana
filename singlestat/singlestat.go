@@ -3,6 +3,7 @@ package singlestat
 import (
 	"strings"
 
+	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/grafana-tools/sdk"
@@ -144,6 +145,15 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+	}
+}
+
+// WithGraphiteTarget adds a Graphite target to the table.
+func WithGraphiteTarget(query string, options ...graphite.Option) Option {
+	target := graphite.New(query, options...)
+
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.AddTarget(target.Builder)
 	}
 }
 

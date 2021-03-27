@@ -26,6 +26,15 @@ up:
         -p 9090:9090 \
         -v $(shell pwd)/testdata/prometheus.yml:/etc/prometheus/prometheus.yml \
         prom/prometheus
+	docker run -d\
+		 --name graphite\
+		 --restart=always\
+		 -p 8081:80\
+		 -p 2003-2004:2003-2004\
+		 -p 2023-2024:2023-2024\
+		 -p 8125:8125/udp\
+		 -p 8126:8126\
+		 graphiteapp/graphite-statsd
 	docker run -d \
       -p 3000:3000 \
       --name=grabana_grafana \

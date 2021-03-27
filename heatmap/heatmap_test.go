@@ -27,6 +27,14 @@ func TestHeatmapPanelCanHavePrometheusTargets(t *testing.T) {
 	req.Len(panel.Builder.HeatmapPanel.Targets, 1)
 }
 
+func TestHeatmapPanelPanelCanHaveGraphiteTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", WithGraphiteTarget("stats_counts.statsd.packets_received"))
+
+	req.Len(panel.Builder.HeatmapPanel.Targets, 1)
+}
+
 func TestHeatmapPanelCanHaveStackdriverTargets(t *testing.T) {
 	req := require.New(t)
 
