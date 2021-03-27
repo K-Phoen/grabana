@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/K-Phoen/grabana/target/graphite"
+	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 )
@@ -16,6 +17,7 @@ var ErrInvalidStackdriverAlignment = fmt.Errorf("invalid stackdriver alignment m
 type Target struct {
 	Prometheus  *PrometheusTarget  `yaml:",omitempty"`
 	Graphite    *GraphiteTarget    `yaml:",omitempty"`
+	InfluxDB    *InfluxDBTarget    `yaml:"influxdb,omitempty"`
 	Stackdriver *StackdriverTarget `yaml:",omitempty"`
 }
 
@@ -71,6 +73,24 @@ func (t GraphiteTarget) toOptions() []graphite.Option {
 
 	if t.Hidden {
 		opts = append(opts, graphite.Hide())
+	}
+
+	return opts
+}
+
+type InfluxDBTarget struct {
+	Query  string
+	Ref    string `yaml:",omitempty"`
+	Hidden bool   `yaml:",omitempty"`
+}
+
+func (t InfluxDBTarget) toOptions() []influxdb.Option {
+	opts := []influxdb.Option{
+		influxdb.Ref(t.Ref),
+	}
+
+	if t.Hidden {
+		opts = append(opts, influxdb.Hide())
 	}
 
 	return opts

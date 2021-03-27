@@ -135,6 +135,9 @@ func (singleStatPanel DashboardSingleStat) target(t Target) (singlestat.Option, 
 	if t.Graphite != nil {
 		return singlestat.WithGraphiteTarget(t.Graphite.Query, t.Graphite.toOptions()...), nil
 	}
+	if t.InfluxDB != nil {
+		return singlestat.WithInfluxDBTarget(t.InfluxDB.Query, t.InfluxDB.toOptions()...), nil
+	}
 	if t.Stackdriver != nil {
 		stackdriverTarget, err := t.Stackdriver.toTarget()
 		if err != nil {

@@ -63,6 +63,9 @@ func (tablePanel *DashboardTable) target(t Target) (table.Option, error) {
 	if t.Graphite != nil {
 		return table.WithGraphiteTarget(t.Graphite.Query, t.Graphite.toOptions()...), nil
 	}
+	if t.InfluxDB != nil {
+		return table.WithInfluxDBTarget(t.InfluxDB.Query, t.InfluxDB.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

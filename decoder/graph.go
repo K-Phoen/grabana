@@ -162,6 +162,9 @@ func (graphPanel *DashboardGraph) target(t Target) (graph.Option, error) {
 	if t.Graphite != nil {
 		return graph.WithGraphiteTarget(t.Graphite.Query, t.Graphite.toOptions()...), nil
 	}
+	if t.InfluxDB != nil {
+		return graph.WithInfluxDBTarget(t.InfluxDB.Query, t.InfluxDB.toOptions()...), nil
+	}
 	if t.Stackdriver != nil {
 		stackdriverTarget, err := t.Stackdriver.toTarget()
 		if err != nil {
