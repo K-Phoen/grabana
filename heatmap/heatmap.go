@@ -2,6 +2,7 @@ package heatmap
 
 import (
 	"github.com/K-Phoen/grabana/target/graphite"
+	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/grafana-tools/sdk"
@@ -140,6 +141,15 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 // WithGraphiteTarget adds a Graphite target to the table.
 func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 	target := graphite.New(query, options...)
+
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.AddTarget(target.Builder)
+	}
+}
+
+// WithInfluxDBTarget adds an InfluxDB target to the graph.
+func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
+	target := influxdb.New(query, options...)
 
 	return func(heatmap *Heatmap) {
 		heatmap.Builder.AddTarget(target.Builder)

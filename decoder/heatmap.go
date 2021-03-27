@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/K-Phoen/grabana/heatmap"
-
 	"github.com/K-Phoen/grabana/row"
 )
 
@@ -112,6 +111,9 @@ func (heatmapPanel DashboardHeatmap) target(t Target) (heatmap.Option, error) {
 	}
 	if t.Graphite != nil {
 		return heatmap.WithGraphiteTarget(t.Graphite.Query, t.Graphite.toOptions()...), nil
+	}
+	if t.InfluxDB != nil {
+		return heatmap.WithInfluxDBTarget(t.InfluxDB.Query, t.InfluxDB.toOptions()...), nil
 	}
 	if t.Stackdriver != nil {
 		stackdriverTarget, err := t.Stackdriver.toTarget()

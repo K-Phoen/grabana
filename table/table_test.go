@@ -56,6 +56,14 @@ func TestTablePanelCanHaveGraphiteTargets(t *testing.T) {
 	req.Len(panel.Builder.TablePanel.Targets, 1)
 }
 
+func TestTablePanelCanHaveInfluxDBTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", WithInfluxDBTarget("buckets()"))
+
+	req.Len(panel.Builder.TablePanel.Targets, 1)
+}
+
 func TestColumnsCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
