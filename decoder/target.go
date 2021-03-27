@@ -3,6 +3,7 @@ package decoder
 import (
 	"fmt"
 
+	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 )
@@ -14,6 +15,7 @@ var ErrInvalidStackdriverAlignment = fmt.Errorf("invalid stackdriver alignment m
 
 type Target struct {
 	Prometheus  *PrometheusTarget  `yaml:",omitempty"`
+	Graphite    *GraphiteTarget    `yaml:",omitempty"`
 	Stackdriver *StackdriverTarget `yaml:",omitempty"`
 }
 
@@ -51,6 +53,24 @@ func (t PrometheusTarget) toOptions() []prometheus.Option {
 		case "time_series":
 			opts = append(opts, prometheus.Format(prometheus.FormatTimeSeries))
 		}
+	}
+
+	return opts
+}
+
+type GraphiteTarget struct {
+	Query  string
+	Ref    string `yaml:",omitempty"`
+	Hidden bool   `yaml:",omitempty"`
+}
+
+func (t GraphiteTarget) toOptions() []graphite.Option {
+	opts := []graphite.Option{
+		graphite.Ref(t.Ref),
+	}
+
+	if t.Hidden {
+		opts = append(opts, graphite.Hide())
 	}
 
 	return opts

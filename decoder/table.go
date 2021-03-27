@@ -60,6 +60,9 @@ func (tablePanel *DashboardTable) target(t Target) (table.Option, error) {
 	if t.Prometheus != nil {
 		return table.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
+	if t.Graphite != nil {
+		return table.WithGraphiteTarget(t.Graphite.Query, t.Graphite.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

@@ -30,6 +30,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		tablePanel(),
 		graphPanelWithStackdriverTarget(),
 		heatmapPanel(),
+		graphPanelWithGraphiteTarget(),
 	}
 
 	for _, testCase := range testCases {
@@ -1160,6 +1161,129 @@ rows:
 
 	return testCase{
 		name:                "single row with single graph panel and stackdriver target",
+		yaml:                yaml,
+		expectedGrafanaJSON: json,
+	}
+}
+
+func graphPanelWithGraphiteTarget() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Packets received
+          datasource: graphite-test
+          targets:
+            - graphite:
+                ref: A
+                query: stats_counts.statsd.packets_received
+`
+	json := `{
+	"slug": "",
+	"title": "Awesome dashboard",
+	"originalTitle": "",
+	"tags": null,
+	"style": "dark",
+	"timezone": "",
+	"editable": false,
+	"hideControls": false,
+	"sharedCrosshair": false,
+	"templating": {"list": null},
+	"annotations": {"list": null},
+	"links": null,
+	"panels": null,
+	"rows": [
+		{
+			"title": "Test row",
+			"collapse": false,
+			"editable": true,
+			"height": "250px",
+			"repeat": null,
+			"showTitle": true,
+			"panels": [
+				{
+					"type": "graph",
+					"datasource": "graphite-test",
+					"editable": false,
+					"error": false,
+					"gridPos": {},
+					"id": 8,
+					"isNew": false,
+					"renderer": "flot",
+					"span": 6,
+					"fill": 1,
+					"title": "Packets received",
+					"aliasColors": {},
+					"bars": false,
+					"points": false,
+					"stack": false,
+					"steppedLine": false,
+					"lines": true,
+					"linewidth": 1,
+					"pointradius": 5,
+					"percentage": false,
+					"nullPointMode": "null as zero",
+					"legend": {
+						"alignAsTable": false,
+						"avg": false,
+						"current": false,
+						"hideEmpty": true,
+						"hideZero": true,
+						"max": false,
+						"min": false,
+						"rightSide": false,
+						"show": true,
+						"total": false,
+						"values": false
+					},
+					"targets": [
+						{
+							"refId": "A",
+							"target": "stats_counts.statsd.packets_received"
+						}
+					],
+					"tooltip": {
+						"shared": true,
+						"value_type": "",
+						"sort": 2
+					},
+					"x-axis": true,
+					"y-axis": true,
+					"xaxis": {
+						"format": "time",
+						"logBase": 1,
+						"show": true
+					},
+					"yaxes": [
+						{
+							"format": "short",
+							"logBase": 1,
+							"show": true
+						},
+						{
+							"format": "short",
+							"logBase": 1,
+							"show": false
+						}
+					],
+					"transparent": false
+				}
+			]
+		}
+	],
+	"time": {"from": "now-3h", "to": "now"},
+	"timepicker": {
+		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
+		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
+	},
+	"schemaVersion": 0,
+	"version": 0
+}`
+
+	return testCase{
+		name:                "single row with single graph panel and graphite target",
 		yaml:                yaml,
 		expectedGrafanaJSON: json,
 	}

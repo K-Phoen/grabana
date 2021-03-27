@@ -132,6 +132,9 @@ func (singleStatPanel DashboardSingleStat) target(t Target) (singlestat.Option, 
 	if t.Prometheus != nil {
 		return singlestat.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
+	if t.Graphite != nil {
+		return singlestat.WithGraphiteTarget(t.Graphite.Query, t.Graphite.toOptions()...), nil
+	}
 	if t.Stackdriver != nil {
 		stackdriverTarget, err := t.Stackdriver.toTarget()
 		if err != nil {
