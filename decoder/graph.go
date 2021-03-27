@@ -159,6 +159,9 @@ func (graphPanel *DashboardGraph) target(t Target) (graph.Option, error) {
 	if t.Prometheus != nil {
 		return graph.WithPrometheusTarget(t.Prometheus.Query, t.Prometheus.toOptions()...), nil
 	}
+	if t.Graphite != nil {
+		return graph.WithGraphiteTarget(t.Graphite.Query, t.Graphite.toOptions()...), nil
+	}
 	if t.Stackdriver != nil {
 		stackdriverTarget, err := t.Stackdriver.toTarget()
 		if err != nil {

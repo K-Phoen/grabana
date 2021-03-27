@@ -3,10 +3,9 @@ package decoder
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/prometheus"
-
 	"github.com/K-Phoen/grabana/target/stackdriver"
-
 	"github.com/stretchr/testify/require"
 )
 
@@ -272,4 +271,26 @@ func TestPrometheusComplexTarget(t *testing.T) {
 		req.Equal(format, target.Format)
 		req.Equal(1/10, target.IntervalFactor)
 	}
+}
+
+func TestGraphiteTarget(t *testing.T) {
+	req := require.New(t)
+
+	opts := GraphiteTarget{
+		Query: "stats_counts.statsd.packets_received",
+		Ref:   "A",
+	}.toOptions()
+	target := graphite.New("query", opts...)
+
+	req.False(target.Builder.Hide)
+	req.Equal("A", target.Builder.RefID)
+}
+
+func TestGraphiteHiddenTarget(t *testing.T) {
+	req := require.New(t)
+
+	opts := GraphiteTarget{Hidden: true}.toOptions()
+	target := graphite.New("query", opts...)
+
+	req.True(target.Builder.Hide)
 }

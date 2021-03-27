@@ -48,6 +48,14 @@ func TestTablePanelCanHavePrometheusTargets(t *testing.T) {
 	req.Len(panel.Builder.TablePanel.Targets, 1)
 }
 
+func TestTablePanelCanHaveGraphiteTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", WithGraphiteTarget("stats_counts.statsd.packets_received"))
+
+	req.Len(panel.Builder.TablePanel.Targets, 1)
+}
+
 func TestColumnsCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
