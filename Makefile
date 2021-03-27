@@ -27,7 +27,7 @@ up:
         -v $(shell pwd)/testdata/prometheus.yml:/etc/prometheus/prometheus.yml \
         prom/prometheus
 	docker run -d\
-		 --name graphite\
+		 --name grabana_graphite\
 		 --restart=always\
 		 -p 8081:80\
 		 -p 2003-2004:2003-2004\
@@ -35,6 +35,17 @@ up:
 		 -p 8125:8125/udp\
 		 -p 8126:8126\
 		 graphiteapp/graphite-statsd
+	docker run -d \
+		-p 8086:8086 \
+		--name=grabana_influxdb \
+		-e DOCKER_INFLUXDB_INIT_MODE=setup \
+		-e DOCKER_INFLUXDB_INIT_USERNAME=my-user \
+		-e DOCKER_INFLUXDB_INIT_PASSWORD=my-password \
+		-e DOCKER_INFLUXDB_INIT_ORG=my-org \
+		-e DOCKER_INFLUXDB_INIT_BUCKET=my-bucket \
+		-e DOCKER_INFLUXDB_INIT_RETENTION=1w \
+		-e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token \
+        influxdb:2.0
 	docker run -d \
       -p 3000:3000 \
       --name=grabana_grafana \
@@ -44,6 +55,8 @@ up:
 .PHONY: down
 down:
 	docker rm -f grabana_grafana
+	docker rm -f grabana_graphite
+	docker rm -f grabana_influxdb
 	docker rm -f grabana_prometheus
 
 build_cli:

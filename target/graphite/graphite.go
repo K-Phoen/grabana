@@ -10,10 +10,10 @@ type Graphite struct {
 	Builder *sdk.Target
 }
 
-func New(target string, options ...Option) *Graphite {
+func New(query string, options ...Option) *Graphite {
 	graphite := &Graphite{
 		Builder: &sdk.Target{
-			Target: target,
+			Target: query,
 		},
 	}
 
