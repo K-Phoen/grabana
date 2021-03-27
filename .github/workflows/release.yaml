@@ -24,6 +24,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - run: TAG_NAME=${{ steps.tag.outputs.tag }} make build_cli
+
       - run: tar -czvf grabana-${{ steps.tag.outputs.tag }}-linux-64bit.tar.gz ./grabana
 
       - name: Upload Release Asset
