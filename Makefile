@@ -1,5 +1,10 @@
 WITH_COVERAGE?=false
 
+TAG_NAME?=$(shell git describe --tags)
+SHORT_SHA?=$(shell git rev-parse --short HEAD)
+VERSION?=$(TAG_NAME)-$(SHORT_SHA)
+LDFLAGS=-ldflags "-X=main.version=$(VERSION)"
+
 ifeq ($(WITH_COVERAGE),true)
 GOCMD_TEST?=go test -mod=vendor -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
 else
@@ -31,3 +36,6 @@ up:
 down:
 	docker rm -f grabana_grafana
 	docker rm -f grabana_prometheus
+
+build_cli:
+	go build -mod vendor $(LDFLAGS) -o grabana github.com/K-Phoen/grabana/cmd/cli

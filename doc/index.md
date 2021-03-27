@@ -2,13 +2,13 @@
 
 ## Dashboards as code
 
-* [Example](../cmd/example/)
+* [Example](../cmd/builder-example/)
 * [GoDoc](https://pkg.go.dev/github.com/K-Phoen/grabana?tab=doc)
 
 ## Dashboards as YAML
 
 * [Unmarshalling a YAML file](unmarshalling_yaml.md)
-* [Realistic example](../cmd/yaml/example.yaml)
+* [Realistic example](../examples/example.yaml)
 * [Dashboard options](dashboard_options_yaml.md)
 * [Variables](variables_yaml.md)
 * [Annotations](annotations_yaml.md)

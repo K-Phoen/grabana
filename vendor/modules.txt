@@ -1,17 +1,23 @@
-# github.com/davecgh/go-spew v1.1.0
+# github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
 # github.com/gosimple/slug v1.9.0
 github.com/gosimple/slug
 # github.com/grafana-tools/sdk v0.0.0-20210301100910-d23004341fc8
 github.com/grafana-tools/sdk
+# github.com/inconshreveable/mousetrap v1.0.0
+github.com/inconshreveable/mousetrap
 # github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
 # github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be
 github.com/rainycape/unidecode
+# github.com/spf13/cobra v1.1.3
+github.com/spf13/cobra
+# github.com/spf13/pflag v1.0.5
+github.com/spf13/pflag
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/require
-# gopkg.in/yaml.v2 v2.2.2
+# gopkg.in/yaml.v2 v2.4.0
 gopkg.in/yaml.v2
