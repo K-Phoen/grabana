@@ -22,6 +22,8 @@ github.com/inconshreveable/mousetrap
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
+# github.com/prometheus/common v0.20.0
+github.com/prometheus/common/model
 # github.com/rainycape/unidecode v0.0.0-20150907023854-cb7f23ec59be
 github.com/rainycape/unidecode
 # github.com/rhysd/go-github-selfupdate v1.2.3
