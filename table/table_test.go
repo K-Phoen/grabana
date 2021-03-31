@@ -67,11 +67,15 @@ func TestTablePanelCanHaveInfluxDBTargets(t *testing.T) {
 func TestColumnsCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", HideColumn("Time.*"))
+	panel := New("", HideColumn("Time.*"), HideColumn("Duration.*"))
 
-	req.Len(panel.Builder.TablePanel.Styles, 2)
+	req.Len(panel.Builder.TablePanel.Styles, 3)
+	req.Equal("Duration.*", panel.Builder.TablePanel.Styles[0].Pattern)
+	req.Equal("hidden", panel.Builder.TablePanel.Styles[0].Type)
 	req.Equal("Time.*", panel.Builder.TablePanel.Styles[1].Pattern)
 	req.Equal("hidden", panel.Builder.TablePanel.Styles[1].Type)
+	req.Equal("/.*/", panel.Builder.TablePanel.Styles[2].Pattern)
+	req.Equal("string", panel.Builder.TablePanel.Styles[2].Type)
 }
 
 func TestDataCanBeTransformedInTimeSeriesToRows(t *testing.T) {

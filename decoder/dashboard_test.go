@@ -1615,14 +1615,14 @@ rows:
 					],
 					"styles": [
 						{
-							"alias": "",
-							"pattern": "/.*/",
-							"type": "string"
-						},
-						{
 							"alias": null,
 							"pattern": "Time",
 							"type": "hidden"
+						},
+						{
+							"alias": "",
+							"pattern": "/.*/",
+							"type": "string"
 						}
 					],
 					"transform": "timeseries_aggregations",
@@ -1648,7 +1648,7 @@ rows:
 }`
 
 	return testCase{
-		name:                "single row with single graph panel",
+		name:                "single row with single table panel",
 		yaml:                yaml,
 		expectedGrafanaJSON: json,
 	}

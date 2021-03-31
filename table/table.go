@@ -108,10 +108,12 @@ func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 // HideColumn hides the column having a label matching the given pattern.
 func HideColumn(columnLabelPattern string) Option {
 	return func(table *Table) {
-		table.Builder.TablePanel.Styles = append(table.Builder.TablePanel.Styles, sdk.ColumnStyle{
-			Pattern: columnLabelPattern,
-			Type:    "hidden",
-		})
+		table.Builder.TablePanel.Styles = append([]sdk.ColumnStyle{
+			{
+				Pattern: columnLabelPattern,
+				Type:    "hidden",
+			},
+		}, table.Builder.TablePanel.Styles...)
 	}
 }
 
