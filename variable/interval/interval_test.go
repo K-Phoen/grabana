@@ -39,9 +39,18 @@ func TestValuesCanBeSet(t *testing.T) {
 		varValues = append(varValues, opt.Value)
 	}
 
-	req.Equal("10m,12h,1h,1m,30m,30s,5m,6h", panel.Builder.Query)
+	req.Equal("30s,1m,5m,10m,30m,1h,6h,12h", panel.Builder.Query)
 	req.ElementsMatch(values, varLabels)
 	req.ElementsMatch(values, varValues)
+}
+
+func TestValuesAreSortedByDuration(t *testing.T) {
+	req := require.New(t)
+	values := []string{"12h", "30m", "6h", "30d", "30s"}
+
+	panel := New("", Values(values))
+
+	req.Equal("30s,30m,6h,12h,30d", panel.Builder.Query)
 }
 
 func TestDefaultValueCanBeSet(t *testing.T) {

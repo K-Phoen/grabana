@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/grafana-tools/sdk"
+	"github.com/prometheus/common/model"
 )
 
 // Option represents an option that can be used to configure an interval.
@@ -36,7 +37,11 @@ func New(name string, options ...Option) *Interval {
 // Values sets the possible values for the variable.
 func Values(values ValuesList) Option {
 	return func(interval *Interval) {
-		sort.Strings(values)
+		sort.SliceStable(values, func(i, j int) bool {
+			iDuration, _ := model.ParseDuration(values[i])
+			jDuration, _ := model.ParseDuration(values[j])
+			return iDuration < jDuration
+		})
 
 		for _, value := range values {
 			interval.Builder.Options = append(interval.Builder.Options, sdk.Option{
