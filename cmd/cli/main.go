@@ -14,6 +14,7 @@ func main() {
 
 	root.AddCommand(cmd.Apply())
 	root.AddCommand(cmd.Validate())
+	root.AddCommand(cmd.SelfUpdate(version))
 
 	_ = root.Execute()
 }
