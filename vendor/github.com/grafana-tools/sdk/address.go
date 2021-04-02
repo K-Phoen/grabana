@@ -1,13 +1,14 @@
 package sdk
 
 /*
-   Copyright 2016-2017 Alexander I.Grafov <grafov@gmail.com>
+   Copyright 2016 Alexander I.Grafov <grafov@gmail.com>
+   Copyright 2016-2019 The Grafana SDK authors
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,16 +19,11 @@ package sdk
    ॐ तारे तुत्तारे तुरे स्व
 */
 
-type Org struct {
-	ID      uint    `json:"id"`
-	Name    string  `json:"name"`
-	Address Address `json:"address"`
-}
-
-type OrgUser struct {
-	ID    uint   `json:"userId"`
-	OrgId uint   `json:"orgId"`
-	Email string `json:"email"`
-	Login string `json:"login"`
-	Role  string `json:"role"`
+type Address struct {
+	Address1 string `json:"address1"`
+	Address2 string `json:"address2"`
+	City     string `json:"city"`
+	ZipCode  string `json:"zipCode"`
+	State    string `json:"state"`
+	Country  string `json:"country"`
 }

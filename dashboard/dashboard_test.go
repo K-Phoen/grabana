@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/K-Phoen/grabana/variable/datasource"
 	"github.com/stretchr/testify/require"
 )
 
@@ -151,6 +152,14 @@ func TestDashboardCanHaveVariablesAsQuery(t *testing.T) {
 	req := require.New(t)
 
 	panel := New("", VariableAsQuery("status"))
+
+	req.Len(panel.board.Templating.List, 1)
+}
+
+func TestDashboardCanHaveVariablesAsDatasource(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", VariableAsDatasource("source", datasource.Type("prometheus")))
 
 	req.Len(panel.board.Templating.List, 1)
 }

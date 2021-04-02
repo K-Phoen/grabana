@@ -46,7 +46,7 @@ func Values(values ValuesList) Option {
 func Default(value string) Option {
 	return func(interval *Interval) {
 		interval.Builder.Current = sdk.Current{
-			Text:  value,
+			Text:  &sdk.StringSliceString{Value: []string{value}, Valid: true},
 			Value: value,
 		}
 	}

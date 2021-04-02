@@ -2,7 +2,7 @@
 github.com/davecgh/go-spew/spew
 # github.com/gosimple/slug v1.9.0
 github.com/gosimple/slug
-# github.com/grafana-tools/sdk v0.0.0-20210301100910-d23004341fc8
+# github.com/grafana-tools/sdk v0.0.0-20210402150123-f7c763c3738c
 github.com/grafana-tools/sdk
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap

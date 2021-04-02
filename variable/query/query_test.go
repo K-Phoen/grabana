@@ -62,7 +62,7 @@ func TestAnAllValuesCanBeTheDefault(t *testing.T) {
 
 	panel := New("", DefaultAll())
 
-	req.Equal("All", panel.Builder.Current.Text)
+	req.Equal([]string{"All"}, panel.Builder.Current.Text.Value)
 	req.Equal("$__all", panel.Builder.Current.Value)
 }
 

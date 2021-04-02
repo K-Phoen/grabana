@@ -106,9 +106,9 @@ type (
 	}
 	// for templateVar
 	Current struct {
-		Tags  []*string   `json:"tags,omitempty"`
-		Text  interface{} `json:"text"`
-		Value interface{} `json:"value"` // TODO select more precise type
+		Tags  []*string          `json:"tags,omitempty"`
+		Text  *StringSliceString `json:"text"`
+		Value interface{}        `json:"value"` // TODO select more precise type
 	}
 	Annotation struct {
 		Name        string   `json:"name"`

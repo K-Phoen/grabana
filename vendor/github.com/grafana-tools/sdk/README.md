@@ -34,6 +34,8 @@ library is useful per se.
 ```go
 	board := sdk.NewBoard("Sample dashboard title")
 	board.ID = 1
+	board.Time.From = "now-30m"
+	board.Time.To = "now"
 	row1 := board.AddRow("Sample row title")
 	row1.Add(sdk.NewGraph("Sample graph"))
 	graph := sdk.NewGraph("Sample graph 2")

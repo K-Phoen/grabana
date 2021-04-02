@@ -52,7 +52,7 @@ func TestDefaultValueCanBeSet(t *testing.T) {
 
 	panel := New("const", Default("99th"))
 
-	req.Equal("99th", panel.Builder.Current.Text)
+	req.Equal([]string{"99th"}, panel.Builder.Current.Text.Value)
 	req.Equal("99th", panel.Builder.Current.Value)
 }
 
