@@ -3,6 +3,8 @@ package graph
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/graph/series"
+
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
@@ -259,4 +261,12 @@ func TestLegendCanHideNullSeries(t *testing.T) {
 	panel := New("", Legend(NoNullSeries))
 
 	req.True(panel.Builder.GraphPanel.Legend.HideEmpty)
+}
+
+func TestSeriesOverridesCanBeAdded(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", SeriesOverride(series.Alias("series"), series.Color("red")))
+
+	req.Len(panel.Builder.GraphPanel.SeriesOverrides, 1)
 }

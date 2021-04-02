@@ -7,6 +7,7 @@ import (
 // OverrideOption represents an option that can be used alter a graph panel series.
 type OverrideOption func(series *sdk.SeriesOverride)
 
+// Alis defines an alias/regex used to identify the series to override.
 func Alias(alias string) OverrideOption {
 	return func(series *sdk.SeriesOverride) {
 		series.Alias = alias
