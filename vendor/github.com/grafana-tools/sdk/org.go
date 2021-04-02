@@ -25,7 +25,7 @@ type Org struct {
 }
 
 type OrgUser struct {
-	ID    uint   `json:"id"`
+	ID    uint   `json:"userId"`
 	OrgId uint   `json:"orgId"`
 	Email string `json:"email"`
 	Login string `json:"login"`
