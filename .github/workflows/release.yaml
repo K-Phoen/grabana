@@ -26,13 +26,13 @@ jobs:
 
       - run: TAG_NAME=${{ steps.tag.outputs.tag }} make build_cli
 
-      - run: tar -czvf grabana-${{ steps.tag.outputs.tag }}-linux-64bit.tar.gz ./grabana
+      - run: tar -czvf grabana-linux-amd64.tar.gz ./grabana
 
       - name: Upload Release Asset
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: grabana-${{ steps.tag.outputs.tag }}-linux-64bit.tar.gz
-          asset_name: grabana-${{ steps.tag.outputs.tag }}-linux-64bit.tar.gz
+          file: grabana-linux-amd64.tar.gz
+          asset_name: grabana-linux-amd64.tar.gz
           tag: ${{ steps.tag.outputs.tag }}
           overwrite: true
