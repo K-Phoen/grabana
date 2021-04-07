@@ -38,6 +38,13 @@ func Values(values ValuesList) Option {
 	return func(interval *Interval) {
 		sort.Strings(values)
 
+		for _, value := range values {
+			interval.Builder.Options = append(interval.Builder.Options, sdk.Option{
+				Text:  value,
+				Value: value,
+			})
+		}
+
 		interval.Builder.Query = strings.Join(values, ",")
 	}
 }

@@ -31,7 +31,17 @@ func TestValuesCanBeSet(t *testing.T) {
 
 	panel := New("", Values(values))
 
+	varLabels := make([]string, 0, len(values))
+	varValues := make([]string, 0, len(values))
+
+	for _, opt := range panel.Builder.Options {
+		varLabels = append(varLabels, opt.Text)
+		varValues = append(varValues, opt.Value)
+	}
+
 	req.Equal("10m,12h,1h,1m,30m,30s,5m,6h", panel.Builder.Query)
+	req.ElementsMatch(values, varLabels)
+	req.ElementsMatch(values, varValues)
 }
 
 func TestDefaultValueCanBeSet(t *testing.T) {

@@ -420,7 +420,7 @@ variables:
       name: interval
       label: Interval
       default: 30s
-      values: ["30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"]
+      values: ["30s", "1m"]
   - query:
       name: status
       label: HTTP status
@@ -464,7 +464,19 @@ variables:
 				"allValue": "",
 				"multi": false,
 				"multiFormat": "",
-				"query": "10m,12h,1h,1m,30m,30s,5m,6h",
+				"query": "1m,30s",
+				"options": [
+					{
+						"text": "1m",
+						"value": "1m",
+						"selected": false
+					},
+					{
+						"text": "30s",
+						"value": "30s",
+						"selected": false
+					}
+				],
 				"regex": "",
 				"current": {
 					"text": ["30s"],
