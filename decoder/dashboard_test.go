@@ -464,16 +464,16 @@ variables:
 				"allValue": "",
 				"multi": false,
 				"multiFormat": "",
-				"query": "1m,30s",
+				"query": "30s,1m",
 				"options": [
-					{
-						"text": "1m",
-						"value": "1m",
-						"selected": false
-					},
 					{
 						"text": "30s",
 						"value": "30s",
+						"selected": false
+					},
+					{
+						"text": "1m",
+						"value": "1m",
 						"selected": false
 					}
 				],
