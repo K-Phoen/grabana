@@ -22,6 +22,7 @@ type DashboardHeatmap struct {
 	Targets         []Target
 	ReverseYBuckets bool            `yaml:"reverse_y_buckets,omitempty"`
 	Tooltip         *HeatmapTooltip `yaml:",omitempty"`
+	YAxis           *YAxis          `yaml:",omitempty"`
 }
 
 type HeatmapTooltip struct {
@@ -45,6 +46,35 @@ func (tooltip *HeatmapTooltip) toOptions() []heatmap.Option {
 	}
 	if tooltip.Decimals != nil {
 		opts = append(opts, heatmap.TooltipDecimals(*tooltip.Decimals))
+	}
+
+	return opts
+}
+
+type YAxis struct {
+	Decimals *int    `json:"decimals"`
+	Format   string  `json:"format"`
+	Max      *string `json:"max"`
+	Min      *string `json:"min"`
+}
+
+func (yaxis *YAxis) toOptions() []heatmap.Option {
+	var opts []heatmap.Option
+
+	if yaxis == nil {
+		return nil
+	}
+
+	if yaxis.Decimals != nil {
+		opts = append(opts, heatmap.YAxisDecimals(*yaxis.Decimals))
+	}
+
+	if yaxis.Format != "" {
+		opts = append(opts, heatmap.YAxisFormat(yaxis.Format))
+	}
+
+	if yaxis.Min != nil || yaxis.Max != nil {
+		opts = append(opts, heatmap.YAxisMinMax(yaxis.Min, yaxis.Max))
 	}
 
 	return opts
@@ -92,6 +122,7 @@ func (heatmapPanel DashboardHeatmap) toOption() (row.Option, error) {
 		opts = append(opts, heatmap.ReverseYBuckets())
 	}
 	opts = append(opts, heatmapPanel.Tooltip.toOptions()...)
+	opts = append(opts, heatmapPanel.YAxis.toOptions()...)
 
 	for _, t := range heatmapPanel.Targets {
 		opt, err := heatmapPanel.target(t)

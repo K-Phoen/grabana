@@ -76,19 +76,6 @@ func New(title string, options ...Option) *Heatmap {
 		Show: true,
 	}
 	panel.Builder.HeatmapPanel.YBucketBound = "auto"
-	panel.Builder.HeatmapPanel.YAxis = struct {
-		Decimals    *int     `json:"decimals"`
-		Format      string   `json:"format"`
-		LogBase     int      `json:"logBase"`
-		Show        bool     `json:"show"`
-		Max         *string  `json:"max"`
-		Min         *string  `json:"min"`
-		SplitFactor *float64 `json:"splitFactor"`
-	}{
-		Format:  "short",
-		LogBase: 1,
-		Show:    true,
-	}
 
 	for _, opt := range append(defaults(), options...) {
 		opt(panel)
@@ -103,6 +90,25 @@ func defaults() []Option {
 		DataFormat(TimeSeriesBuckets),
 		HideZeroBuckets(),
 		HightlightCards(),
+		defaultYAxis(),
+	}
+}
+
+func defaultYAxis() Option {
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.HeatmapPanel.YAxis = struct {
+			Decimals    *int     `json:"decimals"`
+			Format      string   `json:"format"`
+			LogBase     int      `json:"logBase"`
+			Show        bool     `json:"show"`
+			Max         *string  `json:"max"`
+			Min         *string  `json:"min"`
+			SplitFactor *float64 `json:"splitFactor"`
+		}{
+			Format:  "short",
+			LogBase: 1,
+			Show:    true,
+		}
 	}
 }
 
@@ -264,5 +270,27 @@ func TooltipDecimals(decimals int) Option {
 func HideXAxis() Option {
 	return func(heatmap *Heatmap) {
 		heatmap.Builder.HeatmapPanel.XAxis.Show = false
+	}
+}
+
+// YAxisFormat sets the format for the Y-axis
+func YAxisFormat(format string) Option {
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.HeatmapPanel.YAxis.Format = format
+	}
+}
+
+// YAxisDecimals set the number of decimals to be displayed on the Y-axis
+func YAxisDecimals(decimals int) Option {
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.HeatmapPanel.YAxis.Decimals = &decimals
+	}
+}
+
+// YAxisMinMax sets the min and max for the Y-axis
+func YAxisMinMax(min, max *string) Option {
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.HeatmapPanel.YAxis.Min = min
+		heatmap.Builder.HeatmapPanel.YAxis.Max = max
 	}
 }
