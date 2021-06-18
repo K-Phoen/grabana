@@ -275,6 +275,13 @@ func Null(mode NullValue) Option {
 	}
 }
 
+// Repeat configures repeating a panel for a variable
+func Repeat(repeat string) Option {
+	return func(graph *Graph) {
+		graph.Builder.Repeat = &repeat
+	}
+}
+
 // SeriesOverride configures how null values are displayed.
 // See https://grafana.com/docs/grafana/latest/panels/field-options/
 func SeriesOverride(opts ...series.OverrideOption) Option {

@@ -21,6 +21,7 @@ type DashboardGraph struct {
 	Height        string  `yaml:",omitempty"`
 	Transparent   bool    `yaml:",omitempty"`
 	Datasource    string  `yaml:",omitempty"`
+	Repeat        string  `yaml:",omitempty"`
 	Targets       []Target
 	Axes          *GraphAxes          `yaml:",omitempty"`
 	Legend        []string            `yaml:",omitempty,flow"`
@@ -45,6 +46,9 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	}
 	if graphPanel.Datasource != "" {
 		opts = append(opts, graph.DataSource(graphPanel.Datasource))
+	}
+	if graphPanel.Repeat != "" {
+		opts = append(opts, graph.Repeat(graphPanel.Repeat))
 	}
 	if graphPanel.Axes != nil && graphPanel.Axes.Right != nil {
 		opts = append(opts, graph.RightYAxis(graphPanel.Axes.Right.toOptions()...))
