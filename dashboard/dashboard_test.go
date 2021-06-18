@@ -40,6 +40,16 @@ func TestDashboardCanBeMarshalledIntoJSON(t *testing.T) {
 	requireJSON(t, dashboardJSON)
 }
 
+func TestDashboardCanBeMarshalledIntoIndentedJSON(t *testing.T) {
+	req := require.New(t)
+
+	builder := New("Awesome dashboard")
+	dashboardJSON, err := builder.MarshalIndentJSON()
+
+	req.NoError(err)
+	requireJSON(t, dashboardJSON)
+}
+
 func TestDashboardCanBeMadeEditable(t *testing.T) {
 	req := require.New(t)
 

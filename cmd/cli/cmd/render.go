@@ -1,12 +1,10 @@
 package cmd
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"github.com/K-Phoen/grabana/decoder"
-	"io/ioutil"
+	"os"
 
+	"github.com/K-Phoen/grabana/decoder"
 	"github.com/spf13/cobra"
 )
 
@@ -35,22 +33,22 @@ func Render() *cobra.Command {
 }
 
 func renderYAML(opts renderOpts) error {
-	content, err := ioutil.ReadFile(opts.inputYAML)
+	file, err := os.Open(opts.inputYAML)
 	if err != nil {
-		return fmt.Errorf("could not read input file '%s': %w", opts.inputYAML, err)
+		return fmt.Errorf("could not open input file '%s': %w", opts.inputYAML, err)
 	}
 
-	dashboard, err := decoder.UnmarshalYAML(bytes.NewBuffer(content))
+	dashboard, err := decoder.UnmarshalYAML(file)
 	if err != nil {
 		return fmt.Errorf("could not decode input file '%s': %w", opts.inputYAML, err)
 	}
 
-	buf, err := json.MarshalIndent(dashboard.Internal(), "", "  ")
+	buf, err := dashboard.MarshalIndentJSON()
 	if err != nil {
 		return err
 	}
 
-	fmt.Print(string(buf))
+	fmt.Println(string(buf))
 
 	return nil
 }

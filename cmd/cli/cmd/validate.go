@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/K-Phoen/grabana/decoder"
 	"github.com/spf13/cobra"
@@ -33,12 +32,12 @@ func Validate() *cobra.Command {
 }
 
 func validateYAML(opts validateOpts) error {
-	content, err := ioutil.ReadFile(opts.inputYAML)
+	file, err := os.Open(opts.inputYAML)
 	if err != nil {
-		return fmt.Errorf("could not read input file '%s': %w", opts.inputYAML, err)
+		return fmt.Errorf("could not open input file '%s': %w", opts.inputYAML, err)
 	}
 
-	if _, err := decoder.UnmarshalYAML(bytes.NewBuffer(content)); err != nil {
+	if _, err := decoder.UnmarshalYAML(file); err != nil {
 		return fmt.Errorf("could not decode input file '%s': %w", opts.inputYAML, err)
 	}
 

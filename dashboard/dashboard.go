@@ -78,12 +78,20 @@ func defaultTimePicker() Option {
 
 // MarshalJSON implements the encoding/json.Marshaler interface.
 //
-// This method can be used to render the dashboard into a JSON file
+// This method can be used to render the dashboard as JSON
 // which your configuration management tool of choice can then feed into
 // Grafana's dashboard via its provisioning support.
 // See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
 func (builder *Builder) MarshalJSON() ([]byte, error) {
 	return json.Marshal(builder.board)
+}
+
+// MarshalIndentJSON renders the dashboard as indented JSON
+// which your configuration management tool of choice can then feed into
+// Grafana's dashboard via its provisioning support.
+// See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
+	return json.MarshalIndent(builder.board, "", "  ")
 }
 
 // Internal.
