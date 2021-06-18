@@ -1,16 +1,13 @@
 package cmd
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-
-	"github.com/K-Phoen/grabana/decoder"
+	"os"
 
 	"github.com/K-Phoen/grabana"
-
+	"github.com/K-Phoen/grabana/decoder"
 	"github.com/spf13/cobra"
 )
 
@@ -50,12 +47,12 @@ func applyYAML(opts applyOpts) error {
 	ctx := context.Background()
 	client := grabanaClient(opts)
 
-	content, err := ioutil.ReadFile(opts.inputYAML)
+	file, err := os.Open(opts.inputYAML)
 	if err != nil {
-		return fmt.Errorf("could not read input file '%s': %w", opts.inputYAML, err)
+		return fmt.Errorf("could not open input file '%s': %w", opts.inputYAML, err)
 	}
 
-	dashboard, err := decoder.UnmarshalYAML(bytes.NewBuffer(content))
+	dashboard, err := decoder.UnmarshalYAML(file)
 	if err != nil {
 		return fmt.Errorf("could not decode input file '%s': %w", opts.inputYAML, err)
 	}

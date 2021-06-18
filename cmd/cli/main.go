@@ -16,6 +16,7 @@ func main() {
 	root.AddCommand(cmd.Apply())
 	root.AddCommand(cmd.Validate())
 	root.AddCommand(cmd.SelfUpdate(version))
+	root.AddCommand(cmd.Render())
 
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
