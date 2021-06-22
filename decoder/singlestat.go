@@ -18,6 +18,7 @@ type DashboardSingleStat struct {
 	Height          string  `yaml:",omitempty"`
 	Transparent     bool    `yaml:",omitempty"`
 	Datasource      string  `yaml:",omitempty"`
+	Repeat          string  `yaml:",omitempty"`
 	Unit            string
 	Decimals        *int   `yaml:",omitempty"`
 	ValueType       string `yaml:"value_type"`
@@ -49,6 +50,9 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	}
 	if singleStatPanel.Datasource != "" {
 		opts = append(opts, singlestat.DataSource(singleStatPanel.Datasource))
+	}
+	if singleStatPanel.Repeat != "" {
+		opts = append(opts, singlestat.Repeat(singleStatPanel.Repeat))
 	}
 	if singleStatPanel.Unit != "" {
 		opts = append(opts, singlestat.Unit(singleStatPanel.Unit))
