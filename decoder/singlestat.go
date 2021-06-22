@@ -28,7 +28,8 @@ type DashboardSingleStat struct {
 	Targets         []Target
 	Thresholds      [2]string
 	Colors          [3]string
-	Color           []string `yaml:",omitempty"`
+	Color           []string              `yaml:",omitempty"`
+	RangesToText    []singlestat.RangeMap `yaml:"ranges_to_text,omitempty"`
 }
 
 func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
@@ -69,6 +70,9 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	}
 	if singleStatPanel.PostfixFontSize != "" {
 		opts = append(opts, singlestat.PostfixFontSize(singleStatPanel.PostfixFontSize))
+	}
+	if singleStatPanel.RangesToText != nil {
+		opts = append(opts, singlestat.RangesToText(singleStatPanel.RangesToText))
 	}
 
 	switch singleStatPanel.SparkLine {
