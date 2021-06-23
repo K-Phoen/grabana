@@ -100,7 +100,7 @@ func RepeatFor(variable string) Option {
 	}
 }
 
-// Collapse makes the row collapsed by default
+// Collapse makes the row collapsed by default.
 func Collapse() Option {
 	return func(row *Row) {
 		row.builder.Collapse = true

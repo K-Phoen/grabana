@@ -8,7 +8,7 @@ import (
 type DashboardRow struct {
 	Name     string
 	Repeat   string `yaml:"repeat_for,omitempty"`
-	Collapse bool
+	Collapse bool   `yaml:",omitempty"`
 	Panels   []DashboardPanel
 }
 
