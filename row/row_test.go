@@ -88,3 +88,12 @@ func TestRowsCanHaveRepeatedPanels(t *testing.T) {
 
 	req.Equal("repeated", *panel.builder.Repeat)
 }
+
+func TestRowsCanBeCollapsedByDefault(t *testing.T) {
+	req := require.New(t)
+	board := sdk.NewBoard("")
+
+	panel := New(board, "", Collapse())
+
+	req.True(panel.builder.Collapse)
+}

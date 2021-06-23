@@ -6,9 +6,10 @@ import (
 )
 
 type DashboardRow struct {
-	Name   string
-	Repeat string `yaml:"repeat_for,omitempty"`
-	Panels []DashboardPanel
+	Name     string
+	Repeat   string `yaml:"repeat_for,omitempty"`
+	Collapse bool   `yaml:",omitempty"`
+	Panels   []DashboardPanel
 }
 
 func (r DashboardRow) toOption() (dashboard.Option, error) {
@@ -16,6 +17,9 @@ func (r DashboardRow) toOption() (dashboard.Option, error) {
 
 	if r.Repeat != "" {
 		opts = append(opts, row.RepeatFor(r.Repeat))
+	}
+	if r.Collapse {
+		opts = append(opts, row.Collapse())
 	}
 
 	for _, panel := range r.Panels {
