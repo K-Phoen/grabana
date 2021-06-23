@@ -46,6 +46,7 @@ type VariableInterval struct {
 	Label   string
 	Default string
 	Values  []string `yaml:",flow"`
+	Hide    bool
 }
 
 func (variable *VariableInterval) toOption() dashboard.Option {
@@ -59,6 +60,9 @@ func (variable *VariableInterval) toOption() dashboard.Option {
 	if variable.Default != "" {
 		opts = append(opts, interval.Default(variable.Default))
 	}
+	if variable.Hide {
+		opts = append(opts, interval.Hide())
+	}
 
 	return dashboard.VariableAsInterval(variable.Name, opts...)
 }
@@ -70,6 +74,7 @@ type VariableCustom struct {
 	ValuesMap  map[string]string `yaml:"values_map"`
 	IncludeAll bool              `yaml:"include_all"`
 	AllValue   string            `yaml:"all_value,omitempty"`
+	Hide       bool
 }
 
 func (variable *VariableCustom) toOption() dashboard.Option {
@@ -89,6 +94,9 @@ func (variable *VariableCustom) toOption() dashboard.Option {
 	if variable.IncludeAll {
 		opts = append(opts, custom.IncludeAll())
 	}
+	if variable.Hide {
+		opts = append(opts, custom.Hide())
+	}
 
 	return dashboard.VariableAsCustom(variable.Name, opts...)
 }
@@ -98,6 +106,7 @@ type VariableConst struct {
 	Label     string
 	Default   string
 	ValuesMap map[string]string `yaml:"values_map"`
+	Hide      bool
 }
 
 func (variable *VariableConst) toOption() dashboard.Option {
@@ -110,6 +119,9 @@ func (variable *VariableConst) toOption() dashboard.Option {
 	}
 	if variable.Label != "" {
 		opts = append(opts, constant.Label(variable.Label))
+	}
+	if variable.Hide {
+		opts = append(opts, constant.Hide())
 	}
 
 	return dashboard.VariableAsConst(variable.Name, opts...)
@@ -126,6 +138,7 @@ type VariableQuery struct {
 	IncludeAll bool   `yaml:"include_all"`
 	DefaultAll bool   `yaml:"default_all"`
 	AllValue   string `yaml:"all_value,omitempty"`
+	Hide       bool
 }
 
 func (variable *VariableQuery) toOption() dashboard.Option {
@@ -151,6 +164,9 @@ func (variable *VariableQuery) toOption() dashboard.Option {
 	if variable.DefaultAll {
 		opts = append(opts, query.DefaultAll())
 	}
+	if variable.Hide {
+		opts = append(opts, query.Hide())
+	}
 
 	return dashboard.VariableAsQuery(variable.Name, opts...)
 }
@@ -163,6 +179,7 @@ type VariableDatasource struct {
 
 	Regex      string
 	IncludeAll bool `yaml:"include_all"`
+	Hide       bool
 }
 
 func (variable *VariableDatasource) toOption() dashboard.Option {
@@ -178,6 +195,9 @@ func (variable *VariableDatasource) toOption() dashboard.Option {
 	}
 	if variable.IncludeAll {
 		opts = append(opts, datasource.IncludeAll())
+	}
+	if variable.Hide {
+		opts = append(opts, datasource.Hide())
 	}
 
 	return dashboard.VariableAsDatasource(variable.Name, opts...)
