@@ -432,6 +432,7 @@ variables:
       name: percentile
       label: Percentile
       default: 50
+      hide: label
       values_map:
         50th: "50"
   - custom:
@@ -537,7 +538,7 @@ variables:
 					"value": "50"
 				},
 				"label": "Percentile",
-				"hide": 0,
+				"hide": 1,
 				"sort": 0
 			},
 			{
