@@ -12,6 +12,7 @@ import (
 )
 
 var ErrVariableNotConfigured = fmt.Errorf("variable not configured")
+var ErrInvalidHideValue = fmt.Errorf("invalid hide value. Valid values are: 'label', 'variable', empty")
 
 type DashboardVariable struct {
 	Interval   *VariableInterval   `yaml:",omitempty"`
@@ -23,19 +24,19 @@ type DashboardVariable struct {
 
 func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
 	if variable.Query != nil {
-		return variable.Query.toOption(), nil
+		return variable.Query.toOption()
 	}
 	if variable.Interval != nil {
-		return variable.Interval.toOption(), nil
+		return variable.Interval.toOption()
 	}
 	if variable.Const != nil {
-		return variable.Const.toOption(), nil
+		return variable.Const.toOption()
 	}
 	if variable.Custom != nil {
-		return variable.Custom.toOption(), nil
+		return variable.Custom.toOption()
 	}
 	if variable.Datasource != nil {
-		return variable.Datasource.toOption(), nil
+		return variable.Datasource.toOption()
 	}
 
 	return nil, ErrVariableNotConfigured
@@ -46,9 +47,10 @@ type VariableInterval struct {
 	Label   string
 	Default string
 	Values  []string `yaml:",flow"`
+	Hide    string   `yaml:",omitempty"`
 }
 
-func (variable *VariableInterval) toOption() dashboard.Option {
+func (variable *VariableInterval) toOption() (dashboard.Option, error) {
 	opts := []interval.Option{
 		interval.Values(variable.Values),
 	}
@@ -60,7 +62,19 @@ func (variable *VariableInterval) toOption() dashboard.Option {
 		opts = append(opts, interval.Default(variable.Default))
 	}
 
-	return dashboard.VariableAsInterval(variable.Name, opts...)
+	switch variable.Hide {
+	case "":
+		// Nothing to do
+		break
+	case "label":
+		opts = append(opts, interval.HideLabel())
+	case "variable":
+		opts = append(opts, interval.Hide())
+	default:
+		return dashboard.VariableAsInterval(variable.Name), ErrInvalidHideValue
+	}
+
+	return dashboard.VariableAsInterval(variable.Name, opts...), nil
 }
 
 type VariableCustom struct {
@@ -70,9 +84,10 @@ type VariableCustom struct {
 	ValuesMap  map[string]string `yaml:"values_map"`
 	IncludeAll bool              `yaml:"include_all"`
 	AllValue   string            `yaml:"all_value,omitempty"`
+	Hide       string            `yaml:",omitempty"`
 }
 
-func (variable *VariableCustom) toOption() dashboard.Option {
+func (variable *VariableCustom) toOption() (dashboard.Option, error) {
 	opts := []custom.Option{
 		custom.Values(variable.ValuesMap),
 	}
@@ -90,7 +105,19 @@ func (variable *VariableCustom) toOption() dashboard.Option {
 		opts = append(opts, custom.IncludeAll())
 	}
 
-	return dashboard.VariableAsCustom(variable.Name, opts...)
+	switch variable.Hide {
+	case "":
+		// Nothing to do
+		break
+	case "label":
+		opts = append(opts, custom.HideLabel())
+	case "variable":
+		opts = append(opts, custom.Hide())
+	default:
+		return dashboard.VariableAsCustom(variable.Name), ErrInvalidHideValue
+	}
+
+	return dashboard.VariableAsCustom(variable.Name, opts...), nil
 }
 
 type VariableConst struct {
@@ -98,9 +125,10 @@ type VariableConst struct {
 	Label     string
 	Default   string
 	ValuesMap map[string]string `yaml:"values_map"`
+	Hide      string            `yaml:",omitempty"`
 }
 
-func (variable *VariableConst) toOption() dashboard.Option {
+func (variable *VariableConst) toOption() (dashboard.Option, error) {
 	opts := []constant.Option{
 		constant.Values(variable.ValuesMap),
 	}
@@ -112,7 +140,19 @@ func (variable *VariableConst) toOption() dashboard.Option {
 		opts = append(opts, constant.Label(variable.Label))
 	}
 
-	return dashboard.VariableAsConst(variable.Name, opts...)
+	switch variable.Hide {
+	case "":
+		// Nothing to do
+		break
+	case "label":
+		opts = append(opts, constant.HideLabel())
+	case "variable":
+		opts = append(opts, constant.Hide())
+	default:
+		return dashboard.VariableAsConst(variable.Name), ErrInvalidHideValue
+	}
+
+	return dashboard.VariableAsConst(variable.Name, opts...), nil
 }
 
 type VariableQuery struct {
@@ -126,9 +166,10 @@ type VariableQuery struct {
 	IncludeAll bool   `yaml:"include_all"`
 	DefaultAll bool   `yaml:"default_all"`
 	AllValue   string `yaml:"all_value,omitempty"`
+	Hide       string `yaml:",omitempty"`
 }
 
-func (variable *VariableQuery) toOption() dashboard.Option {
+func (variable *VariableQuery) toOption() (dashboard.Option, error) {
 	opts := []query.Option{
 		query.Request(variable.Request),
 	}
@@ -152,7 +193,19 @@ func (variable *VariableQuery) toOption() dashboard.Option {
 		opts = append(opts, query.DefaultAll())
 	}
 
-	return dashboard.VariableAsQuery(variable.Name, opts...)
+	switch variable.Hide {
+	case "":
+		// Nothing to do
+		break
+	case "label":
+		opts = append(opts, query.HideLabel())
+	case "variable":
+		opts = append(opts, query.Hide())
+	default:
+		return dashboard.VariableAsQuery(variable.Name), ErrInvalidHideValue
+	}
+
+	return dashboard.VariableAsQuery(variable.Name, opts...), nil
 }
 
 type VariableDatasource struct {
@@ -162,10 +215,11 @@ type VariableDatasource struct {
 	Type string
 
 	Regex      string
-	IncludeAll bool `yaml:"include_all"`
+	IncludeAll bool   `yaml:"include_all"`
+	Hide       string `yaml:",omitempty"`
 }
 
-func (variable *VariableDatasource) toOption() dashboard.Option {
+func (variable *VariableDatasource) toOption() (dashboard.Option, error) {
 	opts := []datasource.Option{
 		datasource.Type(variable.Type),
 	}
@@ -180,5 +234,17 @@ func (variable *VariableDatasource) toOption() dashboard.Option {
 		opts = append(opts, datasource.IncludeAll())
 	}
 
-	return dashboard.VariableAsDatasource(variable.Name, opts...)
+	switch variable.Hide {
+	case "":
+		// Nothing to do
+		break
+	case "label":
+		opts = append(opts, datasource.HideLabel())
+	case "variable":
+		opts = append(opts, datasource.Hide())
+	default:
+		return dashboard.VariableAsDatasource(variable.Name), ErrInvalidHideValue
+	}
+
+	return dashboard.VariableAsDatasource(variable.Name, opts...), nil
 }
