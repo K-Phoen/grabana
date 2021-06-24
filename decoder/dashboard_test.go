@@ -1444,6 +1444,9 @@ rows:
                 query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
           unit: bytes
           value_type: current
+          value_font_size: '120%'
+          prefix_font_size: '80%'
+          postfix_font_size: '80%'
           sparkline: bottom
           thresholds: ["26000000", "28000000"]
           color: ["value", "background"]
@@ -1527,7 +1530,9 @@ rows:
 						}
 					],
 					"thresholds": "26000000,28000000",
-					"valueFontSize": "100%",
+					"valueFontSize": "120%",
+                    "postfixFontSize": "80%",
+        	        "prefixFontSize": "80%",
 					"valueMaps": [
 						{
 							"op": "=",
