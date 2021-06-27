@@ -17,7 +17,7 @@ func TestHeatmapCanBeDecoded(t *testing.T) {
 		Datasource:      "some-prometheus",
 		DataFormat:      "time_series_buckets",
 		HideZeroBuckets: true,
-		HightlightCards: true,
+		HighlightCards:  true,
 		Targets:         nil,
 		ReverseYBuckets: true,
 	}
@@ -36,7 +36,7 @@ func TestHeatmapCanNotBeDecodedIfDataFormatIsInvalid(t *testing.T) {
 		Datasource:      "some-prometheus",
 		DataFormat:      "invalid value here",
 		HideZeroBuckets: true,
-		HightlightCards: true,
+		HighlightCards:  true,
 		Targets:         nil,
 		ReverseYBuckets: true,
 	}
@@ -56,7 +56,7 @@ func TestHeatmapCanNotBeDecodedIfTargetIsInvalid(t *testing.T) {
 		Datasource:      "prometheus",
 		DataFormat:      "time_series_buckets",
 		HideZeroBuckets: true,
-		HightlightCards: true,
+		HighlightCards:  true,
 		Targets: []Target{
 			{},
 		},
