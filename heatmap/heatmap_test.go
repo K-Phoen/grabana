@@ -3,6 +3,7 @@ package heatmap
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/heatmap/axis"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
 )
@@ -127,7 +128,7 @@ func TestZeroBucketsCanBeDisplayed(t *testing.T) {
 func TestCardsCanBeHighlighted(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", HightlightCards())
+	panel := New("", HighlightCards())
 
 	req.True(panel.Builder.HeatmapPanel.HighlightCards)
 }
@@ -135,7 +136,7 @@ func TestCardsCanBeHighlighted(t *testing.T) {
 func TestCardsCanBeNotHighlighted(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", NoHightlightCards())
+	panel := New("", NoHighlightCards())
 
 	req.False(panel.Builder.HeatmapPanel.HighlightCards)
 }
@@ -178,4 +179,12 @@ func TestXAxisCanBeHidden(t *testing.T) {
 	panel := New("", HideXAxis())
 
 	req.False(panel.Builder.HeatmapPanel.XAxis.Show)
+}
+
+func TestYAxisCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", YAxis(axis.Unit("none")))
+
+	req.Equal("none", panel.Builder.HeatmapPanel.YAxis.Format)
 }

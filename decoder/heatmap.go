@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/K-Phoen/grabana/heatmap"
+	"github.com/K-Phoen/grabana/heatmap/axis"
 	"github.com/K-Phoen/grabana/row"
 )
 
@@ -18,10 +19,11 @@ type DashboardHeatmap struct {
 	Datasource      string  `yaml:",omitempty"`
 	DataFormat      string  `yaml:"data_format,omitempty"`
 	HideZeroBuckets bool    `yaml:"hide_zero_buckets"`
-	HightlightCards bool    `yaml:"highlight_cards"`
+	HighlightCards  bool    `yaml:"highlight_cards"`
 	Targets         []Target
 	ReverseYBuckets bool            `yaml:"reverse_y_buckets,omitempty"`
 	Tooltip         *HeatmapTooltip `yaml:",omitempty"`
+	YAxis           *HeatmapYAxis   `yaml:",omitempty"`
 }
 
 type HeatmapTooltip struct {
@@ -45,6 +47,39 @@ func (tooltip *HeatmapTooltip) toOptions() []heatmap.Option {
 	}
 	if tooltip.Decimals != nil {
 		opts = append(opts, heatmap.TooltipDecimals(*tooltip.Decimals))
+	}
+
+	return opts
+}
+
+type HeatmapYAxis struct {
+	Decimals *int     `yaml:"decimals,omitempty"`
+	Unit     string   `yaml:"unit,omitempty"`
+	Max      *float64 `yaml:"max,omitempty"`
+	Min      *float64 `yaml:"min,omitempty"`
+}
+
+func (yaxis *HeatmapYAxis) toOptions() []axis.Option {
+	var opts []axis.Option
+
+	if yaxis == nil {
+		return nil
+	}
+
+	if yaxis.Decimals != nil {
+		opts = append(opts, axis.Decimals(*yaxis.Decimals))
+	}
+
+	if yaxis.Unit != "" {
+		opts = append(opts, axis.Unit(yaxis.Unit))
+	}
+
+	if yaxis.Min != nil {
+		opts = append(opts, axis.Min(*yaxis.Min))
+	}
+
+	if yaxis.Max != nil {
+		opts = append(opts, axis.Min(*yaxis.Max))
 	}
 
 	return opts
@@ -83,13 +118,16 @@ func (heatmapPanel DashboardHeatmap) toOption() (row.Option, error) {
 	} else {
 		opts = append(opts, heatmap.ShowZeroBuckets())
 	}
-	if heatmapPanel.HightlightCards {
-		opts = append(opts, heatmap.HightlightCards())
+	if heatmapPanel.HighlightCards {
+		opts = append(opts, heatmap.HighlightCards())
 	} else {
-		opts = append(opts, heatmap.NoHightlightCards())
+		opts = append(opts, heatmap.NoHighlightCards())
 	}
 	if heatmapPanel.ReverseYBuckets {
 		opts = append(opts, heatmap.ReverseYBuckets())
+	}
+	if heatmapPanel.YAxis != nil {
+		opts = append(opts, heatmap.YAxis(heatmapPanel.YAxis.toOptions()...))
 	}
 	opts = append(opts, heatmapPanel.Tooltip.toOptions()...)
 

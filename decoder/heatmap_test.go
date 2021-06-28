@@ -3,6 +3,8 @@ package decoder
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/heatmap/axis"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,13 +19,34 @@ func TestHeatmapCanBeDecoded(t *testing.T) {
 		Datasource:      "some-prometheus",
 		DataFormat:      "time_series_buckets",
 		HideZeroBuckets: true,
-		HightlightCards: true,
+		HighlightCards:  true,
 		Targets:         nil,
 		ReverseYBuckets: true,
+		YAxis: &HeatmapYAxis{
+			Unit: "none",
+		},
 	}
 
 	_, err := panel.toOption()
 	req.NoError(err)
+}
+
+func TestHeatmapYAxisCanBeDecoded(t *testing.T) {
+	req := require.New(t)
+
+	decimals := 2
+	min := float64(1)
+	max := float64(3)
+	axisInput := HeatmapYAxis{
+		Decimals: &decimals,
+		Unit:     "none",
+		Max:      &min,
+		Min:      &max,
+	}
+
+	decoded := axis.New(axisInput.toOptions()...).Builder
+	req.Equal("none", decoded.Format)
+	req.Equal(2, *decoded.Decimals)
 }
 
 func TestHeatmapCanNotBeDecodedIfDataFormatIsInvalid(t *testing.T) {
@@ -36,7 +59,7 @@ func TestHeatmapCanNotBeDecodedIfDataFormatIsInvalid(t *testing.T) {
 		Datasource:      "some-prometheus",
 		DataFormat:      "invalid value here",
 		HideZeroBuckets: true,
-		HightlightCards: true,
+		HighlightCards:  true,
 		Targets:         nil,
 		ReverseYBuckets: true,
 	}
@@ -56,7 +79,7 @@ func TestHeatmapCanNotBeDecodedIfTargetIsInvalid(t *testing.T) {
 		Datasource:      "prometheus",
 		DataFormat:      "time_series_buckets",
 		HideZeroBuckets: true,
-		HightlightCards: true,
+		HighlightCards:  true,
 		Targets: []Target{
 			{},
 		},

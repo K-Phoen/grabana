@@ -1,6 +1,7 @@
 package heatmap
 
 import (
+	"github.com/K-Phoen/grabana/heatmap/axis"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -76,19 +77,6 @@ func New(title string, options ...Option) *Heatmap {
 		Show: true,
 	}
 	panel.Builder.HeatmapPanel.YBucketBound = "auto"
-	panel.Builder.HeatmapPanel.YAxis = struct {
-		Decimals    *int     `json:"decimals"`
-		Format      string   `json:"format"`
-		LogBase     int      `json:"logBase"`
-		Show        bool     `json:"show"`
-		Max         *string  `json:"max"`
-		Min         *string  `json:"min"`
-		SplitFactor *float64 `json:"splitFactor"`
-	}{
-		Format:  "short",
-		LogBase: 1,
-		Show:    true,
-	}
 
 	for _, opt := range append(defaults(), options...) {
 		opt(panel)
@@ -102,7 +90,14 @@ func defaults() []Option {
 		Span(6),
 		DataFormat(TimeSeriesBuckets),
 		HideZeroBuckets(),
-		HightlightCards(),
+		HighlightCards(),
+		defaultYAxis(),
+	}
+}
+
+func defaultYAxis() Option {
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.HeatmapPanel.YAxis = *axis.New().Builder
 	}
 }
 
@@ -217,15 +212,15 @@ func HideZeroBuckets() Option {
 	}
 }
 
-// HightlightCards highlights bucket cards.
-func HightlightCards() Option {
+// HighlightCards highlights bucket cards.
+func HighlightCards() Option {
 	return func(heatmap *Heatmap) {
 		heatmap.Builder.HeatmapPanel.HighlightCards = true
 	}
 }
 
-// NoHightlightCards disables the highlighting of bucket cards.
-func NoHightlightCards() Option {
+// NoHighlightCards disables the highlighting of bucket cards.
+func NoHighlightCards() Option {
 	return func(heatmap *Heatmap) {
 		heatmap.Builder.HeatmapPanel.HighlightCards = false
 	}
@@ -264,5 +259,12 @@ func TooltipDecimals(decimals int) Option {
 func HideXAxis() Option {
 	return func(heatmap *Heatmap) {
 		heatmap.Builder.HeatmapPanel.XAxis.Show = false
+	}
+}
+
+// YAxis configures the Y axis.
+func YAxis(opts ...axis.Option) Option {
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.HeatmapPanel.YAxis = *axis.New(opts...).Builder
 	}
 }
