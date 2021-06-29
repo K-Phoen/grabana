@@ -178,6 +178,15 @@ func TestNullValueModeCanBeConfigured(t *testing.T) {
 	req.Equal("null", panel.Builder.GraphPanel.NullPointMode)
 }
 
+func TestRepeatCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Repeat("ds"))
+
+	req.NotNil(panel.Builder.Repeat)
+	req.Equal("ds", *panel.Builder.Repeat)
+}
+
 func TestLegendCanBeHidden(t *testing.T) {
 	req := require.New(t)
 

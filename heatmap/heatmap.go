@@ -268,3 +268,10 @@ func YAxis(opts ...axis.Option) Option {
 		heatmap.Builder.HeatmapPanel.YAxis = *axis.New(opts...).Builder
 	}
 }
+
+// Repeat configures repeating a panel for a variable
+func Repeat(repeat string) Option {
+	return func(heatmap *Heatmap) {
+		heatmap.Builder.Repeat = &repeat
+	}
+}

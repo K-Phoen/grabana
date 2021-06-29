@@ -18,6 +18,7 @@ func TestHeatmapCanBeDecoded(t *testing.T) {
 		Transparent:     true,
 		Datasource:      "some-prometheus",
 		DataFormat:      "time_series_buckets",
+		Repeat:          "ds",
 		HideZeroBuckets: true,
 		HighlightCards:  true,
 		Targets:         nil,

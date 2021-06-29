@@ -17,6 +17,7 @@ type DashboardHeatmap struct {
 	Height          string  `yaml:",omitempty"`
 	Transparent     bool    `yaml:",omitempty"`
 	Datasource      string  `yaml:",omitempty"`
+	Repeat          string  `yaml:",omitempty"`
 	DataFormat      string  `yaml:"data_format,omitempty"`
 	HideZeroBuckets bool    `yaml:"hide_zero_buckets"`
 	HighlightCards  bool    `yaml:"highlight_cards"`
@@ -102,6 +103,9 @@ func (heatmapPanel DashboardHeatmap) toOption() (row.Option, error) {
 	}
 	if heatmapPanel.Datasource != "" {
 		opts = append(opts, heatmap.DataSource(heatmapPanel.Datasource))
+	}
+	if heatmapPanel.Repeat != "" {
+		opts = append(opts, heatmap.Repeat(heatmapPanel.Repeat))
 	}
 	if heatmapPanel.DataFormat != "" {
 		switch heatmapPanel.DataFormat {

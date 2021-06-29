@@ -376,3 +376,10 @@ func RangesToText(mapping []RangeMap) Option {
 		singleStat.Builder.SinglestatPanel.RangeMaps = rangeMap
 	}
 }
+
+// Repeat configures repeating a panel for a variable
+func Repeat(repeat string) Option {
+	return func(singleStat *SingleStat) {
+		singleStat.Builder.Repeat = &repeat
+	}
+}
