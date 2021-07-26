@@ -1,6 +1,10 @@
 package dashboard
 
 import (
+	// We're not using it for security stuff, so it's fine.
+	//nolint:gosec
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 
 	"github.com/K-Phoen/grabana/row"
@@ -120,7 +124,16 @@ func ID(id uint) Option {
 // UID sets the UID used by the dashboard.
 func UID(uid string) Option {
 	return func(builder *Builder) {
-		builder.board.UID = uid
+		validUID := uid
+
+		if len(uid) > 40 {
+			// We're not using it for security stuff, so it's fine.
+			//nolint:gosec
+			sha := sha1.Sum([]byte(uid))
+			validUID = hex.EncodeToString(sha[:])
+		}
+
+		builder.board.UID = validUID
 	}
 }
 
