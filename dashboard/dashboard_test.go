@@ -74,6 +74,16 @@ func TestDashboardUIDCanBeSet(t *testing.T) {
 	req.Equal("foo", panel.board.UID)
 }
 
+func TestDashboardUIDWillBeHashedWhenTooLongForGrafana(t *testing.T) {
+	req := require.New(t)
+
+	originalUID := "this-uid-is-more-than-forty-characters-and-grafana-does-not-like-it"
+	panel := New("", UID(originalUID))
+
+	req.NotEqual(originalUID, panel.board.UID)
+	req.Len(panel.board.UID, 40)
+}
+
 func TestDashboardCanBeMadeReadOnly(t *testing.T) {
 	req := require.New(t)
 
