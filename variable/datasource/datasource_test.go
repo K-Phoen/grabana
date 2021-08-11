@@ -66,6 +66,14 @@ func TestValuesCanBeFilteredByRegex(t *testing.T) {
 	req.Equal(regex, panel.Builder.Regex)
 }
 
+func TestValuesRefreshTimeCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Refresh(TimeChange))
+
+	req.Equal(int64(TimeChange), *panel.Builder.Refresh.Value)
+}
+
 func TestDataSourceTypeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
