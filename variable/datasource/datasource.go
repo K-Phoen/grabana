@@ -7,19 +7,15 @@ import (
 // Option represents an option that can be used to configure a query.
 type Option func(constant *Datasource)
 
-// RefreshInterval represents the interval at which the results of a query will
-// be refreshed.
-type RefreshInterval int
-
 const (
 	// Never will prevent the results from being refreshed.
-	Never RefreshInterval = 0
+	Never int64 = 0
 
 	// DashboardLoad will refresh the results every time the dashboard is loaded.
-	DashboardLoad RefreshInterval = 1
+	DashboardLoad int64 = 1
 
 	// TimeChange will refresh the results every time the time interval changes.
-	TimeChange RefreshInterval = 2
+	TimeChange int64 = 2
 )
 
 // Datasource represents a "query" templated variable.
@@ -29,13 +25,18 @@ type Datasource struct {
 
 // New creates a new "query" templated variable.
 func New(name string, options ...Option) *Datasource {
+	refreshValue := int64(DashboardLoad)
 	query := &Datasource{Builder: sdk.TemplateVar{
 		Name:  name,
 		Label: name,
 		Type:  "datasource",
+		Refresh: sdk.BoolInt{
+			Flag:  true,
+			Value: &refreshValue,
+		},
 	}}
 
-	for _, opt := range append([]Option{Refresh(DashboardLoad)}, options...) {
+	for _, opt := range options {
 		opt(query)
 	}
 
@@ -46,14 +47,6 @@ func New(name string, options ...Option) *Datasource {
 func Type(datasourceType string) Option {
 	return func(query *Datasource) {
 		query.Builder.Query = datasourceType
-	}
-}
-
-// Refresh defines the interval in which the values will be refreshed.
-func Refresh(refresh RefreshInterval) Option {
-	return func(query *Datasource) {
-		value := int64(refresh)
-		query.Builder.Refresh = sdk.BoolInt{Flag: true, Value: &value}
 	}
 }
 

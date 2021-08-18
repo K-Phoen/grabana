@@ -14,6 +14,8 @@ func TestNewDatasourceVariablesCanBeCreated(t *testing.T) {
 	req.Equal("source", panel.Builder.Name)
 	req.Equal("source", panel.Builder.Label)
 	req.Equal("datasource", panel.Builder.Type)
+	req.Equal(DashboardLoad, *panel.Builder.Refresh.Value)
+	req.Equal(true, panel.Builder.Refresh.Flag)
 }
 
 func TestLabelCanBeSet(t *testing.T) {
@@ -64,14 +66,6 @@ func TestValuesCanBeFilteredByRegex(t *testing.T) {
 	panel := New("", Regex(regex))
 
 	req.Equal(regex, panel.Builder.Regex)
-}
-
-func TestValuesRefreshTimeCanBeSet(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Refresh(TimeChange))
-
-	req.Equal(int64(TimeChange), *panel.Builder.Refresh.Value)
 }
 
 func TestDataSourceTypeCanBeSet(t *testing.T) {
