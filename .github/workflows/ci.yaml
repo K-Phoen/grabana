@@ -4,27 +4,23 @@ on: [pull_request]
 jobs:
   lint:
     name: Linters
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          depth: 1
 
       - name: golangci-lint
-        uses: docker://reviewdog/action-golangci-lint:v1
+        uses: reviewdog/action-golangci-lint@v2
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           golangci_lint_flags: "--config=.golangci.yaml"
           reporter: github-pr-review
 
   doc:
     name: Documentation
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          depth: 1
 
       - uses: nosborn/github-action-markdown-cli@master
         with:
@@ -41,11 +37,9 @@ jobs:
 
   tests:
     name: Tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          depth: 1
 
       - uses: actions/setup-go@v1
         with:
