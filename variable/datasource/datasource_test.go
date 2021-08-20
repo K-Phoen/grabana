@@ -14,7 +14,7 @@ func TestNewDatasourceVariablesCanBeCreated(t *testing.T) {
 	req.Equal("source", panel.Builder.Name)
 	req.Equal("source", panel.Builder.Label)
 	req.Equal("datasource", panel.Builder.Type)
-	req.Equal(DashboardLoad, *panel.Builder.Refresh.Value)
+	req.Equal(dashboardLoad, *panel.Builder.Refresh.Value)
 	req.Equal(true, panel.Builder.Refresh.Flag)
 }
 

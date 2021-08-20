@@ -8,24 +8,19 @@ import (
 type Option func(constant *Datasource)
 
 const (
-	// Never will prevent the results from being refreshed.
-	Never int64 = 0
-
-	// DashboardLoad will refresh the results every time the dashboard is loaded.
-	DashboardLoad int64 = 1
-
-	// TimeChange will refresh the results every time the time interval changes.
-	TimeChange int64 = 2
+	// dashboardLoad will refresh the results every time the dashboard is loaded.
+	dashboardLoad int64 = 1
 )
 
-// Datasource represents a "query" templated variable.
+// Datasource represents a "datasource" templated variable.
 type Datasource struct {
 	Builder sdk.TemplateVar
 }
 
 // New creates a new "query" templated variable.
 func New(name string, options ...Option) *Datasource {
-	refreshValue := int64(DashboardLoad)
+	refreshValue := dashboardLoad
+
 	query := &Datasource{Builder: sdk.TemplateVar{
 		Name:  name,
 		Label: name,
