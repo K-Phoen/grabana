@@ -7,17 +7,28 @@ import (
 // Option represents an option that can be used to configure a query.
 type Option func(constant *Datasource)
 
-// Datasource represents a "query" templated variable.
+const (
+	// dashboardLoad will refresh the results every time the dashboard is loaded.
+	dashboardLoad int64 = 1
+)
+
+// Datasource represents a "datasource" templated variable.
 type Datasource struct {
 	Builder sdk.TemplateVar
 }
 
 // New creates a new "query" templated variable.
 func New(name string, options ...Option) *Datasource {
+	refreshValue := dashboardLoad
+
 	query := &Datasource{Builder: sdk.TemplateVar{
 		Name:  name,
 		Label: name,
 		Type:  "datasource",
+		Refresh: sdk.BoolInt{
+			Flag:  true,
+			Value: &refreshValue,
+		},
 	}}
 
 	for _, opt := range options {
