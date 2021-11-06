@@ -1,6 +1,7 @@
 package timeseries
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/K-Phoen/grabana/target/stackdriver"
@@ -158,82 +159,66 @@ func TestLegendCanBeShownToTheBottom(t *testing.T) {
 	req.Equal("bottom", panel.Builder.TimeseriesPanel.Options.Legend.Placement)
 }
 
-func TestLegendCanShowAvg(t *testing.T) {
-	req := require.New(t)
+func TestLegendCanShowCalculatedData(t *testing.T) {
+	testCases := []struct {
+		option   LegendOption
+		expected string
+	}{
+		{option: Min, expected: "min"},
+		{option: Max, expected: "max"},
+		{option: Avg, expected: "mean"},
 
-	panel := New("", Legend(Avg))
+		{option: Total, expected: "sum"},
+		{option: Count, expected: "count"},
+		{option: Range, expected: "range"},
 
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "mean")
+		{option: First, expected: "first"},
+		{option: FirstNonNull, expected: "firstNotNull"},
+		{option: Last, expected: "last"},
+		{option: LastNonNull, expected: "lastNotNull"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("option %s", tc.expected), func(t *testing.T) {
+			req := require.New(t)
+
+			panel := New("", Legend(tc.option))
+
+			req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, tc.expected)
+		})
+	}
 }
 
-func TestLegendCanShowMin(t *testing.T) {
-	req := require.New(t)
+func TestLineInterpolationCanBeConfigured(t *testing.T) {
+	testCases := []struct {
+		mode     InterpolationMode
+		expected string
+	}{
+		{
+			mode:     Linear,
+			expected: string(Linear),
+		},
+		{
+			mode:     Smooth,
+			expected: string(Smooth),
+		},
+		{
+			mode:     StepBefore,
+			expected: string(StepBefore),
+		},
+		{
+			mode:     StepAfter,
+			expected: string(StepAfter),
+		},
+	}
 
-	panel := New("", Legend(Min))
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("interpolation mode %s", tc.expected), func(t *testing.T) {
+			req := require.New(t)
 
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "min")
-}
+			panel := New("", LineInterpolation(tc.mode))
 
-func TestLegendCanShowMax(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(Max))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "max")
-}
-
-func TestLegendCanShowTotal(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(Total))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "sum")
-}
-
-func TestLegendCanShowCount(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(Count))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "count")
-}
-
-func TestLegendCanShowRange(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(Range))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "range")
-}
-
-func TestLegendCanShowFirst(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(First))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "first")
-}
-
-func TestLegendCanShowFirstNotNull(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(FirstNonNull))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "firstNotNull")
-}
-
-func TestLegendCanShowLast(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(Last))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "last")
-}
-
-func TestLegendCanShowLastNotNull(t *testing.T) {
-	req := require.New(t)
-
-	panel := New("", Legend(LastNonNull))
-
-	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "lastNotNull")
+			req.Equal(tc.expected, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation)
+		})
+	}
 }

@@ -8,16 +8,30 @@ import (
 // Option represents an option that can be used to configure a graph panel.
 type Option func(timeseries *TimeSeries)
 
-// TooltipMode configures which series will be displayed in the tooltip
+// TooltipMode configures which series will be displayed in the tooltip.
 type TooltipMode string
 
 const (
 	// SingleSeries will only display the hovered series.
 	SingleSeries TooltipMode = "single"
 	// AllSeries will display all series.
-	AllSeries = "multi"
+	AllSeries TooltipMode = "multi"
 	// NoSeries will hide the tooltip completely.
-	NoSeries = "none"
+	NoSeries TooltipMode = "none"
+)
+
+// InterpolationMode defines how Grafana interpolates series lines.
+type InterpolationMode string
+
+const (
+	// Points are joined by straight lines.
+	Linear InterpolationMode = "linear"
+	// Points are joined by curved lines resulting in smooth transitions between points.
+	Smooth InterpolationMode = "smooth"
+	// The line is displayed as steps between points. Points are rendered at the end of the step.
+	StepBefore InterpolationMode = "stepBefore"
+	// Line is displayed as steps between points. Points are rendered at the beginning of the step.
+	StepAfter InterpolationMode = "stepAfter"
 )
 
 // LegendOption allows to configure a legend.
@@ -82,6 +96,7 @@ func defaults() []Option {
 		LineWidth(1),
 		Tooltip(SingleSeries),
 		Legend(Bottom, AsList),
+		LineInterpolation(Linear),
 	}
 }
 
@@ -103,6 +118,13 @@ func Tooltip(mode TooltipMode) Option {
 func LineWidth(value int) Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineWidth = value
+	}
+}
+
+// LineInterpolation defines how Grafana interpolates the series line.
+func LineInterpolation(mode InterpolationMode) Option {
+	return func(timeseries *TimeSeries) {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation = string(mode)
 	}
 }
 
