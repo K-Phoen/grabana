@@ -94,6 +94,8 @@ func defaults() []Option {
 	return []Option{
 		Span(6),
 		LineWidth(1),
+		FillOpacity(25),
+		PointSize(5),
 		Tooltip(SingleSeries),
 		Legend(Bottom, AsList),
 		LineInterpolation(Linear),
@@ -118,6 +120,20 @@ func Tooltip(mode TooltipMode) Option {
 func LineWidth(value int) Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineWidth = value
+	}
+}
+
+// FillOpacity defines the opacity level of the series. The lower the value, the more transparent.
+func FillOpacity(value int) Option {
+	return func(timeseries *TimeSeries) {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.FillOpacity = value
+	}
+}
+
+// PointSize adjusts the size of points.
+func PointSize(value int) Option {
+	return func(timeseries *TimeSeries) {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.PointSize = value
 	}
 }
 

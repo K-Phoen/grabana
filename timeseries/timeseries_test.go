@@ -110,6 +110,22 @@ func TestLineWidthCanBeConfigured(t *testing.T) {
 	req.Equal(3, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineWidth)
 }
 
+func TestFillOpacityCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", FillOpacity(10))
+
+	req.Equal(10, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.FillOpacity)
+}
+
+func TestPointSizeCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", PointSize(3))
+
+	req.Equal(3, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.PointSize)
+}
+
 func TestRepeatCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
