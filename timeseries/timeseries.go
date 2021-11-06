@@ -20,6 +20,45 @@ const (
 	NoSeries = "none"
 )
 
+// LegendOption allows to configure a legend.
+type LegendOption uint16
+
+const (
+	// Hide keeps the legend from being displayed.
+	Hide LegendOption = iota
+	// AsTable displays the legend as a table.
+	AsTable
+	// AsList displays the legend as a list.
+	AsList
+	// Bottom displays the legend below the graph.
+	Bottom
+	// ToTheRight displays the legend on the right side of the graph.
+	ToTheRight
+
+	// Min displays the smallest value of the series.
+	Min
+	// Max displays the largest value of the series.
+	Max
+	// Avg displays the average of the series.
+	Avg
+
+	// First displays the first value of the series.
+	First
+	// FirstNonNull displays the first non-null value of the series.
+	FirstNonNull
+	// Last displays the last value of the series.
+	Last
+	// LastNonNull displays the last non-null value of the series.
+	LastNonNull
+
+	// Total displays the sum of values in the series.
+	Total
+	// Count displays the number of value in the series.
+	Count
+	// Range displays the difference between the minimum and maximum values.
+	Range
+)
+
 // TimeSeries represents a time series panel.
 type TimeSeries struct {
 	Builder *sdk.Panel
@@ -42,6 +81,7 @@ func defaults() []Option {
 		Span(6),
 		LineWidth(1),
 		Tooltip(SingleSeries),
+		Legend(Bottom, AsList),
 	}
 }
 
@@ -63,6 +103,57 @@ func Tooltip(mode TooltipMode) Option {
 func LineWidth(value int) Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineWidth = value
+	}
+}
+
+// Legend defines what should be shown in the legend.
+func Legend(opts ...LegendOption) Option {
+	return func(timeseries *TimeSeries) {
+		legend := sdk.TimeseriesLegendOptions{
+			DisplayMode: "list",
+			Placement:   "bottom",
+			Calcs:       make([]string, 0),
+		}
+
+		for _, opt := range opts {
+			switch opt {
+			case Hide:
+				legend.DisplayMode = "hidden"
+			case AsList:
+				legend.DisplayMode = "list"
+			case AsTable:
+				legend.DisplayMode = "table"
+			case ToTheRight:
+				legend.Placement = "right"
+			case Bottom:
+				legend.Placement = "bottom"
+
+			case First:
+				legend.Calcs = append(legend.Calcs, "first")
+			case FirstNonNull:
+				legend.Calcs = append(legend.Calcs, "firstNotNull")
+			case Last:
+				legend.Calcs = append(legend.Calcs, "last")
+			case LastNonNull:
+				legend.Calcs = append(legend.Calcs, "lastNotNull")
+
+			case Min:
+				legend.Calcs = append(legend.Calcs, "min")
+			case Max:
+				legend.Calcs = append(legend.Calcs, "max")
+			case Avg:
+				legend.Calcs = append(legend.Calcs, "mean")
+
+			case Count:
+				legend.Calcs = append(legend.Calcs, "count")
+			case Total:
+				legend.Calcs = append(legend.Calcs, "sum")
+			case Range:
+				legend.Calcs = append(legend.Calcs, "range")
+			}
+		}
+
+		timeseries.Builder.TimeseriesPanel.Options.Legend = legend
 	}
 }
 

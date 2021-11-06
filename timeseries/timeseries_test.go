@@ -117,3 +117,123 @@ func TestRepeatCanBeConfigured(t *testing.T) {
 	req.NotNil(panel.Builder.Repeat)
 	req.Equal("ds", *panel.Builder.Repeat)
 }
+
+func TestLegendCanBeHidden(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Hide))
+
+	req.Equal("hidden", panel.Builder.TimeseriesPanel.Options.Legend.DisplayMode)
+}
+
+func TestLegendCanBeDisplayedAsATable(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(AsTable))
+
+	req.Equal("table", panel.Builder.TimeseriesPanel.Options.Legend.DisplayMode)
+}
+
+func TestLegendCanBeDisplayedAsAList(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(AsList))
+
+	req.Equal("list", panel.Builder.TimeseriesPanel.Options.Legend.DisplayMode)
+}
+
+func TestLegendCanBeShownToTheRight(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(ToTheRight))
+
+	req.Equal("right", panel.Builder.TimeseriesPanel.Options.Legend.Placement)
+}
+
+func TestLegendCanBeShownToTheBottom(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Bottom))
+
+	req.Equal("bottom", panel.Builder.TimeseriesPanel.Options.Legend.Placement)
+}
+
+func TestLegendCanShowAvg(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Avg))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "mean")
+}
+
+func TestLegendCanShowMin(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Min))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "min")
+}
+
+func TestLegendCanShowMax(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Max))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "max")
+}
+
+func TestLegendCanShowTotal(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Total))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "sum")
+}
+
+func TestLegendCanShowCount(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Count))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "count")
+}
+
+func TestLegendCanShowRange(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Range))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "range")
+}
+
+func TestLegendCanShowFirst(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(First))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "first")
+}
+
+func TestLegendCanShowFirstNotNull(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(FirstNonNull))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "firstNotNull")
+}
+
+func TestLegendCanShowLast(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(Last))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "last")
+}
+
+func TestLegendCanShowLastNotNull(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Legend(LastNonNull))
+
+	req.Contains(panel.Builder.TimeseriesPanel.Options.Legend.Calcs, "lastNotNull")
+}

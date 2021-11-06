@@ -67,8 +67,8 @@ func main() {
 				timeseries.Height("400px"),
 				timeseries.DataSource("Prometheus"),
 				timeseries.WithPrometheusTarget(
-					"rate(promhttp_metric_handler_requests_total[$interval])",
-					prometheus.Legend("{{handler}} - {{ code }}"),
+					"sum(rate(promhttp_metric_handler_requests_total[$interval])) by (code)",
+					prometheus.Legend("{{ code }}"),
 				),
 				timeseries.Height("600px"),
 				timeseries.Description("some description"),
