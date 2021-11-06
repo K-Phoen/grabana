@@ -199,3 +199,11 @@ func TestDashboardCanHaveAnnotationsFromTags(t *testing.T) {
 
 	req.Len(panel.board.Annotations.List, 1)
 }
+
+func TestDashboardCanHaveExternalLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", ExternalLinks(ExternalLink{}, ExternalLink{}))
+
+	req.Len(panel.board.Links, 2)
+}
