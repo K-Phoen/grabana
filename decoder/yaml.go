@@ -3,17 +3,16 @@ package decoder
 import (
 	"io"
 
-	builder "github.com/K-Phoen/grabana/dashboard"
-	"gopkg.in/yaml.v2"
+	"github.com/K-Phoen/grabana/dashboard"
+	"gopkg.in/yaml.v3"
 )
 
-func UnmarshalYAML(input io.Reader) (builder.Builder, error) {
+func UnmarshalYAML(input io.Reader) (dashboard.Builder, error) {
 	decoder := yaml.NewDecoder(input)
-	decoder.SetStrict(true)
 
 	parsed := &DashboardModel{}
 	if err := decoder.Decode(parsed); err != nil {
-		return builder.Builder{}, err
+		return dashboard.Builder{}, err
 	}
 
 	return parsed.toDashboardBuilder()
