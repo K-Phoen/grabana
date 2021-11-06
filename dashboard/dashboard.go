@@ -178,6 +178,16 @@ func VariableAsDatasource(name string, options ...datasource.Option) Option {
 	}
 }
 
+// Link adds a dashboard-level link.
+// See https://grafana.com/docs/grafana/latest/linking/dashboard-links/
+func ExternalLinks(links ...ExternalLink) Option {
+	return func(builder *Builder) {
+		for _, link := range links {
+			builder.board.Links = append(builder.board.Links, link.asSdk())
+		}
+	}
+}
+
 // Row adds a row to the dashboard.
 func Row(title string, options ...row.Option) Option {
 	return func(builder *Builder) {
