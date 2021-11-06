@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/singlestat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/text"
+	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -38,6 +39,15 @@ func defaults() []Option {
 func WithGraph(title string, options ...graph.Option) Option {
 	return func(row *Row) {
 		graphPanel := graph.New(title, options...)
+
+		row.builder.Add(graphPanel.Builder)
+	}
+}
+
+// WithTimeSeries adds a "timeseries" panel in the row.
+func WithTimeSeries(title string, options ...timeseries.Option) Option {
+	return func(row *Row) {
+		graphPanel := timeseries.New(title, options...)
 
 		row.builder.Add(graphPanel.Builder)
 	}
