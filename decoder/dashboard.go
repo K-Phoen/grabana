@@ -22,6 +22,7 @@ type DashboardModel struct {
 
 	TagsAnnotation []dashboard.TagAnnotation `yaml:"tags_annotations"`
 	Variables      []DashboardVariable
+	ExternalLinks  []DashboardExternalLink `yaml:"external_links,omitempty"`
 
 	Rows []DashboardRow
 }
@@ -35,6 +36,10 @@ func (d *DashboardModel) toDashboardBuilder() (dashboard.Builder, error) {
 
 	if len(d.Tags) != 0 {
 		opts = append(opts, dashboard.Tags(d.Tags))
+	}
+
+	for _, externalLink := range d.ExternalLinks {
+		opts = append(opts, dashboard.ExternalLinks(externalLink.toModel()))
 	}
 
 	if d.AutoRefresh != "" {
