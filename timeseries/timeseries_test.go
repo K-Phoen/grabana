@@ -207,7 +207,7 @@ func TestLegendCanShowCalculatedData(t *testing.T) {
 
 func TestLineInterpolationCanBeConfigured(t *testing.T) {
 	testCases := []struct {
-		mode     InterpolationMode
+		mode     LineInterpolationMode
 		expected string
 	}{
 		{
@@ -232,9 +232,41 @@ func TestLineInterpolationCanBeConfigured(t *testing.T) {
 		t.Run(fmt.Sprintf("interpolation mode %s", tc.expected), func(t *testing.T) {
 			req := require.New(t)
 
-			panel := New("", LineInterpolation(tc.mode))
+			panel := New("", Lines(tc.mode))
 
 			req.Equal(tc.expected, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation)
+			req.Equal("line", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle)
+		})
+	}
+}
+
+func TestBarsAlignmentCanBeConfigured(t *testing.T) {
+	testCases := []struct {
+		mode     BarAlignment
+		expected int
+	}{
+		{
+			mode:     AlignCenter,
+			expected: 0,
+		},
+		{
+			mode:     AlignBefore,
+			expected: -1,
+		},
+		{
+			mode:     AlignAfter,
+			expected: 1,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("alignment %d", tc.expected), func(t *testing.T) {
+			req := require.New(t)
+
+			panel := New("", Bars(tc.mode))
+
+			req.Equal(tc.expected, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.BarAlignment)
+			req.Equal("bars", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle)
 		})
 	}
 }

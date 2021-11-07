@@ -20,18 +20,30 @@ const (
 	NoSeries TooltipMode = "none"
 )
 
-// InterpolationMode defines how Grafana interpolates series lines.
-type InterpolationMode string
+// LineInterpolationMode defines how Grafana interpolates series lines when drawn as lines.
+type LineInterpolationMode string
 
 const (
 	// Points are joined by straight lines.
-	Linear InterpolationMode = "linear"
+	Linear LineInterpolationMode = "linear"
 	// Points are joined by curved lines resulting in smooth transitions between points.
-	Smooth InterpolationMode = "smooth"
+	Smooth LineInterpolationMode = "smooth"
 	// The line is displayed as steps between points. Points are rendered at the end of the step.
-	StepBefore InterpolationMode = "stepBefore"
+	StepBefore LineInterpolationMode = "stepBefore"
 	// Line is displayed as steps between points. Points are rendered at the beginning of the step.
-	StepAfter InterpolationMode = "stepAfter"
+	StepAfter LineInterpolationMode = "stepAfter"
+)
+
+// BarAlignment defines how Grafana aligns bars.
+type BarAlignment int
+
+const (
+	// The bar is drawn around the point. The point is placed in the center of the bar.
+	AlignCenter BarAlignment = 0
+	// The bar is drawn before the point. The point is placed on the trailing corner of the bar.
+	AlignBefore BarAlignment = -1
+	// The bar is drawn after the point. The point is placed on the leading corner of the bar.
+	AlignAfter BarAlignment = 1
 )
 
 // LegendOption allows to configure a legend.
@@ -98,7 +110,7 @@ func defaults() []Option {
 		PointSize(5),
 		Tooltip(SingleSeries),
 		Legend(Bottom, AsList),
-		LineInterpolation(Linear),
+		Lines(Linear),
 	}
 }
 
@@ -137,10 +149,19 @@ func PointSize(value int) Option {
 	}
 }
 
-// LineInterpolation defines how Grafana interpolates the series line.
-func LineInterpolation(mode InterpolationMode) Option {
+// Lines displays the series as lines, with a given interpolation strategy.
+func Lines(mode LineInterpolationMode) Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation = string(mode)
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "line"
+	}
+}
+
+// Bars displays the series as bars, with a given alignment strategy.
+func Bars(alignment BarAlignment) Option {
+	return func(timeseries *TimeSeries) {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.BarAlignment = int(alignment)
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "bars"
 	}
 }
 
