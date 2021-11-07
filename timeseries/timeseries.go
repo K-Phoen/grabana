@@ -170,6 +170,11 @@ func Lines(mode LineInterpolationMode) Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation = string(mode)
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "line"
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineStyle = struct {
+			Fill string `json:"fill"`
+		}{
+			Fill: "solid",
+		}
 	}
 }
 
