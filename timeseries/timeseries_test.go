@@ -271,6 +271,14 @@ func TestBarsAlignmentCanBeConfigured(t *testing.T) {
 	}
 }
 
+func TestUnitCanBeShownToTheBottom(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Unit("reqps"))
+
+	req.Equal("reqps", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Unit)
+}
+
 func TestSeriesCanBeDisplayedAsPoints(t *testing.T) {
 	req := require.New(t)
 

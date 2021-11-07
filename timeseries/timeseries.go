@@ -195,6 +195,13 @@ func GradientMode(mode GradientType) Option {
 	}
 }
 
+// Unit sets the unit of the data displayed in this series.
+func Unit(unit string) Option {
+	return func(timeseries *TimeSeries) {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Unit = unit
+	}
+}
+
 // Legend defines what should be shown in the legend.
 func Legend(opts ...LegendOption) Option {
 	return func(timeseries *TimeSeries) {
