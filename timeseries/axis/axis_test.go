@@ -108,3 +108,12 @@ func TestDecimalsCanBeConfigured(t *testing.T) {
 
 	req.Equal(2, *cfg.Defaults.Decimals)
 }
+
+func TestUnitCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	cfg := &sdk.FieldConfig{}
+	New(cfg, Unit("reqps"))
+
+	req.Equal("reqps", cfg.Defaults.Unit)
+}

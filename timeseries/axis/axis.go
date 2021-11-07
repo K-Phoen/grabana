@@ -77,6 +77,13 @@ func Max(value int) Option {
 	}
 }
 
+// Unit sets the unit of the data displayed in this series.
+func Unit(unit string) Option {
+	return func(axis *Axis) {
+		axis.fieldConfig.Defaults.Unit = unit
+	}
+}
+
 // Scale sets the scale to use for the Y-axis values..
 func Scale(mode ScaleMode) Option {
 	return func(axis *Axis) {
