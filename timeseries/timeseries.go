@@ -165,6 +165,13 @@ func Bars(alignment BarAlignment) Option {
 	}
 }
 
+// Points displays the series as points.
+func Points() Option {
+	return func(timeseries *TimeSeries) {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "points"
+	}
+}
+
 // Legend defines what should be shown in the legend.
 func Legend(opts ...LegendOption) Option {
 	return func(timeseries *TimeSeries) {

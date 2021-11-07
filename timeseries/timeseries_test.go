@@ -270,3 +270,11 @@ func TestBarsAlignmentCanBeConfigured(t *testing.T) {
 		})
 	}
 }
+
+func TestSeriesCanBeDisplayedAsPoints(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Points())
+
+	req.Equal("points", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle)
+}
