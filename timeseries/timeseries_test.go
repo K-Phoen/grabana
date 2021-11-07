@@ -278,3 +278,37 @@ func TestSeriesCanBeDisplayedAsPoints(t *testing.T) {
 
 	req.Equal("points", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle)
 }
+
+func TestGradientModeCanBeConfigured(t *testing.T) {
+	testCases := []struct {
+		mode     GradientType
+		expected string
+	}{
+		{
+			mode:     NoGradient,
+			expected: "none",
+		},
+		{
+			mode:     Opacity,
+			expected: "opacity",
+		},
+		{
+			mode:     Hue,
+			expected: "hue",
+		},
+		{
+			mode:     Scheme,
+			expected: "scheme",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("mode %s", tc.expected), func(t *testing.T) {
+			req := require.New(t)
+
+			panel := New("", GradientMode(tc.mode))
+
+			req.Equal(tc.expected, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode)
+		})
+	}
+}

@@ -46,6 +46,21 @@ const (
 	AlignAfter BarAlignment = 1
 )
 
+// GradientType defines the mode of the gradient fill.
+type GradientType string
+
+const (
+	// No gradient fill.
+	NoGradient GradientType = "none"
+	// Transparency of the gradient is calculated based on the values on the y-axis.
+	// Opacity of the fill is increasing with the values on the Y-axis.
+	Opacity GradientType = "opacity"
+	// Gradient color is generated based on the hue of the line color.
+	Hue GradientType = "hue"
+	// In this mode the whole bar will use a color gradient defined by the color scheme.
+	Scheme GradientType = "scheme"
+)
+
 // LegendOption allows to configure a legend.
 type LegendOption uint16
 
@@ -111,6 +126,7 @@ func defaults() []Option {
 		Tooltip(SingleSeries),
 		Legend(Bottom, AsList),
 		Lines(Linear),
+		GradientMode(Opacity),
 	}
 }
 
@@ -169,6 +185,13 @@ func Bars(alignment BarAlignment) Option {
 func Points() Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "points"
+	}
+}
+
+// GradientMode sets the mode of the gradient fill.
+func GradientMode(mode GradientType) Option {
+	return func(timeseries *TimeSeries) {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode = string(mode)
 	}
 }
 
