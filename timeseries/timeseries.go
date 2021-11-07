@@ -2,6 +2,7 @@ package timeseries
 
 import (
 	"github.com/K-Phoen/grabana/alert"
+	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -127,6 +128,10 @@ func defaults() []Option {
 		Legend(Bottom, AsList),
 		Lines(Linear),
 		GradientMode(Opacity),
+		Axis(
+			axis.Placement(axis.Auto),
+			axis.Scale(axis.Linear),
+		),
 	}
 }
 
@@ -204,6 +209,13 @@ func GradientMode(mode GradientType) Option {
 func Unit(unit string) Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Unit = unit
+	}
+}
+
+// Axis configures the axis for this time series.
+func Axis(options ...axis.Option) Option {
+	return func(timeseries *TimeSeries) {
+		axis.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
 	}
 }
 

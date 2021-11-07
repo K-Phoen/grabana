@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/target/stackdriver"
+	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/stretchr/testify/require"
 )
 
@@ -285,6 +286,14 @@ func TestSeriesCanBeDisplayedAsPoints(t *testing.T) {
 	panel := New("", Points())
 
 	req.Equal("points", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle)
+}
+
+func TestAxisCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Axis(axis.Decimals(2)))
+
+	req.Equal(2, *panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Decimals)
 }
 
 func TestGradientModeCanBeConfigured(t *testing.T) {
