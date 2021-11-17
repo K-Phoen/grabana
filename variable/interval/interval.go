@@ -22,9 +22,10 @@ type Interval struct {
 // New creates a new "interval" templated variable.
 func New(name string, options ...Option) *Interval {
 	interval := &Interval{Builder: sdk.TemplateVar{
-		Name:  name,
-		Label: name,
-		Type:  "interval",
+		Name:    name,
+		Label:   name,
+		Type:    "interval",
+		Options: []sdk.Option{},
 	}}
 
 	for _, opt := range options {

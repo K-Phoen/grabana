@@ -44,9 +44,10 @@ type Custom struct {
 // New creates a new "custom" templated variable.
 func New(name string, options ...Option) *Custom {
 	custom := &Custom{Builder: sdk.TemplateVar{
-		Name:  name,
-		Label: name,
-		Type:  "custom",
+		Name:    name,
+		Label:   name,
+		Type:    "custom",
+		Options: []sdk.Option{},
 	}}
 
 	for _, opt := range options {
