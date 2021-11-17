@@ -58,17 +58,20 @@ type StatusMessage struct {
 // NewClient initializes client for interacting with an instance of Grafana server;
 // apiKeyOrBasicAuth accepts either 'username:password' basic authentication credentials,
 // or a Grafana API key
-func NewClient(apiURL, apiKeyOrBasicAuth string, client *http.Client) *Client {
+func NewClient(apiURL, apiKeyOrBasicAuth string, client *http.Client) (*Client, error) {
 	key := ""
 	basicAuth := strings.Contains(apiKeyOrBasicAuth, ":")
-	baseURL, _ := url.Parse(apiURL)
+	baseURL, err := url.Parse(apiURL)
+	if err != nil {
+		return nil, err
+	}
 	if !basicAuth {
 		key = fmt.Sprintf("Bearer %s", apiKeyOrBasicAuth)
 	} else {
 		parts := strings.Split(apiKeyOrBasicAuth, ":")
 		baseURL.User = url.UserPassword(parts[0], parts[1])
 	}
-	return &Client{baseURL: baseURL.String(), basicAuth: basicAuth, key: key, client: client}
+	return &Client{baseURL: baseURL.String(), basicAuth: basicAuth, key: key, client: client}, nil
 }
 
 func (r *Client) get(ctx context.Context, query string, params url.Values) ([]byte, int, error) {

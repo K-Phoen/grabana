@@ -79,24 +79,24 @@ type (
 		List []TemplateVar `json:"list"`
 	}
 	TemplateVar struct {
-		Name        string   `json:"name"`
-		Type        string   `json:"type"`
-		Auto        bool     `json:"auto,omitempty"`
-		AutoCount   *int     `json:"auto_count,omitempty"`
-		Datasource  *string  `json:"datasource"`
-		Refresh     BoolInt  `json:"refresh"`
-		Options     []Option `json:"options"`
-		IncludeAll  bool     `json:"includeAll"`
-		AllFormat   string   `json:"allFormat"`
-		AllValue    string   `json:"allValue"`
-		Multi       bool     `json:"multi"`
-		MultiFormat string   `json:"multiFormat"`
-		Query       string   `json:"query"`
-		Regex       string   `json:"regex"`
-		Current     Current  `json:"current"`
-		Label       string   `json:"label"`
-		Hide        uint8    `json:"hide"`
-		Sort        int      `json:"sort"`
+		Name        string      `json:"name"`
+		Type        string      `json:"type"`
+		Auto        bool        `json:"auto,omitempty"`
+		AutoCount   *int        `json:"auto_count,omitempty"`
+		Datasource  *string     `json:"datasource"`
+		Refresh     BoolInt     `json:"refresh"`
+		Options     []Option    `json:"options"`
+		IncludeAll  bool        `json:"includeAll"`
+		AllFormat   string      `json:"allFormat"`
+		AllValue    string      `json:"allValue"`
+		Multi       bool        `json:"multi"`
+		MultiFormat string      `json:"multiFormat"`
+		Query       interface{} `json:"query"`
+		Regex       string      `json:"regex"`
+		Current     Current     `json:"current"`
+		Label       string      `json:"label"`
+		Hide        uint8       `json:"hide"`
+		Sort        int         `json:"sort"`
 	}
 	// for templateVar
 	Option struct {

@@ -42,7 +42,7 @@ func Unidecode(s string) string {
 			r = append(r, c)
 			continue
 		}
-		if c > unicode.MaxRune || c > transCount {
+		if c > unicode.MaxRune || c >= transCount {
 			/* Ignore reserved chars */
 			continue
 		}

@@ -98,7 +98,7 @@ datasources. State of support for misc API parts noted below.
 | Organizations               | partially                 |
 | Users                       | partially                 |
 | User (actual)               | partially                 |
-| Snapshots                   | -                         |
+| Snapshots                   | partially                 |
 | Frontend settings           | -                         |
 | Admin                       | partially                 |
 
