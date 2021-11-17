@@ -225,7 +225,7 @@ func TestStackdriverGroupBy(t *testing.T) {
 	target, err := StackdriverTarget{Type: "delta", GroupBy: []string{"field", "other"}}.toTarget()
 
 	req.NoError(err)
-	req.ElementsMatch(target.Builder.GroupBys, []string{"field", "other"})
+	req.ElementsMatch(target.Builder.GroupBy, []string{"field", "other"})
 }
 
 func TestStackdriverProject(t *testing.T) {
