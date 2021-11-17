@@ -57,6 +57,45 @@ type BoardProperties struct {
 	FolderURL   string    `json:"folderUrl"`
 }
 
+//RawBoardRequest struct that wraps Board and parameters being sent
+type RawBoardRequest struct {
+	Dashboard  []byte
+	Parameters SetDashboardParams
+}
+
+//MarshalJSON serializes the request to match the expectations of the grafana API.
+// Additionally, if preseveID is false, then the dashboard id is set to 0
+func (d RawBoardRequest) MarshalJSON() ([]byte, error) {
+	var raw []byte
+
+	if d.Parameters.PreserveId {
+		raw = d.Dashboard
+	} else {
+		var plain map[string]interface{} = make(map[string]interface{})
+		if err := json.Unmarshal(d.Dashboard, &plain); err != nil {
+			return nil, err
+		}
+		plain["id"] = 0
+		raw, _ = json.Marshal(plain)
+	}
+
+	var output struct {
+		Dashboard map[string]interface{} `json:"dashboard"`
+		SetDashboardParams
+	}
+	err := json.Unmarshal(raw, &output.Dashboard)
+	if err != nil {
+		return nil, err
+	}
+	output.SetDashboardParams = d.Parameters
+	result, err := json.Marshal(&output)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 // GetDashboardByUID loads a dashboard and its metadata from Grafana by dashboard uid.
 //
 // Reflects GET /api/dashboards/uid/:uid API call.
@@ -219,11 +258,12 @@ func (r *Client) Search(ctx context.Context, params ...SearchParam) ([]FoundBoar
 	return boards, err
 }
 
-// SetDashboardParams contains the extra parameteres
+// SetDashboardParams contains the extra parameters
 // that affects where and how the dashboard will be stored
 type SetDashboardParams struct {
-	FolderID  int
-	Overwrite bool
+	FolderID   int
+	Overwrite  bool
+	PreserveId bool `json:"-"`
 }
 
 // SetDashboard updates existing dashboard or creates a new one.
@@ -271,31 +311,20 @@ func (r *Client) SetDashboard(ctx context.Context, board Board, params SetDashbo
 	return resp, nil
 }
 
-// SetRawDashboard updates existing dashboard or creates a new one.
-// Contrary to SetDashboard() it accepts raw JSON instead of Board structure.
-// Grafana only can create or update a dashboard in a database. File dashboards
-// may be only loaded with HTTP API but not created or updated.
-//
-// Reflects POST /api/dashboards/db API call.
-func (r *Client) SetRawDashboard(ctx context.Context, raw []byte) (StatusMessage, error) {
+//SetRawDashboardWithParam sends the serialized along with request parameters
+func (r *Client) SetRawDashboardWithParam(ctx context.Context, request RawBoardRequest) (StatusMessage, error) {
 	var (
 		rawResp []byte
 		resp    StatusMessage
 		code    int
 		err     error
-		buf     bytes.Buffer
-		plain   = make(map[string]interface{})
 	)
-	if err = json.Unmarshal(raw, &plain); err != nil {
-		return StatusMessage{}, err
+	raw, err := json.Marshal(request)
+
+	if err != nil {
+		return StatusMessage{}, errors.New(err.Error())
 	}
-	// TODO(axel) fragile place, refactor it
-	plain["id"] = 0
-	raw, _ = json.Marshal(plain)
-	buf.WriteString(`{"dashboard":`)
-	buf.Write(raw)
-	buf.WriteString(`, "overwrite": true}`)
-	if rawResp, code, err = r.post(ctx, "api/dashboards/db", nil, buf.Bytes()); err != nil {
+	if rawResp, code, err = r.post(ctx, "api/dashboards/db", nil, raw); err != nil {
 		return StatusMessage{}, err
 	}
 	if err = json.Unmarshal(rawResp, &resp); err != nil {
@@ -305,6 +334,24 @@ func (r *Client) SetRawDashboard(ctx context.Context, raw []byte) (StatusMessage
 		return StatusMessage{}, fmt.Errorf("HTTP error %d: returns %s", code, *resp.Message)
 	}
 	return resp, nil
+}
+
+// SetRawDashboard updates existing dashboard or creates a new one.
+// Contrary to SetDashboard() it accepts raw JSON instead of Board structure.
+// Grafana only can create or update a dashboard in a database. File dashboards
+// may be only loaded with HTTP API but not created or updated.
+//
+// Reflects POST /api/dashboards/db API call.
+func (r *Client) SetRawDashboard(ctx context.Context, raw []byte) (StatusMessage, error) {
+	defaultParams := SetDashboardParams{
+		Overwrite: true,
+		FolderID:  DefaultFolderId,
+	}
+	request := RawBoardRequest{
+		Parameters: defaultParams,
+		Dashboard:  raw,
+	}
+	return r.SetRawDashboardWithParam(ctx, request)
 }
 
 // DeleteDashboard deletes dashboard that selected by slug string.
@@ -323,6 +370,21 @@ func (r *Client) DeleteDashboard(ctx context.Context, slug string) (StatusMessag
 		return StatusMessage{}, errors.New("only database dashboards (with 'db/' prefix in a slug) can be removed")
 	}
 	if raw, _, err = r.delete(ctx, fmt.Sprintf("api/dashboards/db/%s", slug)); err != nil {
+		return StatusMessage{}, err
+	}
+	err = json.Unmarshal(raw, &reply)
+	return reply, err
+}
+
+// DeleteDashboard deletes dashboard by UID
+// Reflects DELETE /api/dashboards/uid/:uid API call.
+func (r *Client) DeleteDashboardByUID(ctx context.Context, uid string) (StatusMessage, error) {
+	var (
+		raw   []byte
+		reply StatusMessage
+		err   error
+	)
+	if raw, _, err = r.delete(ctx, fmt.Sprintf("api/dashboards/uid/%s", uid)); err != nil {
 		return StatusMessage{}, err
 	}
 	err = json.Unmarshal(raw, &reply)

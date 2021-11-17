@@ -20,14 +20,18 @@ package sdk
 */
 
 type User struct {
-	ID             uint   `json:"id"`
-	Login          string `json:"login"`
-	Name           string `json:"name"`
-	Email          string `json:"email"`
-	Theme          string `json:"theme"`
-	OrgID          uint   `json:"orgId"`
-	Password       string `json:"password"`
-	IsGrafanaAdmin bool   `json:"isGrafanaAdmin"`
+	ID             uint     `json:"id"`
+	Login          string   `json:"login"`
+	Name           string   `json:"name"`
+	Email          string   `json:"email"`
+	OrgID          uint     `json:"orgId"`
+	Theme          string   `json:"theme"`
+	Password       string   `json:"password"`
+	IsDisabled     bool     `json:"isDisabled"`
+	AuthLabels     []string `json:"authLabels"`
+	IsGrafanaAdmin bool     `json:"isGrafanaAdmin"`
+	IsExternal     bool     `json:"isExternal"`
+	IsAdmin        bool     `json:"isAdmin"` //Different value used for Search Endpoint
 }
 
 type UserRole struct {

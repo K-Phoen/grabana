@@ -44,9 +44,10 @@ type Constant struct {
 // New creates a new "constant" templated variable.
 func New(name string, options ...Option) *Constant {
 	constant := &Constant{Builder: sdk.TemplateVar{
-		Name:  name,
-		Label: name,
-		Type:  "constant",
+		Name:    name,
+		Label:   name,
+		Type:    "constant",
+		Options: []sdk.Option{},
 	}}
 
 	for _, opt := range options {

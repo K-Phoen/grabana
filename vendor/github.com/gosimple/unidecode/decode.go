@@ -2,15 +2,17 @@ package unidecode
 
 import (
 	"compress/zlib"
-	"encoding/binary"
 	"io"
 	"strings"
+)
+
+const (
+	dummyLenght = byte(0xff)
 )
 
 var (
 	transliterations [65536][]rune
 	transCount       = rune(len(transliterations))
-	getUint16        = binary.LittleEndian.Uint16
 )
 
 func decodeTransliterations() {
@@ -19,20 +21,21 @@ func decodeTransliterations() {
 		panic(err)
 	}
 	defer r.Close()
-	tmp1 := make([]byte, 2)
-	tmp2 := tmp1[:1]
+	b := make([]byte, 0, 13) // 13 = longest transliteration, adjust if needed
+	lenB := b[:1]
+	chr := uint16(0xffff) // char counter, rely on overflow on first pass
 	for {
-		if _, err := io.ReadAtLeast(r, tmp1, 2); err != nil {
+		chr++
+		if _, err := io.ReadFull(r, lenB); err != nil {
 			if err == io.EOF {
 				break
 			}
 			panic(err)
 		}
-		chr := getUint16(tmp1)
-		if _, err := io.ReadAtLeast(r, tmp2, 1); err != nil {
-			panic(err)
+		if lenB[0] == dummyLenght {
+			continue
 		}
-		b := make([]byte, int(tmp2[0]))
+		b = b[:lenB[0]] // resize, preserving allocation
 		if _, err := io.ReadFull(r, b); err != nil {
 			panic(err)
 		}

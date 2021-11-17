@@ -10,7 +10,21 @@ func init() {
 	// TODO: Find better way so all langs are merged automatically and better
 	// tested.
 	for _, sub := range []*map[rune]string{
-		&deSub, &enSub, &esSub, &fiSub, &grSub, &kkSub, &nlSub, &plSub, &svSub, &trSub,
+		&csSub,
+		&deSub,
+		&enSub,
+		&esSub,
+		&fiSub,
+		&frSub,
+		&grSub,
+		&kkSub,
+		&nbSub,
+		&nlSub,
+		&nnSub,
+		&plSub,
+		&slSub,
+		&svSub,
+		&trSub,
 	} {
 		for key, value := range defaultSub {
 			(*sub)[key] = value
@@ -26,6 +40,11 @@ var defaultSub = map[rune]string{
 	'–':  "-", // en dash
 	'—':  "-", // em dash
 	'―':  "-", // horizontal bar
+}
+
+var csSub = map[rune]string{
+	'&': "a",
+	'@': "zavinac",
 }
 
 var deSub = map[rune]string{
@@ -52,6 +71,11 @@ var esSub = map[rune]string{
 var fiSub = map[rune]string{
 	'&': "ja",
 	'@': "at",
+}
+
+var frSub = map[rune]string{
+	'&': "et",
+	'@': "arobase",
 }
 
 var grSub = map[rune]string{
@@ -87,6 +111,20 @@ var kkSub = map[rune]string{
 	'Ұ': "U",
 }
 
+var nbSub = map[rune]string{
+	'&': "og",
+	'@': "at",
+	'æ': "ae",
+	'ø': "oe",
+	'å': "aa",
+	'Æ': "Ae",
+	'Ø': "Oe",
+	'Å': "Aa",
+}
+
+// Norwegian Nynorsk has the same rules
+var nnSub = nbSub
+
 var nlSub = map[rune]string{
 	'&': "en",
 	'@': "at",
@@ -95,6 +133,12 @@ var nlSub = map[rune]string{
 var plSub = map[rune]string{
 	'&': "i",
 	'@': "na",
+}
+
+var slSub = map[rune]string{
+	'&': "in",
+	'Đ': "DZ",
+	'đ': "dz",
 }
 
 var svSub = map[rune]string{

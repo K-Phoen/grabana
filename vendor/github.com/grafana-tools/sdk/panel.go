@@ -20,6 +20,7 @@ package sdk
 */
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 )
@@ -72,15 +73,15 @@ type (
 			X *int `json:"x,omitempty"`
 			Y *int `json:"y,omitempty"`
 		} `json:"gridPos,omitempty"`
-		Height           *string   `json:"height,omitempty"` // general
-		HideTimeOverride *bool     `json:"hideTimeOverride,omitempty"`
-		ID               uint      `json:"id"`
-		IsNew            bool      `json:"isNew"`
-		Links            []Link    `json:"links,omitempty"`    // general
-		MinSpan          *float32  `json:"minSpan,omitempty"`  // templating options
-		OfType           panelType `json:"-"`                  // it required for defining type of the panel
-		Renderer         *string   `json:"renderer,omitempty"` // display styles
-		Repeat           *string   `json:"repeat,omitempty"`   // templating options
+		Height           interface{} `json:"height,omitempty"` // general
+		HideTimeOverride *bool       `json:"hideTimeOverride,omitempty"`
+		ID               uint        `json:"id"`
+		IsNew            bool        `json:"isNew"`
+		Links            []Link      `json:"links,omitempty"`    // general
+		MinSpan          *float32    `json:"minSpan,omitempty"`  // templating options
+		OfType           panelType   `json:"-"`                  // it required for defining type of the panel
+		Renderer         *string     `json:"renderer,omitempty"` // display styles
+		Repeat           *string     `json:"repeat,omitempty"`   // templating options
 		// RepeatIteration *int64   `json:"repeatIteration,omitempty"`
 		RepeatPanelID *uint `json:"repeatPanelId,omitempty"`
 		ScopedVars    map[string]struct {
@@ -133,7 +134,7 @@ type (
 		Bars        bool        `json:"bars"`
 		DashLength  *uint       `json:"dashLength,omitempty"`
 		Dashes      *bool       `json:"dashes,omitempty"`
-		Decimals    *uint       `json:"decimals,omitempty"`
+		Decimals    *int        `json:"decimals,omitempty"`
 		Fill        int         `json:"fill"`
 		//		Grid        grid        `json:"grid"` obsoleted in 4.1 by xaxis and yaxis
 
@@ -160,6 +161,7 @@ type (
 		YFormats        []string         `json:"y_formats,omitempty"`
 		Xaxis           Axis             `json:"xaxis"` // was added in Grafana 4.x?
 		Yaxes           []Axis           `json:"yaxes"` // was added in Grafana 4.x?
+		FieldConfig     *FieldConfig     `json:"fieldConfig,omitempty"`
 	}
 	FieldConfig struct {
 		Defaults struct {
@@ -171,6 +173,7 @@ type (
 					Value string `json:"value"`
 				} `json:"steps"`
 			} `json:"threshold"`
+			Links []Link `json:"links,omitempty"`
 		} `json:"defaults"`
 	}
 	Options struct {
@@ -442,7 +445,7 @@ type (
 		Type            string     `json:"type"`
 		ColorMode       *string    `json:"colorMode,omitempty"`
 		Colors          *[]string  `json:"colors,omitempty"`
-		Decimals        *uint      `json:"decimals,omitempty"`
+		Decimals        *int       `json:"decimals,omitempty"`
 		Thresholds      *[]string  `json:"thresholds,omitempty"`
 		Unit            *string    `json:"unit,omitempty"`
 		MappingType     int        `json:"mappingType,omitempty"`
@@ -532,11 +535,11 @@ type Target struct {
 		Field    string `json:"field"`
 		Type     string `json:"type"`
 		Settings struct {
-			Interval    string `json:"interval,omitempty"`
-			MinDocCount int    `json:"min_doc_count"`
-			Order       string `json:"order,omitempty"`
-			OrderBy     string `json:"orderBy,omitempty"`
-			Size        string `json:"size,omitempty"`
+			Interval    string      `json:"interval,omitempty"`
+			MinDocCount interface{} `json:"min_doc_count"`
+			Order       string      `json:"order,omitempty"`
+			OrderBy     string      `json:"orderBy,omitempty"`
+			Size        string      `json:"size,omitempty"`
 		} `json:"settings"`
 	} `json:"bucketAggs,omitempty"`
 
@@ -563,7 +566,12 @@ type Target struct {
 	CrossSeriesReducer string                    `json:"crossSeriesReducer,omitempty"`
 	PerSeriesAligner   string                    `json:"perSeriesAligner,omitempty"`
 	ValueType          string                    `json:"valueType,omitempty"`
-	GroupBys           []string                  `json:"groupBys,omitempty"`
+	GroupBy            []string                  `json:"groupBy,omitempty"`
+	Tags               []struct {
+		Key      string `json:"key,omitempty"`
+		Operator string `json:"operator,omitempty"`
+		Value    string `json:"value,omitempty"`
+	} `json:"tags,omitempty"`
 }
 
 // StackdriverAlignOptions defines the list of alignment options shown in
@@ -1053,13 +1061,40 @@ func (p *Panel) MarshalJSON() ([]byte, error) {
 		}{p.CommonPanel, *p.HeatmapPanel}
 		return json.Marshal(outHeatmap)
 	case CustomType:
-		var outCustom = struct {
-			CommonPanel
-			CustomPanel
-		}{p.CommonPanel, *p.CustomPanel}
+		var outCustom = customPanelOutput{
+			p.CommonPanel,
+			*p.CustomPanel,
+		}
 		return json.Marshal(outCustom)
 	}
 	return nil, errors.New("can't marshal unknown panel type")
+}
+
+type customPanelOutput struct {
+	CommonPanel
+	CustomPanel
+}
+
+func (c customPanelOutput) MarshalJSON() ([]byte, error) {
+	b, err := json.Marshal(c.CommonPanel)
+	if err != nil {
+		return b, err
+	}
+	// Append custom keys to marshalled CommonPanel.
+	buf := bytes.NewBuffer(b[:len(b)-1])
+
+	for k, v := range c.CustomPanel {
+		buf.WriteString(`,"`)
+		buf.WriteString(k)
+		buf.WriteString(`":`)
+		b, err := json.Marshal(v)
+		if err != nil {
+			return b, err
+		}
+		buf.Write(b)
+	}
+	buf.WriteString("}")
+	return buf.Bytes(), nil
 }
 
 func incRefID(refID string) string {

@@ -67,7 +67,7 @@ func TestGraphPanelHeightCanBeConfigured(t *testing.T) {
 
 	panel := New("", Height("400px"))
 
-	req.Equal("400px", *panel.Builder.Height)
+	req.Equal("400px", *(panel.Builder.Height).(*string))
 }
 
 func TestGraphPanelBackgroundCanBeTransparent(t *testing.T) {

@@ -56,9 +56,10 @@ type Query struct {
 // New creates a new "query" templated variable.
 func New(name string, options ...Option) *Query {
 	query := &Query{Builder: sdk.TemplateVar{
-		Name:  name,
-		Label: name,
-		Type:  "query",
+		Name:    name,
+		Label:   name,
+		Type:    "query",
+		Options: []sdk.Option{},
 	}}
 
 	for _, opt := range append([]Option{Refresh(DashboardLoad)}, options...) {

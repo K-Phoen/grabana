@@ -22,9 +22,10 @@ func New(name string, options ...Option) *Datasource {
 	refreshValue := dashboardLoad
 
 	query := &Datasource{Builder: sdk.TemplateVar{
-		Name:  name,
-		Label: name,
-		Type:  "datasource",
+		Name:    name,
+		Label:   name,
+		Type:    "datasource",
+		Options: []sdk.Option{},
 		Refresh: sdk.BoolInt{
 			Flag:  true,
 			Value: &refreshValue,

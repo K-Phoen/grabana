@@ -167,6 +167,6 @@ func Filter(filters ...FilterOption) Option {
 // GroupBys defines a list of fields to group the query by.
 func GroupBys(groupBys ...string) Option {
 	return func(stackdriver *Stackdriver) {
-		stackdriver.Builder.GroupBys = groupBys
+		stackdriver.Builder.GroupBy = groupBys
 	}
 }
