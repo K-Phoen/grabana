@@ -660,9 +660,42 @@ rows:
 					"fieldConfig": {
 						"defaults": {
 							"unit": "",
-							"threshold": {
+							"color": {
+								"mode": ""
+							},
+							"thresholds": {
 								"mode": "",
 								"steps": null
+							},
+							"custom": {
+								"axisPlacement": "",
+								"barAlignment": 0,
+								"drawStyle": "",
+								"fillOpacity": 0,
+								"gradientMode": "",
+								"hideFrom": {
+									"legend": false,
+									"tooltip": false,
+									"viz": false
+								},
+								"lineInterpolation": "",
+								"lineStyle": {
+									"fill": ""
+								},
+								"lineWidth": 0,
+								"pointSize": 0,
+								"scaleDistribution": {
+									"type": ""
+								},
+								"showPoints": "",
+								"spanNulls": false,
+								"stacking": {
+									"group": "",
+									"mode": ""
+								},
+								"thresholdsStyle": {
+									"mode": ""
+								}
 							}
 						}
 					}
@@ -693,9 +726,42 @@ rows:
 					"fieldConfig": {
 						"defaults": {
 							"unit": "",
-							"threshold": {
+							"color": {
+								"mode": ""
+							},
+							"thresholds": {
 								"mode": "",
 								"steps": null
+							},
+							"custom": {
+								"axisPlacement": "",
+								"barAlignment": 0,
+								"drawStyle": "",
+								"fillOpacity": 0,
+								"gradientMode": "",
+								"hideFrom": {
+									"legend": false,
+									"tooltip": false,
+									"viz": false
+								},
+								"lineInterpolation": "",
+								"lineStyle": {
+									"fill": ""
+								},
+								"lineWidth": 0,
+								"pointSize": 0,
+								"scaleDistribution": {
+									"type": ""
+								},
+								"showPoints": "",
+								"spanNulls": false,
+								"stacking": {
+									"group": "",
+									"mode": ""
+								},
+								"thresholdsStyle": {
+									"mode": ""
+								}
 							}
 						}
 					}
@@ -1869,9 +1935,42 @@ rows:
 					"fieldConfig": {
 						"defaults": {
 							"unit": "",
-							"threshold": {
+							"color": {
+								"mode": ""
+							},
+							"thresholds": {
 								"mode": "",
 								"steps": null
+							},
+							"custom": {
+								"axisPlacement": "",
+								"barAlignment": 0,
+								"drawStyle": "",
+								"fillOpacity": 0,
+								"gradientMode": "",
+								"hideFrom": {
+									"legend": false,
+									"tooltip": false,
+									"viz": false
+								},
+								"lineInterpolation": "",
+								"lineStyle": {
+									"fill": ""
+								},
+								"lineWidth": 0,
+								"pointSize": 0,
+								"scaleDistribution": {
+									"type": ""
+								},
+								"showPoints": "",
+								"spanNulls": false,
+								"stacking": {
+									"group": "",
+									"mode": ""
+								},
+								"thresholdsStyle": {
+									"mode": ""
+								}
 							}
 						}
 					}
