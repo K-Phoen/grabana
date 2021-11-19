@@ -1,7 +1,7 @@
 package axis
 
 import (
-	"github.com/grafana-tools/sdk"
+	"github.com/K-Phoen/sdk"
 )
 
 // PlacementMode represents the axis display placement mode.
