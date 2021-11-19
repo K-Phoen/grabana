@@ -195,7 +195,8 @@ func TestLegendCanShowCalculatedData(t *testing.T) {
 		{option: LastNonNull, expected: "lastNotNull"},
 	}
 
-	for _, tc := range testCases {
+	for _, test := range testCases {
+		tc := test
 		t.Run(fmt.Sprintf("option %s", tc.expected), func(t *testing.T) {
 			req := require.New(t)
 
@@ -229,7 +230,8 @@ func TestLineInterpolationCanBeConfigured(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for _, test := range testCases {
+		tc := test
 		t.Run(fmt.Sprintf("interpolation mode %s", tc.expected), func(t *testing.T) {
 			req := require.New(t)
 
@@ -260,7 +262,8 @@ func TestBarsAlignmentCanBeConfigured(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for _, test := range testCases {
+		tc := test
 		t.Run(fmt.Sprintf("alignment %d", tc.expected), func(t *testing.T) {
 			req := require.New(t)
 
@@ -311,7 +314,8 @@ func TestGradientModeCanBeConfigured(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
+	for _, test := range testCases {
+		tc := test
 		t.Run(fmt.Sprintf("mode %s", tc.expected), func(t *testing.T) {
 			req := require.New(t)
 

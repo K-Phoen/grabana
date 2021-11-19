@@ -135,7 +135,7 @@ func (graphViz *GraphVisualization) toOptions() []graph.Option {
 		return nil
 	}
 
-	var opts []graph.Option
+	opts := []graph.Option{}
 	if graphViz.NullValue != "" {
 		mode := graph.AsZero
 		switch graphViz.NullValue {

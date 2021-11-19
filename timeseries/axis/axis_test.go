@@ -19,7 +19,8 @@ func TestAxisPlacementCanBeConfigured(t *testing.T) {
 		{value: Right, expected: "right"},
 	}
 
-	for _, tc := range testCases {
+	for _, test := range testCases {
+		tc := test
 		t.Run(fmt.Sprintf("placement %s", tc.expected), func(t *testing.T) {
 			req := require.New(t)
 
@@ -42,7 +43,8 @@ func TestAxisScaleCanBeConfigured(t *testing.T) {
 		{value: Log10, expectedType: "log", expectedLog: 10},
 	}
 
-	for _, tc := range testCases {
+	for _, test := range testCases {
+		tc := test
 		t.Run(fmt.Sprintf("placement %s %d", tc.expectedType, tc.expectedLog), func(t *testing.T) {
 			req := require.New(t)
 

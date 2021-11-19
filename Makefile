@@ -6,14 +6,14 @@ VERSION?=$(TAG_NAME)-$(SHORT_SHA)
 LDFLAGS=-ldflags "-X=main.version=$(VERSION)"
 
 ifeq ($(WITH_COVERAGE),true)
-GOCMD_TEST?=go test -mod=vendor -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
+GOCMD_TEST?=go test -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
 else
-GOCMD_TEST?=go test -mod=vendor
+GOCMD_TEST?=go test
 endif
 
 .PHONY: lint
 lint:
-	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:v1.23.1 golangci-lint run -c .golangci.yaml
+	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:v1.43.0 golangci-lint run -c .golangci.yaml
 
 .PHONY: tests
 tests:
@@ -60,4 +60,4 @@ down:
 	docker rm -f grabana_prometheus
 
 build_cli:
-	go build -mod vendor $(LDFLAGS) -o grabana github.com/K-Phoen/grabana/cmd/cli
+	go build $(LDFLAGS) -o grabana github.com/K-Phoen/grabana/cmd/cli

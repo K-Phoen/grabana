@@ -263,13 +263,13 @@ func TestPrometheusComplexTarget(t *testing.T) {
 		"time_series",
 	}
 
-	intervalFactor := 1 / 10
+	intervalFactor := 1
 	for _, format := range validFormats {
 		opts := PrometheusTarget{IntervalFactor: &intervalFactor, Format: format}.toOptions()
 		target := prometheus.New("query", opts...)
 
 		req.Equal(format, target.Format)
-		req.Equal(1/10, target.IntervalFactor)
+		req.Equal(1, target.IntervalFactor)
 	}
 }
 
