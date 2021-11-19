@@ -106,7 +106,7 @@ type StackdriverTarget struct {
 	Legend      string                `yaml:",omitempty"`
 	Ref         string                `yaml:",omitempty"`
 	Hidden      bool                  `yaml:",omitempty"`
-	GroupBy     []string              `yaml:",omitempty"`
+	GroupBy     []string              `yaml:"group_by,omitempty"`
 }
 
 type StackdriverFilters struct {
