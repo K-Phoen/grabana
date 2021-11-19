@@ -1,6 +1,6 @@
 package dashboard
 
-import "github.com/grafana-tools/sdk"
+import "github.com/K-Phoen/sdk"
 
 type LinkIcon string
 

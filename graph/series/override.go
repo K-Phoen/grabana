@@ -1,7 +1,7 @@
 package series
 
 import (
-	"github.com/grafana-tools/sdk"
+	"github.com/K-Phoen/sdk"
 )
 
 // OverrideOption represents an option that can be used alter a graph panel series.

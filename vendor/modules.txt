@@ -1,3 +1,6 @@
+# github.com/K-Phoen/sdk v0.0.0-20211119151408-adef1e5fdd11
+## explicit
+github.com/K-Phoen/sdk
 # github.com/blang/semver v3.5.1+incompatible
 ## explicit
 github.com/blang/semver
@@ -14,9 +17,6 @@ github.com/google/go-querystring/query
 github.com/gosimple/slug
 # github.com/gosimple/unidecode v1.0.1
 github.com/gosimple/unidecode
-# github.com/grafana-tools/sdk v0.0.0-20211109141249-6856e1821d44
-## explicit
-github.com/grafana-tools/sdk
 # github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf
 github.com/inconshreveable/go-update
 github.com/inconshreveable/go-update/internal/binarydist

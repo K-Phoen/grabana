@@ -196,5 +196,5 @@ func TestTargetSupportsGroupBys(t *testing.T) {
 
 	target := stackdriver.Delta("", stackdriver.GroupBys("field", "other"))
 
-	req.ElementsMatch(target.Builder.GroupBy, []string{"field", "other"})
+	req.ElementsMatch(target.Builder.GroupBys, []string{"field", "other"})
 }

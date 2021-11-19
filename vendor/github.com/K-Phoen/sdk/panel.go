@@ -39,6 +39,7 @@ const (
 	RowType
 	BarGaugeType
 	HeatmapType
+	TimeseriesType
 )
 
 const MixedSource = "-- Mixed --"
@@ -60,6 +61,7 @@ type (
 		*AlertlistPanel
 		*BarGaugePanel
 		*HeatmapPanel
+		*TimeseriesPanel
 		*CustomPanel
 	}
 	panelType   int8
@@ -164,17 +166,7 @@ type (
 		FieldConfig     *FieldConfig     `json:"fieldConfig,omitempty"`
 	}
 	FieldConfig struct {
-		Defaults struct {
-			Unit      string `json:"unit"`
-			Threshold struct {
-				Mode  string `json:"mode"`
-				Steps []struct {
-					Color string `json:"color"`
-					Value string `json:"value"`
-				} `json:"steps"`
-			} `json:"threshold"`
-			Links []Link `json:"links,omitempty"`
-		} `json:"defaults"`
+		Defaults FieldConfigDefaults `json:"defaults"`
 	}
 	Options struct {
 		Orientation   string `json:"orientation"`
@@ -360,6 +352,80 @@ type (
 		YBucketBound  string   `json:"yBucketBound"`
 		YBucketNumber *float64 `json:"yBucketNumber"`
 		YBucketSize   *float64 `json:"yBucketSize"`
+	}
+	TimeseriesPanel struct {
+		Targets     []Target          `json:"targets,omitempty"`
+		Options     TimeseriesOptions `json:"options"`
+		FieldConfig FieldConfig       `json:"fieldConfig"`
+	}
+	TimeseriesOptions struct {
+		Legend  TimeseriesLegendOptions  `json:"legend,omitempty"`
+		Tooltip TimeseriesTooltipOptions `json:"tooltip,omitempty"`
+	}
+	TimeseriesLegendOptions struct {
+		Calcs       []string `json:"calcs"`
+		DisplayMode string   `json:"displayMode"`
+		Placement   string   `json:"placement"`
+	}
+	TimeseriesTooltipOptions struct {
+		Mode string `json:"mode"`
+	}
+	FieldConfigDefaults struct {
+		Unit       string            `json:"unit"`
+		Decimals   *int              `json:"decimals,omitempty"`
+		Min        *int              `json:"min,omitempty"`
+		Max        *int              `json:"max,omitempty"`
+		Color      FieldConfigColor  `json:"color"`
+		Thresholds Thresholds        `json:"thresholds"`
+		Custom     FieldConfigCustom `json:"custom"`
+		Links      []Link            `json:"links,omitempty"`
+	}
+	FieldConfigCustom struct {
+		AxisLabel         string `json:"axisLabel,omitempty"`
+		AxisPlacement     string `json:"axisPlacement"`
+		AxisSoftMin       *int   `json:"axisSoftMin,omitempty"`
+		AxisSoftMax       *int   `json:"axisSoftMax,omitempty"`
+		BarAlignment      int    `json:"barAlignment"`
+		DrawStyle         string `json:"drawStyle"`
+		FillOpacity       int    `json:"fillOpacity"`
+		GradientMode      string `json:"gradientMode"`
+		LineInterpolation string `json:"lineInterpolation"`
+		LineWidth         int    `json:"lineWidth"`
+		PointSize         int    `json:"pointSize"`
+		ShowPoints        string `json:"showPoints"`
+		SpanNulls         bool   `json:"spanNulls"`
+		HideFrom          struct {
+			Legend  bool `json:"legend"`
+			Tooltip bool `json:"tooltip"`
+			Viz     bool `json:"viz"`
+		} `json:"hideFrom"`
+		LineStyle struct {
+			Fill string `json:"fill"`
+		} `json:"lineStyle"`
+		ScaleDistribution struct {
+			Type string `json:"type"`
+			Log  int    `json:"log,omitempty"`
+		} `json:"scaleDistribution"`
+		Stacking struct {
+			Group string `json:"group"`
+			Mode  string `json:"mode"`
+		} `json:"stacking"`
+		ThresholdsStyle struct {
+			Mode string `json:"mode"`
+		} `json:"thresholdsStyle"`
+	}
+	Thresholds struct {
+		Mode  string          `json:"mode"`
+		Steps []ThresholdStep `json:"steps"`
+	}
+	ThresholdStep struct {
+		Color string `json:"color"`
+		Value *int   `json:"value"`
+	}
+	FieldConfigColor struct {
+		Mode       string `json:"mode"`
+		FixedColor string `json:"fixedColor,omitempty"`
+		SeriesBy   string `json:"seriesBy,omitempty"`
 	}
 	CustomPanel map[string]interface{}
 )
@@ -566,7 +632,7 @@ type Target struct {
 	CrossSeriesReducer string                    `json:"crossSeriesReducer,omitempty"`
 	PerSeriesAligner   string                    `json:"perSeriesAligner,omitempty"`
 	ValueType          string                    `json:"valueType,omitempty"`
-	GroupBy            []string                  `json:"groupBy,omitempty"`
+	GroupBys           []string                  `json:"groupBys,omitempty"`
 	Tags               []struct {
 		Key      string `json:"key,omitempty"`
 		Operator string `json:"operator,omitempty"`
@@ -639,6 +705,34 @@ func NewGraph(title string) *Panel {
 			XAxis:         true,
 			YAxis:         true,
 		}}
+}
+
+// NewTimeseries initializes panel with a timeseries panel.
+func NewTimeseries(title string) *Panel {
+	if title == "" {
+		title = "Panel Title"
+	}
+
+	return &Panel{
+		CommonPanel: CommonPanel{
+			OfType: TimeseriesType,
+			Title:  title,
+			Type:   "timeseries",
+			Span:   12,
+			IsNew:  true,
+		},
+		TimeseriesPanel: &TimeseriesPanel{
+			FieldConfig: FieldConfig{
+				Defaults: FieldConfigDefaults{
+					Color: FieldConfigColor{
+						Mode:       "palette-classic",
+						FixedColor: "green",
+						SeriesBy:   "last",
+					},
+				},
+			},
+		},
+	}
 }
 
 // NewTable initializes panel with a table panel.
@@ -782,6 +876,8 @@ func (p *Panel) ResetTargets() {
 		p.BarGaugePanel.Targets = nil
 	case HeatmapType:
 		p.HeatmapPanel.Targets = nil
+	case TimeseriesType:
+		p.TimeseriesPanel.Targets = nil
 	}
 }
 
@@ -801,6 +897,8 @@ func (p *Panel) AddTarget(t *Target) {
 		p.TablePanel.Targets = append(p.TablePanel.Targets, *t)
 	case HeatmapType:
 		p.HeatmapPanel.Targets = append(p.HeatmapPanel.Targets, *t)
+	case TimeseriesType:
+		p.TimeseriesPanel.Targets = append(p.TimeseriesPanel.Targets, *t)
 	}
 	// TODO check for existing refID
 }
@@ -828,6 +926,8 @@ func (p *Panel) SetTarget(t *Target) {
 		setTarget(t, &p.TablePanel.Targets)
 	case HeatmapType:
 		setTarget(t, &p.HeatmapPanel.Targets)
+	case TimeseriesType:
+		setTarget(t, &p.TimeseriesPanel.Targets)
 	}
 }
 
@@ -859,6 +959,8 @@ func (p *Panel) RepeatDatasourcesForEachTarget(dsNames ...string) {
 		repeatDS(dsNames, &p.TablePanel.Targets)
 	case HeatmapType:
 		repeatDS(dsNames, &p.HeatmapPanel.Targets)
+	case TimeseriesType:
+		repeatDS(dsNames, &p.TimeseriesPanel.Targets)
 	}
 }
 
@@ -893,6 +995,8 @@ func (p *Panel) RepeatTargetsForDatasources(dsNames ...string) {
 		repeatTarget(dsNames, &p.TablePanel.Targets)
 	case HeatmapType:
 		repeatTarget(dsNames, &p.HeatmapPanel.Targets)
+	case TimeseriesType:
+		repeatTarget(dsNames, &p.TimeseriesPanel.Targets)
 	}
 }
 
@@ -912,6 +1016,8 @@ func (p *Panel) GetTargets() *[]Target {
 		return &p.BarGaugePanel.Targets
 	case HeatmapType:
 		return &p.HeatmapPanel.Targets
+	case TimeseriesType:
+		return &p.TimeseriesPanel.Targets
 	default:
 		return nil
 	}
@@ -974,6 +1080,12 @@ func (p *Panel) UnmarshalJSON(b []byte) (err error) {
 			p.OfType = HeatmapType
 			if err = json.Unmarshal(b, &heatmap); err == nil {
 				p.HeatmapPanel = &heatmap
+			}
+		case "timeseries":
+			var timeseries TimeseriesPanel
+			p.OfType = TimeseriesType
+			if err = json.Unmarshal(b, &timeseries); err == nil {
+				p.TimeseriesPanel = &timeseries
 			}
 		case "row":
 			var rowpanel RowPanel
@@ -1060,6 +1172,12 @@ func (p *Panel) MarshalJSON() ([]byte, error) {
 			HeatmapPanel
 		}{p.CommonPanel, *p.HeatmapPanel}
 		return json.Marshal(outHeatmap)
+	case TimeseriesType:
+		var outTimeseries = struct {
+			CommonPanel
+			TimeseriesPanel
+		}{p.CommonPanel, *p.TimeseriesPanel}
+		return json.Marshal(outTimeseries)
 	case CustomType:
 		var outCustom = customPanelOutput{
 			p.CommonPanel,

@@ -1,7 +1,7 @@
 package text
 
 import (
-	"github.com/grafana-tools/sdk"
+	"github.com/K-Phoen/sdk"
 )
 
 // Option represents an option that can be used to configure a text panel.

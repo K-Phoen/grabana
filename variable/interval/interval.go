@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/grafana-tools/sdk"
+	"github.com/K-Phoen/sdk"
 	"github.com/prometheus/common/model"
 )
 

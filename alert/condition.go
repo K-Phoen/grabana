@@ -1,7 +1,7 @@
 package alert
 
 import (
-	"github.com/grafana-tools/sdk"
+	"github.com/K-Phoen/sdk"
 )
 
 // Operator represents a logical operator used to chain conditions.
