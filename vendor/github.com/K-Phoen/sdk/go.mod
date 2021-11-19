@@ -1,6 +1,6 @@
-module github.com/grafana-tools/sdk
+module github.com/K-Phoen/sdk
 
-go 1.13
+go 1.16
 
 require (
 	github.com/chromedp/cdproto v0.0.0-20210706234513-2bc298e8be7f // indirect

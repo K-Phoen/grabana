@@ -13,7 +13,7 @@ import (
 
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/dashboard"
-	"github.com/grafana-tools/sdk"
+	"github.com/K-Phoen/sdk"
 )
 
 // ErrFolderNotFound is returned when the given folder can not be found.

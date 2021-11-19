@@ -57,7 +57,7 @@ type StatusMessage struct {
 
 // NewClient initializes client for interacting with an instance of Grafana server;
 // apiKeyOrBasicAuth accepts either 'username:password' basic authentication credentials,
-// or a Grafana API key
+// or a Grafana API key. If it is an empty string then no authentication is used.
 func NewClient(apiURL, apiKeyOrBasicAuth string, client *http.Client) (*Client, error) {
 	key := ""
 	basicAuth := strings.Contains(apiKeyOrBasicAuth, ":")
@@ -65,12 +65,15 @@ func NewClient(apiURL, apiKeyOrBasicAuth string, client *http.Client) (*Client, 
 	if err != nil {
 		return nil, err
 	}
-	if !basicAuth {
-		key = fmt.Sprintf("Bearer %s", apiKeyOrBasicAuth)
-	} else {
-		parts := strings.Split(apiKeyOrBasicAuth, ":")
-		baseURL.User = url.UserPassword(parts[0], parts[1])
+	if len(apiKeyOrBasicAuth) > 0 {
+		if !basicAuth {
+			key = fmt.Sprintf("Bearer %s", apiKeyOrBasicAuth)
+		} else {
+			parts := strings.Split(apiKeyOrBasicAuth, ":")
+			baseURL.User = url.UserPassword(parts[0], parts[1])
+		}
 	}
+
 	return &Client{baseURL: baseURL.String(), basicAuth: basicAuth, key: key, client: client}, nil
 }
 
@@ -105,7 +108,7 @@ func (r *Client) doRequest(ctx context.Context, method, query string, params url
 		return nil, 0, err
 	}
 	req = req.WithContext(ctx)
-	if !r.basicAuth {
+	if !r.basicAuth && len(r.key) > 0 {
 		req.Header.Set("Authorization", r.key)
 	}
 	req.Header.Set("Accept", "application/json")

@@ -1,6 +1,6 @@
 package stackdriver
 
-import "github.com/grafana-tools/sdk"
+import "github.com/K-Phoen/sdk"
 
 // Option represents an option that can be used to configure a stackdriver query.
 type Option func(target *Stackdriver)
@@ -167,6 +167,6 @@ func Filter(filters ...FilterOption) Option {
 // GroupBys defines a list of fields to group the query by.
 func GroupBys(groupBys ...string) Option {
 	return func(stackdriver *Stackdriver) {
-		stackdriver.Builder.GroupBy = groupBys
+		stackdriver.Builder.GroupBys = groupBys
 	}
 }

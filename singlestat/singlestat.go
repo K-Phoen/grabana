@@ -7,7 +7,7 @@ import (
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
-	"github.com/grafana-tools/sdk"
+	"github.com/K-Phoen/sdk"
 )
 
 // Option represents an option that can be used to configure a single stat panel.

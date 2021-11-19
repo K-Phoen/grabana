@@ -1,6 +1,6 @@
 package graphite
 
-import "github.com/grafana-tools/sdk"
+import "github.com/K-Phoen/sdk"
 
 // Option represents an option that can be used to configure a graphite query.
 type Option func(target *Graphite)
