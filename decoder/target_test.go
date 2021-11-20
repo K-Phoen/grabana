@@ -3,6 +3,8 @@ package decoder
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/target/influxdb"
+
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
@@ -235,6 +237,15 @@ func TestStackdriverProject(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("gcp-project", target.Builder.ProjectName)
+}
+
+func TestInfluxDBHiddenTarget(t *testing.T) {
+	req := require.New(t)
+
+	opts := InfluxDBTarget{Hidden: true}.toOptions()
+	target := influxdb.New("query", opts...)
+
+	req.True(target.Builder.Hide)
 }
 
 func TestPrometheusHiddenTarget(t *testing.T) {

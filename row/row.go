@@ -47,9 +47,9 @@ func WithGraph(title string, options ...graph.Option) Option {
 // WithTimeSeries adds a "timeseries" panel in the row.
 func WithTimeSeries(title string, options ...timeseries.Option) Option {
 	return func(row *Row) {
-		graphPanel := timeseries.New(title, options...)
+		panel := timeseries.New(title, options...)
 
-		row.builder.Add(graphPanel.Builder)
+		row.builder.Add(panel.Builder)
 	}
 }
 

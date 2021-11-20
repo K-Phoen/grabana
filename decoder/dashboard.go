@@ -109,11 +109,15 @@ type DashboardPanel struct {
 	SingleStat *DashboardSingleStat `yaml:"single_stat,omitempty"`
 	Text       *DashboardText       `yaml:",omitempty"`
 	Heatmap    *DashboardHeatmap    `yaml:",omitempty"`
+	TimeSeries *DashboardTimeSeries `yaml:"timeseries,omitempty"`
 }
 
 func (panel DashboardPanel) toOption() (row.Option, error) {
 	if panel.Graph != nil {
 		return panel.Graph.toOption()
+	}
+	if panel.TimeSeries != nil {
+		return panel.TimeSeries.toOption()
 	}
 	if panel.Table != nil {
 		return panel.Table.toOption()
