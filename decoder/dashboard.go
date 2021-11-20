@@ -18,11 +18,11 @@ type DashboardModel struct {
 	AutoRefresh     string `yaml:"auto_refresh"`
 
 	Time     [2]string
-	Timezone string
+	Timezone string `yaml:",omitempty"`
 
-	TagsAnnotation []dashboard.TagAnnotation `yaml:"tags_annotations"`
-	Variables      []DashboardVariable
-	ExternalLinks  []DashboardExternalLink `yaml:"external_links,omitempty"`
+	TagsAnnotation []dashboard.TagAnnotation `yaml:"tags_annotations,omitempty"`
+	Variables      []DashboardVariable       `yaml:",omitempty"`
+	ExternalLinks  []DashboardExternalLink   `yaml:"external_links,omitempty"`
 
 	Rows []DashboardRow
 }
