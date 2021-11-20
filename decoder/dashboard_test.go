@@ -2,6 +2,7 @@ package decoder
 
 import (
 	"bytes"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -48,7 +49,7 @@ func TestUnmarshalYAML(t *testing.T) {
 			json, err := builder.MarshalJSON()
 			req.NoError(err)
 
-			req.JSONEq(tc.expectedGrafanaJSON, string(json))
+			req.JSONEq(dashboardFromFixtures(t, "testdata/"+tc.expectedGrafanaJSON), string(json))
 		})
 	}
 }
@@ -316,35 +317,11 @@ auto_refresh: 10s
 time: ["now-6h", "now"]
 timezone: utc
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": ["generated", "yaml"],
-	"style": "dark",
-	"timezone": "utc",
-	"editable": true,
-	"hideControls": false,
-	"sharedCrosshair": true,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [],
-	"refresh": "10s",
-	"time": {"from": "now-6h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "general options",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "general_options.json",
 	}
 }
 
@@ -359,56 +336,11 @@ tags_annotations:
     color: "#5794F2"
     tags: ["deploy", "production"]
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {
-		"list": null
-	},
-	"annotations": {
-		"list": [{
-			"datasource": "-- Grafana --",
-			"enable": true,
-			"expr": "",
-			"iconColor": "#5794F2",
-			"iconSize": 0,
-			"name": "Deployments",
-			"query": "",
-			"showLine": false,
-			"step": "",
-			"tagKeys": "",
-			"lineColor": "",
-			"tags": ["deploy", "production"],
-			"tagsField": "",
-			"textField": "",
-			"textFormat": "",
-			"titleFormat": "",
-			"type": "tags"
-		}]
-	},
-	"links": null,
-	"panels": null,
-	"rows": [],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "tag annotations",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "tag_annotations.json",
 	}
 }
 
@@ -444,151 +376,11 @@ variables:
       values_map:
         v1: v1
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "browser",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {
-		"list": [
-			{
-				"name": "interval",
-				"type": "interval",
-				"datasource": null,
-				"refresh": false,
-				"options": null,
-				"includeAll": false,
-				"allFormat": "",
-				"allValue": "",
-				"multi": false,
-				"multiFormat": "",
-				"query": "30s,1m",
-				"options": [
-					{
-						"text": "30s",
-						"value": "30s",
-						"selected": false
-					},
-					{
-						"text": "1m",
-						"value": "1m",
-						"selected": false
-					}
-				],
-				"regex": "",
-				"current": {
-					"text": ["30s"],
-					"value": "30s"
-				},
-				"label": "Interval",
-				"hide": 0,
-				"sort": 0
-			},
-			{
-				"name": "status",
-				"type": "query",
-				"datasource": "prometheus-default",
-				"refresh": 1,
-				"options": [
-					{
-						"text": "All",
-						"value": "$__all",
-						"selected": false
-					}
-				],
-				"includeAll": true,
-				"allFormat": "",
-				"allValue": "",
-				"multi": false,
-				"multiFormat": "",
-				"query": "label_values(prometheus_http_requests_total, code)",
-				"regex": "",
-				"current": {
-					"text": ["All"],
-					"value": "$__all"
-				},
-				"label": "HTTP status",
-				"hide": 0,
-				"sort": 0
-			},
-			{
-				"name": "percentile",
-				"type": "constant",
-				"datasource": null,
-				"refresh": false,
-				"options": [
-					{
-						"selected": false,
-						"text": "50th",
-						"value": "50"
-					}
-				],
-				"includeAll": false,
-				"allFormat": "",
-				"allValue": "",
-				"multi": false,
-				"multiFormat": "",
-				"query": "50",
-				"regex": "",
-				"current": {
-					"text": ["50th"],
-					"value": "50"
-				},
-				"label": "Percentile",
-				"hide": 1,
-				"sort": 0
-			},
-			{
-				"name": "vX",
-				"type": "custom",
-				"datasource": null,
-				"refresh": false,
-				"options": [
-					{
-						"text": "v1",
-						"value": "v1",
-						"selected": false
-					}
-				],
-				"includeAll": false,
-				"allFormat": "",
-				"allValue": "",
-				"multi": false,
-				"multiFormat": "",
-				"query": "v1",
-				"regex": "",
-				"current": {
-					"text": ["v1"],
-					"value": "v1"
-				},
-				"label": "vX",
-				"hide": 0,
-				"sort": 0
-			}
-		]
-	},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "variables",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "variables.json",
 	}
 }
 
@@ -611,178 +403,11 @@ rows:
           title: Some html?
           html: "Some <b>awesome</b> html"
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"type": "text",
-					"mode": "markdown",
-					"content": "*markdown*",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 1,
-					"isNew": false,
-					"pageSize": 0,
-					"scroll": false,
-					"renderer": "flot",
-					"showHeader": false,
-					"sort": {"col": 0, "desc": false},
-					"span": 6,
-					"height": "400px",
-					"styles": null,
-					"title": "Some markdown?",
-					"description": "Some description",
-					"transparent": true,
-					"options": {
-						"content": "",
-						"mode": ""
-					},
-					"fieldConfig": {
-						"defaults": {
-							"unit": "",
-							"color": {
-								"mode": ""
-							},
-							"thresholds": {
-								"mode": "",
-								"steps": null
-							},
-							"custom": {
-								"axisPlacement": "",
-								"barAlignment": 0,
-								"drawStyle": "",
-								"fillOpacity": 0,
-								"gradientMode": "",
-								"hideFrom": {
-									"legend": false,
-									"tooltip": false,
-									"viz": false
-								},
-								"lineInterpolation": "",
-								"lineStyle": {
-									"fill": ""
-								},
-								"lineWidth": 0,
-								"pointSize": 0,
-								"scaleDistribution": {
-									"type": ""
-								},
-								"showPoints": "",
-								"spanNulls": false,
-								"stacking": {
-									"group": "",
-									"mode": ""
-								},
-								"thresholdsStyle": {
-									"mode": ""
-								}
-							}
-						}
-					}
-				},
-				{
-					"type": "text",
-					"mode": "html",
-					"content": "Some <b>awesome</b> html",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 2,
-					"isNew": false,
-					"scroll": false,
-					"pageSize": 0,
-					"renderer": "flot",
-					"showHeader": false,
-					"sort": {"col": 0, "desc": false},
-					"span": 6,
-					"height": "400px",
-					"styles": null,
-					"title": "Some html?",
-					"transparent": false,
-					"options": {
-						"content": "",
-						"mode": ""
-					},
-					"fieldConfig": {
-						"defaults": {
-							"unit": "",
-							"color": {
-								"mode": ""
-							},
-							"thresholds": {
-								"mode": "",
-								"steps": null
-							},
-							"custom": {
-								"axisPlacement": "",
-								"barAlignment": 0,
-								"drawStyle": "",
-								"fillOpacity": 0,
-								"gradientMode": "",
-								"hideFrom": {
-									"legend": false,
-									"tooltip": false,
-									"viz": false
-								},
-								"lineInterpolation": "",
-								"lineStyle": {
-									"fill": ""
-								},
-								"lineWidth": 0,
-								"pointSize": 0,
-								"scaleDistribution": {
-									"type": ""
-								},
-								"showPoints": "",
-								"spanNulls": false,
-								"stacking": {
-									"group": "",
-									"mode": ""
-								},
-								"thresholdsStyle": {
-									"mode": ""
-								}
-							}
-						}
-					}
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with text panels",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "text_panel.json",
 	}
 }
 
@@ -824,153 +449,11 @@ rows:
                 legend: "{{job}}"
                 ref: A
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"type": "graph",
-					"datasource": "prometheus-default",
-					"editable": false,
-					"error": false,
-					"height": "400px",
-					"gridPos": {},
-					"id": 3,
-					"isNew": false,
-					"renderer": "flot",
-					"span": 4,
-					"fill": 1,
-					"title": "Heap allocations",
-					"description": "Some description",
-					"aliasColors": {},
-					"alert": {
-						"conditions": [
-							{
-								"evaluator": {
-									"params": [23000000],
-									"type": "gt"
-								},
-								"operator": {"type": "and"},
-								"query": {"params": ["A", "1m", "now"]},
-								"reducer": {"type": "avg"},
-								"type": "query"
-							}
-						],
-						"executionErrorState": "alerting",
-						"alertRuleTags": {"severity": "super-critical-stop-the-world-now"},
-						"for": "1m",
-						"frequency": "1m",
-						"handler": 1,
-						"message": "Wow, a we're allocating a lot.",
-						"name": "Too many heap allocations",
-						"noDataState": "alerting",
-						"notifications": [
-							{
-								"disableResolveMessage": false,
-								"frequency": "",
-								"uid": "P-N3fxuZz",
-								"isDefault": false,
-								"name": "",
-								"sendReminder": false,
-								"settings": null,
-								"type": ""
-							}
-						]
-					},
-					"bars": false,
-					"points": false,
-					"stack": false,
-					"steppedLine": false,
-					"lines": true,
-					"linewidth": 1,
-					"pointradius": 5,
-					"percentage": false,
-					"nullPointMode": "null as zero",
-					"legend": {
-						"alignAsTable": true,
-						"avg": true,
-						"current": true,
-						"hideEmpty": true,
-						"hideZero": true,
-						"max": true,
-						"min": true,
-						"rightSide": false,
-						"show": true,
-						"total": false,
-						"values": true
-					},
-					"targets": [
-						{
-							"refId": "A",
-							"expr": "go_memstats_heap_alloc_bytes",
-							"legendFormat": "{{job}}",
-							"format": "time_series"
-						}
-					],
-					"tooltip": {
-						"shared": true,
-						"value_type": "",
-						"sort": 2
-					},
-					"x-axis": true,
-					"y-axis": true,
-					"xaxis": {
-						"format": "short",
-						"logBase": 1,
-						"show": false
-					},
-					"yaxes": [
-						{
-							"format": "short",
-							"label": "Requests",
-							"min": 0,
-							"max": 100,
-							"logBase": 1,
-							"show": true
-						},
-						{
-							"format": "short",
-							"logBase": 1,
-							"show": false
-						}
-					],
-					"transparent": true
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with single graph panel",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "graph_panel.json",
 	}
 }
 
@@ -995,256 +478,11 @@ rows:
                   eq:
                     resource.type: pubsub_subscription
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"type": "graph",
-					"datasource": "voi-stage-stackdriver",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 6,
-					"isNew": false,
-					"renderer": "flot",
-					"span": 6,
-					"fill": 1,
-					"title": "Pubsub Ack msg count",
-					"aliasColors": {},
-					"bars": false,
-					"points": false,
-					"stack": false,
-					"steppedLine": false,
-					"lines": true,
-					"linewidth": 1,
-					"pointradius": 5,
-					"percentage": false,
-					"nullPointMode": "null as zero",
-					"legend": {
-						"alignAsTable": false,
-						"avg": false,
-						"current": false,
-						"hideEmpty": true,
-						"hideZero": true,
-						"max": false,
-						"min": false,
-						"rightSide": false,
-						"show": true,
-						"total": false,
-						"values": false
-					},
-					"targets": [
-						{
-							"aliasBy": "Ack-ed messages",
-							"alignOptions": [
-								{
-								  "expanded": true,
-								  "label": "Alignment options",
-								  "options": [
-									{
-									  "label": "delta",
-									  "metricKinds": [
-										"CUMULATIVE",
-										"DELTA"
-									  ],
-									  "text": "delta",
-									  "value": "ALIGN_DELTA",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY",
-										"DISTRIBUTION"
-									  ]
-									},
-									{
-									  "label": "rate",
-									  "metricKinds": [
-										"CUMULATIVE",
-										"DELTA"
-									  ],
-									  "text": "rate",
-									  "value": "ALIGN_RATE",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY"
-									  ]
-									},
-									{
-									  "label": "min",
-									  "metricKinds": [
-										"GAUGE",
-										"DELTA"
-									  ],
-									  "text": "min",
-									  "value": "ALIGN_MIN",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY"
-									  ]
-									},
-									{
-									  "label": "max",
-									  "metricKinds": [
-										"GAUGE",
-										"DELTA"
-									  ],
-									  "text": "max",
-									  "value": "ALIGN_MAX",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY"
-									  ]
-									},
-									{
-									  "label": "mean",
-									  "metricKinds": [
-										"GAUGE",
-										"DELTA"
-									  ],
-									  "text": "mean",
-									  "value": "ALIGN_MEAN",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY"
-									  ]
-									},
-									{
-									  "label": "count",
-									  "metricKinds": [
-										"GAUGE",
-										"DELTA"
-									  ],
-									  "text": "count",
-									  "value": "ALIGN_COUNT",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY",
-										"BOOL"
-									  ]
-									},
-									{
-									  "label": "sum",
-									  "metricKinds": [
-										"GAUGE",
-										"DELTA"
-									  ],
-									  "text": "sum",
-									  "value": "ALIGN_SUM",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY",
-										"DISTRIBUTION"
-									  ]
-									},
-									{
-									  "label": "stddev",
-									  "metricKinds": [
-										"GAUGE",
-										"DELTA"
-									  ],
-									  "text": "stddev",
-									  "value": "ALIGN_STDDEV",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY"
-									  ]
-									},
-									{
-									  "label": "percent change",
-									  "metricKinds": [
-										"GAUGE",
-										"DELTA"
-									  ],
-									  "text": "percent change",
-									  "value": "ALIGN_PERCENT_CHANGE",
-									  "valueTypes": [
-										"INT64",
-										"DOUBLE",
-										"MONEY"
-									  ]
-									}
-								  ]
-								}
-							  ],
-							"refId": "A",
-							"metricKind": "DELTA",
-							"metricType": "pubsub.googleapis.com/subscription/ack_message_count",
-							"perSeriesAligner": "ALIGN_DELTA",
-							"alignmentPeriod": "stackdriver-auto",
-							"crossSeriesReducer": "REDUCE_MEAN",
-							"filters": ["resource.type", "=", "pubsub_subscription"],
-							"valueType": "INT64"
-						}
-					],
-					"tooltip": {
-						"shared": true,
-						"value_type": "",
-						"sort": 2
-					},
-					"x-axis": true,
-					"y-axis": true,
-					"xaxis": {
-						"format": "time",
-						"logBase": 1,
-						"show": true
-					},
-					"yaxes": [
-						{
-							"format": "short",
-							"logBase": 1,
-							"show": true
-						},
-						{
-							"format": "short",
-							"logBase": 1,
-							"show": false
-						}
-					],
-					"transparent": false
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with single graph panel and stackdriver target",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "graph_panel_stackdriver_target.json",
 	}
 }
 
@@ -1262,112 +500,11 @@ rows:
                 ref: A
                 query: stats_counts.statsd.packets_received
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"type": "graph",
-					"datasource": "graphite-test",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 8,
-					"isNew": false,
-					"renderer": "flot",
-					"span": 6,
-					"fill": 1,
-					"title": "Packets received",
-					"aliasColors": {},
-					"bars": false,
-					"points": false,
-					"stack": false,
-					"steppedLine": false,
-					"lines": true,
-					"linewidth": 1,
-					"pointradius": 5,
-					"percentage": false,
-					"nullPointMode": "null as zero",
-					"legend": {
-						"alignAsTable": false,
-						"avg": false,
-						"current": false,
-						"hideEmpty": true,
-						"hideZero": true,
-						"max": false,
-						"min": false,
-						"rightSide": false,
-						"show": true,
-						"total": false,
-						"values": false
-					},
-					"targets": [
-						{
-							"refId": "A",
-							"target": "stats_counts.statsd.packets_received"
-						}
-					],
-					"tooltip": {
-						"shared": true,
-						"value_type": "",
-						"sort": 2
-					},
-					"x-axis": true,
-					"y-axis": true,
-					"xaxis": {
-						"format": "time",
-						"logBase": 1,
-						"show": true
-					},
-					"yaxes": [
-						{
-							"format": "short",
-							"logBase": 1,
-							"show": true
-						},
-						{
-							"format": "short",
-							"logBase": 1,
-							"show": false
-						}
-					],
-					"transparent": false
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with single graph panel and graphite target",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "graph_panel_graphite_target.json",
 	}
 }
 
@@ -1385,112 +522,11 @@ rows:
                 ref: A
                 query: buckets()
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"type": "graph",
-					"datasource": "influxdb-test",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 9,
-					"isNew": false,
-					"renderer": "flot",
-					"span": 6,
-					"fill": 1,
-					"title": "Dummy",
-					"aliasColors": {},
-					"bars": false,
-					"points": false,
-					"stack": false,
-					"steppedLine": false,
-					"lines": true,
-					"linewidth": 1,
-					"pointradius": 5,
-					"percentage": false,
-					"nullPointMode": "null as zero",
-					"legend": {
-						"alignAsTable": false,
-						"avg": false,
-						"current": false,
-						"hideEmpty": true,
-						"hideZero": true,
-						"max": false,
-						"min": false,
-						"rightSide": false,
-						"show": true,
-						"total": false,
-						"values": false
-					},
-					"targets": [
-						{
-							"refId": "A",
-							"measurement": "buckets()"
-						}
-					],
-					"tooltip": {
-						"shared": true,
-						"value_type": "",
-						"sort": 2
-					},
-					"x-axis": true,
-					"y-axis": true,
-					"xaxis": {
-						"format": "time",
-						"logBase": 1,
-						"show": true
-					},
-					"yaxes": [
-						{
-							"format": "short",
-							"logBase": 1,
-							"show": true
-						},
-						{
-							"format": "short",
-							"logBase": 1,
-							"show": false
-						}
-					],
-					"transparent": false
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with single graph panel and influxdb target",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "graph_panel_influxdb_target.json",
 	}
 }
 
@@ -1520,112 +556,11 @@ rows:
           color: ["value", "background"]
           colors: ["green", "yellow", "red"]
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"datasource": "prometheus-default",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 4,
-					"isNew": false,
-					"renderer": "flot",
-					"span": 4,
-					"height": "400px",
-					"title": "Heap Allocations",
-					"description": "Some description",
-					"transparent": true,
-					"type": "singlestat",
-					"colors": [
-						"green",
-						"yellow",
-						"red"
-					],
-					"colorValue": true,
-					"colorBackground": true,
-					"decimals": 0,
-					"format": "bytes",
-					"gauge": {
-						"maxValue": 0,
-						"minValue": 0,
-						"show": false,
-						"thresholdLabels": false,
-						"thresholdMarkers": false
-					},
-					"mappingType": 1,
-					"mappingTypes": [
-						{
-							"name": "value to text",
-							"value": 1
-						},
-						{
-							"name": "range to text",
-							"value": 2
-						}
-					],
-					"nullPointMode": "",
-					"sparkline": {
-						"show": true,
-						"fillColor": "rgba(31, 118, 189, 0.18)",
-						"lineColor": "rgb(31, 120, 193)"
-					},
-					"targets": [
-						{
-							"refId": "",
-							"expr": "go_memstats_heap_alloc_bytes{job=\"prometheus\"}",
-							"format": "time_series"
-						}
-					],
-					"thresholds": "26000000,28000000",
-					"valueFontSize": "120%",
-                    "postfixFontSize": "80%",
-        	        "prefixFontSize": "80%",
-					"valueMaps": [
-						{
-							"op": "=",
-							"text": "N/A",
-							"value": "null"
-						}
-					],
-					"valueName": "current"
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with single graph panel",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "singlestat_panel.json",
 	}
 }
 
@@ -1652,91 +587,11 @@ rows:
             - label: Current
               type: current
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"datasource": "prometheus-default",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"height": "400px",
-					"id": 5,
-					"isNew": false,
-					"renderer": "flot",
-					"span": 4,
-					"title": "Threads",
-					"description": "Threads here",
-					"transparent": true,
-					"type": "table",
-					"columns": [
-						{
-							"text": "AVG",
-							"value": "avg"
-						},
-						{
-							"text": "Current",
-							"value": "current"
-						}
-					],
-					"styles": [
-						{
-							"alias": null,
-							"pattern": "Time",
-							"type": "hidden"
-						},
-						{
-							"alias": "",
-							"pattern": "/.*/",
-							"type": "string"
-						}
-					],
-					"transform": "timeseries_aggregations",
-					"targets": [
-						{
-							"refId": "",
-							"expr": "go_threads",
-							"format": "time_series"
-						}
-					],
-					"scroll": false
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with single table panel",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "table_panel.json",
 	}
 }
 
@@ -1766,108 +621,11 @@ rows:
           showhistogram: true
           decimals: 0
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"datasource": "$datasource",
-					"dataFormat": "tsbuckets",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 7,
-					"isNew": false,
-					"renderer": "flot",
-					"span": 12,
-					"title": "Reconciliation Performance",
-					"description": "Does it perform?",
-					"transparent": false,
-					"type": "heatmap",
-					"targets": [
-						{
-							"refId": "A",
-							"expr": "sum(increase(argocd_app_reconcile_bucket{namespace=~\"$namespace\"}[$interval])) by (le)",
-							"format": "heatmap",
-							"intervalFactor": 10,
-							"legendFormat": "{{le}}"
-						}
-					],
-					"cards": {
-						"cardRound": null,
-						"cardPadding": null
-					},
-					"color": {
-						"cardColor": "#b4ff00",
-						"colorScale": "sqrt",
-						"colorScheme": "interpolateSpectral",
-						"exponent": 0.5,
-						"mode": "spectrum"
-					},
-					"xAxis": {
-						"show": true
-					},
-					"yAxis": {
-						"show": true,
-						"format": "short",
-						"logBase": 1,
-						"max": null,
-						"min": null,
-						"splitFactor": null,
-						"decimals": null
-					},
-					"tooltip": {
-						"show": true,
-						"showHistogram": true
-					},
-					"legend": {
-						"show": true
-					},
-					"tooltipDecimals": 0,
-					"hideZeroBuckets": false,
-					"highlightCards": true,
-					"xBucketNumber": null,
-					"xBucketSize": null,
-					"yBucketBound": "auto",
-					"yBucketNumber": null,
-					"yBucketSize": null,
-					"reverseYBuckets": false
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with heatmap panel",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "heatmap_panel.json",
 	}
 }
 
@@ -1886,118 +644,11 @@ rows:
             query: "go_memstats_heap_alloc_bytes"
             ref: A
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test row",
-			"collapse": false,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 10,
-					"fieldConfig": {
-						"defaults": {
-							"unit": "",
-							"color": {
-								"fixedColor": "green",
-								"seriesBy": "last",
-								"mode": "palette-classic"
-							},
-							"thresholds": {
-								"mode": "",
-								"steps": null
-							},
-							"custom": {
-								"axisPlacement": "auto",
-								"barAlignment": 0,
-								"drawStyle": "line",
-								"fillOpacity": 25,
-								"gradientMode": "opacity",
-								"hideFrom": {
-									"legend": false,
-									"tooltip": false,
-									"viz": false
-								},
-								"lineInterpolation": "linear",
-								"lineStyle": {
-									"fill": "solid"
-								},
-								"lineWidth": 1,
-								"pointSize": 5,
-								"scaleDistribution": {
-									"type": "linear"
-								},
-								"showPoints": "",
-								"spanNulls": false,
-								"stacking": {
-									"group": "",
-									"mode": ""
-								},
-								"thresholdsStyle": {
-									"mode": ""
-								}
-							}
-						}
-					},
-					"isNew": false,
-					"span": 12,
-					"title": "Total Request per Second",
-					"description": "Does it perform?",
-					"transparent": false,
-					"type": "timeseries",
-					"targets": [
-						{
-							"refId": "A",
-							"expr": "go_memstats_heap_alloc_bytes",
-							"format": "time_series"
-						}
-					],
-					"options": {
-						"legend": {
-							"calcs": [],
-							"placement": "bottom",
-							"displayMode": "list"
-						},
-						"tooltip": {
-							"mode": "single"
-						}
-					}
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single row with timeseries panel",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "timeseries_panel.json",
 	}
 }
 
@@ -2016,111 +667,19 @@ rows:
           title: Some markdown?
           markdown: "*markdown*"
 `
-	json := `{
-	"slug": "",
-	"title": "Awesome dashboard",
-	"originalTitle": "",
-	"tags": null,
-	"style": "dark",
-	"timezone": "",
-	"editable": false,
-	"hideControls": false,
-	"sharedCrosshair": false,
-	"templating": {"list": null},
-	"annotations": {"list": null},
-	"links": null,
-	"panels": null,
-	"rows": [
-		{
-			"title": "Test collapsed row",
-			"collapse": true,
-			"editable": true,
-			"height": "250px",
-			"repeat": null,
-			"showTitle": true,
-			"panels": [
-				{
-					"type": "text",
-					"mode": "markdown",
-					"content": "*markdown*",
-					"editable": false,
-					"error": false,
-					"gridPos": {},
-					"id": 11,
-					"isNew": false,
-					"pageSize": 0,
-					"scroll": false,
-					"renderer": "flot",
-					"showHeader": false,
-					"sort": {"col": 0, "desc": false},
-					"span": 6,
-					"height": "400px",
-					"styles": null,
-					"title": "Some markdown?",
-					"description": "Some description",
-					"transparent": true,
-					"options": {
-						"content": "",
-						"mode": ""
-					},
-					"fieldConfig": {
-						"defaults": {
-							"unit": "",
-							"color": {
-								"mode": ""
-							},
-							"thresholds": {
-								"mode": "",
-								"steps": null
-							},
-							"custom": {
-								"axisPlacement": "",
-								"barAlignment": 0,
-								"drawStyle": "",
-								"fillOpacity": 0,
-								"gradientMode": "",
-								"hideFrom": {
-									"legend": false,
-									"tooltip": false,
-									"viz": false
-								},
-								"lineInterpolation": "",
-								"lineStyle": {
-									"fill": ""
-								},
-								"lineWidth": 0,
-								"pointSize": 0,
-								"scaleDistribution": {
-									"type": ""
-								},
-								"showPoints": "",
-								"spanNulls": false,
-								"stacking": {
-									"group": "",
-									"mode": ""
-								},
-								"thresholdsStyle": {
-									"mode": ""
-								}
-							}
-						}
-					}
-				}
-			]
-		}
-	],
-	"time": {"from": "now-3h", "to": "now"},
-	"timepicker": {
-		"refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
-		"time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
-	},
-	"schemaVersion": 0,
-	"version": 0
-}`
 
 	return testCase{
 		name:                "single collapsed row",
 		yaml:                yaml,
-		expectedGrafanaJSON: json,
+		expectedGrafanaJSON: "single_collapsed_row.json",
 	}
+}
+
+func dashboardFromFixtures(t *testing.T, path string) string {
+	req := require.New(t)
+
+	payload, err := os.ReadFile(path)
+	req.NoError(err)
+
+	return string(payload)
 }
