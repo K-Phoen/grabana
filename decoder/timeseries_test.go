@@ -176,7 +176,7 @@ func TestTimeSeriesGradientModeCanBeDecided(t *testing.T) {
 		expectedMode timeseries.GradientType
 	}{
 		{
-			mode:         "no_gradient",
+			mode:         "none",
 			expectedMode: timeseries.NoGradient,
 		},
 		{
@@ -238,7 +238,7 @@ func TestTimeSeriesTooltipCanBeDecided(t *testing.T) {
 			expectedMode: timeseries.AllSeries,
 		},
 		{
-			mode:         "no_series",
+			mode:         "none",
 			expectedMode: timeseries.NoSeries,
 		},
 	}

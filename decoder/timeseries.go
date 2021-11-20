@@ -210,7 +210,7 @@ func (timeseriesViz *TimeSeriesVisualization) toOptions() ([]timeseries.Option, 
 func (timeseriesViz *TimeSeriesVisualization) gradientModeOption() (timeseries.Option, error) {
 	var mode timeseries.GradientType
 	switch timeseriesViz.GradientMode {
-	case "no_gradient":
+	case "none":
 		mode = timeseries.NoGradient
 	case "opacity":
 		mode = timeseries.Opacity
@@ -232,7 +232,7 @@ func (timeseriesViz *TimeSeriesVisualization) tooltipOption() (timeseries.Option
 		mode = timeseries.SingleSeries
 	case "all_series":
 		mode = timeseries.AllSeries
-	case "no_series":
+	case "none":
 		mode = timeseries.NoSeries
 	default:
 		return timeseries.Tooltip(mode), ErrInvalidTooltipMode
