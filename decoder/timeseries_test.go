@@ -5,6 +5,7 @@ import (
 
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/timeseries"
+	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/stretchr/testify/require"
 )
 
@@ -20,6 +21,22 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 		Datasource:  "some-prometheus",
 		Repeat:      "ds",
 		Legend:      []string{"hide"},
+		Visualization: &TimeSeriesVisualization{
+			GradientMode: "opacity",
+			Tooltip:      "single_series",
+			FillOpacity:  intPtr(5),
+		},
+		Axis: &TimeSeriesAxis{
+			SoftMin:  intPtr(1),
+			SoftMax:  intPtr(10),
+			Min:      intPtr(0),
+			Max:      intPtr(11),
+			Decimals: intPtr(2),
+			Display:  "auto",
+			Scale:    "linear",
+			Unit:     "short",
+			Label:    "Some label",
+		},
 	}
 
 	rowOption, err := panel.toOption()
@@ -41,6 +58,20 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 	req.Equal(panel.Span, sdkPanel.Span)
 	req.True(sdkPanel.Transparent)
 	req.Equal("hidden", tsPanel.Options.Legend.DisplayMode)
+
+	// visualization
+	req.Equal("opacity", tsPanel.FieldConfig.Defaults.Custom.GradientMode)
+	req.Equal("single", tsPanel.Options.Tooltip.Mode)
+	req.Equal(5, tsPanel.FieldConfig.Defaults.Custom.FillOpacity)
+
+	// axis
+	req.Equal("Some label", tsPanel.FieldConfig.Defaults.Custom.AxisLabel)
+	req.Equal(2, *tsPanel.FieldConfig.Defaults.Decimals)
+	req.Equal(0, *tsPanel.FieldConfig.Defaults.Min)
+	req.Equal(11, *tsPanel.FieldConfig.Defaults.Max)
+	req.Equal(1, *tsPanel.FieldConfig.Defaults.Custom.AxisSoftMin)
+	req.Equal(10, *tsPanel.FieldConfig.Defaults.Custom.AxisSoftMax)
+	req.Equal("short", tsPanel.FieldConfig.Defaults.Unit)
 }
 
 func TestTimeSeriesCanNotBeDecodedIfTargetIsInvalid(t *testing.T) {
@@ -150,11 +181,11 @@ func TestTimeSeriesGradientModeCanBeDecided(t *testing.T) {
 			viz := TimeSeriesVisualization{
 				GradientMode: tc.mode,
 			}
-			modeOpt, err := viz.gradientModeOption()
+			opts, err := viz.toOptions()
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", modeOpt)
+			tsPanel := timeseries.New("", opts...)
 
 			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode)
 		})
@@ -167,7 +198,7 @@ func TestTimeSeriesGradientModeRejectsInvalidValues(t *testing.T) {
 	viz := TimeSeriesVisualization{
 		GradientMode: "invalid",
 	}
-	_, err := viz.gradientModeOption()
+	_, err := viz.toOptions()
 
 	req.Equal(ErrInvalidGradientMode, err)
 }
@@ -200,11 +231,11 @@ func TestTimeSeriesTooltipCanBeDecided(t *testing.T) {
 			viz := TimeSeriesVisualization{
 				Tooltip: tc.mode,
 			}
-			modeOpt, err := viz.tooltipOption()
+			opts, err := viz.toOptions()
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", modeOpt)
+			tsPanel := timeseries.New("", opts...)
 
 			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.Options.Tooltip.Mode)
 		})
@@ -217,7 +248,115 @@ func TestTimeSeriesTooltipRejectsInvalidValues(t *testing.T) {
 	viz := TimeSeriesVisualization{
 		Tooltip: "invalid",
 	}
-	_, err := viz.tooltipOption()
+	_, err := viz.toOptions()
 
 	req.Equal(ErrInvalidTooltipMode, err)
+}
+
+func TestTimeSeriesAxisSupportsDisplay(t *testing.T) {
+	testCases := []struct {
+		value    string
+		expected axis.PlacementMode
+	}{
+		{
+			value:    "none",
+			expected: axis.Hidden,
+		},
+		{
+			value:    "auto",
+			expected: axis.Auto,
+		},
+		{
+			value:    "left",
+			expected: axis.Left,
+		},
+		{
+			value:    "right",
+			expected: axis.Right,
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.value, func(t *testing.T) {
+			req := require.New(t)
+
+			tsAxis := TimeSeriesAxis{
+				Display: tc.value,
+			}
+			opt, err := tsAxis.toOptions()
+
+			req.NoError(err)
+
+			tsPanel := timeseries.New("", timeseries.Axis(opt...))
+
+			req.Equal(string(tc.expected), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.AxisPlacement)
+		})
+	}
+}
+
+func TestTimeSeriesAxisRejectsInvalidDisplay(t *testing.T) {
+	req := require.New(t)
+
+	tsAxis := TimeSeriesAxis{
+		Display: "invalid",
+	}
+	_, err := tsAxis.toOptions()
+
+	req.Equal(ErrInvalidAxisDisplay, err)
+}
+
+func TestTimeSeriesAxisSupportsScale(t *testing.T) {
+	testCases := []struct {
+		value        string
+		expectedType string
+		expectedLog  int
+	}{
+		{
+			value:        "linear",
+			expectedType: "linear",
+		},
+		{
+			value:        "log2",
+			expectedType: "log",
+			expectedLog:  2,
+		},
+		{
+			value:        "log10",
+			expectedType: "log",
+			expectedLog:  10,
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.value, func(t *testing.T) {
+			req := require.New(t)
+
+			tsAxis := TimeSeriesAxis{
+				Scale: tc.value,
+			}
+			opt, err := tsAxis.toOptions()
+
+			req.NoError(err)
+
+			tsPanel := timeseries.New("", timeseries.Axis(opt...))
+
+			req.Equal(tc.expectedType, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.ScaleDistribution.Type)
+			req.Equal(tc.expectedLog, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.ScaleDistribution.Log)
+		})
+	}
+}
+
+func TestTimeSeriesAxisRejectsInvalidScale(t *testing.T) {
+	req := require.New(t)
+
+	tsAxis := TimeSeriesAxis{
+		Scale: "invalid",
+	}
+	_, err := tsAxis.toOptions()
+
+	req.Equal(ErrInvalidAxisScale, err)
 }

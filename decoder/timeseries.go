@@ -5,10 +5,13 @@ import (
 
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/timeseries"
+	"github.com/K-Phoen/grabana/timeseries/axis"
 )
 
 var ErrInvalidGradientMode = fmt.Errorf("invalid gradient mode")
 var ErrInvalidTooltipMode = fmt.Errorf("invalid tooltip mode")
+var ErrInvalidAxisDisplay = fmt.Errorf("invalid axis display")
+var ErrInvalidAxisScale = fmt.Errorf("invalid axis scale")
 
 type DashboardTimeSeries struct {
 	Title         string
@@ -22,7 +25,7 @@ type DashboardTimeSeries struct {
 	Legend        []string                 `yaml:",omitempty,flow"`
 	Alert         *Alert                   `yaml:",omitempty"`
 	Visualization *TimeSeriesVisualization `yaml:",omitempty"`
-	// TODO axis: {}
+	Axis          *TimeSeriesAxis          `yaml:",omitempty"`
 }
 
 func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
@@ -69,6 +72,14 @@ func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
 		}
 
 		opts = append(opts, vizOpts...)
+	}
+	if timeseriesPanel.Axis != nil {
+		axisOpts, err := timeseriesPanel.Axis.toOptions()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, timeseries.Axis(axisOpts...))
 	}
 
 	for _, t := range timeseriesPanel.Targets {
@@ -224,4 +235,100 @@ func (timeseriesViz *TimeSeriesVisualization) tooltipOption() (timeseries.Option
 	}
 
 	return timeseries.Tooltip(mode), nil
+}
+
+type TimeSeriesAxis struct {
+	SoftMin *int `yaml:"soft_min,omitempty"`
+	SoftMax *int `yaml:"soft_max,omitempty"`
+	Min     *int `yaml:",omitempty"`
+	Max     *int `yaml:",omitempty"`
+
+	Decimals *int `yaml:",omitempty"`
+
+	Display string `yaml:",omitempty"`
+	Scale   string `yaml:",omitempty"`
+
+	Unit  string `yaml:",omitempty"`
+	Label string `yaml:",omitempty"`
+}
+
+func (tsAxis *TimeSeriesAxis) toOptions() ([]axis.Option, error) {
+	opts := []axis.Option{}
+
+	if tsAxis.SoftMin != nil {
+		opts = append(opts, axis.SoftMin(*tsAxis.SoftMin))
+	}
+	if tsAxis.SoftMax != nil {
+		opts = append(opts, axis.SoftMax(*tsAxis.SoftMax))
+	}
+	if tsAxis.Min != nil {
+		opts = append(opts, axis.Min(*tsAxis.Min))
+	}
+	if tsAxis.Max != nil {
+		opts = append(opts, axis.Max(*tsAxis.Max))
+	}
+
+	if tsAxis.Decimals != nil {
+		opts = append(opts, axis.Decimals(*tsAxis.Decimals))
+	}
+
+	if tsAxis.Display != "" {
+		opt, err := tsAxis.placementOption()
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, opt)
+	}
+	if tsAxis.Scale != "" {
+		opt, err := tsAxis.scaleOption()
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, opt)
+	}
+
+	if tsAxis.Unit != "" {
+		opts = append(opts, axis.Unit(tsAxis.Unit))
+	}
+	if tsAxis.Label != "" {
+		opts = append(opts, axis.Label(tsAxis.Label))
+	}
+
+	return opts, nil
+}
+
+func (tsAxis *TimeSeriesAxis) placementOption() (axis.Option, error) {
+	var placementMode axis.PlacementMode
+
+	switch tsAxis.Display {
+	case "none":
+		placementMode = axis.Hidden
+	case "auto":
+		placementMode = axis.Auto
+	case "left":
+		placementMode = axis.Left
+	case "right":
+		placementMode = axis.Right
+	default:
+		return nil, ErrInvalidAxisDisplay
+	}
+
+	return axis.Placement(placementMode), nil
+}
+
+func (tsAxis *TimeSeriesAxis) scaleOption() (axis.Option, error) {
+	var scaleMode axis.ScaleMode
+
+	switch tsAxis.Scale {
+	case "linear":
+		scaleMode = axis.Linear
+	case "log2":
+		scaleMode = axis.Log2
+	case "log10":
+		scaleMode = axis.Log10
+	default:
+		return nil, ErrInvalidAxisScale
+	}
+
+	return axis.Scale(scaleMode), nil
 }
