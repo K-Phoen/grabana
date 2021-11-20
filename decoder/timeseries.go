@@ -170,6 +170,7 @@ type TimeSeriesVisualization struct {
 	GradientMode string `yaml:"gradient_mode,omitempty"`
 	Tooltip      string `yaml:"tooltip,omitempty"`
 	FillOpacity  *int   `yaml:"fill_opacity,omitempty"`
+	PointSize    *int   `yaml:"point_size,omitempty"`
 	// TODO: draw: {bars: {}, lines: {}}
 }
 
@@ -182,6 +183,9 @@ func (timeseriesViz *TimeSeriesVisualization) toOptions() ([]timeseries.Option, 
 
 	if timeseriesViz.FillOpacity != nil {
 		opts = append(opts, timeseries.FillOpacity(*timeseriesViz.FillOpacity))
+	}
+	if timeseriesViz.PointSize != nil {
+		opts = append(opts, timeseries.PointSize(*timeseriesViz.PointSize))
 	}
 	if timeseriesViz.GradientMode != "" {
 		gradient, err := timeseriesViz.gradientModeOption()

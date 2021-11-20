@@ -149,6 +149,27 @@ func TestTimeSeriesLegendCanBeDecided(t *testing.T) {
 	req.ElementsMatch(expectedOptions, legendOptions)
 }
 
+func TestTimeSeriesVisualizationCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	tsViz := &TimeSeriesVisualization{
+		GradientMode: "opacity",
+		Tooltip:      "single_series",
+		FillOpacity:  intPtr(30),
+		PointSize:    intPtr(4),
+	}
+
+	opts, err := tsViz.toOptions()
+	req.NoError(err)
+
+	tsPanel := timeseries.New("", opts...)
+
+	req.Equal("opacity", tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode)
+	req.Equal(30, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.FillOpacity)
+	req.Equal(4, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.PointSize)
+	req.Equal("single", tsPanel.Builder.TimeseriesPanel.Options.Tooltip.Mode)
+}
+
 func TestTimeSeriesGradientModeCanBeDecided(t *testing.T) {
 	testCases := []struct {
 		mode         string
