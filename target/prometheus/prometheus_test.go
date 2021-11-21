@@ -62,7 +62,7 @@ func TestFormatCanBeConfigured(t *testing.T) {
 func TestIntervalFactorCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	target := prometheus.New("", prometheus.IntervalFactor(1/10))
+	target := prometheus.New("", prometheus.IntervalFactor(1))
 
-	req.Equal(1/10, target.IntervalFactor)
+	req.Equal(1, target.IntervalFactor)
 }

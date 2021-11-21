@@ -18,11 +18,11 @@ type DashboardModel struct {
 	AutoRefresh     string `yaml:"auto_refresh"`
 
 	Time     [2]string
-	Timezone string
+	Timezone string `yaml:",omitempty"`
 
-	TagsAnnotation []dashboard.TagAnnotation `yaml:"tags_annotations"`
-	Variables      []DashboardVariable
-	ExternalLinks  []DashboardExternalLink `yaml:"external_links,omitempty"`
+	TagsAnnotation []dashboard.TagAnnotation `yaml:"tags_annotations,omitempty"`
+	Variables      []DashboardVariable       `yaml:",omitempty"`
+	ExternalLinks  []DashboardExternalLink   `yaml:"external_links,omitempty"`
 
 	Rows []DashboardRow
 }
@@ -109,11 +109,15 @@ type DashboardPanel struct {
 	SingleStat *DashboardSingleStat `yaml:"single_stat,omitempty"`
 	Text       *DashboardText       `yaml:",omitempty"`
 	Heatmap    *DashboardHeatmap    `yaml:",omitempty"`
+	TimeSeries *DashboardTimeSeries `yaml:"timeseries,omitempty"`
 }
 
 func (panel DashboardPanel) toOption() (row.Option, error) {
 	if panel.Graph != nil {
 		return panel.Graph.toOption()
+	}
+	if panel.TimeSeries != nil {
+		return panel.TimeSeries.toOption()
 	}
 	if panel.Table != nil {
 		return panel.Table.toOption()

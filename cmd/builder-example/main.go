@@ -8,7 +8,6 @@ import (
 
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/alert"
-	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
@@ -16,6 +15,8 @@ import (
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
+	"github.com/K-Phoen/grabana/timeseries"
+	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/interval"
@@ -109,15 +110,19 @@ func main() {
 					prometheus.Legend("{{handler}} - {{ code }}"),
 				),
 			),
-			row.WithGraph(
+			row.WithTimeSeries(
 				"Heap allocations",
-				graph.Span(6),
-				graph.Height("400px"),
-				graph.DataSource("prometheus-default"),
-				graph.WithPrometheusTarget("go_memstats_heap_alloc_bytes", prometheus.Ref("A")),
-				graph.LeftYAxis(axis.Unit("bytes"), axis.Label("memory"), axis.Min(0)),
-				graph.Legend(graph.Current, graph.NoNullSeries, graph.NoZeroSeries, graph.AsTable),
-				graph.Alert(
+				timeseries.Span(6),
+				timeseries.Height("400px"),
+				timeseries.DataSource("prometheus-default"),
+				timeseries.WithPrometheusTarget("go_memstats_heap_alloc_bytes", prometheus.Ref("A")),
+				timeseries.Axis(
+					axis.Unit("bytes"),
+					axis.Label("Memory"),
+					axis.SoftMin(0),
+				),
+				timeseries.Legend(timeseries.Last, timeseries.AsTable),
+				timeseries.Alert(
 					"Too many heap allocations",
 					alert.If(
 						alert.And,

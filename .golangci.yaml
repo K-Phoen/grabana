@@ -17,16 +17,15 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - interfacer
     - misspell
     - nakedret
     - prealloc
-    - scopelint
+    - exportloopref
     - stylecheck
     - unconvert
     - unparam
     - gosec
-    - golint
+    - revive
     - gochecknoglobals
   disable:
     - lll

@@ -44,6 +44,15 @@ func TestRowsCanHaveGraphs(t *testing.T) {
 	req.Len(panel.builder.Panels, 1)
 }
 
+func TestRowsCanHaveTimeSeries(t *testing.T) {
+	req := require.New(t)
+	board := sdk.NewBoard("")
+
+	panel := New(board, "", WithTimeSeries("HTTP Rate"))
+
+	req.Len(panel.builder.Panels, 1)
+}
+
 func TestRowsCanHaveTextPanels(t *testing.T) {
 	req := require.New(t)
 	board := sdk.NewBoard("")
