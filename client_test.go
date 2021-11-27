@@ -318,3 +318,18 @@ func TestDeleteDashboardCanFail(t *testing.T) {
 
 	req.Error(err)
 }
+
+func TestDeletingANonExistingDashboardReturnsSpecificError(t *testing.T) {
+	req := require.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintln(w, `{"message": "oh noes, does not exist"}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteDashboard(context.TODO(), "some uid")
+
+	req.Equal(ErrDashboardNotFound, err)
+}
