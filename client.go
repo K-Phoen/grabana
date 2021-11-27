@@ -19,6 +19,9 @@ import (
 // ErrFolderNotFound is returned when the given folder can not be found.
 var ErrFolderNotFound = errors.New("folder not found")
 
+// ErrDashboardNotFound is returned when the given dashboard can not be found.
+var ErrDashboardNotFound = errors.New("dashboard not found")
+
 // ErrAlertChannelNotFound is returned when the given alert notification
 // channel can not be found.
 var ErrAlertChannelNotFound = errors.New("alert channel not found")
@@ -252,6 +255,9 @@ func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
 
 	defer func() { _ = resp.Body.Close() }()
 
+	if resp.StatusCode == http.StatusNotFound {
+		return ErrDashboardNotFound
+	}
 	if resp.StatusCode != http.StatusOK {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
