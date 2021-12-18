@@ -1,10 +1,5 @@
 WITH_COVERAGE?=false
 
-TAG_NAME?=$(shell git describe --tags)
-SHORT_SHA?=$(shell git rev-parse --short HEAD)
-VERSION?=$(TAG_NAME)-$(SHORT_SHA)
-LDFLAGS=-ldflags "-X=main.version=$(VERSION)"
-
 ifeq ($(WITH_COVERAGE),true)
 GOCMD_TEST?=go test -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic ./...
 else
@@ -59,8 +54,5 @@ down:
 	docker rm -f grabana_influxdb
 	docker rm -f grabana_prometheus
 
-build_cli:
-	go build $(LDFLAGS) -o grabana github.com/K-Phoen/grabana/cmd/cli
-
 install_goreleaser:
-	go install github.com/goreleaser/goreleaser@v1.1.0
+	go install github.com/goreleaser/goreleaser@latest
