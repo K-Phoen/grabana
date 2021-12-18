@@ -5,8 +5,9 @@ on:
     types: closed
 
 jobs:
-  build:
+  tag:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -24,15 +25,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_RELEASE_PAT }}
 
-      - run: TAG_NAME=${{ steps.tag.outputs.tag }} make build_cli
-
-      - run: tar -czvf grabana-linux-amd64.tar.gz ./grabana
-
-      - name: Upload Release Asset
-        uses: svenstaro/upload-release-action@v1-release
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: grabana-linux-amd64.tar.gz
-          asset_name: grabana-linux-amd64.tar.gz
-          tag: ${{ steps.tag.outputs.tag }}
-          overwrite: true
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17'
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          distribution: goreleaser
+          version:  latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_PAT }}
+
+      - name: Upload assets
+        uses: actions/upload-artifact@v2
+        with:
+          name: grabana
+          path: dist/*
