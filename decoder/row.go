@@ -5,6 +5,7 @@ import (
 	"github.com/K-Phoen/grabana/row"
 )
 
+// DashboardRow represents a dashboard row.
 type DashboardRow struct {
 	Name     string
 	Repeat   string `yaml:"repeat_for,omitempty"`

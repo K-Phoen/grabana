@@ -1,6 +1,6 @@
 package prometheus
 
-// Format switches between Table, Time series, or Heatmap. Table will only work
+// FormatMode switches between Table, Time series, or Heatmap. Table will only work
 // in the Table panel. Heatmap is suitable for displaying metrics of the
 // Histogram type on a Heatmap panel. Under the hood, it converts cumulative
 // histograms to regular ones and sorts series by the bucket bound.

@@ -10,6 +10,7 @@ type Graphite struct {
 	Builder *sdk.Target
 }
 
+// New creates a new Graphite query.
 func New(query string, options ...Option) *Graphite {
 	graphite := &Graphite{
 		Builder: &sdk.Target{

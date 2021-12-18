@@ -10,6 +10,7 @@ import (
 
 var ErrInvalidDataFormat = fmt.Errorf("invalid data format")
 
+// DashboardHeatmap represents a heatmap panel.
 type DashboardHeatmap struct {
 	Title           string
 	Description     string  `yaml:",omitempty"`

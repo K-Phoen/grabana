@@ -5,6 +5,7 @@ import (
 	"github.com/K-Phoen/grabana/table"
 )
 
+// DashboardTable represents a table panel.
 type DashboardTable struct {
 	Title                  string
 	Description            string  `yaml:",omitempty"`
