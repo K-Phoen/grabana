@@ -34,6 +34,7 @@ type Datasource struct {
 	BasicAuth         *bool       `json:"basicAuth,omitempty"`
 	BasicAuthUser     *string     `json:"basicAuthUser,omitempty"`
 	BasicAuthPassword *string     `json:"basicAuthPassword,omitempty"`
+	WithCredentials   bool        `json:"withCredentials"`
 	IsDefault         bool        `json:"isDefault"`
 	JSONData          interface{} `json:"jsonData"`
 	SecureJSONData    interface{} `json:"secureJsonData"`

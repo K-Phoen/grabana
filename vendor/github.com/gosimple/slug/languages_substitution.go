@@ -17,6 +17,8 @@ func init() {
 		&fiSub,
 		&frSub,
 		&grSub,
+		&huSub,
+		&idSub,
 		&kkSub,
 		&nbSub,
 		&nlSub,
@@ -93,6 +95,31 @@ var grSub = map[rune]string{
 	'ώ': "w",
 	'Ω': "w",
 	'ϋ': "u",
+}
+
+var huSub = map[rune]string{
+	'á': "a",
+	'Á': "A",
+	'é': "e",
+	'É': "E",
+	'í': "i",
+	'Í': "I",
+	'ó': "o",
+	'Ó': "O",
+	'ö': "o",
+	'Ö': "O",
+	'ő': "o",
+	'Ő': "O",
+	'ú': "u",
+	'Ú': "U",
+	'ü': "u",
+	'Ü': "U",
+	'ű': "u",
+	'Ű': "U",
+}
+
+var idSub = map[rune]string{
+	'&': "dan",
 }
 
 var kkSub = map[rune]string{

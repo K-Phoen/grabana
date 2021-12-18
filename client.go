@@ -13,6 +13,7 @@ import (
 
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/dashboard"
+	"github.com/K-Phoen/grabana/datasource"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -21,6 +22,9 @@ var ErrFolderNotFound = errors.New("folder not found")
 
 // ErrDashboardNotFound is returned when the given dashboard can not be found.
 var ErrDashboardNotFound = errors.New("dashboard not found")
+
+// ErrDatasourceNotFound is returned when the given datasource can not be found.
+var ErrDatasourceNotFound = errors.New("datasource not found")
 
 // ErrAlertChannelNotFound is returned when the given alert notification
 // channel can not be found.
@@ -119,7 +123,7 @@ func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, e
 		return nil, err
 	}
 
-	resp, err := client.postJSON(ctx, "/api/folders", buf)
+	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/folders", buf)
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +226,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		return nil, err
 	}
 
-	resp, err := client.postJSON(ctx, "/api/dashboards/db", buf)
+	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/dashboards/db", buf)
 	if err != nil {
 		return nil, err
 	}
@@ -270,6 +274,76 @@ func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
 	return nil
 }
 
+// UpsertDatasource creates or replaces a datasource.
+func (client *Client) UpsertDatasource(ctx context.Context, datasource datasource.Datasource) error {
+	buf, err := json.Marshal(datasource)
+	if err != nil {
+		return err
+	}
+
+	id, err := client.getDatasourceIDByName(ctx, datasource.Name())
+	if err != nil && err != ErrDatasourceNotFound {
+		return err
+	}
+
+	method := http.MethodPost
+	url := "/api/datasources"
+	if id != 0 {
+		method = http.MethodPut
+		url = fmt.Sprintf("/api/datasources/%d", id)
+	}
+
+	resp, err := client.sendJSON(ctx, method, url, buf)
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		return fmt.Errorf("could not create datasource: %s", body)
+	}
+
+	return nil
+}
+
+// getDatasourceIDByName finds a datasource, given its name.
+func (client *Client) getDatasourceIDByName(ctx context.Context, name string) (int, error) {
+	resp, err := client.get(ctx, "/api/datasources/id/"+name)
+	if err != nil {
+		return 0, err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return 0, ErrDatasourceNotFound
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return 0, err
+		}
+
+		return 0, fmt.Errorf("could query datasources: %s (HTTP status %d)", body, resp.StatusCode)
+	}
+
+	response := struct {
+		ID int `json:"id"`
+	}{}
+	if err := decodeJSON(resp.Body, &response); err != nil {
+		return 0, err
+	}
+
+	return response.ID, nil
+}
+
 func (client Client) delete(ctx context.Context, path string) (*http.Response, error) {
 	request, err := http.NewRequestWithContext(ctx, http.MethodDelete, client.url(path), nil)
 	if err != nil {
@@ -281,8 +355,8 @@ func (client Client) delete(ctx context.Context, path string) (*http.Response, e
 	return client.http.Do(request)
 }
 
-func (client Client) postJSON(ctx context.Context, path string, body []byte) (*http.Response, error) {
-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, client.url(path), bytes.NewReader(body))
+func (client Client) sendJSON(ctx context.Context, method string, path string, body []byte) (*http.Response, error) {
+	request, err := http.NewRequestWithContext(ctx, method, client.url(path), bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}

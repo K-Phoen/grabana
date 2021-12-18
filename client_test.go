@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	builder "github.com/K-Phoen/grabana/dashboard"
+	"github.com/K-Phoen/grabana/datasource/prometheus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -332,4 +333,23 @@ func TestDeletingANonExistingDashboardReturnsSpecificError(t *testing.T) {
 	err := client.DeleteDashboard(context.TODO(), "some uid")
 
 	req.Equal(ErrDashboardNotFound, err)
+}
+
+func TestDatasourceUpsertCanFail(t *testing.T) {
+	req := require.New(t)
+	datasource := prometheus.New("name", "address")
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, `{
+  "message": "The datasource creation failed for some reason",
+  "status": "version-mismatch"
+}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.UpsertDatasource(context.TODO(), datasource)
+
+	req.Error(err)
 }
