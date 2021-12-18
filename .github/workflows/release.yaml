@@ -50,9 +50,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_RELEASE_PAT }}
           GORELEASER_CURRENT_TAG: ${{ needs.tag.outputs.version }}
-
-      - name: Upload assets
-        uses: actions/upload-artifact@v2
-        with:
-          name: grabana
-          path: dist/*
