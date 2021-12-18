@@ -61,3 +61,6 @@ down:
 
 build_cli:
 	go build $(LDFLAGS) -o grabana github.com/K-Phoen/grabana/cmd/cli
+
+install_goreleaser:
+	go install github.com/goreleaser/goreleaser@v1.1.0
