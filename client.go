@@ -312,6 +312,35 @@ func (client *Client) UpsertDatasource(ctx context.Context, datasource datasourc
 	return nil
 }
 
+// DeleteDatasource deletes a datasource given its name.
+func (client *Client) DeleteDatasource(ctx context.Context, name string) error {
+	id, err := client.getDatasourceIDByName(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.delete(ctx, fmt.Sprintf("/api/datasources/%d", id))
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return ErrDatasourceNotFound
+	}
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		return fmt.Errorf("could not delete datasource: %s", body)
+	}
+
+	return nil
+}
+
 // getDatasourceIDByName finds a datasource, given its name.
 func (client *Client) getDatasourceIDByName(ctx context.Context, name string) (int, error) {
 	resp, err := client.get(ctx, "/api/datasources/id/"+name)
