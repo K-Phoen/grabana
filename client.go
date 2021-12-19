@@ -360,7 +360,7 @@ func (client *Client) getDatasourceIDByName(ctx context.Context, name string) (i
 			return 0, err
 		}
 
-		return 0, fmt.Errorf("could query datasources: %s (HTTP status %d)", body, resp.StatusCode)
+		return 0, fmt.Errorf("could not query datasources: %s (HTTP status %d)", body, resp.StatusCode)
 	}
 
 	response := struct {
