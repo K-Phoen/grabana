@@ -131,12 +131,7 @@ func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, e
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could not create folder: %s (HTTP status %d)", body, resp.StatusCode)
+		return nil, client.httpError(resp)
 	}
 
 	var folder Folder
@@ -157,12 +152,7 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could list folders: %s (HTTP status %d)", body, resp.StatusCode)
+		return nil, client.httpError(resp)
 	}
 
 	var folders []Folder
@@ -189,12 +179,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could lookup alert channels: %s (HTTP status %d)", body, resp.StatusCode)
+		return nil, client.httpError(resp)
 	}
 
 	var channels []alert.Channel
@@ -234,12 +219,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could not create dashboard: %s", body)
+		return nil, client.httpError(resp)
 	}
 
 	var model Dashboard
@@ -263,12 +243,7 @@ func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
 		return ErrDashboardNotFound
 	}
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		return fmt.Errorf("could not delete dashboard: %s", body)
+		return client.httpError(resp)
 	}
 
 	return nil
@@ -301,12 +276,7 @@ func (client *Client) UpsertDatasource(ctx context.Context, datasource datasourc
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		return fmt.Errorf("could not create datasource: %s", body)
+		return client.httpError(resp)
 	}
 
 	return nil
@@ -330,12 +300,7 @@ func (client *Client) DeleteDatasource(ctx context.Context, name string) error {
 		return ErrDatasourceNotFound
 	}
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		return fmt.Errorf("could not delete datasource: %s", body)
+		return client.httpError(resp)
 	}
 
 	return nil
@@ -355,12 +320,7 @@ func (client *Client) getDatasourceIDByName(ctx context.Context, name string) (i
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return 0, err
-		}
-
-		return 0, fmt.Errorf("could not query datasources: %s (HTTP status %d)", body, resp.StatusCode)
+		return 0, client.httpError(resp)
 	}
 
 	response := struct {
@@ -371,6 +331,15 @@ func (client *Client) getDatasourceIDByName(ctx context.Context, name string) (i
 	}
 
 	return response.ID, nil
+}
+
+func (client Client) httpError(resp *http.Response) error {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return fmt.Errorf("could not query grafana: %s (HTTP status %d)", body, resp.StatusCode)
 }
 
 func (client Client) delete(ctx context.Context, path string) (*http.Response, error) {
