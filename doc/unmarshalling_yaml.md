@@ -36,7 +36,6 @@ func main() {
 }
 ```
 
-
 ## That was it!
 
 [Return to the index to explore the other possibilities of the module](index.md)
