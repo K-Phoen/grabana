@@ -13,7 +13,7 @@ type InfluxDB struct {
 func New(query string, options ...Option) *InfluxDB {
 	influxdb := &InfluxDB{
 		Builder: &sdk.Target{
-			Measurement: query,
+			Query: query,
 		},
 	}
 

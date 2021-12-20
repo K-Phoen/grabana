@@ -12,7 +12,7 @@ func TestQueriesCanBeCreated(t *testing.T) {
 
 	target := influxdb.New("buckets()")
 
-	req.Equal("buckets()", target.Builder.Measurement)
+	req.Equal("buckets()", target.Builder.Query)
 }
 
 func TestRefCanBeConfigured(t *testing.T) {
