@@ -59,7 +59,7 @@
           "targets": [
             {
               "refId": "A",
-              "measurement": "buckets()"
+              "query": "buckets()"
             }
           ],
           "tooltip": {
