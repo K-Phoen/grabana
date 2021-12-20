@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	builder "github.com/K-Phoen/grabana/dashboard"
+	"github.com/K-Phoen/grabana/datasource/prometheus"
 	"github.com/stretchr/testify/require"
 )
 
@@ -332,4 +333,168 @@ func TestDeletingANonExistingDashboardReturnsSpecificError(t *testing.T) {
 	err := client.DeleteDashboard(context.TODO(), "some uid")
 
 	req.Equal(ErrDashboardNotFound, err)
+}
+
+func TestDatasourceUpsertCanCreateANewDatasource(t *testing.T) {
+	req := require.New(t)
+	datasourcePosted := false
+
+	datasource := prometheus.New("name", "address")
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// "Datasource ID by name" call
+		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		datasourcePosted = true
+
+		req.Equal(http.MethodPost, r.Method)
+		req.Equal("/api/datasources", r.URL.Path)
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, `{}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.UpsertDatasource(context.TODO(), datasource)
+
+	req.NoError(err)
+	req.True(datasourcePosted)
+}
+
+func TestDatasourceUpsertCanUpdateADatasource(t *testing.T) {
+	req := require.New(t)
+	datasourceUpdated := false
+
+	datasource := prometheus.New("name", "address")
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// "Datasource ID by name" call
+		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, `{"id": 2}`)
+			return
+		}
+
+		datasourceUpdated = true
+
+		req.Equal(http.MethodPut, r.Method)
+		req.Equal("/api/datasources/2", r.URL.Path)
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, `{}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.UpsertDatasource(context.TODO(), datasource)
+
+	req.NoError(err)
+	req.True(datasourceUpdated)
+}
+
+func TestUpsertDatasourceForwardsErrorsOnFailure(t *testing.T) {
+	req := require.New(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// "Datasource ID by name" call
+		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, `{
+  "message": "something when wrong"
+}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.UpsertDatasource(context.TODO(), prometheus.New("name", "address"))
+
+	req.Error(err)
+	req.Contains(err.Error(), "something when wrong")
+}
+
+func TestDeleteDatasource(t *testing.T) {
+	req := require.New(t)
+	datasourceDeleted := false
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// "Datasource ID by name" call
+		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, `{"id": 2}`)
+			return
+		}
+
+		datasourceDeleted = true
+
+		req.Equal(http.MethodDelete, r.Method)
+		req.Equal("/api/datasources/2", r.URL.Path)
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, `{}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteDatasource(context.TODO(), "test-ds")
+
+	req.NoError(err)
+	req.True(datasourceDeleted)
+}
+
+func TestDeleteDatasourceReturnsKnownErrorIfDatasourceDoesNotExist(t *testing.T) {
+	req := require.New(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// "Datasource ID by name" call
+		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteDatasource(context.TODO(), "test-ds")
+
+	req.Error(err)
+	req.Equal(ErrDatasourceNotFound, err)
+}
+
+func TestDeleteDatasourceForwardsErrorOnFailure(t *testing.T) {
+	req := require.New(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// "Datasource ID by name" call
+		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, `{"id": 2}`)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, `{
+  "message": "something when wrong"
+}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteDatasource(context.TODO(), "test-ds")
+
+	req.Error(err)
+	req.Contains(err.Error(), "something when wrong")
 }

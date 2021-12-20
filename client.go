@@ -13,6 +13,7 @@ import (
 
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/dashboard"
+	"github.com/K-Phoen/grabana/datasource"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -21,6 +22,9 @@ var ErrFolderNotFound = errors.New("folder not found")
 
 // ErrDashboardNotFound is returned when the given dashboard can not be found.
 var ErrDashboardNotFound = errors.New("dashboard not found")
+
+// ErrDatasourceNotFound is returned when the given datasource can not be found.
+var ErrDatasourceNotFound = errors.New("datasource not found")
 
 // ErrAlertChannelNotFound is returned when the given alert notification
 // channel can not be found.
@@ -119,7 +123,7 @@ func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, e
 		return nil, err
 	}
 
-	resp, err := client.postJSON(ctx, "/api/folders", buf)
+	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/folders", buf)
 	if err != nil {
 		return nil, err
 	}
@@ -127,12 +131,7 @@ func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, e
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could not create folder: %s (HTTP status %d)", body, resp.StatusCode)
+		return nil, client.httpError(resp)
 	}
 
 	var folder Folder
@@ -153,12 +152,7 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could list folders: %s (HTTP status %d)", body, resp.StatusCode)
+		return nil, client.httpError(resp)
 	}
 
 	var folders []Folder
@@ -185,12 +179,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could lookup alert channels: %s (HTTP status %d)", body, resp.StatusCode)
+		return nil, client.httpError(resp)
 	}
 
 	var channels []alert.Channel
@@ -222,7 +211,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		return nil, err
 	}
 
-	resp, err := client.postJSON(ctx, "/api/dashboards/db", buf)
+	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/dashboards/db", buf)
 	if err != nil {
 		return nil, err
 	}
@@ -230,12 +219,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		return nil, fmt.Errorf("could not create dashboard: %s", body)
+		return nil, client.httpError(resp)
 	}
 
 	var model Dashboard
@@ -259,15 +243,103 @@ func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
 		return ErrDashboardNotFound
 	}
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		return fmt.Errorf("could not delete dashboard: %s", body)
+		return client.httpError(resp)
 	}
 
 	return nil
+}
+
+// UpsertDatasource creates or replaces a datasource.
+func (client *Client) UpsertDatasource(ctx context.Context, datasource datasource.Datasource) error {
+	buf, err := json.Marshal(datasource)
+	if err != nil {
+		return err
+	}
+
+	id, err := client.getDatasourceIDByName(ctx, datasource.Name())
+	if err != nil && err != ErrDatasourceNotFound {
+		return err
+	}
+
+	method := http.MethodPost
+	url := "/api/datasources"
+	if id != 0 {
+		method = http.MethodPut
+		url = fmt.Sprintf("/api/datasources/%d", id)
+	}
+
+	resp, err := client.sendJSON(ctx, method, url, buf)
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return client.httpError(resp)
+	}
+
+	return nil
+}
+
+// DeleteDatasource deletes a datasource given its name.
+func (client *Client) DeleteDatasource(ctx context.Context, name string) error {
+	id, err := client.getDatasourceIDByName(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.delete(ctx, fmt.Sprintf("/api/datasources/%d", id))
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return ErrDatasourceNotFound
+	}
+	if resp.StatusCode != http.StatusOK {
+		return client.httpError(resp)
+	}
+
+	return nil
+}
+
+// getDatasourceIDByName finds a datasource, given its name.
+func (client *Client) getDatasourceIDByName(ctx context.Context, name string) (int, error) {
+	resp, err := client.get(ctx, "/api/datasources/id/"+name)
+	if err != nil {
+		return 0, err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return 0, ErrDatasourceNotFound
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return 0, client.httpError(resp)
+	}
+
+	response := struct {
+		ID int `json:"id"`
+	}{}
+	if err := decodeJSON(resp.Body, &response); err != nil {
+		return 0, err
+	}
+
+	return response.ID, nil
+}
+
+func (client Client) httpError(resp *http.Response) error {
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return fmt.Errorf("could not query grafana: %s (HTTP status %d)", body, resp.StatusCode)
 }
 
 func (client Client) delete(ctx context.Context, path string) (*http.Response, error) {
@@ -281,8 +353,8 @@ func (client Client) delete(ctx context.Context, path string) (*http.Response, e
 	return client.http.Do(request)
 }
 
-func (client Client) postJSON(ctx context.Context, path string, body []byte) (*http.Response, error) {
-	request, err := http.NewRequestWithContext(ctx, http.MethodPost, client.url(path), bytes.NewReader(body))
+func (client Client) sendJSON(ctx context.Context, method string, path string, body []byte) (*http.Response, error) {
+	request, err := http.NewRequestWithContext(ctx, method, client.url(path), bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}

@@ -45,7 +45,7 @@ up:
       -p 3000:3000 \
       --name=grabana_grafana \
       -e "GF_SECURITY_ADMIN_PASSWORD=secret" \
-      grafana/grafana
+      grafana/grafana:8.3.2
 
 .PHONY: down
 down:
