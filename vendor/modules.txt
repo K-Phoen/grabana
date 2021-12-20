@@ -1,4 +1,4 @@
-# github.com/K-Phoen/sdk v0.8.1
+# github.com/K-Phoen/sdk v0.8.1 => github.com/ptxmac/sdk v0.8.2-0.20211220183005-6bf8e9c10730
 ## explicit
 github.com/K-Phoen/sdk
 # github.com/blang/semver v3.5.1+incompatible
@@ -102,3 +102,4 @@ google.golang.org/protobuf/types/descriptorpb
 # gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 ## explicit
 gopkg.in/yaml.v3
+# github.com/K-Phoen/sdk => github.com/ptxmac/sdk v0.8.2-0.20211220183005-6bf8e9c10730
