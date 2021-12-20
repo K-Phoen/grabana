@@ -1,0 +1,16 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "markdownlint",
+      "pattern": [
+        {
+          "code": 3,
+          "file": 1,
+          "line": 2,
+          "message": 4,
+          "regexp": "^(.+):(\\d+)(?:\\d+)? (\\S+) (.+)$"
+        }
+      ]
+    }
+  ]
+}
