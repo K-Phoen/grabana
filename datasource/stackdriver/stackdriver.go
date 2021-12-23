@@ -16,7 +16,7 @@ type Stackdriver struct {
 type Option func(datasource *Stackdriver)
 
 func New(name string, options ...Option) Stackdriver {
-	prometheus := &Stackdriver{
+	stackdriver := &Stackdriver{
 		builder: &sdk.Datasource{
 			Name:           name,
 			Type:           "stackdriver",
@@ -31,10 +31,10 @@ func New(name string, options ...Option) Stackdriver {
 	}
 
 	for _, opt := range append(defaults, options...) {
-		opt(prometheus)
+		opt(stackdriver)
 	}
 
-	return *prometheus
+	return *stackdriver
 }
 
 func (datasource Stackdriver) Name() string {
