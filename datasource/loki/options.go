@@ -2,6 +2,19 @@ package loki
 
 import "time"
 
+type DerivedField struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+	// Used to parse and capture some part of the log message. You can use the captured groups in the template.
+	Regex string `json:"matcherRegex"`
+	// Used to override the button label when this derived field is found in a log.
+	// Optional.
+	URLDisplayLabel string `json:"urlDisplayLabel,omitempty"`
+	// For internal links
+	// Optional.
+	DatasourceUID string `json:"datasourceUid,omitempty"`
+}
+
 // Default configures this datasource to be the default one.
 func Default() Option {
 	return func(datasource *Loki) {
@@ -72,5 +85,13 @@ func ForwardCookies(cookies ...string) Option {
 func MaximumLines(max int) Option {
 	return func(datasource *Loki) {
 		datasource.builder.JSONData.(map[string]interface{})["maxLines"] = max
+	}
+}
+
+// DerivedFields defines fields can be used to extract new fields from a log
+// message and create a link from its value.
+func DerivedFields(fields ...DerivedField) Option {
+	return func(datasource *Loki) {
+		datasource.builder.JSONData.(map[string]interface{})["derivedFields"] = fields
 	}
 }

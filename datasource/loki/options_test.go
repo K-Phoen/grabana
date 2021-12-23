@@ -82,3 +82,18 @@ func TestWithNodeGraph(t *testing.T) {
 
 	req.Equal(2000, datasource.builder.JSONData.(map[string]interface{})["maxLines"])
 }
+
+func TestDerivedFields(t *testing.T) {
+	req := require.New(t)
+
+	field := DerivedField{
+		Name:          "TraceID",
+		URL:           "${__value.raw}",
+		Regex:         "(?:traceID|trace_id)=(\\w+)",
+		DatasourceUID: "tempo-uid",
+	}
+
+	datasource := New("", "", DerivedFields(field))
+
+	req.ElementsMatch([]DerivedField{field}, datasource.builder.JSONData.(map[string]interface{})["derivedFields"])
+}
