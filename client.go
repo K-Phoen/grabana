@@ -306,6 +306,33 @@ func (client *Client) DeleteDatasource(ctx context.Context, name string) error {
 	return nil
 }
 
+// GetDatasourceUIDByName finds a datasource UID given its name.
+func (client *Client) GetDatasourceUIDByName(ctx context.Context, name string) (string, error) {
+	resp, err := client.get(ctx, "/api/datasources/name/"+name)
+	if err != nil {
+		return "", err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return "", ErrDatasourceNotFound
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", client.httpError(resp)
+	}
+
+	response := struct {
+		UID string `json:"uid"`
+	}{}
+	if err := decodeJSON(resp.Body, &response); err != nil {
+		return "", err
+	}
+
+	return response.UID, nil
+}
+
 // getDatasourceIDByName finds a datasource, given its name.
 func (client *Client) getDatasourceIDByName(ctx context.Context, name string) (int, error) {
 	resp, err := client.get(ctx, "/api/datasources/id/"+name)
