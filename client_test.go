@@ -498,3 +498,39 @@ func TestDeleteDatasourceForwardsErrorOnFailure(t *testing.T) {
 	req.Error(err)
 	req.Contains(err.Error(), "something when wrong")
 }
+
+func TestGetDatasourceUIDByName(t *testing.T) {
+	req := require.New(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, `{
+  "uid": "some-uid"
+}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	uid, err := client.GetDatasourceUIDByName(context.TODO(), "some-prometheus")
+
+	req.NoError(err)
+	req.Equal("some-uid", uid)
+}
+
+func TestGetDatasourceUIDByNameReturnsASpecificErrorIfDatasourceIsNotFound(t *testing.T) {
+	req := require.New(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	uid, err := client.GetDatasourceUIDByName(context.TODO(), "some-prometheus")
+
+	req.Error(err)
+	req.Equal(ErrDatasourceNotFound, err)
+	req.Empty(uid)
+}
