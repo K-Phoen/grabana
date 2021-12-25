@@ -101,3 +101,10 @@ func ForwardCookies(cookies ...string) Option {
 		datasource.builder.JSONData.(map[string]interface{})["keepCookies"] = cookies
 	}
 }
+
+// Exemplars configures a list of exemplars on this datasource.
+func Exemplars(exemplars ...Exemplar) Option {
+	return func(datasource *Prometheus) {
+		datasource.builder.JSONData.(map[string]interface{})["exemplarTraceIdDestinations"] = exemplars
+	}
+}
