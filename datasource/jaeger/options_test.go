@@ -84,3 +84,28 @@ func TestWithNodeGraph(t *testing.T) {
 
 	req.Equal(true, jsonData["nodeGraph"].(map[string]interface{})["enabled"])
 }
+
+func TestTraceToLogs(t *testing.T) {
+	req := require.New(t)
+
+	lokiDatasourceUID := "lala"
+	datasource := New("", "", TraceToLogs(
+		lokiDatasourceUID,
+		Tags("pod", "namespace"),
+		SpanStartShift(2*time.Second),
+		SpanEndShift(1*time.Second),
+		FilterByTrace(),
+		FilterBySpan(),
+	))
+
+	jsonData := datasource.builder.JSONData.(map[string]interface{})
+	traceToLogsSettings := jsonData["tracesToLogs"].(map[string]interface{})
+
+	req.NotEmpty(traceToLogsSettings)
+	req.Equal(lokiDatasourceUID, traceToLogsSettings["datasourceUid"])
+	req.ElementsMatch([]string{"pod", "namespace"}, traceToLogsSettings["tags"])
+	req.Equal("2s", traceToLogsSettings["spanStartTimeShift"])
+	req.Equal("1s", traceToLogsSettings["spanEndTimeShift"])
+	req.Equal(true, traceToLogsSettings["filterByTraceID"])
+	req.Equal(true, traceToLogsSettings["filterBySpanID"])
+}

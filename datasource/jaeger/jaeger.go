@@ -7,8 +7,6 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
-// TODO: support "Trace to logs" settings
-
 var _ datasource.Datasource = Jaeger{}
 
 type Jaeger struct {
@@ -16,6 +14,7 @@ type Jaeger struct {
 }
 
 type Option func(datasource *Jaeger)
+type TraceToLogsOption func(settings map[string]interface{})
 
 func New(name string, url string, options ...Option) Jaeger {
 	jaeger := &Jaeger{

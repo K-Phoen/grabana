@@ -73,3 +73,56 @@ func WithNodeGraph() Option {
 		}
 	}
 }
+
+// TraceToLogs defines how to navigate from a trace span to the selected datasource logs.
+func TraceToLogs(logsDatasourceUID string, options ...TraceToLogsOption) Option {
+	settings := map[string]interface{}{
+		"datasourceUid": logsDatasourceUID,
+	}
+
+	for _, opt := range options {
+		opt(settings)
+	}
+
+	return func(datasource *Jaeger) {
+		datasource.builder.JSONData.(map[string]interface{})["tracesToLogs"] = settings
+	}
+}
+
+// Tags defines tags that will be used in the Loki query.
+// Default tags: 'cluster', 'hostname', 'namespace', 'pod'.
+func Tags(tags ...string) TraceToLogsOption {
+	return func(settings map[string]interface{}) {
+		settings["tags"] = tags
+	}
+}
+
+// SpanStartShift shifts the start time of the span.
+// Default 0 (Time units can be used here, for example: 5s, 1m, 3h)
+func SpanStartShift(shift time.Duration) TraceToLogsOption {
+	return func(settings map[string]interface{}) {
+		settings["spanStartTimeShift"] = shift.String()
+	}
+}
+
+// SpanEndShift shifts the start time of the span.
+// Default 0 (Time units can be used here, for example: 5s, 1m, 3h)
+func SpanEndShift(shift time.Duration) TraceToLogsOption {
+	return func(settings map[string]interface{}) {
+		settings["spanEndTimeShift"] = shift.String()
+	}
+}
+
+// FilterByTrace filters logs by Trace ID. Appends '|=<trace id>' to the query.
+func FilterByTrace() TraceToLogsOption {
+	return func(settings map[string]interface{}) {
+		settings["filterByTraceID"] = true
+	}
+}
+
+// FilterBySpan filters logs by Trace ID. Appends '|=<trace id>' to the query.
+func FilterBySpan() TraceToLogsOption {
+	return func(settings map[string]interface{}) {
+		settings["filterBySpanID"] = true
+	}
+}
