@@ -119,3 +119,16 @@ func TestForwardCookies(t *testing.T) {
 
 	req.ElementsMatch([]string{"foo", "bar"}, datasource.builder.JSONData.(map[string]interface{})["keepCookies"])
 }
+
+func TestExemplars(t *testing.T) {
+	req := require.New(t)
+
+	traceIDExemplar := Exemplar{
+		LabelName:     "traceID",
+		DatasourceUID: "tempo",
+	}
+
+	datasource := New("", "", Exemplars(traceIDExemplar))
+
+	req.ElementsMatch([]Exemplar{traceIDExemplar}, datasource.builder.JSONData.(map[string]interface{})["exemplarTraceIdDestinations"])
+}
