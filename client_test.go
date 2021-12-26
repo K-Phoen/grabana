@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/K-Phoen/grabana/alertmanager"
 	builder "github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/datasource/prometheus"
 	"github.com/stretchr/testify/require"
@@ -56,7 +57,7 @@ func TestFoldersCanBeCreated(t *testing.T) {
 	req := require.New(t)
 	folderName := "Test folder"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{
+		_, _ = fmt.Fprintln(w, `{
   "uid": "nErXDvCkzz",
   "id": 1,
   "title": "Test folder"
@@ -76,7 +77,7 @@ func TestFoldersCreationCanFail(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintln(w, `{
+		_, _ = fmt.Fprintln(w, `{
   "message": "The folder has been changed by someone else",
   "status": "version-mismatch"
 }`)
@@ -95,7 +96,7 @@ func TestAFolderCanBeFoundByTitle(t *testing.T) {
 	req := require.New(t)
 	folderName := "Test folder"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[
+		_, _ = fmt.Fprintln(w, `[
   {
     "id":1,
     "uid": "nErXDvCkzz",
@@ -126,7 +127,7 @@ func TestAFolderCanBeFoundByTitle(t *testing.T) {
 func TestAnExplicitErrorIsReturnedIfTheFolderIsNotFound(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[
+		_, _ = fmt.Fprintln(w, `[
   {
     "id":1,
     "uid": "nErXDvCkzz",
@@ -154,7 +155,7 @@ func TestGetFolderByTitleCanFail(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprintln(w, `{}}`)
+		_, _ = fmt.Fprintln(w, `{}}`)
 	}))
 	defer ts.Close()
 
@@ -170,7 +171,7 @@ func TestAnAlertChannelCanBeFoundByName(t *testing.T) {
 	req := require.New(t)
 	name := "Team B"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[
+		_, _ = fmt.Fprintln(w, `[
   {
     "id": 1,
     "uid": "team-a-email-notifier",
@@ -205,7 +206,7 @@ func TestAnAlertChannelCanBeFoundByName(t *testing.T) {
 func TestAnExplicitErrorIsReturnedIfTheChannelIsNotFound(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[
+		_, _ = fmt.Fprintln(w, `[
    {
     "id": 1,
     "uid": "team-a-email-notifier",
@@ -235,7 +236,7 @@ func TestGetAlertChannelByNameCanFail(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprintln(w, `{}}`)
+		_, _ = fmt.Fprintln(w, `{}}`)
 	}))
 	defer ts.Close()
 
@@ -251,7 +252,7 @@ func TestDashboardsCanBeCreated(t *testing.T) {
 	req := require.New(t)
 	dashboard := builder.New("Dashboard name")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `{
+		_, _ = fmt.Fprintln(w, `{
   "id":      1,
   "uid":     "cIBgcSjkk",
   "url":     "/d/cIBgcSjkk/production-overview",
@@ -275,7 +276,7 @@ func TestDashboardsCreationCanFail(t *testing.T) {
 	dashboard := builder.New("Dashboard name")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintln(w, `{
+		_, _ = fmt.Fprintln(w, `{
   "message": "The folder has been changed by someone else",
   "status": "version-mismatch"
 }`)
@@ -294,7 +295,7 @@ func TestDeleteDashboard(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `{"title": "Production Overview"}`)
+		_, _ = fmt.Fprintln(w, `{"title": "Production Overview"}`)
 	}))
 	defer ts.Close()
 
@@ -309,7 +310,7 @@ func TestDeleteDashboardCanFail(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
-		fmt.Fprintln(w, `{"message": "oh noes"}`)
+		_, _ = fmt.Fprintln(w, `{"message": "oh noes"}`)
 	}))
 	defer ts.Close()
 
@@ -324,7 +325,7 @@ func TestDeletingANonExistingDashboardReturnsSpecificError(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintln(w, `{"message": "oh noes, does not exist"}`)
+		_, _ = fmt.Fprintln(w, `{"message": "oh noes, does not exist"}`)
 	}))
 	defer ts.Close()
 
@@ -353,7 +354,7 @@ func TestDatasourceUpsertCanCreateANewDatasource(t *testing.T) {
 		req.Equal("/api/datasources", r.URL.Path)
 
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `{}`)
+		_, _ = fmt.Fprintln(w, `{}`)
 	}))
 	defer ts.Close()
 
@@ -374,7 +375,7 @@ func TestDatasourceUpsertCanUpdateADatasource(t *testing.T) {
 		// "Datasource ID by name" call
 		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, `{"id": 2}`)
+			_, _ = fmt.Fprintln(w, `{"id": 2}`)
 			return
 		}
 
@@ -384,7 +385,7 @@ func TestDatasourceUpsertCanUpdateADatasource(t *testing.T) {
 		req.Equal("/api/datasources/2", r.URL.Path)
 
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `{}`)
+		_, _ = fmt.Fprintln(w, `{}`)
 	}))
 	defer ts.Close()
 
@@ -407,7 +408,7 @@ func TestUpsertDatasourceForwardsErrorsOnFailure(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintln(w, `{
+		_, _ = fmt.Fprintln(w, `{
   "message": "something when wrong"
 }`)
 	}))
@@ -429,7 +430,7 @@ func TestDeleteDatasource(t *testing.T) {
 		// "Datasource ID by name" call
 		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, `{"id": 2}`)
+			_, _ = fmt.Fprintln(w, `{"id": 2}`)
 			return
 		}
 
@@ -439,7 +440,7 @@ func TestDeleteDatasource(t *testing.T) {
 		req.Equal("/api/datasources/2", r.URL.Path)
 
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `{}`)
+		_, _ = fmt.Fprintln(w, `{}`)
 	}))
 	defer ts.Close()
 
@@ -480,12 +481,12 @@ func TestDeleteDatasourceForwardsErrorOnFailure(t *testing.T) {
 		// "Datasource ID by name" call
 		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, `{"id": 2}`)
+			_, _ = fmt.Fprintln(w, `{"id": 2}`)
 			return
 		}
 
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintln(w, `{
+		_, _ = fmt.Fprintln(w, `{
   "message": "something when wrong"
 }`)
 	}))
@@ -504,7 +505,7 @@ func TestGetDatasourceUIDByName(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `{
+		_, _ = fmt.Fprintln(w, `{
   "uid": "some-uid"
 }`)
 	}))
@@ -540,7 +541,7 @@ func TestCreateAPIKey(t *testing.T) {
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `{"name":"mykey","key":"eyJrIjoiWHZiSWd3NzdCYUZnNUtibE9obUpESmE3bzJYNDRIc0UiLCJuIjoibXlrZXkiLCJpZCI6MX1=","id":1}`)
+		_, _ = fmt.Fprintln(w, `{"name":"mykey","key":"eyJrIjoiWHZiSWd3NzdCYUZnNUtibE9obUpESmE3bzJYNDRIc0UiLCJuIjoibXlrZXkiLCJpZCI6MX1=","id":1}`)
 	}))
 	defer ts.Close()
 
@@ -567,13 +568,13 @@ func TestDeleteDeleteAPIKeyByName(t *testing.T) {
 			req.Equal("/api/auth/keys/2", r.URL.Path)
 
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, `{}`)
+			_, _ = fmt.Fprintln(w, `{}`)
 			return
 		}
 
 		// API keys list call
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `[{"id": 2, "name": "foo"}]`)
+		_, _ = fmt.Fprintln(w, `[{"id": 2, "name": "foo"}]`)
 	}))
 	defer ts.Close()
 
@@ -594,13 +595,13 @@ func TestDeleteAPIKeyByNameReturnsKnownErrorIfDatasourceDoesNotExist(t *testing.
 		if strings.HasPrefix(r.URL.Path, "/api/auth/keys/") {
 			deleted = true
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, `{}`)
+			_, _ = fmt.Fprintln(w, `{}`)
 			return
 		}
 
 		// API keys list call
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `[{"id": 2, "name": "foo"}]`)
+		_, _ = fmt.Fprintln(w, `[{"id": 2, "name": "foo"}]`)
 	}))
 	defer ts.Close()
 
@@ -620,7 +621,7 @@ func TestDeleteAPIKeyByNameForwardsErrorOnFailure(t *testing.T) {
 		// deletion call
 		if strings.HasPrefix(r.URL.Path, "/api/auth/keys/") {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintln(w, `{
+			_, _ = fmt.Fprintln(w, `{
   "message": "something when wrong"
 }`)
 			return
@@ -628,13 +629,52 @@ func TestDeleteAPIKeyByNameForwardsErrorOnFailure(t *testing.T) {
 
 		// API keys list call
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprintln(w, `[{"id": 2, "name": "foo"}]`)
+		_, _ = fmt.Fprintln(w, `[{"id": 2, "name": "foo"}]`)
 	}))
 	defer ts.Close()
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
 	err := client.DeleteAPIKeyByName(context.TODO(), "foo")
+
+	req.Error(err)
+	req.Contains(err.Error(), "something when wrong")
+}
+
+func TestConfigureAlertManager(t *testing.T) {
+	req := require.New(t)
+
+	endpointCalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		endpointCalled = true
+		w.WriteHeader(http.StatusAccepted)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+	manager := alertmanager.New()
+
+	err := client.ConfigureAlertManager(context.TODO(), manager)
+
+	req.NoError(err)
+	req.True(endpointCalled)
+}
+
+func TestConfigureAlertManagerForwardsErrorOnFailure(t *testing.T) {
+	req := require.New(t)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = fmt.Fprintln(w, `{
+  "message": "something when wrong"
+}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+	manager := alertmanager.New()
+
+	err := client.ConfigureAlertManager(context.TODO(), manager)
 
 	req.Error(err)
 	req.Contains(err.Error(), "something when wrong")

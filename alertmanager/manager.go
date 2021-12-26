@@ -28,6 +28,7 @@ func New(opts ...Option) *Manager {
 	return manager
 }
 
+// ContactPoints defines the contact points that can receive alerts.
 func ContactPoints(contactPoints ...Contact) Option {
 	return func(manager *Manager) {
 		config := &manager.builder.Config
@@ -36,15 +37,24 @@ func ContactPoints(contactPoints ...Contact) Option {
 		for i, point := range contactPoints {
 			config.Receivers = append(config.Receivers, *point.Builder)
 
-			// we must have a default contact point, so we either use one that
-			// explicitly was indicated as such, or the first one.
-			if point.IsDefault || i == 0 {
+			// we must have a default contact point, so we use the first contact point
+			// if none is already set.
+			if i == 0 && config.Route.Receiver == "" {
 				config.Route.Receiver = point.Builder.Name
 			}
 		}
 	}
 }
 
+// DefaultContactPoint sets the default contact point to be used when no
+// specific routing policy applies.
+func DefaultContactPoint(contactPoint string) Option {
+	return func(manager *Manager) {
+		manager.builder.Config.Route.Receiver = contactPoint
+	}
+}
+
+// Routing configures the routing policies to apply on alerts.
 func Routing(policies ...RoutingPolicy) Option {
 	return func(manager *Manager) {
 		config := &manager.builder.Config

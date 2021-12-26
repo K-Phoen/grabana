@@ -5,8 +5,11 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
+// Option represents an option that can be used to configure an "opsgenie"
+// contact point type.
 type Option func(contactType *opsgenieType)
 
+// TagForwardMode describes how alert tags should be forwarded to Opsgenie.
 type TagForwardMode string
 
 const (
@@ -19,6 +22,7 @@ type opsgenieType struct {
 	builder *sdk.ContactPointType
 }
 
+// With creates an Opsgenie contact point type with the given settings.
 func With(apiURL string, apiKey string, opts ...Option) alertmanager.ContactPointOption {
 	opsgenie := &opsgenieType{
 		builder: &sdk.ContactPointType{

@@ -4,13 +4,16 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
+// ContactPointOption represents an option that can be used to configure a
+// contact point.
 type ContactPointOption func(contactPoint *Contact)
 
+// Contact describes a contact point.
 type Contact struct {
-	Builder   *sdk.ContactPoint
-	IsDefault bool
+	Builder *sdk.ContactPoint
 }
 
+// ContactPoint defines a new contact point.
 func ContactPoint(name string, opts ...ContactPointOption) Contact {
 	contactPoint := &Contact{
 		Builder: &sdk.ContactPoint{
@@ -23,10 +26,4 @@ func ContactPoint(name string, opts ...ContactPointOption) Contact {
 	}
 
 	return *contactPoint
-}
-
-func Default() ContactPointOption {
-	return func(contactPoint *Contact) {
-		contactPoint.IsDefault = true
-	}
 }

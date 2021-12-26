@@ -7,12 +7,15 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
+// Option represents an option that can be used to configure an "email"
+// contact point type.
 type Option func(contactType *emailType)
 
 type emailType struct {
 	builder *sdk.ContactPointType
 }
 
+// To creates an "email" contact point type.
 func To(emails []string, opts ...Option) alertmanager.ContactPointOption {
 	email := &emailType{
 		builder: &sdk.ContactPointType{

@@ -36,6 +36,7 @@ func main() {
 		alertmanager.Routing(
 			alertmanager.Policy("Platform", alertmanager.TagEq("owner", "platform")),
 		),
+		alertmanager.DefaultContactPoint("Core Exp"),
 	)
 
 	if err := client.ConfigureAlertManager(ctx, manager); err != nil {

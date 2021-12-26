@@ -381,8 +381,6 @@ func (client *Client) ConfigureAlertManager(ctx context.Context, manager *alertm
 		return err
 	}
 
-	fmt.Printf("Payload:\n\n%s\n\n", string(buf))
-
 	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/alertmanager/grafana/config/api/v1/alerts", buf)
 	if err != nil {
 		return err
