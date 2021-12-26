@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/K-Phoen/grabana/alert"
+	"github.com/K-Phoen/grabana/alertmanager"
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/datasource"
 	"github.com/K-Phoen/sdk"
@@ -367,6 +368,29 @@ func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
 		return ErrDashboardNotFound
 	}
 	if resp.StatusCode != http.StatusOK {
+		return client.httpError(resp)
+	}
+
+	return nil
+}
+
+// ConfigureAlertManager updates the alert manager configuration.
+func (client *Client) ConfigureAlertManager(ctx context.Context, manager *alertmanager.Manager) error {
+	buf, err := manager.MarshalIndentJSON()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Payload:\n\n%s\n\n", string(buf))
+
+	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/alertmanager/grafana/config/api/v1/alerts", buf)
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusAccepted {
 		return client.httpError(resp)
 	}
 

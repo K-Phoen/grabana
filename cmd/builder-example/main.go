@@ -24,7 +24,7 @@ import (
 
 func main() {
 	if len(os.Args) != 3 {
-		fmt.Fprint(os.Stderr, "Usage: go run -mod=vendor main.go http://grafana-host:3000 api-key-string-here\n")
+		fmt.Fprint(os.Stderr, "Usage: go run main.go http://grafana-host:3000 api-key-string-here\n")
 		os.Exit(1)
 	}
 
