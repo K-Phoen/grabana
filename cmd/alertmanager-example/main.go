@@ -10,6 +10,7 @@ import (
 	"github.com/K-Phoen/grabana/alertmanager"
 	"github.com/K-Phoen/grabana/alertmanager/email"
 	"github.com/K-Phoen/grabana/alertmanager/opsgenie"
+	"github.com/K-Phoen/grabana/alertmanager/webhook"
 )
 
 func main() {
@@ -31,6 +32,7 @@ func main() {
 			alertmanager.ContactPoint(
 				"Core Exp",
 				email.To([]string{"core@exp"}, email.Single()),
+				webhook.Call("http://example.com"),
 			),
 		),
 		alertmanager.Routing(
