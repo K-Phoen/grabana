@@ -89,6 +89,15 @@ func TestRowsCanHaveHeatmapPanels(t *testing.T) {
 	req.Len(panel.builder.Panels, 1)
 }
 
+func TestRowsCanHaveLogsPanels(t *testing.T) {
+	req := require.New(t)
+	board := sdk.NewBoard("")
+
+	panel := New(board, "", WithLogs("Some logs"))
+
+	req.Len(panel.builder.Panels, 1)
+}
+
 func TestRowsCanHaveRepeatedPanels(t *testing.T) {
 	req := require.New(t)
 	board := sdk.NewBoard("")

@@ -3,6 +3,7 @@ package row
 import (
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/heatmap"
+	"github.com/K-Phoen/grabana/logs"
 	"github.com/K-Phoen/grabana/singlestat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/text"
@@ -48,6 +49,15 @@ func WithGraph(title string, options ...graph.Option) Option {
 func WithTimeSeries(title string, options ...timeseries.Option) Option {
 	return func(row *Row) {
 		panel := timeseries.New(title, options...)
+
+		row.builder.Add(panel.Builder)
+	}
+}
+
+// WithLogs adds a "logs" panel in the row.
+func WithLogs(title string, options ...logs.Option) Option {
+	return func(row *Row) {
+		panel := logs.New(title, options...)
 
 		row.builder.Add(panel.Builder)
 	}
