@@ -9,6 +9,7 @@ import (
 
 func UnmarshalYAML(input io.Reader) (dashboard.Builder, error) {
 	decoder := yaml.NewDecoder(input)
+	decoder.KnownFields(true)
 
 	parsed := &DashboardModel{}
 	if err := decoder.Decode(parsed); err != nil {
