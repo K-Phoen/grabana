@@ -5,6 +5,7 @@ import (
 
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
+	"github.com/K-Phoen/grabana/target/loki"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 )
@@ -55,6 +56,26 @@ func (t PrometheusTarget) toOptions() []prometheus.Option {
 		case "time_series":
 			opts = append(opts, prometheus.Format(prometheus.FormatTimeSeries))
 		}
+	}
+
+	return opts
+}
+
+type LokiTarget struct {
+	Query  string
+	Legend string `yaml:",omitempty"`
+	Ref    string `yaml:",omitempty"`
+	Hidden bool   `yaml:",omitempty"`
+}
+
+func (t LokiTarget) toOptions() []loki.Option {
+	opts := []loki.Option{
+		loki.Legend(t.Legend),
+		loki.Ref(t.Ref),
+	}
+
+	if t.Hidden {
+		opts = append(opts, loki.Hide())
 	}
 
 	return opts

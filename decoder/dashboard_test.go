@@ -35,6 +35,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		graphPanelWithInfluxdbTarget(),
 		timeseriesPanel(),
 		collapseRow(),
+		logsPanel(),
 	}
 
 	for _, testCase := range testCases {
@@ -649,6 +650,31 @@ rows:
 		name:                "single row with timeseries panel",
 		yaml:                yaml,
 		expectedGrafanaJSON: "timeseries_panel.json",
+	}
+}
+
+func logsPanel() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Test row
+    panels:
+    - logs:
+        title: Kubernetes logs
+        description: Everything okay?
+        span: 12
+        visualization:
+          deduplication: exact
+        targets:
+        - loki:
+            query: "{namespace=\"default\"}"
+            ref: A
+`
+
+	return testCase{
+		name:                "single row with logs panel",
+		yaml:                yaml,
+		expectedGrafanaJSON: "logs_panel.json",
 	}
 }
 

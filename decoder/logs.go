@@ -18,7 +18,12 @@ type DashboardLogs struct {
 	Transparent   bool               `yaml:",omitempty"`
 	Datasource    string             `yaml:",omitempty"`
 	Repeat        string             `yaml:",omitempty"`
+	Targets       []LogsTarget       `yaml:",omitempty"`
 	Visualization *LogsVisualization `yaml:",omitempty"`
+}
+
+type LogsTarget struct {
+	Loki *LokiTarget `yaml:",omitempty"`
 }
 
 func (panel DashboardLogs) toOption() (row.Option, error) {
@@ -50,8 +55,24 @@ func (panel DashboardLogs) toOption() (row.Option, error) {
 
 		opts = append(opts, vizOpts...)
 	}
+	for _, t := range panel.Targets {
+		opt, err := panel.target(t)
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
+	}
 
 	return row.WithLogs(panel.Title, opts...), nil
+}
+
+func (panel DashboardLogs) target(t LogsTarget) (logs.Option, error) {
+	if t.Loki != nil {
+		return logs.WithLokiTarget(t.Loki.Query, t.Loki.toOptions()...), nil
+	}
+
+	return nil, ErrTargetNotConfigured
 }
 
 type LogsVisualization struct {
