@@ -47,14 +47,6 @@ func (panel DashboardLogs) toOption() (row.Option, error) {
 	if panel.Repeat != "" {
 		opts = append(opts, logs.Repeat(panel.Repeat))
 	}
-	if panel.Visualization != nil {
-		vizOpts, err := panel.Visualization.toOptions()
-		if err != nil {
-			return nil, err
-		}
-
-		opts = append(opts, vizOpts...)
-	}
 	for _, t := range panel.Targets {
 		opt, err := panel.target(t)
 		if err != nil {
@@ -63,6 +55,13 @@ func (panel DashboardLogs) toOption() (row.Option, error) {
 
 		opts = append(opts, opt)
 	}
+
+	vizOpts, err := panel.Visualization.toOptions()
+	if err != nil {
+		return nil, err
+	}
+
+	opts = append(opts, vizOpts...)
 
 	return row.WithLogs(panel.Title, opts...), nil
 }
@@ -98,6 +97,9 @@ func (viz *LogsVisualization) toOptions() ([]logs.Option, error) {
 	}
 	if viz.UniqueLabels {
 		opts = append(opts, logs.UniqueLabels())
+	}
+	if viz.CommonLabels {
+		opts = append(opts, logs.CommonLabels())
 	}
 	if viz.WrapLines {
 		opts = append(opts, logs.WrapLines())
