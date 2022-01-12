@@ -13,6 +13,7 @@ import (
 var ErrTargetNotConfigured = fmt.Errorf("target not configured")
 var ErrInvalidStackdriverType = fmt.Errorf("invalid stackdriver target type")
 var ErrInvalidStackdriverAggregation = fmt.Errorf("invalid stackdriver aggregation type")
+var ErrInvalidStackdriverPreprocessor = fmt.Errorf("invalid stackdriver preprocessor")
 var ErrInvalidStackdriverAlignment = fmt.Errorf("invalid stackdriver alignment method")
 
 type Target struct {
@@ -118,16 +119,17 @@ func (t InfluxDBTarget) toOptions() []influxdb.Option {
 }
 
 type StackdriverTarget struct {
-	Project     string
-	Type        string
-	Metric      string
-	Filters     StackdriverFilters    `yaml:",omitempty"`
-	Aggregation string                `yaml:",omitempty"`
-	Alignment   *StackdriverAlignment `yaml:",omitempty"`
-	Legend      string                `yaml:",omitempty"`
-	Ref         string                `yaml:",omitempty"`
-	Hidden      bool                  `yaml:",omitempty"`
-	GroupBy     []string              `yaml:"group_by,omitempty"`
+	Project      string
+	Type         string
+	Metric       string
+	Filters      StackdriverFilters    `yaml:",omitempty"`
+	Aggregation  string                `yaml:",omitempty"`
+	Alignment    *StackdriverAlignment `yaml:",omitempty"`
+	Legend       string                `yaml:",omitempty"`
+	Preprocessor string                `yaml:",omitempty"`
+	Ref          string                `yaml:",omitempty"`
+	Hidden       bool                  `yaml:",omitempty"`
+	GroupBy      []string              `yaml:"group_by,omitempty"`
 }
 
 type StackdriverFilters struct {
@@ -192,6 +194,15 @@ func (t StackdriverTarget) toOptions() ([]stackdriver.Option, error) {
 		opts = append(opts, opt)
 	}
 
+	if t.Preprocessor != "" {
+		opt, err := t.preprocessor()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
+	}
+
 	if t.Alignment != nil {
 		opt, err := t.Alignment.toOption()
 		if err != nil {
@@ -236,6 +247,17 @@ func (t StackdriverTarget) aggregation() (stackdriver.Option, error) {
 		return stackdriver.Aggregation(stackdriver.ReducePercentile05), nil
 	default:
 		return nil, ErrInvalidStackdriverAggregation
+	}
+}
+
+func (t StackdriverTarget) preprocessor() (stackdriver.Option, error) {
+	switch t.Preprocessor {
+	case "delta":
+		return stackdriver.Preprocessor(stackdriver.PreprocessDelta), nil
+	case "rate":
+		return stackdriver.Preprocessor(stackdriver.PreprocessRate), nil
+	default:
+		return nil, ErrInvalidStackdriverPreprocessor
 	}
 }
 
