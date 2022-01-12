@@ -8,6 +8,12 @@ type Option func(target *Stackdriver)
 const AlignmentStackdriverAuto = "stackdriver-auto"
 const AlignmentGrafanaAuto = "grafana-auto"
 
+// PreprocessorMethod defines the available pre-processing options.
+type PreprocessorMethod string
+
+const PreprocessRate = "rate"
+const PreprocessDelta = "delta"
+
 // Aligner specifies the operation that will be applied to the data points in
 // each alignment period in a time series.
 // See https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies#Aligner
@@ -145,6 +151,13 @@ func Alignment(aligner Aligner, alignmentPeriod string) Option {
 	return func(stackdriver *Stackdriver) {
 		stackdriver.Builder.AlignmentPeriod = alignmentPeriod
 		stackdriver.Builder.PerSeriesAligner = string(aligner)
+	}
+}
+
+// Preprocessor defines how the time series should be pre-processed.
+func Preprocessor(preprocessor PreprocessorMethod) Option {
+	return func(stackdriver *Stackdriver) {
+		stackdriver.Builder.Preprocessor = string(preprocessor)
 	}
 }
 

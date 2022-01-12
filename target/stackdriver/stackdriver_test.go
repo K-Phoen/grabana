@@ -198,3 +198,17 @@ func TestTargetSupportsGroupBys(t *testing.T) {
 
 	req.ElementsMatch(target.Builder.GroupBys, []string{"field", "other"})
 }
+
+func TestPreprocessorCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+	preprocessors := []stackdriver.PreprocessorMethod{
+		stackdriver.PreprocessDelta,
+		stackdriver.PreprocessRate,
+	}
+
+	for _, preprocessor := range preprocessors {
+		target := stackdriver.Delta("", stackdriver.Preprocessor(preprocessor))
+
+		req.Equal(string(preprocessor), target.Builder.Preprocessor)
+	}
+}
