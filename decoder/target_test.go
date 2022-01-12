@@ -98,6 +98,44 @@ func TestValidStackdriverAggregations(t *testing.T) {
 	}
 }
 
+func TestValidStackdriverPreprocessor(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected stackdriver.Reducer
+	}{
+		{input: "delta", expected: stackdriver.PreprocessDelta},
+		{input: "rate", expected: stackdriver.PreprocessRate},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.input, func(t *testing.T) {
+			req := require.New(t)
+
+			panel := StackdriverTarget{Preprocessor: tc.input}
+
+			opt, err := panel.preprocessor()
+
+			req.NoError(err)
+
+			target := stackdriver.Delta("test")
+			opt(target)
+
+			req.Equal(string(tc.expected), target.Builder.Preprocessor)
+		})
+	}
+}
+
+func TestInvalidStackdriverPreprocessor(t *testing.T) {
+	req := require.New(t)
+
+	_, err := StackdriverTarget{Preprocessor: "invalid"}.toTarget()
+
+	req.Error(err)
+	req.Equal(ErrInvalidStackdriverPreprocessor, err)
+}
+
 func TestValidStackdriverTargetTypes(t *testing.T) {
 	testCases := []struct {
 		input    string
