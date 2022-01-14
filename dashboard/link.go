@@ -12,6 +12,7 @@ const (
 	IconBolt      LinkIcon = "bolt"
 	IconDoc       LinkIcon = "doc"
 	IconCloud     LinkIcon = "cloud"
+	IconDatabase  LinkIcon = "database"
 )
 
 // ExternalLink describes dashboard-level external link.
