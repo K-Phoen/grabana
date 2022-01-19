@@ -33,19 +33,10 @@ func main() {
 	client := grabana.NewClient(&http.Client{}, os.Args[1], grabana.WithAPIToken(os.Args[2]))
 
 	// create the folder holding the dashboard for the service
-	folder, err := client.GetFolderByTitle(ctx, "Test Folder")
-	if err != nil && err != grabana.ErrFolderNotFound {
-		fmt.Printf("Could not create folder: %s\n", err)
+	folder, err := client.FindOrCreateFolder(ctx, "Test Folder")
+	if err != nil {
+		fmt.Printf("Could not find or create folder: %s\n", err)
 		os.Exit(1)
-	}
-	if folder == nil {
-		folder, err = client.CreateFolder(ctx, "Test Folder")
-		if err != nil {
-			fmt.Printf("Could not create folder: %s\n", err)
-			os.Exit(1)
-		}
-
-		fmt.Printf("Folder created (id: %d, uid: %s)\n", folder.ID, folder.UID)
 	}
 
 	channel, err := client.GetAlertChannelByName(ctx, "Mail")
