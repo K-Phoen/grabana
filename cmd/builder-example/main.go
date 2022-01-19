@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/K-Phoen/grabana"
-	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
@@ -39,15 +38,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	channel, err := client.GetAlertChannelByName(ctx, "Mail")
-	if err != nil {
-		fmt.Printf("Could not find notification channel 'Mail': %s\n", err)
-		os.Exit(1)
-	}
-
 	builder := dashboard.New(
 		"Awesome dashboard",
-		dashboard.AutoRefresh("5s"),
+		dashboard.AutoRefresh("30s"),
 		dashboard.Tags([]string{"generated"}),
 		dashboard.TagsAnnotation(dashboard.TagAnnotation{
 			Name:       "Deployments",
@@ -58,10 +51,11 @@ func main() {
 		dashboard.VariableAsInterval(
 			"interval",
 			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
+			interval.Default("30s"),
 		),
 		dashboard.VariableAsQuery(
 			"status",
-			query.DataSource("prometheus-default"),
+			query.DataSource("Prometheus"),
 			query.Request("label_values(prometheus_http_requests_total, code)"),
 			query.Sort(query.NumericalAsc),
 		),
@@ -95,39 +89,28 @@ func main() {
 				"HTTP Rate",
 				graph.Span(6),
 				graph.Height("400px"),
-				graph.DataSource("prometheus-default"),
+				graph.DataSource("Prometheus"),
 				graph.WithPrometheusTarget(
-					"rate(promhttp_metric_handler_requests_total[$interval])",
-					prometheus.Legend("{{handler}} - {{ code }}"),
+					"sum(rate(promhttp_metric_handler_requests_total[$interval])) by (app, code)",
+					prometheus.Legend("{{ app }} - {{ code }}"),
 				),
 			),
 			row.WithTimeSeries(
 				"Heap allocations",
 				timeseries.Span(6),
 				timeseries.Height("400px"),
-				timeseries.DataSource("prometheus-default"),
-				timeseries.WithPrometheusTarget("go_memstats_heap_alloc_bytes", prometheus.Ref("A")),
+				timeseries.DataSource("Prometheus"),
+				timeseries.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)", prometheus.Legend("{{ app }}")),
 				timeseries.Axis(
 					axis.Unit("bytes"),
 					axis.Label("Memory"),
 					axis.SoftMin(0),
 				),
 				timeseries.Legend(timeseries.Last, timeseries.AsTable),
-				timeseries.Alert(
-					"Too many heap allocations",
-					alert.If(
-						alert.And,
-						alert.Avg("A", "1m", "now"),
-						alert.IsAbove(35000000),
-					),
-					alert.EvaluateEvery("1m"),
-					alert.For("1m"),
-					alert.Notify(channel),
-				),
 			),
 			row.WithTable(
 				"Threads",
-				table.WithPrometheusTarget("go_threads"),
+				table.WithPrometheusTarget("sum(go_threads{app!=\"\"}) by (app)", prometheus.Legend("{{ app }}")),
 				table.HideColumn("Time"),
 				table.AsTimeSeriesAggregations([]table.Aggregation{
 					{Label: "AVG", Type: table.AVG},
@@ -138,7 +121,7 @@ func main() {
 				"Heap Allocations",
 				singlestat.Unit("bytes"),
 				singlestat.ColorValue(),
-				singlestat.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
+				singlestat.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes)"),
 				singlestat.Thresholds([2]string{"26000000", "28000000"}),
 			),
 		),
