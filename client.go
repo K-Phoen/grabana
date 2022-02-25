@@ -74,9 +74,20 @@ type APIKey struct {
 
 // Dashboard represents a Grafana dashboard.
 type Dashboard struct {
-	ID  uint   `json:"id"`
-	UID string `json:"uid"`
-	URL string `json:"url"`
+	ID          int      `json:"id"`
+	UID         string   `json:"uid"`
+	Title       string   `json:"title"`
+	URI         string   `json:"uri"`
+	URL         string   `json:"url"`
+	Slug        string   `json:"slug"`
+	Type        string   `json:"type"`
+	Tags        []string `json:"tags"`
+	IsStarred   bool     `json:"isStarred"`
+	FolderID    int      `json:"folderId"`
+	FolderUID   string   `json:"folderUid"`
+	FolderTitle string   `json:"folderTitle"`
+	FolderURL   string   `json:"folderUrl"`
+	SortMeta    int      `json:"sortMeta"`
 }
 
 // Folder represents a dashboard folder.
@@ -292,6 +303,39 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 	}
 
 	return nil, ErrFolderNotFound
+}
+
+// GetDashboardByTitle finds a dashboard, given its title
+func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*Dashboard, error) {
+	request := fmt.Sprintf("/api/search?query=%s", title)
+	resp, err := client.get(ctx, request)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, client.httpError(resp)
+	}
+
+	var dashboards []Dashboard
+	if err := decodeJSON(resp.Body, &dashboards); err != nil {
+		return nil, err
+	}
+
+	if len(dashboards) == 0 {
+		return nil, nil
+	}
+
+	for i := range dashboards {
+		if strings.EqualFold(dashboards[i].Title, title) {
+			return &dashboards[i], nil
+		}
+	}
+
+	return nil, ErrDashboardNotFound
 }
 
 // GetAlertChannelByName finds an alert notification channel, given its name.
