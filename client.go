@@ -77,17 +77,13 @@ type Dashboard struct {
 	ID          int      `json:"id"`
 	UID         string   `json:"uid"`
 	Title       string   `json:"title"`
-	URI         string   `json:"uri"`
 	URL         string   `json:"url"`
-	Slug        string   `json:"slug"`
-	Type        string   `json:"type"`
 	Tags        []string `json:"tags"`
 	IsStarred   bool     `json:"isStarred"`
 	FolderID    int      `json:"folderId"`
 	FolderUID   string   `json:"folderUid"`
 	FolderTitle string   `json:"folderTitle"`
 	FolderURL   string   `json:"folderUrl"`
-	SortMeta    int      `json:"sortMeta"`
 }
 
 // Folder represents a dashboard folder.
@@ -305,11 +301,36 @@ func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Fold
 	return nil, ErrFolderNotFound
 }
 
-// GetDashboardByTitle finds a dashboard, given its title
-func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*Dashboard, error) {
-	request := fmt.Sprintf("/api/search?query=%s", title)
-	resp, err := client.get(ctx, request)
+// GetAlertChannelByName finds an alert notification channel, given its name.
+func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*alert.Channel, error) {
+	resp, err := client.get(ctx, "/api/alert-notifications")
+	if err != nil {
+		return nil, err
+	}
 
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, client.httpError(resp)
+	}
+
+	var channels []alert.Channel
+	if err := decodeJSON(resp.Body, &channels); err != nil {
+		return nil, err
+	}
+
+	for i := range channels {
+		if strings.EqualFold(channels[i].Name, name) {
+			return &channels[i], nil
+		}
+	}
+
+	return nil, ErrAlertChannelNotFound
+}
+
+// GetDashboardByTitle finds a dashboard, given its title.
+func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*Dashboard, error) {
+	resp, err := client.get(ctx, fmt.Sprintf("/api/search?type=dash-db&query=%s", title))
 	if err != nil {
 		return nil, err
 	}
@@ -336,33 +357,6 @@ func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*D
 	}
 
 	return nil, ErrDashboardNotFound
-}
-
-// GetAlertChannelByName finds an alert notification channel, given its name.
-func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*alert.Channel, error) {
-	resp, err := client.get(ctx, "/api/alert-notifications")
-	if err != nil {
-		return nil, err
-	}
-
-	defer func() { _ = resp.Body.Close() }()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, client.httpError(resp)
-	}
-
-	var channels []alert.Channel
-	if err := decodeJSON(resp.Body, &channels); err != nil {
-		return nil, err
-	}
-
-	for i := range channels {
-		if strings.EqualFold(channels[i].Name, name) {
-			return &channels[i], nil
-		}
-	}
-
-	return nil, ErrAlertChannelNotFound
 }
 
 // UpsertDashboard creates or replaces a dashboard, in the given folder.
