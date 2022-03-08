@@ -248,6 +248,76 @@ func TestGetAlertChannelByNameCanFail(t *testing.T) {
 	req.Nil(folder)
 }
 
+func TestADashboardCanBeFoundByTitle(t *testing.T) {
+	req := require.New(t)
+	dashboardName := "Test dashboard"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, `[
+  {
+    "id":1,
+    "uid": "eErXDvCkzz",
+    "title": "Department ABC"
+  },
+  {
+    "id":2,
+    "uid": "eErXDvCkyy",
+    "title": "Test dashboard"
+  }
+]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	dashboard, err := client.GetDashboardByTitle(context.TODO(), strings.ToLower(dashboardName))
+
+	req.NoError(err)
+	req.Equal(dashboardName, dashboard.Title)
+}
+
+func TestAnExplicitErrorIsReturnedIfTheDashboardIsNotFound(t *testing.T) {
+	req := require.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, `[
+  {
+    "id":1,
+    "uid": "eErXDvCkzz",
+    "title": "Department ABC"
+  },
+  {
+    "id":2,
+    "uid": "eErXDvCkyy",
+    "title": "Test dashboard"
+  }
+]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	dashboard, err := client.GetDashboardByTitle(context.TODO(), "dashboard that do not exist")
+
+	req.Error(err)
+	req.Nil(dashboard)
+	req.Equal(ErrDashboardNotFound, err)
+}
+
+func TestGetDashboardByTitleCanFail(t *testing.T) {
+	req := require.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = fmt.Fprintln(w, `{}}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	dashboard, err := client.GetDashboardByTitle(context.TODO(), "does not matter")
+
+	req.Error(err)
+	req.Nil(dashboard)
+}
+
 func TestDashboardsCanBeCreated(t *testing.T) {
 	req := require.New(t)
 	dashboard := builder.New("Dashboard name")

@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/K-Phoen/grabana/alert"
@@ -330,7 +331,7 @@ func (client *Client) GetAlertChannelByName(ctx context.Context, name string) (*
 
 // GetDashboardByTitle finds a dashboard, given its title.
 func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*Dashboard, error) {
-	resp, err := client.get(ctx, fmt.Sprintf("/api/search?type=dash-db&query=%s", title))
+	resp, err := client.get(ctx, "/api/search?type=dash-db&query="+url.QueryEscape(title))
 	if err != nil {
 		return nil, err
 	}
