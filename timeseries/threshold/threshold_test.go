@@ -80,6 +80,6 @@ func TestStepsCanBeDefined(t *testing.T) {
 	req.Equal("red", steps[0].Color)
 
 	// Threshold value
-	req.Equal(10, *steps[1].Value)
+	req.Equal(float64(10), *steps[1].Value)
 	req.Equal("green", steps[1].Color)
 }

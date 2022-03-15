@@ -27,7 +27,7 @@ type Option func(threshold *Threshold)
 
 type Step struct {
 	Color string
-	Value int
+	Value float64
 }
 
 // Threshold represents a threshold visualization.
