@@ -6,6 +6,7 @@ import (
 
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/K-Phoen/grabana/timeseries/axis"
+	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/stretchr/testify/require"
 )
 
@@ -324,4 +325,15 @@ func TestGradientModeCanBeConfigured(t *testing.T) {
 			req.Equal(tc.expected, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode)
 		})
 	}
+}
+
+func TestFieldOverridesCanBeDefined(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", FieldOverride(
+		fields.ByQuery("A"),
+		fields.Unit("short"),
+	))
+
+	req.Len(panel.Builder.TimeseriesPanel.FieldConfig.Overrides, 1)
 }

@@ -168,7 +168,8 @@ type (
 		FieldConfig     *FieldConfig     `json:"fieldConfig,omitempty"`
 	}
 	FieldConfig struct {
-		Defaults FieldConfigDefaults `json:"defaults"`
+		Defaults  FieldConfigDefaults   `json:"defaults"`
+		Overrides []FieldConfigOverride `json:"overrides"`
 	}
 	Options struct {
 		Orientation   string `json:"orientation"`
@@ -382,6 +383,17 @@ type (
 		Custom     FieldConfigCustom `json:"custom"`
 		Links      []Link            `json:"links,omitempty"`
 	}
+	FieldConfigOverrideProperty struct {
+		ID    string      `json:"id"`
+		Value interface{} `json:"value"`
+	}
+	FieldConfigOverride struct {
+		Matcher struct {
+			ID      string `json:"id"`
+			Options string `json:"options"`
+		} `json:"matcher"`
+		Properties []FieldConfigOverrideProperty `json:"properties"`
+	}
 	FieldConfigCustom struct {
 		AxisLabel         string `json:"axisLabel,omitempty"`
 		AxisPlacement     string `json:"axisPlacement"`
@@ -450,7 +462,7 @@ type (
 type (
 	// TODO look at schema versions carefully
 	// grid was obsoleted by xaxis and yaxes
-	grid struct { //nolint: unused,deadcode
+	grid struct { // nolint: unused,deadcode
 		LeftLogBase     *int     `json:"leftLogBase"`
 		LeftMax         *int     `json:"leftMax"`
 		LeftMin         *int     `json:"leftMin"`

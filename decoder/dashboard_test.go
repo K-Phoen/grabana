@@ -50,7 +50,7 @@ func TestUnmarshalYAML(t *testing.T) {
 			json, err := builder.MarshalJSON()
 			req.NoError(err)
 
-			req.JSONEq(dashboardFromFixtures(t, "testdata/"+tc.expectedGrafanaJSON), string(json))
+			req.JSONEq(dashboardFromFixtures(t, "testdata/"+tc.expectedGrafanaJSON), string(json), "test file "+tc.expectedGrafanaJSON)
 		})
 	}
 }

@@ -3,6 +3,7 @@ package timeseries
 import (
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/timeseries/axis"
+	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -303,5 +304,20 @@ func Alert(name string, opts ...alert.Option) Option {
 func Repeat(repeat string) Option {
 	return func(timeseries *TimeSeries) {
 		timeseries.Builder.Repeat = &repeat
+	}
+}
+
+// FieldOverride allows overriding visualization options.
+func FieldOverride(m fields.Matcher, opts ...fields.OverrideOption) Option {
+	return func(timeseries *TimeSeries) {
+		override := sdk.FieldConfigOverride{}
+
+		m(&override)
+
+		for _, opt := range opts {
+			opt(&override)
+		}
+
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Overrides = append(timeseries.Builder.TimeseriesPanel.FieldConfig.Overrides, override)
 	}
 }
