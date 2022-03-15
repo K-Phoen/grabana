@@ -7,6 +7,8 @@ import (
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
+	"github.com/K-Phoen/grabana/timeseries/scheme"
+	"github.com/K-Phoen/grabana/timeseries/threshold"
 	"github.com/stretchr/testify/require"
 )
 
@@ -336,4 +338,27 @@ func TestFieldOverridesCanBeDefined(t *testing.T) {
 	))
 
 	req.Len(panel.Builder.TimeseriesPanel.FieldConfig.Overrides, 1)
+}
+
+func TestThresholdsCanBeDefined(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", Thresholds(
+		threshold.Steps(
+			threshold.Step{
+				Color: "green",
+				Value: 10,
+			},
+		),
+	))
+
+	req.Len(panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Thresholds.Steps, 2)
+}
+
+func TestColorSchemeCanBeDefined(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", ColorScheme(scheme.SingleColor("yellow")))
+
+	req.Equal("fixed", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Color.Mode)
 }
