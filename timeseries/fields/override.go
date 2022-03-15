@@ -25,3 +25,17 @@ func FillOpacity(opacity int) OverrideOption {
 			})
 	}
 }
+
+// FixedColorScheme forces the use of a fixed color scheme.
+func FixedColorScheme(color string) OverrideOption {
+	return func(field *sdk.FieldConfigOverride) {
+		field.Properties = append(field.Properties,
+			sdk.FieldConfigOverrideProperty{
+				ID: "color",
+				Value: map[string]string{
+					"mode":       "fixed",
+					"fixedColor": color,
+				},
+			})
+	}
+}
