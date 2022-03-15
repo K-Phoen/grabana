@@ -4,6 +4,7 @@ import (
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
+	"github.com/K-Phoen/grabana/timeseries/scheme"
 	"github.com/K-Phoen/grabana/timeseries/threshold"
 	"github.com/K-Phoen/sdk"
 )
@@ -218,6 +219,13 @@ func Axis(options ...axis.Option) Option {
 func Thresholds(options ...threshold.Option) Option {
 	return func(timeseries *TimeSeries) {
 		threshold.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
+	}
+}
+
+// ColorScheme configures the color scheme.
+func ColorScheme(options ...scheme.Option) Option {
+	return func(timeseries *TimeSeries) {
+		scheme.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
 	}
 }
 

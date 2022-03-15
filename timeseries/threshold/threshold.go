@@ -38,7 +38,7 @@ type Threshold struct {
 
 // New creates a new Threshold configuration.
 func New(fieldConfig *sdk.FieldConfig, options ...Option) *Threshold {
-	axis := &Threshold{fieldConfig: fieldConfig}
+	threshold := &Threshold{fieldConfig: fieldConfig}
 
 	defaultOpts := []Option{
 		Style(AsLines),
@@ -46,10 +46,10 @@ func New(fieldConfig *sdk.FieldConfig, options ...Option) *Threshold {
 		BaseColor("green"),
 	}
 	for _, opt := range append(defaultOpts, options...) {
-		opt(axis)
+		opt(threshold)
 	}
 
-	return axis
+	return threshold
 }
 
 // Style defines the thresholds display style.
