@@ -1,6 +1,8 @@
 package fields
 
-import "github.com/K-Phoen/sdk"
+import (
+	"github.com/K-Phoen/sdk"
+)
 
 type Matcher func(field *sdk.FieldConfigOverride)
 

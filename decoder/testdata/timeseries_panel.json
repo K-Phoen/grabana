@@ -68,7 +68,8 @@
                   "mode": ""
                 }
               }
-            }
+            },
+            "overrides": null
           },
           "isNew": false,
           "span": 12,
