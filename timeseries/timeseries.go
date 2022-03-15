@@ -4,6 +4,7 @@ import (
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
+	"github.com/K-Phoen/grabana/timeseries/threshold"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -210,6 +211,13 @@ func GradientMode(mode GradientType) Option {
 func Axis(options ...axis.Option) Option {
 	return func(timeseries *TimeSeries) {
 		axis.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
+	}
+}
+
+// Thresholds configures the thresholds for this time series.
+func Thresholds(options ...threshold.Option) Option {
+	return func(timeseries *TimeSeries) {
+		threshold.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
 	}
 }
 
