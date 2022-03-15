@@ -3,7 +3,7 @@ module github.com/K-Phoen/grabana
 go 1.16
 
 require (
-	github.com/K-Phoen/sdk v0.8.4
+	github.com/K-Phoen/sdk v0.8.5
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/gosimple/slug v1.12.0 // indirect
 	github.com/prometheus/common v0.32.0
@@ -12,5 +12,3 @@ require (
 	github.com/stretchr/testify v1.7.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
-
-replace github.com/K-Phoen/sdk => github.com/ptxmac/sdk v0.8.2-0.20211220183005-6bf8e9c10730

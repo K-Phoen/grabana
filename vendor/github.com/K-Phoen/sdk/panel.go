@@ -40,6 +40,7 @@ const (
 	BarGaugeType
 	HeatmapType
 	TimeseriesType
+	LogsType
 )
 
 const MixedSource = "-- Mixed --"
@@ -62,6 +63,7 @@ type (
 		*BarGaugePanel
 		*HeatmapPanel
 		*TimeseriesPanel
+		*LogsPanel
 		*CustomPanel
 	}
 	panelType   int8
@@ -439,6 +441,20 @@ type (
 		FixedColor string `json:"fixedColor,omitempty"`
 		SeriesBy   string `json:"seriesBy,omitempty"`
 	}
+	LogsPanel struct {
+		Targets []Target    `json:"targets,omitempty"`
+		Options LogsOptions `json:"options,omitempty"`
+	}
+	LogsOptions struct {
+		DedupStrategy      string `json:"dedupStrategy"`
+		WrapLogMessage     bool   `json:"wrapLogMessage"`
+		ShowTime           bool   `json:"showTime"`
+		ShowLabels         bool   `json:"showLabels"`
+		ShowCommonLabels   bool   `json:"showCommonLabels"`
+		PrettifyLogMessage bool   `json:"prettifyLogMessage"`
+		SortOrder          string `json:"sortOrder"`
+		EnableLogDetails   bool   `json:"enableLogDetails"`
+	}
 	CustomPanel map[string]interface{}
 )
 
@@ -644,6 +660,7 @@ type Target struct {
 	CrossSeriesReducer string                    `json:"crossSeriesReducer,omitempty"`
 	PerSeriesAligner   string                    `json:"perSeriesAligner,omitempty"`
 	ValueType          string                    `json:"valueType,omitempty"`
+	Preprocessor       string                    `json:"preprocessor,omitempty"`
 	GroupBys           []string                  `json:"groupBys,omitempty"`
 	Tags               []struct {
 		Key      string `json:"key,omitempty"`
@@ -744,6 +761,24 @@ func NewTimeseries(title string) *Panel {
 				},
 			},
 		},
+	}
+}
+
+// NewLogs initializes a new panel as a Logs panel.
+func NewLogs(title string) *Panel {
+	if title == "" {
+		title = "Panel Title"
+	}
+
+	return &Panel{
+		CommonPanel: CommonPanel{
+			OfType: LogsType,
+			Title:  title,
+			Type:   "logs",
+			Span:   12,
+			IsNew:  true,
+		},
+		LogsPanel: &LogsPanel{},
 	}
 }
 
@@ -890,6 +925,8 @@ func (p *Panel) ResetTargets() {
 		p.HeatmapPanel.Targets = nil
 	case TimeseriesType:
 		p.TimeseriesPanel.Targets = nil
+	case LogsType:
+		p.LogsPanel.Targets = nil
 	}
 }
 
@@ -911,6 +948,8 @@ func (p *Panel) AddTarget(t *Target) {
 		p.HeatmapPanel.Targets = append(p.HeatmapPanel.Targets, *t)
 	case TimeseriesType:
 		p.TimeseriesPanel.Targets = append(p.TimeseriesPanel.Targets, *t)
+	case LogsType:
+		p.LogsPanel.Targets = append(p.LogsPanel.Targets, *t)
 	}
 	// TODO check for existing refID
 }
@@ -940,6 +979,8 @@ func (p *Panel) SetTarget(t *Target) {
 		setTarget(t, &p.HeatmapPanel.Targets)
 	case TimeseriesType:
 		setTarget(t, &p.TimeseriesPanel.Targets)
+	case LogsType:
+		setTarget(t, &p.LogsPanel.Targets)
 	}
 }
 
@@ -973,6 +1014,8 @@ func (p *Panel) RepeatDatasourcesForEachTarget(dsNames ...string) {
 		repeatDS(dsNames, &p.HeatmapPanel.Targets)
 	case TimeseriesType:
 		repeatDS(dsNames, &p.TimeseriesPanel.Targets)
+	case LogsType:
+		repeatDS(dsNames, &p.LogsPanel.Targets)
 	}
 }
 
@@ -1009,6 +1052,8 @@ func (p *Panel) RepeatTargetsForDatasources(dsNames ...string) {
 		repeatTarget(dsNames, &p.HeatmapPanel.Targets)
 	case TimeseriesType:
 		repeatTarget(dsNames, &p.TimeseriesPanel.Targets)
+	case LogsType:
+		repeatTarget(dsNames, &p.LogsPanel.Targets)
 	}
 }
 
@@ -1030,6 +1075,8 @@ func (p *Panel) GetTargets() *[]Target {
 		return &p.HeatmapPanel.Targets
 	case TimeseriesType:
 		return &p.TimeseriesPanel.Targets
+	case LogsType:
+		return &p.LogsPanel.Targets
 	default:
 		return nil
 	}
@@ -1098,6 +1145,12 @@ func (p *Panel) UnmarshalJSON(b []byte) (err error) {
 			p.OfType = TimeseriesType
 			if err = json.Unmarshal(b, &timeseries); err == nil {
 				p.TimeseriesPanel = &timeseries
+			}
+		case "logs":
+			var logs LogsPanel
+			p.OfType = LogsType
+			if err = json.Unmarshal(b, &logs); err == nil {
+				p.LogsPanel = &logs
 			}
 		case "row":
 			var rowpanel RowPanel
@@ -1190,6 +1243,12 @@ func (p *Panel) MarshalJSON() ([]byte, error) {
 			TimeseriesPanel
 		}{p.CommonPanel, *p.TimeseriesPanel}
 		return json.Marshal(outTimeseries)
+	case LogsType:
+		var outLogs = struct {
+			CommonPanel
+			LogsPanel
+		}{p.CommonPanel, *p.LogsPanel}
+		return json.Marshal(outLogs)
 	case CustomType:
 		var outCustom = customPanelOutput{
 			p.CommonPanel,

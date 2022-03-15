@@ -307,6 +307,7 @@ func Repeat(repeat string) Option {
 	}
 }
 
+// FieldOverride allows overriding visualization options.
 func FieldOverride(m fields.Matcher, opts ...fields.OverrideOption) Option {
 	return func(timeseries *TimeSeries) {
 		override := sdk.FieldConfigOverride{}
