@@ -19,7 +19,7 @@ func TestNewAlertCanBeCreated(t *testing.T) {
 func TestMessageCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", Message("content"))
+	a := New("", Summary("content"))
 
 	req.Equal("content", a.Builder.Message)
 }

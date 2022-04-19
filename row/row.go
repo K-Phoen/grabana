@@ -17,6 +17,7 @@ type Option func(row *Row)
 // Row represents a dashboard row.
 type Row struct {
 	builder *sdk.Row
+	alerts  []*sdk.Alert
 }
 
 // New creates a new row.
@@ -36,12 +37,20 @@ func defaults() []Option {
 	}
 }
 
+// Alerts returns a list of alerts defined within this row.
+func (row *Row) Alerts() []*sdk.Alert {
+	return row.alerts
+}
+
 // WithGraph adds a "graph" panel in the row.
 func WithGraph(title string, options ...graph.Option) Option {
 	return func(row *Row) {
-		graphPanel := graph.New(title, options...)
+		panel := graph.New(title, options...)
+		row.builder.Add(panel.Builder)
 
-		row.builder.Add(graphPanel.Builder)
+		if panel.Alert != nil {
+			row.alerts = append(row.alerts, panel.Alert)
+		}
 	}
 }
 
@@ -49,8 +58,11 @@ func WithGraph(title string, options ...graph.Option) Option {
 func WithTimeSeries(title string, options ...timeseries.Option) Option {
 	return func(row *Row) {
 		panel := timeseries.New(title, options...)
-
 		row.builder.Add(panel.Builder)
+
+		if panel.Alert != nil {
+			row.alerts = append(row.alerts, panel.Alert)
+		}
 	}
 }
 
@@ -58,7 +70,6 @@ func WithTimeSeries(title string, options ...timeseries.Option) Option {
 func WithLogs(title string, options ...logs.Option) Option {
 	return func(row *Row) {
 		panel := logs.New(title, options...)
-
 		row.builder.Add(panel.Builder)
 	}
 }
@@ -66,36 +77,32 @@ func WithLogs(title string, options ...logs.Option) Option {
 // WithSingleStat adds a "single stat" panel in the row.
 func WithSingleStat(title string, options ...singlestat.Option) Option {
 	return func(row *Row) {
-		singleStatPanel := singlestat.New(title, options...)
-
-		row.builder.Add(singleStatPanel.Builder)
+		panel := singlestat.New(title, options...)
+		row.builder.Add(panel.Builder)
 	}
 }
 
 // WithTable adds a "table" panel in the row.
 func WithTable(title string, options ...table.Option) Option {
 	return func(row *Row) {
-		tablePanel := table.New(title, options...)
-
-		row.builder.Add(tablePanel.Builder)
+		panel := table.New(title, options...)
+		row.builder.Add(panel.Builder)
 	}
 }
 
 // WithText adds a "text" panel in the row.
 func WithText(title string, options ...text.Option) Option {
 	return func(row *Row) {
-		textPanel := text.New(title, options...)
-
-		row.builder.Add(textPanel.Builder)
+		panel := text.New(title, options...)
+		row.builder.Add(panel.Builder)
 	}
 }
 
 // WithHeatmap adds a "heatmap" panel in the row.
 func WithHeatmap(title string, options ...heatmap.Option) Option {
 	return func(row *Row) {
-		heatmapPanel := heatmap.New(title, options...)
-
-		row.builder.Add(heatmapPanel.Builder)
+		panel := heatmap.New(title, options...)
+		row.builder.Add(panel.Builder)
 	}
 }
 

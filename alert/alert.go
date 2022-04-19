@@ -8,26 +8,26 @@ import (
 type ErrorMode string
 
 // Alerting will set the alert state to "alerting".
-const Alerting ErrorMode = "alerting"
+const ErrorAlerting ErrorMode = "Alerting"
 
 // LastState will set the alert state to its previous state.
-const LastState ErrorMode = "keep_state"
+const ErrorKO ErrorMode = "Error"
+
+// LastState will set the alert state to its previous state.
+const ErrorOK ErrorMode = "OK"
 
 // NoDataMode represents the behavior of an alert when no data is returned by
 // the query.
 type NoDataMode string
 
 // NoData will set the alert state to "no data".
-const NoData NoDataMode = "no_data"
+const NoDataEmpty NoDataMode = "NoData"
 
 // Error will set the alert state to "alerting".
-const Error NoDataMode = "alerting"
-
-// KeepLastState will set the alert state to its previous state.
-const KeepLastState NoDataMode = "keep_state"
+const NoDataAlerting NoDataMode = "Alerting"
 
 // OK will set the alert state to "ok".
-const OK NoDataMode = "ok"
+const NoDataOK NoDataMode = "OK"
 
 // Option represents an option that can be used to configure an alert.
 type Option func(alert *Alert)
@@ -41,6 +41,8 @@ type Channel struct {
 	Type string `json:"type"`
 }
 
+const alertConditionRef = "_alert_condition_"
+
 // Alert represents an alert that can be triggered by a query.
 type Alert struct {
 	Builder *sdk.Alert
@@ -49,53 +51,56 @@ type Alert struct {
 // New creates a new alert.
 func New(name string, options ...Option) *Alert {
 	alert := &Alert{Builder: &sdk.Alert{
-		Name:                name,
-		Handler:             1, // TODO: what's that?
-		ExecutionErrorState: string(LastState),
-		NoDataState:         string(KeepLastState),
+		Name: name,
+		Rules: []sdk.AlertRule{
+			{
+				GrafanaAlert: &sdk.GrafanaAlert{
+					Title:               name,
+					Condition:           alertConditionRef,
+					NoDataState:         string(NoDataEmpty),
+					ExecutionErrorState: string(ErrorKO),
+					Data:                nil,
+				},
+				Annotations: map[string]string{},
+				Labels:      map[string]string{},
+			},
+		},
 	}}
 
-	for _, opt := range options {
+	for _, opt := range append(defaults(), options...) {
 		opt(alert)
 	}
 
 	return alert
 }
 
-// Notify adds a notification for this alert given a channel.
-func Notify(channel *Channel) Option {
-	return func(alert *Alert) {
-		alert.Builder.Notifications = append(alert.Builder.Notifications, sdk.AlertNotification{
-			UID: channel.UID,
-		})
+func defaults() []Option {
+	return []Option{
+		EvaluateEvery("1m"),
+		For("5m"),
+		OnNoData(NoDataEmpty),
+		OnExecutionError(ErrorAlerting),
 	}
 }
 
-// NotifyChannels appends the given notification channels to the list of
-// channels for this alert.
-func NotifyChannels(channels ...*Channel) Option {
+// Summary sets the summary associated to the alert.
+func Summary(content string) Option {
 	return func(alert *Alert) {
-		for _, channel := range channels {
-			alert.Builder.Notifications = append(alert.Builder.Notifications, sdk.AlertNotification{
-				UID: channel.UID,
-			})
-		}
+		alert.Builder.Rules[0].Annotations["summary"] = content
 	}
 }
 
-// NotifyChannel adds a notification for this alert given a channel UID.
-func NotifyChannel(channelUID string) Option {
+// Description sets the description associated to the alert.
+func Description(content string) Option {
 	return func(alert *Alert) {
-		alert.Builder.Notifications = append(alert.Builder.Notifications, sdk.AlertNotification{
-			UID: channelUID,
-		})
+		alert.Builder.Rules[0].Annotations["description"] = content
 	}
 }
 
-// Message sets the message associated to the alert.
-func Message(content string) Option {
+// Runbook sets the runbook URL associated to the alert.
+func Runbook(url string) Option {
 	return func(alert *Alert) {
-		alert.Builder.Message = content
+		alert.Builder.Rules[0].Annotations["runbook_url"] = url
 	}
 }
 
@@ -104,14 +109,14 @@ func Message(content string) Option {
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#for
 func For(duration string) Option {
 	return func(alert *Alert) {
-		alert.Builder.For = duration
+		alert.Builder.Rules[0].For = duration
 	}
 }
 
 // EvaluateEvery defines the evaluation interval.
 func EvaluateEvery(interval string) Option {
 	return func(alert *Alert) {
-		alert.Builder.Frequency = interval
+		alert.Builder.Interval = interval
 	}
 }
 
@@ -119,7 +124,7 @@ func EvaluateEvery(interval string) Option {
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#execution-errors-or-timeouts
 func OnExecutionError(mode ErrorMode) Option {
 	return func(alert *Alert) {
-		alert.Builder.ExecutionErrorState = string(mode)
+		alert.Builder.Rules[0].GrafanaAlert.ExecutionErrorState = string(mode)
 	}
 }
 
@@ -127,25 +132,52 @@ func OnExecutionError(mode ErrorMode) Option {
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#no-data-null-values
 func OnNoData(mode NoDataMode) Option {
 	return func(alert *Alert) {
-		alert.Builder.NoDataState = string(mode)
+		alert.Builder.Rules[0].GrafanaAlert.NoDataState = string(mode)
 	}
 }
 
-// If adds a condition that could trigger the alert.
-// See https://grafana.com/docs/grafana/latest/alerting/rules/#conditions
-func If(operator Operator, opts ...ConditionOption) Option {
+func If(opts ...ConditionOption) Option {
 	return func(alert *Alert) {
 		cond := newCondition(opts...)
-		cond.builder.Operator = sdk.AlertOperator{Type: string(operator)}
+		cond.builder.Operator = sdk.AlertOperator{Type: string(And)}
 
-		alert.Builder.Conditions = append(alert.Builder.Conditions, *cond.builder)
+		nope := false
+
+		alertQuery := sdk.AlertQuery{
+			RefID:         alertConditionRef,
+			QueryType:     "",
+			DatasourceUID: "-100",
+			Model: sdk.AlertModel{
+				RefID: alertConditionRef,
+				Type:  "classic_conditions",
+				Hide:  &nope,
+				Datasource: sdk.AlertDatasourceRef{
+					UID:  "-100",
+					Type: "__expr__",
+				},
+				Conditions: []sdk.AlertCondition{*cond.builder},
+			},
+		}
+
+		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, alertQuery)
 	}
 }
 
+//// If adds a condition that could trigger the alert.
+//// See https://grafana.com/docs/grafana/latest/alerting/rules/#conditions
+//func If(operator Operator, opts ...ConditionOption) Option {
+//	return func(alert *Alert) {
+//		cond := newCondition(opts...)
+//		cond.builder.Operator = sdk.AlertOperator{Type: string(operator)}
+//
+//		alert.Builder.Conditions = append(alert.Builder.Conditions, *cond.builder)
+//	}
+//}
+
 // Tags defines a set of tags that will be forwarded to the notifications
-// channels when the alert will tbe triggered.
+// channels when the alert will tbe triggered or used to route the alert.
 func Tags(tags map[string]string) Option {
 	return func(alert *Alert) {
-		alert.Builder.AlertRuleTags = tags
+		alert.Builder.Rules[0].Labels = tags
 	}
 }

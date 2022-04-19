@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/K-Phoen/grabana"
+	"github.com/K-Phoen/grabana/alert"
+	prometheusAlert "github.com/K-Phoen/grabana/alert/queries/prometheus"
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
@@ -39,7 +41,8 @@ func main() {
 	}
 
 	builder := dashboard.New(
-		"Awesome dashboard",
+		"Awesome dashboard test",
+		dashboard.UID("test-dashboard-alerts"),
 		dashboard.AutoRefresh("30s"),
 		dashboard.Tags([]string{"generated"}),
 		dashboard.TagsAnnotation(dashboard.TagAnnotation{
@@ -107,6 +110,26 @@ func main() {
 					axis.SoftMin(0),
 				),
 				timeseries.Legend(timeseries.Last, timeseries.AsTable),
+				timeseries.Alert(
+					fmt.Sprintf("Too many heap allocations"),
+					alert.Summary("Yup, too much of {{ app }}"),
+					alert.Runbook("https://google.com"),
+					alert.Tags(map[string]string{
+						"service": "amazing-service",
+						"owner":   "team-b",
+					}),
+					alert.If(
+						alert.Avg("A"),
+						alert.IsAbove(3),
+					),
+					alert.Queries(
+						alert.WithPrometheusQuery(
+							"A",
+							"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+							prometheusAlert.Legend("{{ app }}"),
+						),
+					),
+				),
 			),
 			row.WithTable(
 				"Threads",

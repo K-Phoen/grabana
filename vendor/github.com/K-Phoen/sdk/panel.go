@@ -98,40 +98,6 @@ type (
 		Description *string `json:"description,omitempty"` // general
 		Transparent bool    `json:"transparent"`
 		Type        string  `json:"type"`
-		Alert       *Alert  `json:"alert,omitempty"`
-	}
-	AlertEvaluator struct {
-		Params []float64 `json:"params,omitempty"`
-		Type   string    `json:"type,omitempty"`
-	}
-	AlertOperator struct {
-		Type string `json:"type,omitempty"`
-	}
-	AlertQuery struct {
-		Params []string `json:"params,omitempty"`
-	}
-	AlertReducer struct {
-		Params []string `json:"params,omitempty"`
-		Type   string   `json:"type,omitempty"`
-	}
-	AlertCondition struct {
-		Evaluator AlertEvaluator `json:"evaluator,omitempty"`
-		Operator  AlertOperator  `json:"operator,omitempty"`
-		Query     AlertQuery     `json:"query,omitempty"`
-		Reducer   AlertReducer   `json:"reducer,omitempty"`
-		Type      string         `json:"type,omitempty"`
-	}
-	Alert struct {
-		AlertRuleTags       map[string]string   `json:"alertRuleTags,omitempty"`
-		Conditions          []AlertCondition    `json:"conditions,omitempty"`
-		ExecutionErrorState string              `json:"executionErrorState,omitempty"`
-		Frequency           string              `json:"frequency,omitempty"`
-		Handler             int                 `json:"handler,omitempty"`
-		Name                string              `json:"name,omitempty"`
-		NoDataState         string              `json:"noDataState,omitempty"`
-		Notifications       []AlertNotification `json:"notifications,omitempty"`
-		Message             string              `json:"message,omitempty"`
-		For                 string              `json:"for,omitempty"`
 	}
 	GraphPanel struct {
 		AliasColors interface{} `json:"aliasColors"` // XXX

@@ -31,9 +31,17 @@ var ErrDatasourceNotFound = errors.New("datasource not found")
 // ErrAPIKeyNotFound is returned when the given API key can not be found.
 var ErrAPIKeyNotFound = errors.New("API key not found")
 
+// ErrAlertNotFound is returned when the requested alert can not be found.
+var ErrAlertNotFound = errors.New("alert not found")
+
 // ErrAlertChannelNotFound is returned when the given alert notification
 // channel can not be found.
 var ErrAlertChannelNotFound = errors.New("alert channel not found")
+
+type alertRef struct {
+	Namespace string
+	RuleGroup string
+}
 
 // APIKeyRole represents a role given to an API key.
 type APIKeyRole uint8
@@ -143,6 +151,84 @@ func (client *Client) modifyRequest(request *http.Request) {
 	for _, modifier := range client.requestModifiers {
 		modifier(request)
 	}
+}
+
+// AddAlert creates an alert group within a given namespace.
+func (client *Client) AddAlert(ctx context.Context, namespace string, alertDefinition sdk.Alert) error {
+	// Before we can add this alert, we need to delete any other alert that might exist for this dashboard and panel
+	if err := client.DeleteAlertGroup(ctx, namespace, alertDefinition.Name); err != nil && err != ErrAlertNotFound {
+		return fmt.Errorf("could not delete existing alerts: %w", err)
+	}
+
+	buf, err := json.Marshal(alertDefinition)
+	if err != nil {
+		return err
+	}
+
+	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/ruler/grafana/api/v1/rules/"+url.PathEscape(namespace), buf)
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusAccepted {
+		return client.httpError(resp)
+	}
+
+	return nil
+}
+
+// DeleteAlertGroup deletes an alert group.
+func (client *Client) DeleteAlertGroup(ctx context.Context, namespace string, groupName string) error {
+	deleteURL := fmt.Sprintf("/api/ruler/grafana/api/v1/rules/%s/%s", url.PathEscape(namespace), url.PathEscape(groupName))
+	resp, err := client.delete(ctx, deleteURL)
+	if err != nil {
+		return err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return ErrAlertNotFound
+	}
+	if resp.StatusCode != http.StatusAccepted {
+		return client.httpError(resp)
+	}
+
+	return nil
+}
+
+// DeleteAlertGroup deletes an alert group.
+func (client *Client) listAlertsForDashboard(ctx context.Context, dashboardUID string) ([]alertRef, error) {
+	resp, err := client.get(ctx, "/api/ruler/grafana/api/v1/rules?dashboard_uid="+url.QueryEscape(dashboardUID))
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, client.httpError(resp)
+	}
+
+	var alerts map[string][]sdk.Alert
+	if err := decodeJSON(resp.Body, &alerts); err != nil {
+		return nil, err
+	}
+
+	var refs []alertRef
+
+	for namespace := range alerts {
+		for _, a := range alerts[namespace] {
+			refs = append(refs, alertRef{
+				Namespace: namespace,
+				RuleGroup: a.Name,
+			})
+		}
+	}
+
+	return refs, nil
 }
 
 // CreateAPIKey creates a new API key.
@@ -362,6 +448,35 @@ func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*D
 
 // UpsertDashboard creates or replaces a dashboard, in the given folder.
 func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, builder dashboard.Builder) (*Dashboard, error) {
+	// first pass: save the new dashboard
+	dashboardModel, err := client.persistDashboard(ctx, folder, builder)
+	if err != nil {
+		return nil, err
+	}
+
+	// second pass: delete existing alerts associated to that dashboard
+	alertRefs, err := client.listAlertsForDashboard(ctx, dashboardModel.UID)
+	if err != nil {
+		return nil, fmt.Errorf("could not prepare deletion of previous alerts for dashboard: %w", err)
+	}
+	for _, ref := range alertRefs {
+		if err := client.DeleteAlertGroup(ctx, ref.Namespace, ref.RuleGroup); err != nil {
+			return nil, fmt.Errorf("could not delete of previous alerts for dashboard: %w", err)
+		}
+	}
+
+	// third pass: create new alerts
+	alerts := builder.Alerts()
+	for i := range alerts {
+		if err := client.AddAlert(ctx, folder.Title, *alerts[i]); err != nil {
+			return nil, fmt.Errorf("could not add new alerts for dashboard: %w", err)
+		}
+	}
+
+	return dashboardModel, nil
+}
+
+func (client *Client) persistDashboard(ctx context.Context, folder *Folder, builder dashboard.Builder) (*Dashboard, error) {
 	buf, err := json.Marshal(struct {
 		Dashboard *sdk.Board `json:"dashboard"`
 		FolderID  uint       `json:"folderId"`

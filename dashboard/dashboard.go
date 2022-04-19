@@ -45,7 +45,8 @@ const Browser TimezoneOption = "browser"
 
 // Builder is the main builder used to configure dashboards.
 type Builder struct {
-	board *sdk.Board
+	board  *sdk.Board
+	alerts []*sdk.Alert
 }
 
 // New creates a new dashboard builder.
@@ -96,6 +97,11 @@ func (builder *Builder) MarshalJSON() ([]byte, error) {
 // See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
 func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
 	return json.MarshalIndent(builder.board, "", "  ")
+}
+
+// Alerts returns all the alerts defined in this dashboard.
+func (builder *Builder) Alerts() []*sdk.Alert {
+	return builder.alerts
 }
 
 // Internal.
@@ -178,7 +184,7 @@ func VariableAsDatasource(name string, options ...datasource.Option) Option {
 	}
 }
 
-// Link adds a dashboard-level link.
+// ExternalLinks adds a dashboard-level link.
 // See https://grafana.com/docs/grafana/latest/linking/dashboard-links/
 func ExternalLinks(links ...ExternalLink) Option {
 	return func(builder *Builder) {
@@ -191,7 +197,9 @@ func ExternalLinks(links ...ExternalLink) Option {
 // Row adds a row to the dashboard.
 func Row(title string, options ...row.Option) Option {
 	return func(builder *Builder) {
-		row.New(builder.board, title, options...)
+		r := row.New(builder.board, title, options...)
+
+		builder.alerts = append(builder.alerts, r.Alerts()...)
 	}
 }
 

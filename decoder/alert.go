@@ -64,7 +64,7 @@ func (a Alert) toOptions() ([]alert.Option, error) {
 		opts = append(opts, alert.NotifyChannel(a.Notify))
 	}
 	if a.Message != "" {
-		opts = append(opts, alert.Message(a.Message))
+		opts = append(opts, alert.Summary(a.Message))
 	}
 	if len(a.Tags) != 0 {
 		opts = append(opts, alert.Tags(a.Tags))
