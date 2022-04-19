@@ -94,7 +94,7 @@ type AlertThreshold struct {
 	WithinRange  [2]float64 `yaml:"within_range,omitempty,flow"`
 }
 
-func (threshold AlertThreshold) toOption() (alert.ConditionOption, error) {
+func (threshold AlertThreshold) toOption() (alert.ConditionEvaluator, error) {
 	if threshold.HasNoValue {
 		return alert.HasNoValue(), nil
 	}
@@ -121,8 +121,8 @@ type AlertValue struct {
 	To       string
 }
 
-func (v AlertValue) toOption() (alert.ConditionOption, error) {
-	var alertFunc func(refID string, from string, to string) alert.ConditionOption
+func (v AlertValue) toOption() (alert.ConditionEvaluator, error) {
+	var alertFunc func(refID string, from string, to string) alert.ConditionEvaluator
 
 	switch v.Func {
 	case "avg":

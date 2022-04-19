@@ -24,13 +24,6 @@ func New(query string, options ...Option) *InfluxDB {
 	return influxdb
 }
 
-// Ref sets the reference ID for this query.
-func Ref(ref string) Option {
-	return func(influxdb *InfluxDB) {
-		influxdb.Builder.RefID = ref
-	}
-}
-
 // Hide the query. Grafana does not send hidden queries to the data source,
 // but they can still be referenced in alerts.
 func Hide() Option {

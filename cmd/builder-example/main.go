@@ -8,7 +8,6 @@ import (
 
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/alert"
-	prometheusAlert "github.com/K-Phoen/grabana/alert/queries/prometheus"
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
@@ -121,14 +120,10 @@ func main() {
 						"service": "amazing-service",
 						"owner":   "team-b",
 					}),
-					alert.If(
-						alert.Avg("A"),
-						alert.IsAbove(3),
-					),
+					alert.If(alert.Avg, "A", alert.IsAbove(3)),
 					alert.WithPrometheusQuery(
 						"A",
 						"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
-						prometheusAlert.Legend("{{ app }}"),
 					),
 				),
 			),

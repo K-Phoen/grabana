@@ -170,11 +170,11 @@ func OnNoData(mode NoDataMode) Option {
 	}
 }
 
-// If adds a condition that could trigger the alert.
+// If defines a single condition that will trigger the alert.
 // See https://grafana.com/docs/grafana/latest/alerting/rules/#conditions
-func If(opts ...ConditionOption) Option {
+func If(reducer QueryReducer, queryRef string, evaluator ConditionEvaluator) Option {
 	return func(alert *Alert) {
-		cond := newCondition(opts...)
+		cond := newCondition(reducer, queryRef, evaluator)
 		cond.builder.Operator = sdk.AlertOperator{Type: string(And)}
 
 		nope := false

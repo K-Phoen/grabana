@@ -9,7 +9,6 @@ import (
 	"net/url"
 
 	"github.com/K-Phoen/grabana/alert"
-
 	"github.com/K-Phoen/grabana/alertmanager"
 	"github.com/K-Phoen/sdk"
 )
