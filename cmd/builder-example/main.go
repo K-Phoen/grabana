@@ -161,10 +161,12 @@ func main() {
 			),
 		),
 	)
-	if _, err := client.UpsertDashboard(ctx, folder, builder); err != nil {
+
+	dash, err := client.UpsertDashboard(ctx, folder, builder)
+	if err != nil {
 		fmt.Printf("Could not create dashboard: %s\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Println("The deed is done.")
+	fmt.Printf("The deed is done:\n%s\n", os.Args[1]+dash.URL)
 }

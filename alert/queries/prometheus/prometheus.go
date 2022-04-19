@@ -6,18 +6,6 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
-// FormatMode switches between Table, Time series, or Heatmap. Table will only work
-// in the Table panel. Heatmap is suitable for displaying metrics of the
-// Histogram type on a Heatmap panel. Under the hood, it converts cumulative
-// histograms to regular ones and sorts series by the bucket bound.
-type FormatMode string
-
-const (
-	FormatTable      FormatMode = "table"
-	FormatHeatmap    FormatMode = "heatmap"
-	FormatTimeSeries FormatMode = "time_series"
-)
-
 // Option represents an option that can be used to configure a prometheus query.
 type Option func(query *Prometheus)
 
@@ -34,7 +22,7 @@ func New(ref string, query string, options ...Option) *Prometheus {
 		Builder: sdk.AlertQuery{
 			RefID:             ref,
 			QueryType:         "",
-			DatasourceUID:     "PBFA97CFB590B2093", // TODO: "__FILL_ME__",
+			DatasourceUID:     "__FILL_ME__",
 			RelativeTimeRange: &sdk.AlertRelativeTimeRange{},
 			Model: sdk.AlertModel{
 				RefID:  ref,
@@ -42,7 +30,7 @@ func New(ref string, query string, options ...Option) *Prometheus {
 				Format: "time_series",
 				Hide:   &nope,
 				Datasource: sdk.AlertDatasourceRef{
-					UID:  "PBFA97CFB590B2093", // TODO: "__FILL_ME__",
+					UID:  "__FILL_ME__",
 					Type: "prometheus",
 				},
 				Interval:   "",

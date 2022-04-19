@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/K-Phoen/grabana/alert"
+
 	"github.com/K-Phoen/grabana/alertmanager"
 	"github.com/K-Phoen/sdk"
 )
@@ -42,17 +44,31 @@ func (client *Client) ConfigureAlertManager(ctx context.Context, manager *alertm
 }
 
 // AddAlert creates an alert group within a given namespace.
-func (client *Client) AddAlert(ctx context.Context, namespace string, alertDefinition sdk.Alert) error {
+func (client *Client) AddAlert(ctx context.Context, namespace string, alertDefinition alert.Alert, datasourcesMap map[string]string) error {
+	// Find out which datasource the alert depends on, and inject its UID into the sdk definition
+	datasource := defaultDatasourceKey
+	if alertDefinition.Datasource != "" {
+		datasource = alertDefinition.Datasource
+	}
+
+	datasourceUID := datasourcesMap[datasource]
+	if datasourceUID == "" {
+		return fmt.Errorf("could not infer datasource UID from its name: %s", datasource)
+	}
+
+	alertDefinition.HookDatasourceUID(datasourceUID)
+
 	// Before we can add this alert, we need to delete any other alert that might exist for this dashboard and panel
-	if err := client.DeleteAlertGroup(ctx, namespace, alertDefinition.Name); err != nil && err != ErrAlertNotFound {
+	if err := client.DeleteAlertGroup(ctx, namespace, alertDefinition.Builder.Name); err != nil && err != ErrAlertNotFound {
 		return fmt.Errorf("could not delete existing alerts: %w", err)
 	}
 
-	buf, err := json.Marshal(alertDefinition)
+	buf, err := json.Marshal(alertDefinition.Builder)
 	if err != nil {
 		return err
 	}
 
+	// Save the alert!
 	resp, err := client.sendJSON(ctx, http.MethodPost, "/api/ruler/grafana/api/v1/rules/"+url.PathEscape(namespace), buf)
 	if err != nil {
 		return err

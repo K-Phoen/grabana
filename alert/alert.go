@@ -45,7 +45,8 @@ const alertConditionRef = "_alert_condition_"
 
 // Alert represents an alert that can be triggered by a query.
 type Alert struct {
-	Builder *sdk.Alert
+	Builder    *sdk.Alert
+	Datasource string
 }
 
 // New creates a new alert.
@@ -80,6 +81,21 @@ func defaults() []Option {
 		For("5m"),
 		OnNoData(NoDataEmpty),
 		OnExecutionError(ErrorAlerting),
+	}
+}
+
+func (alert *Alert) HookDatasourceUID(uid string) {
+	for _, rule := range alert.Builder.Rules {
+		for i := range rule.GrafanaAlert.Data {
+			query := &rule.GrafanaAlert.Data[i]
+
+			if query.RefID == alertConditionRef {
+				continue
+			}
+
+			query.DatasourceUID = uid
+			query.Model.Datasource.UID = uid
+		}
 	}
 }
 

@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/graph/series"
 	"github.com/K-Phoen/grabana/target/graphite"
@@ -69,7 +70,7 @@ const (
 // Graph represents a graph panel.
 type Graph struct {
 	Builder *sdk.Panel
-	Alert   *sdk.Alert
+	Alert   *alert.Alert
 }
 
 // New creates a new graph panel.
@@ -213,13 +214,13 @@ func XAxis(opts ...axis.Option) Option {
 	}
 }
 
-//
-//// Alert creates an alert for this graph.
-//func Alert(name string, opts ...alert.Option) Option {
-//	return func(graph *Graph) {
-//		graph.Builder.Alert = alert.New(name, opts...).Builder
-//	}
-//}
+// Alert creates an alert for this graph.
+func Alert(name string, opts ...alert.Option) Option {
+	return func(graph *Graph) {
+		graph.Alert = alert.New(name, opts...)
+		graph.Alert.Builder.Name = graph.Builder.Title
+	}
+}
 
 // Draw specifies how the graph will be drawn.
 func Draw(modes ...DrawMode) Option {

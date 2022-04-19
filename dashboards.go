@@ -61,8 +61,40 @@ func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*D
 	return nil, ErrDashboardNotFound
 }
 
+// GetDashboardByUID finds a dashboard, given its UID.
+func (client *Client) rawDashboardByUID(ctx context.Context, uid string) (*sdk.Board, error) {
+	resp, err := client.get(ctx, "/api/dashboards/uid/"+url.PathEscape(uid))
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, ErrDashboardNotFound
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, client.httpError(resp)
+	}
+
+	response := struct {
+		Board sdk.Board `json:"dashboard"`
+	}{}
+
+	if err := decodeJSON(resp.Body, &response); err != nil {
+		return nil, err
+	}
+
+	return &response.Board, nil
+}
+
 // UpsertDashboard creates or replaces a dashboard, in the given folder.
 func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, builder dashboard.Builder) (*Dashboard, error) {
+	datasourcesMap, err := client.datasourcesUIDMap(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	// first pass: save the new dashboard
 	dashboardModel, err := client.persistDashboard(ctx, folder, builder)
 	if err != nil {
@@ -80,10 +112,17 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		}
 	}
 
+	/*
+		dashboardFromGrafana, err := client.rawDashboardByUID(ctx, dashboardModel.UID)
+		if err != nil {
+			return nil, err
+		}
+	*/
+
 	// third pass: create new alerts
 	alerts := builder.Alerts()
 	for i := range alerts {
-		if err := client.AddAlert(ctx, folder.Title, *alerts[i]); err != nil {
+		if err := client.AddAlert(ctx, folder.Title, *alerts[i], datasourcesMap); err != nil {
 			return nil, fmt.Errorf("could not add new alerts for dashboard: %w", err)
 		}
 	}

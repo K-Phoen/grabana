@@ -107,7 +107,7 @@ const (
 // TimeSeries represents a time series panel.
 type TimeSeries struct {
 	Builder *sdk.Panel
-	Alert   *sdk.Alert
+	Alert   *alert.Alert
 }
 
 // New creates a new time series panel.
@@ -313,8 +313,8 @@ func Transparent() Option {
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
 	return func(timeseries *TimeSeries) {
-		timeseries.Alert = alert.New(name, opts...).Builder
-		timeseries.Alert.Name = timeseries.Builder.Title
+		timeseries.Alert = alert.New(name, opts...)
+		timeseries.Alert.Builder.Name = timeseries.Builder.Title
 	}
 }
 

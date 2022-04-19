@@ -13,6 +13,8 @@ import (
 // ErrDatasourceNotFound is returned when the given datasource can not be found.
 var ErrDatasourceNotFound = errors.New("datasource not found")
 
+const defaultDatasourceKey = "$grabana_default_datasource_key$"
+
 // UpsertDatasource creates or replaces a datasource.
 func (client *Client) UpsertDatasource(ctx context.Context, datasource datasource.Datasource) error {
 	buf, err := json.Marshal(datasource)
@@ -95,6 +97,40 @@ func (client *Client) GetDatasourceUIDByName(ctx context.Context, name string) (
 	}
 
 	return response.UID, nil
+}
+
+// datasourcesUIDMap builds a map of datasources UIDs indexed by their name.
+func (client *Client) datasourcesUIDMap(ctx context.Context) (map[string]string, error) {
+	resp, err := client.get(ctx, "/api/datasources")
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() { _ = resp.Body.Close() }()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, client.httpError(resp)
+	}
+
+	var datasources []struct {
+		UID       string `json:"uid"`
+		Name      string `json:"name"`
+		IsDefault bool   `json:"isDefault"`
+	}
+	if err := decodeJSON(resp.Body, &datasources); err != nil {
+		return nil, err
+	}
+
+	datasourcesMap := make(map[string]string, len(datasources))
+	for _, ds := range datasources {
+		datasourcesMap[ds.Name] = ds.UID
+
+		if ds.IsDefault {
+			datasourcesMap[defaultDatasourceKey] = ds.UID
+		}
+	}
+
+	return datasourcesMap, nil
 }
 
 // getDatasourceIDByName finds a datasource, given its name.

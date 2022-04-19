@@ -7,6 +7,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
+	"github.com/K-Phoen/grabana/alert"
+
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
@@ -46,7 +48,7 @@ const Browser TimezoneOption = "browser"
 // Builder is the main builder used to configure dashboards.
 type Builder struct {
 	board  *sdk.Board
-	alerts []*sdk.Alert
+	alerts []*alert.Alert
 }
 
 // New creates a new dashboard builder.
@@ -100,7 +102,7 @@ func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
 }
 
 // Alerts returns all the alerts defined in this dashboard.
-func (builder *Builder) Alerts() []*sdk.Alert {
+func (builder *Builder) Alerts() []*alert.Alert {
 	return builder.alerts
 }
 

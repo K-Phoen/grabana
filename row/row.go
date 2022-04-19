@@ -1,6 +1,7 @@
 package row
 
 import (
+	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/heatmap"
 	"github.com/K-Phoen/grabana/logs"
@@ -17,7 +18,7 @@ type Option func(row *Row)
 // Row represents a dashboard row.
 type Row struct {
 	builder *sdk.Row
-	alerts  []*sdk.Alert
+	alerts  []*alert.Alert
 }
 
 // New creates a new row.
@@ -38,7 +39,7 @@ func defaults() []Option {
 }
 
 // Alerts returns a list of alerts defined within this row.
-func (row *Row) Alerts() []*sdk.Alert {
+func (row *Row) Alerts() []*alert.Alert {
 	return row.alerts
 }
 
@@ -48,9 +49,15 @@ func WithGraph(title string, options ...graph.Option) Option {
 		panel := graph.New(title, options...)
 		row.builder.Add(panel.Builder)
 
-		if panel.Alert != nil {
-			row.alerts = append(row.alerts, panel.Alert)
+		if panel.Alert == nil {
+			return
 		}
+
+		if panel.Builder.Datasource != nil {
+			panel.Alert.Datasource = *panel.Builder.Datasource
+		}
+
+		row.alerts = append(row.alerts, panel.Alert)
 	}
 }
 
@@ -60,9 +67,15 @@ func WithTimeSeries(title string, options ...timeseries.Option) Option {
 		panel := timeseries.New(title, options...)
 		row.builder.Add(panel.Builder)
 
-		if panel.Alert != nil {
-			row.alerts = append(row.alerts, panel.Alert)
+		if panel.Alert == nil {
+			return
 		}
+
+		if panel.Builder.Datasource != nil {
+			panel.Alert.Datasource = *panel.Builder.Datasource
+		}
+
+		row.alerts = append(row.alerts, panel.Alert)
 	}
 }
 
