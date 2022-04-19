@@ -61,11 +61,9 @@ func New(name string, options ...Option) *Alert {
 			Rules: []sdk.AlertRule{
 				{
 					GrafanaAlert: &sdk.GrafanaAlert{
-						Title:               name,
-						Condition:           alertConditionRef,
-						NoDataState:         string(NoDataEmpty),
-						ExecutionErrorState: string(ErrorKO),
-						Data:                nil,
+						Title:     name,
+						Condition: alertConditionRef,
+						Data:      nil,
 					},
 					Annotations: map[string]string{},
 					Labels:      map[string]string{},
