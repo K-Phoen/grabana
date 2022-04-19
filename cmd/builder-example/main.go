@@ -103,7 +103,10 @@ func main() {
 				timeseries.Span(6),
 				timeseries.Height("400px"),
 				timeseries.DataSource("Prometheus"),
-				timeseries.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)", prometheus.Legend("{{ app }}")),
+				timeseries.WithPrometheusTarget(
+					"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+					prometheus.Legend("{{ app }}"),
+				),
 				timeseries.Axis(
 					axis.Unit("bytes"),
 					axis.Label("Memory"),
@@ -122,12 +125,10 @@ func main() {
 						alert.Avg("A"),
 						alert.IsAbove(3),
 					),
-					alert.Queries(
-						alert.WithPrometheusQuery(
-							"A",
-							"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
-							prometheusAlert.Legend("{{ app }}"),
-						),
+					alert.WithPrometheusQuery(
+						"A",
+						"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+						prometheusAlert.Legend("{{ app }}"),
 					),
 				),
 			),

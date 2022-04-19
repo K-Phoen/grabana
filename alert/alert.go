@@ -136,6 +136,8 @@ func OnNoData(mode NoDataMode) Option {
 	}
 }
 
+// If adds a condition that could trigger the alert.
+// See https://grafana.com/docs/grafana/latest/alerting/rules/#conditions
 func If(opts ...ConditionOption) Option {
 	return func(alert *Alert) {
 		cond := newCondition(opts...)
@@ -162,17 +164,6 @@ func If(opts ...ConditionOption) Option {
 		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, alertQuery)
 	}
 }
-
-//// If adds a condition that could trigger the alert.
-//// See https://grafana.com/docs/grafana/latest/alerting/rules/#conditions
-//func If(operator Operator, opts ...ConditionOption) Option {
-//	return func(alert *Alert) {
-//		cond := newCondition(opts...)
-//		cond.builder.Operator = sdk.AlertOperator{Type: string(operator)}
-//
-//		alert.Builder.Conditions = append(alert.Builder.Conditions, *cond.builder)
-//	}
-//}
 
 // Tags defines a set of tags that will be forwarded to the notifications
 // channels when the alert will tbe triggered or used to route the alert.
