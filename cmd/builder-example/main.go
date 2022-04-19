@@ -115,7 +115,7 @@ func main() {
 				timeseries.Legend(timeseries.Last, timeseries.AsTable),
 				timeseries.Alert(
 					fmt.Sprintf("Too many heap allocations"),
-					alert.Summary("Yup, too much of {{ app }}"),
+					alert.Description("Yup, too much of {{ app }}"),
 					alert.Runbook("https://google.com"),
 					alert.Tags(map[string]string{
 						"service": "amazing-service",

@@ -217,7 +217,7 @@ func XAxis(opts ...axis.Option) Option {
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
 	return func(graph *Graph) {
-		graph.Alert = alert.New(name, opts...)
+		graph.Alert = alert.New(graph.Builder.Title, append(opts, alert.Summary(name))...)
 		graph.Alert.Builder.Name = graph.Builder.Title
 	}
 }

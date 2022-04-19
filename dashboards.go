@@ -101,6 +101,11 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		return nil, err
 	}
 
+	dashboardFromGrafana, err := client.rawDashboardByUID(ctx, dashboardModel.UID)
+	if err != nil {
+		return nil, err
+	}
+
 	// second pass: delete existing alerts associated to that dashboard
 	alertRefs, err := client.listAlertsForDashboard(ctx, dashboardModel.UID)
 	if err != nil {
@@ -112,17 +117,15 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		}
 	}
 
-	/*
-		dashboardFromGrafana, err := client.rawDashboardByUID(ctx, dashboardModel.UID)
-		if err != nil {
-			return nil, err
-		}
-	*/
-
 	// third pass: create new alerts
 	alerts := builder.Alerts()
 	for i := range alerts {
-		if err := client.AddAlert(ctx, folder.Title, *alerts[i], datasourcesMap); err != nil {
+		alert := *alerts[i]
+
+		alert.HookDashboardUID(dashboardModel.UID)
+		alert.HookPanelID(panelIDByTitle(dashboardFromGrafana, alert.Builder.Name))
+
+		if err := client.AddAlert(ctx, folder.Title, alert, datasourcesMap); err != nil {
 			return nil, fmt.Errorf("could not add new alerts for dashboard: %w", err)
 		}
 	}
@@ -180,4 +183,22 @@ func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
 	}
 
 	return nil
+}
+
+func panelIDByTitle(board *sdk.Board, title string) string {
+	for _, row := range board.Rows {
+		for _, panel := range row.Panels {
+			if panel.Title == title {
+				return fmt.Sprintf("%d", panel.ID)
+			}
+		}
+	}
+
+	for _, panel := range board.Panels {
+		if panel.Title == title {
+			return fmt.Sprintf("%d", panel.ID)
+		}
+	}
+
+	return ""
 }

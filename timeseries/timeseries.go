@@ -313,7 +313,7 @@ func Transparent() Option {
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
 	return func(timeseries *TimeSeries) {
-		timeseries.Alert = alert.New(name, opts...)
+		timeseries.Alert = alert.New(timeseries.Builder.Title, append(opts, alert.Summary(name))...)
 		timeseries.Alert.Builder.Name = timeseries.Builder.Title
 	}
 }

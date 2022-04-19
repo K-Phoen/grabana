@@ -45,28 +45,34 @@ const alertConditionRef = "_alert_condition_"
 
 // Alert represents an alert that can be triggered by a query.
 type Alert struct {
-	Builder    *sdk.Alert
-	Datasource string
+	Builder *sdk.Alert
+
+	// For internal use only
+	Datasource   string
+	DashboardUID string
+	PanelID      string
 }
 
 // New creates a new alert.
 func New(name string, options ...Option) *Alert {
-	alert := &Alert{Builder: &sdk.Alert{
-		Name: name,
-		Rules: []sdk.AlertRule{
-			{
-				GrafanaAlert: &sdk.GrafanaAlert{
-					Title:               name,
-					Condition:           alertConditionRef,
-					NoDataState:         string(NoDataEmpty),
-					ExecutionErrorState: string(ErrorKO),
-					Data:                nil,
+	alert := &Alert{
+		Builder: &sdk.Alert{
+			Name: name,
+			Rules: []sdk.AlertRule{
+				{
+					GrafanaAlert: &sdk.GrafanaAlert{
+						Title:               name,
+						Condition:           alertConditionRef,
+						NoDataState:         string(NoDataEmpty),
+						ExecutionErrorState: string(ErrorKO),
+						Data:                nil,
+					},
+					Annotations: map[string]string{},
+					Labels:      map[string]string{},
 				},
-				Annotations: map[string]string{},
-				Labels:      map[string]string{},
 			},
 		},
-	}}
+	}
 
 	for _, opt := range append(defaults(), options...) {
 		opt(alert)
@@ -96,6 +102,18 @@ func (alert *Alert) HookDatasourceUID(uid string) {
 			query.DatasourceUID = uid
 			query.Model.Datasource.UID = uid
 		}
+	}
+}
+
+func (alert *Alert) HookDashboardUID(uid string) {
+	for _, rule := range alert.Builder.Rules {
+		rule.Annotations["__dashboardUid__"] = uid
+	}
+}
+
+func (alert *Alert) HookPanelID(id string) {
+	for _, rule := range alert.Builder.Rules {
+		rule.Annotations["__panelId__"] = id
 	}
 }
 
