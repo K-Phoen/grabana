@@ -119,7 +119,6 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 
 	return func(graph *Graph) {
 		graph.Builder.AddTarget(&sdk.Target{
-			RefID:          target.Ref,
 			Hide:           target.Hidden,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,

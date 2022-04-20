@@ -122,10 +122,10 @@ func TestXAxisCanBeConfigured(t *testing.T) {
 func TestAlertsCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Alert("some alert"))
+	panel := New("panel title", Alert("some alert"))
 
-	req.NotNil(panel.Builder.Alert)
-	req.Equal("some alert", panel.Builder.Alert.Name)
+	req.NotNil(panel.Alert)
+	req.Equal("panel title", panel.Alert.Builder.Name)
 }
 
 func TestDrawModeCanBeConfigured(t *testing.T) {
