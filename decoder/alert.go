@@ -8,6 +8,7 @@ import (
 
 var ErrNoAlertThresholdDefined = fmt.Errorf("no threshold defined")
 var ErrInvalidAlertValueFunc = fmt.Errorf("invalid alert value function")
+var ErrInvalidAlertOperand = fmt.Errorf("invalid alert operand")
 
 type Alert struct {
 	Summary     string
@@ -102,7 +103,20 @@ func (a Alert) executionErrorOption() (alert.Option, error) {
 	return alert.OnExecutionError(mode), nil
 }
 
-type AlertThreshold struct {
+type AlertCondition struct {
+	Operand *string `yaml:"operand,omitempty"`
+
+	// Query reducers, only one should be used
+	Avg         *string `yaml:"avg,omitempty"`
+	Sum         *string `yaml:"sum,omitempty"`
+	Count       *string `yaml:"count,omitempty"`
+	Last        *string `yaml:"last,omitempty"`
+	Min         *string `yaml:"min,omitempty"`
+	Max         *string `yaml:"max,omitempty"`
+	Median      *string `yaml:"median,omitempty"`
+	Diff        *string `yaml:"diff,omitempty"`
+	PercentDiff *string `yaml:"percent_diff,omitempty"`
+
 	HasNoValue   bool       `yaml:"has_no_value,omitempty"`
 	Above        *float64   `yaml:",omitempty"`
 	Below        *float64   `yaml:",omitempty"`
@@ -110,71 +124,82 @@ type AlertThreshold struct {
 	WithinRange  [2]float64 `yaml:"within_range,omitempty,flow"`
 }
 
-func (threshold AlertThreshold) toOption() (alert.ConditionEvaluator, error) {
-	if threshold.HasNoValue {
+func (c AlertCondition) toOption() (alert.Option, error) {
+	var err error
+	alertOpt := alert.If
+
+	if c.Operand != nil {
+		switch *c.Operand {
+		case string(alert.And):
+			alertOpt = alert.If
+		case string(alert.Or):
+			alertOpt = alert.IfOr
+		default:
+			return nil, ErrInvalidAlertOperand
+		}
+	}
+
+	reducer, queryRef, err := c.queryReducer()
+	if err != nil {
+		return nil, err
+	}
+
+	threshold, err := c.toThresholdOption()
+	if err != nil {
+		return nil, err
+	}
+
+	return alertOpt(reducer, queryRef, threshold), nil
+}
+
+func (c AlertCondition) queryReducer() (alert.QueryReducer, string, error) {
+	if c.Avg != nil {
+		return alert.Avg, *c.Avg, nil
+	}
+	if c.Sum != nil {
+		return alert.Sum, *c.Sum, nil
+	}
+	if c.Count != nil {
+		return alert.Count, *c.Count, nil
+	}
+	if c.Last != nil {
+		return alert.Last, *c.Last, nil
+	}
+	if c.Min != nil {
+		return alert.Min, *c.Min, nil
+	}
+	if c.Max != nil {
+		return alert.Max, *c.Max, nil
+	}
+	if c.Median != nil {
+		return alert.Median, *c.Median, nil
+	}
+	if c.Diff != nil {
+		return alert.Diff, *c.Diff, nil
+	}
+	if c.PercentDiff != nil {
+		return alert.PercentDiff, *c.PercentDiff, nil
+	}
+
+	return "", "", ErrInvalidAlertValueFunc
+}
+
+func (c AlertCondition) toThresholdOption() (alert.ConditionEvaluator, error) {
+	if c.HasNoValue {
 		return alert.HasNoValue(), nil
 	}
-	if threshold.Above != nil {
-		return alert.IsAbove(*threshold.Above), nil
+	if c.Above != nil {
+		return alert.IsAbove(*c.Above), nil
 	}
-	if threshold.Below != nil {
-		return alert.IsBelow(*threshold.Below), nil
+	if c.Below != nil {
+		return alert.IsBelow(*c.Below), nil
 	}
-	if threshold.OutsideRange[0] != 0 && threshold.OutsideRange[1] != 0 {
-		return alert.IsOutsideRange(threshold.OutsideRange[0], threshold.OutsideRange[1]), nil
+	if c.OutsideRange[0] != 0 && c.OutsideRange[1] != 0 {
+		return alert.IsOutsideRange(c.OutsideRange[0], c.OutsideRange[1]), nil
 	}
-	if threshold.WithinRange[0] != 0 && threshold.WithinRange[1] != 0 {
-		return alert.IsWithinRange(threshold.WithinRange[0], threshold.WithinRange[1]), nil
+	if c.WithinRange[0] != 0 && c.WithinRange[1] != 0 {
+		return alert.IsWithinRange(c.WithinRange[0], c.WithinRange[1]), nil
 	}
 
 	return nil, ErrNoAlertThresholdDefined
-}
-
-type AlertCondition struct {
-	Reducer   string `yaml:"func"`
-	QueryRef  string `yaml:"ref"`
-	Threshold AlertThreshold
-}
-
-func (c AlertCondition) toOption() (alert.Option, error) {
-	threshold, err := c.Threshold.toOption()
-	if err != nil {
-		return nil, err
-	}
-
-	reducer, err := c.queryReducer()
-	if err != nil {
-		return nil, err
-	}
-
-	return alert.If(reducer, c.QueryRef, threshold), nil
-}
-
-func (c AlertCondition) queryReducer() (alert.QueryReducer, error) {
-	var queryReducer alert.QueryReducer
-
-	switch c.Reducer {
-	case "avg":
-		queryReducer = alert.Avg
-	case "sum":
-		queryReducer = alert.Sum
-	case "count":
-		queryReducer = alert.Count
-	case "last":
-		queryReducer = alert.Last
-	case "min":
-		queryReducer = alert.Min
-	case "max":
-		queryReducer = alert.Max
-	case "median":
-		queryReducer = alert.Median
-	case "diff":
-		queryReducer = alert.Diff
-	case "percent_diff":
-		queryReducer = alert.PercentDiff
-	default:
-		return "", ErrInvalidAlertValueFunc
-	}
-
-	return queryReducer, nil
 }
