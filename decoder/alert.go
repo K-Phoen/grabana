@@ -10,16 +10,18 @@ var ErrNoAlertThresholdDefined = fmt.Errorf("no threshold defined")
 var ErrInvalidAlertValueFunc = fmt.Errorf("invalid alert value function")
 
 type Alert struct {
-	Title            string
+	Summary     string
+	Description string            `yaml:",omitempty"`
+	Runbook     string            `yaml:",omitempty"`
+	Tags        map[string]string `yaml:",omitempty"`
+
 	EvaluateEvery    string `yaml:"evaluate_every"`
 	For              string
-	If               []AlertCondition
-	Notify           string            `yaml:",omitempty"`
-	Notifications    []string          `yaml:",omitempty,flow"`
-	Message          string            `yaml:",omitempty"`
-	OnNoData         string            `yaml:"on_no_data"`
-	OnExecutionError string            `yaml:"on_execution_error"`
-	Tags             map[string]string `yaml:",omitempty"`
+	OnNoData         string `yaml:"on_no_data"`
+	OnExecutionError string `yaml:"on_execution_error"`
+
+	If []AlertCondition
+	// TODO queries definition
 }
 
 func (a Alert) toOptions() ([]alert.Option, error) {
@@ -29,49 +31,29 @@ func (a Alert) toOptions() ([]alert.Option, error) {
 	}
 
 	if a.OnNoData != "" {
-		var mode alert.NoDataMode
-
-		switch a.OnNoData {
-		case "no_data":
-			mode = alert.NoData
-		case "alerting":
-			mode = alert.Error
-		case "keep_state":
-			mode = alert.KeepLastState
-		case "ok":
-			mode = alert.OK
-		default:
-			return nil, fmt.Errorf("unknown on_no_data mode '%s'", a.OnNoData)
+		noDataOpt, err := a.noDataOption()
+		if err != nil {
+			return nil, err
 		}
 
-		opts = append(opts, alert.OnNoData(mode))
+		opts = append(opts, noDataOpt)
 	}
 	if a.OnExecutionError != "" {
-		var mode alert.ErrorMode
-
-		switch a.OnExecutionError {
-		case "alerting":
-			mode = alert.Alerting
-		case "keep_state":
-			mode = alert.LastState
-		default:
-			return nil, fmt.Errorf("unknown on_execution_error mode '%s'", a.OnExecutionError)
+		execErrorOpt, err := a.executionErrorOption()
+		if err != nil {
+			return nil, err
 		}
 
-		opts = append(opts, alert.OnExecutionError(mode))
+		opts = append(opts, execErrorOpt)
 	}
-	if a.Notify != "" {
-		opts = append(opts, alert.NotifyChannel(a.Notify))
+	if a.Description != "" {
+		opts = append(opts, alert.Description(a.Description))
 	}
-	if a.Message != "" {
-		opts = append(opts, alert.Summary(a.Message))
+	if a.Runbook != "" {
+		opts = append(opts, alert.Runbook(a.Runbook))
 	}
 	if len(a.Tags) != 0 {
 		opts = append(opts, alert.Tags(a.Tags))
-	}
-
-	for _, channel := range a.Notifications {
-		opts = append(opts, alert.NotifyChannel(channel))
 	}
 
 	for _, condition := range a.If {
@@ -84,6 +66,40 @@ func (a Alert) toOptions() ([]alert.Option, error) {
 	}
 
 	return opts, nil
+}
+
+func (a Alert) noDataOption() (alert.Option, error) {
+	var mode alert.NoDataMode
+
+	switch a.OnNoData {
+	case "no_data":
+		mode = alert.NoDataEmpty
+	case "alerting":
+		mode = alert.NoDataAlerting
+	case "ok":
+		mode = alert.NoDataOK
+	default:
+		return nil, fmt.Errorf("unknown on_no_data mode '%s'", a.OnNoData)
+	}
+
+	return alert.OnNoData(mode), nil
+}
+
+func (a Alert) executionErrorOption() (alert.Option, error) {
+	var mode alert.ErrorMode
+
+	switch a.OnExecutionError {
+	case "alerting":
+		mode = alert.ErrorAlerting
+	case "error":
+		mode = alert.ErrorKO
+	case "ok":
+		mode = alert.ErrorOK
+	default:
+		return nil, fmt.Errorf("unknown on_execution_error mode '%s'", a.OnExecutionError)
+	}
+
+	return alert.OnExecutionError(mode), nil
 }
 
 type AlertThreshold struct {
@@ -114,63 +130,51 @@ func (threshold AlertThreshold) toOption() (alert.ConditionEvaluator, error) {
 	return nil, ErrNoAlertThresholdDefined
 }
 
-type AlertValue struct {
-	Func     string
-	QueryRef string `yaml:"ref"`
-	From     string
-	To       string
-}
-
-func (v AlertValue) toOption() (alert.ConditionEvaluator, error) {
-	var alertFunc func(refID string, from string, to string) alert.ConditionEvaluator
-
-	switch v.Func {
-	case "avg":
-		alertFunc = alert.Avg
-	case "sum":
-		alertFunc = alert.Sum
-	case "count":
-		alertFunc = alert.Count
-	case "last":
-		alertFunc = alert.Last
-	case "min":
-		alertFunc = alert.Min
-	case "max":
-		alertFunc = alert.Max
-	case "median":
-		alertFunc = alert.Median
-	case "diff":
-		alertFunc = alert.Diff
-	case "percent_diff":
-		alertFunc = alert.PercentDiff
-	default:
-		return nil, ErrInvalidAlertValueFunc
-	}
-
-	return alertFunc(v.QueryRef, v.From, v.To), nil
-}
-
 type AlertCondition struct {
-	Operand   string
-	Value     AlertValue `yaml:",flow"`
+	Reducer   string `yaml:"func"`
+	QueryRef  string `yaml:"ref"`
 	Threshold AlertThreshold
 }
 
 func (c AlertCondition) toOption() (alert.Option, error) {
-	operand := alert.And
-	if c.Operand == "or" {
-		operand = alert.Or
-	}
-
 	threshold, err := c.Threshold.toOption()
 	if err != nil {
 		return nil, err
 	}
 
-	value, err := c.Value.toOption()
+	reducer, err := c.queryReducer()
 	if err != nil {
 		return nil, err
 	}
 
-	return alert.If(operand, value, threshold), nil
+	return alert.If(reducer, c.QueryRef, threshold), nil
+}
+
+func (c AlertCondition) queryReducer() (alert.QueryReducer, error) {
+	var queryReducer alert.QueryReducer
+
+	switch c.Reducer {
+	case "avg":
+		queryReducer = alert.Avg
+	case "sum":
+		queryReducer = alert.Sum
+	case "count":
+		queryReducer = alert.Count
+	case "last":
+		queryReducer = alert.Last
+	case "min":
+		queryReducer = alert.Min
+	case "max":
+		queryReducer = alert.Max
+	case "median":
+		queryReducer = alert.Median
+	case "diff":
+		queryReducer = alert.Diff
+	case "percent_diff":
+		queryReducer = alert.PercentDiff
+	default:
+		return "", ErrInvalidAlertValueFunc
+	}
+
+	return queryReducer, nil
 }

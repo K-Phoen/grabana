@@ -17,7 +17,6 @@ import (
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
-	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
@@ -43,6 +42,7 @@ func main() {
 		"Awesome dashboard test",
 		dashboard.UID("test-dashboard-alerts"),
 		dashboard.AutoRefresh("30s"),
+		dashboard.Time("now-30m", "now"),
 		dashboard.Tags([]string{"generated"}),
 		dashboard.TagsAnnotation(dashboard.TagAnnotation{
 			Name:       "Deployments",
@@ -53,7 +53,7 @@ func main() {
 		dashboard.VariableAsInterval(
 			"interval",
 			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
-			interval.Default("30s"),
+			interval.Default("5m"),
 		),
 		dashboard.VariableAsQuery(
 			"status",
@@ -61,10 +61,10 @@ func main() {
 			query.Request("label_values(prometheus_http_requests_total, code)"),
 			query.Sort(query.NumericalAsc),
 		),
-		dashboard.VariableAsConst(
+		dashboard.VariableAsCustom(
 			"percentile",
-			constant.Label("Percentile"),
-			constant.Values(map[string]string{
+			custom.Label("Percentile"),
+			custom.Values(map[string]string{
 				"50th": "50",
 				"75th": "75",
 				"80th": "80",
@@ -73,7 +73,7 @@ func main() {
 				"95th": "95",
 				"99th": "99",
 			}),
-			constant.Default("80"),
+			custom.Default("80"),
 		),
 		dashboard.VariableAsCustom(
 			"vX",
@@ -93,8 +93,8 @@ func main() {
 				graph.Height("400px"),
 				graph.DataSource("Prometheus"),
 				graph.WithPrometheusTarget(
-					"sum(rate(promhttp_metric_handler_requests_total[$interval])) by (app, code)",
-					prometheus.Legend("{{ app }} - {{ code }}"),
+					"sum(rate(promhttp_metric_handler_requests_total[$interval])) by (code)",
+					prometheus.Legend("{{ code }}"),
 				),
 			),
 			row.WithTimeSeries(
@@ -120,11 +120,11 @@ func main() {
 						"service": "amazing-service",
 						"owner":   "team-b",
 					}),
-					alert.If(alert.Avg, "A", alert.IsAbove(3)),
 					alert.WithPrometheusQuery(
 						"A",
 						"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
 					),
+					alert.If(alert.Avg, "A", alert.IsAbove(3)),
 				),
 			),
 			row.WithTable(

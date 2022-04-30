@@ -1,4 +1,4 @@
-package prometheus
+package loki
 
 import (
 	"time"
@@ -6,19 +6,19 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
-// Option represents an option that can be used to configure a prometheus query.
-type Option func(query *Prometheus)
+// Option represents an option that can be used to configure a loki query.
+type Option func(query *Loki)
 
-// Prometheus represents a prometheus query.
-type Prometheus struct {
+// Loki represents a loki query.
+type Loki struct {
 	Builder sdk.AlertQuery
 }
 
-// New creates a new prometheus query.
-func New(ref string, query string, options ...Option) *Prometheus {
+// New creates a new loki query.
+func New(ref string, query string, options ...Option) *Loki {
 	nope := false
 
-	prometheus := &Prometheus{
+	loki := &Loki{
 		Builder: sdk.AlertQuery{
 			RefID:             ref,
 			QueryType:         "",
@@ -31,7 +31,7 @@ func New(ref string, query string, options ...Option) *Prometheus {
 				Hide:   &nope,
 				Datasource: sdk.AlertDatasourceRef{
 					UID:  "__FILL_ME__",
-					Type: "prometheus",
+					Type: "loki",
 				},
 				Interval:   "",
 				IntervalMs: 15000,
@@ -40,10 +40,10 @@ func New(ref string, query string, options ...Option) *Prometheus {
 	}
 
 	for _, opt := range append(defaults(), options...) {
-		opt(prometheus)
+		opt(loki)
 	}
 
-	return prometheus
+	return loki
 }
 
 func defaults() []Option {
@@ -54,15 +54,15 @@ func defaults() []Option {
 
 // TimeRange sets the legend format.
 func TimeRange(from time.Duration, to time.Duration) Option {
-	return func(prometheus *Prometheus) {
-		prometheus.Builder.RelativeTimeRange.From = int(from.Seconds())
-		prometheus.Builder.RelativeTimeRange.To = int(to.Seconds())
+	return func(loki *Loki) {
+		loki.Builder.RelativeTimeRange.From = int(from.Seconds())
+		loki.Builder.RelativeTimeRange.To = int(to.Seconds())
 	}
 }
 
 // Legend sets the legend format.
 func Legend(legend string) Option {
-	return func(prometheus *Prometheus) {
-		prometheus.Builder.Model.LegendFormat = legend
+	return func(loki *Loki) {
+		loki.Builder.Model.LegendFormat = legend
 	}
 }

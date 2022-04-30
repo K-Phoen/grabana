@@ -24,14 +24,12 @@ func TestLogsPanelsCanBeDecoded(t *testing.T) {
 				Loki: &LokiTarget{
 					Query:  "{namespace=\"default\"}",
 					Legend: "logs",
-					Ref:    "A",
 				},
 			},
 			{
 				Loki: &LokiTarget{
 					Query:  "{namespace=\"other\"}",
 					Legend: "other",
-					Ref:    "B",
 					Hidden: true,
 				},
 			},

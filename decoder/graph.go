@@ -70,7 +70,7 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 			return nil, err
 		}
 
-		opts = append(opts, graph.Alert(graphPanel.Alert.Title, alertOpts...))
+		opts = append(opts, graph.Alert(graphPanel.Alert.Summary, alertOpts...))
 	}
 	if graphPanel.Visualization != nil {
 		opts = append(opts, graphPanel.Visualization.toOptions()...)

@@ -1,4 +1,4 @@
-package prometheus
+package influxdb
 
 import (
 	"time"
@@ -6,19 +6,19 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
-// Option represents an option that can be used to configure a prometheus query.
-type Option func(query *Prometheus)
+// Option represents an option that can be used to configure a influxdb query.
+type Option func(query *InfluxDB)
 
-// Prometheus represents a prometheus query.
-type Prometheus struct {
+// InfluxDB represents a influxdb query.
+type InfluxDB struct {
 	Builder sdk.AlertQuery
 }
 
-// New creates a new prometheus query.
-func New(ref string, query string, options ...Option) *Prometheus {
+// New creates a new influxdb query.
+func New(ref string, query string, options ...Option) *InfluxDB {
 	nope := false
 
-	prometheus := &Prometheus{
+	influxdb := &InfluxDB{
 		Builder: sdk.AlertQuery{
 			RefID:             ref,
 			QueryType:         "",
@@ -31,7 +31,7 @@ func New(ref string, query string, options ...Option) *Prometheus {
 				Hide:   &nope,
 				Datasource: sdk.AlertDatasourceRef{
 					UID:  "__FILL_ME__",
-					Type: "prometheus",
+					Type: "influxdb",
 				},
 				Interval:   "",
 				IntervalMs: 15000,
@@ -40,10 +40,10 @@ func New(ref string, query string, options ...Option) *Prometheus {
 	}
 
 	for _, opt := range append(defaults(), options...) {
-		opt(prometheus)
+		opt(influxdb)
 	}
 
-	return prometheus
+	return influxdb
 }
 
 func defaults() []Option {
@@ -54,15 +54,15 @@ func defaults() []Option {
 
 // TimeRange sets the legend format.
 func TimeRange(from time.Duration, to time.Duration) Option {
-	return func(prometheus *Prometheus) {
-		prometheus.Builder.RelativeTimeRange.From = int(from.Seconds())
-		prometheus.Builder.RelativeTimeRange.To = int(to.Seconds())
+	return func(influxdb *InfluxDB) {
+		influxdb.Builder.RelativeTimeRange.From = int(from.Seconds())
+		influxdb.Builder.RelativeTimeRange.To = int(to.Seconds())
 	}
 }
 
 // Legend sets the legend format.
 func Legend(legend string) Option {
-	return func(prometheus *Prometheus) {
-		prometheus.Builder.Model.LegendFormat = legend
+	return func(influxdb *InfluxDB) {
+		influxdb.Builder.Model.LegendFormat = legend
 	}
 }

@@ -102,7 +102,7 @@ func (client *Client) DeleteAlertGroup(ctx context.Context, namespace string, gr
 	return nil
 }
 
-// DeleteAlertGroup deletes an alert group.
+// listAlertsForDashboard fetches a list of alerts linked to the given dashboard.
 func (client *Client) listAlertsForDashboard(ctx context.Context, dashboardUID string) ([]alertRef, error) {
 	resp, err := client.get(ctx, "/api/ruler/grafana/api/v1/rules?dashboard_uid="+url.QueryEscape(dashboardUID))
 	if err != nil {

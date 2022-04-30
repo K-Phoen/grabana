@@ -64,7 +64,7 @@ func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
 			return nil, err
 		}
 
-		opts = append(opts, timeseries.Alert(timeseriesPanel.Alert.Title, alertOpts...))
+		opts = append(opts, timeseries.Alert(timeseriesPanel.Alert.Summary, alertOpts...))
 	}
 	if timeseriesPanel.Visualization != nil {
 		vizOpts, err := timeseriesPanel.Visualization.toOptions()

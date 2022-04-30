@@ -448,7 +448,6 @@ rows:
             - prometheus:
                 query: "go_memstats_heap_alloc_bytes"
                 legend: "{{job}}"
-                ref: A
 `
 
 	return testCase{
@@ -469,7 +468,6 @@ rows:
           datasource: voi-stage-stackdriver
           targets:
             - stackdriver:
-                ref: A
                 legend: Ack-ed messages
                 type: delta
                 metric: pubsub.googleapis.com/subscription/ack_message_count
@@ -498,7 +496,6 @@ rows:
           datasource: graphite-test
           targets:
             - graphite:
-                ref: A
                 query: stats_counts.statsd.packets_received
 `
 
@@ -520,7 +517,6 @@ rows:
           datasource: influxdb-test
           targets:
             - influxdb:
-                ref: A
                 query: buckets()
 `
 
@@ -614,7 +610,6 @@ rows:
         - prometheus:
             query: sum(increase(argocd_app_reconcile_bucket{namespace=~"$namespace"}[$interval])) by (le)
             legend: '{{le}}'
-            ref: A
             format: heatmap
             interval_factor: 10
         tooltip:
@@ -643,7 +638,6 @@ rows:
         targets:
         - prometheus:
             query: "go_memstats_heap_alloc_bytes"
-            ref: A
 `
 
 	return testCase{
@@ -668,7 +662,6 @@ rows:
         targets:
         - loki:
             query: "{namespace=\"default\"}"
-            ref: A
 `
 
 	return testCase{
