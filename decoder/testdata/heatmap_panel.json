@@ -37,7 +37,7 @@
           "type": "heatmap",
           "targets": [
             {
-              "refId": "A",
+              "refId": "",
               "expr": "sum(increase(argocd_app_reconcile_bucket{namespace=~\"$namespace\"}[$interval])) by (le)",
               "format": "heatmap",
               "intervalFactor": 10,

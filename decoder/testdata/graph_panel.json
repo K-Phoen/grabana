@@ -36,40 +36,6 @@
           "title": "Heap allocations",
           "description": "Some description",
           "aliasColors": {},
-          "alert": {
-            "conditions": [
-              {
-                "evaluator": {
-                  "params": [23000000],
-                  "type": "gt"
-                },
-                "operator": {"type": "and"},
-                "query": {"params": ["A", "1m", "now"]},
-                "reducer": {"type": "avg"},
-                "type": "query"
-              }
-            ],
-            "executionErrorState": "alerting",
-            "alertRuleTags": {"severity": "super-critical-stop-the-world-now"},
-            "for": "1m",
-            "frequency": "1m",
-            "handler": 1,
-            "message": "Wow, a we're allocating a lot.",
-            "name": "Too many heap allocations",
-            "noDataState": "alerting",
-            "notifications": [
-              {
-                "disableResolveMessage": false,
-                "frequency": "",
-                "uid": "P-N3fxuZz",
-                "isDefault": false,
-                "name": "",
-                "sendReminder": false,
-                "settings": null,
-                "type": ""
-              }
-            ]
-          },
           "bars": false,
           "points": false,
           "stack": false,
@@ -94,7 +60,7 @@
           },
           "targets": [
             {
-              "refId": "A",
+              "refId": "",
               "expr": "go_memstats_heap_alloc_bytes",
               "legendFormat": "{{job}}",
               "format": "time_series"

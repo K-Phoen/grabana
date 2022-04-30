@@ -3,9 +3,11 @@ package decoder
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
 type testCase struct {
@@ -205,12 +207,11 @@ rows:
       - graph:
           title: Heap allocations
           alert:
-            title: Too many heap allocations
+            summary: Too many heap allocations
             evaluate_every: 1m
             for: 1m
             if:
-              - operand: and
-                value: {func: avg, ref: A, from: 1m, to: now}
+              - { avg: A }
 
           targets:
             - prometheus: { query: "go_memstats_heap_alloc_bytes" }
@@ -248,13 +249,11 @@ rows:
       - graph:
           title: Heap allocations
           alert:
-            title: Too many heap allocations
+            summary: Too many heap allocations
             evaluate_every: 1m
             for: 1m
             if:
-              - operand: and
-                value: {func: BLOOPER, ref: A, from: 1m, to: now}
-                threshold: {above: 23000000}
+              - { BLOOPER: A, above: 23000000 }
           targets:
             - prometheus: { query: "go_memstats_heap_alloc_bytes" }
 `
@@ -262,7 +261,7 @@ rows:
 	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
 
 	require.Error(t, err)
-	require.Equal(t, ErrInvalidAlertValueFunc, err)
+	require.True(t, strings.HasPrefix(err.Error(), (&yaml.TypeError{}).Error()))
 }
 
 func TestUnmarshalYAMLWithInvalidStackdriverAggregation(t *testing.T) {
@@ -427,19 +426,16 @@ rows:
           datasource: prometheus-default
           legend: [avg, current, min, max, as_table, no_null_series, no_zero_series]
           alert:
-            title: Too many heap allocations
+            summary: Too many heap allocations
+            description: "Wow, a we're allocating a lot."
             evaluate_every: 1m
-            for: 1m
-            notify: P-N3fxuZz
-            message: "Wow, a we're allocating a lot."
+            for: 2m
             on_no_data: alerting
             on_execution_error: alerting
             tags:
               severity: super-critical-stop-the-world-now
             if:
-              - operand: and
-                value: {func: avg, ref: A, from: 1m, to: now}
-                threshold: {above: 23000000}
+              - { avg: A, above: 23000000 }
           axes:
             left: { unit: short, min: 0, max: 100, label: Requests }
             right: { hidden: true }

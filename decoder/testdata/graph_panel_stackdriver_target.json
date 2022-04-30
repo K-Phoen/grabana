@@ -196,7 +196,7 @@
                   ]
                 }
               ],
-              "refId": "A",
+              "refId": "",
               "metricKind": "DELTA",
               "metricType": "pubsub.googleapis.com/subscription/ack_message_count",
               "perSeriesAligner": "ALIGN_DELTA",

@@ -54,7 +54,21 @@ rows:
                 legend: "{{ code }}"
           axes:
             left: { unit: short, min: 0, label: Requests }
-            right: { hidden: true }
+          alert:
+            summary: Too many successes
+            description: "Wow wow wow, why are you complaining?"
+            evaluate_every: 1m
+            for: 2m
+            on_no_data: alerting
+            on_execution_error: alerting
+            if:
+              - { avg: A, above: 0 }
+            targets:
+              - prometheus:
+                  ref: A
+                  query: "sum(rate(promhttp_metric_handler_requests_total{code=\"200\"}[5m])) by (code)"
+                  legend: "{{ code }}"
+                  lookback: 5m
       - graph:
           title: Heap allocations
           height: 400px
@@ -65,13 +79,20 @@ rows:
                 legend: "{{job}}"
           alert:
             summary: Too many heap allocations
-            description: "Wow, a we're allocating a lot."
+            description: "Wow wow wow, a we're allocating a lot."
             evaluate_every: 1m
-            for: 1m
+            for: 2m
             on_no_data: alerting
             on_execution_error: alerting
+            tags:
+              foo: bar
             if:
               - { avg: A, above: 23000000}
+            targets:
+              - prometheus:
+                  ref: A
+                  query: go_memstats_heap_alloc_bytes
+                  legend: "{{ job }}"
 
       - table:
           title: Threads

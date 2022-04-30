@@ -79,7 +79,7 @@
           "type": "timeseries",
           "targets": [
             {
-              "refId": "A",
+              "refId": "",
               "expr": "go_memstats_heap_alloc_bytes",
               "format": "time_series"
             }

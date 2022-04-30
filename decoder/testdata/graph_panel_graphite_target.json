@@ -58,7 +58,7 @@
           },
           "targets": [
             {
-              "refId": "A",
+              "refId": "",
               "target": "stats_counts.statsd.packets_received"
             }
           ],

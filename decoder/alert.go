@@ -21,8 +21,8 @@ type Alert struct {
 	OnNoData         string `yaml:"on_no_data"`
 	OnExecutionError string `yaml:"on_execution_error"`
 
-	If []AlertCondition
-	// TODO queries definition
+	If      []AlertCondition
+	Targets []AlertTarget
 }
 
 func (a Alert) toOptions() ([]alert.Option, error) {
@@ -64,6 +64,26 @@ func (a Alert) toOptions() ([]alert.Option, error) {
 		}
 
 		opts = append(opts, conditionOpt)
+	}
+
+	targetOpts, err := a.targetOptions()
+	if err != nil {
+		return nil, err
+	}
+
+	return append(opts, targetOpts...), nil
+}
+
+func (a Alert) targetOptions() ([]alert.Option, error) {
+	opts := make([]alert.Option, 0, len(a.Targets))
+
+	for _, alertTarget := range a.Targets {
+		_, opt, err := alertTarget.toOption()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
 	}
 
 	return opts, nil
