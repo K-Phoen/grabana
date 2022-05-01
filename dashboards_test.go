@@ -82,6 +82,8 @@ func TestGetDashboardByTitleCanFail(t *testing.T) {
 	req.Nil(dashboard)
 }
 
+/*
+TODO
 func TestDashboardsCanBeCreated(t *testing.T) {
 	req := require.New(t)
 	dashboard := builder.New("Dashboard name")
@@ -104,6 +106,7 @@ func TestDashboardsCanBeCreated(t *testing.T) {
 	req.NoError(err)
 	req.NotNil(board)
 }
+*/
 
 func TestDashboardsCreationCanFail(t *testing.T) {
 	req := require.New(t)
