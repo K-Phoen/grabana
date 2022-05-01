@@ -12,6 +12,7 @@ import (
 )
 
 var ErrMissingRef = fmt.Errorf("target ref missing")
+var ErrInvalidLookback = fmt.Errorf("invalid lookback")
 
 type AlertTarget struct {
 	Prometheus  *AlertPrometheus  `yaml:",omitempty"`
@@ -56,7 +57,7 @@ func (t AlertPrometheus) toOptions() (alert.Option, error) {
 	if t.Lookback != "" {
 		from, err := time.ParseDuration(t.Lookback)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
 		}
 
 		opts = append(opts, prometheus.TimeRange(from, 0))
@@ -84,7 +85,7 @@ func (t AlertLoki) toOptions() (alert.Option, error) {
 	if t.Lookback != "" {
 		from, err := time.ParseDuration(t.Lookback)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
 		}
 
 		opts = append(opts, loki.TimeRange(from, 0))
@@ -109,7 +110,7 @@ func (t AlertGraphite) toOptions() (alert.Option, error) {
 	if t.Lookback != "" {
 		from, err := time.ParseDuration(t.Lookback)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
 		}
 
 		opts = append(opts, graphite.TimeRange(from, 0))
@@ -146,6 +147,10 @@ type StackdriverAlertAlignment struct {
 }
 
 func (t AlertStackdriver) toOptions() (alert.Option, error) {
+	if t.Ref == "" {
+		return nil, ErrMissingRef
+	}
+
 	opts, err := t.targetOptions()
 	if err != nil {
 		return nil, err
@@ -170,6 +175,15 @@ func (t AlertStackdriver) toOptions() (alert.Option, error) {
 func (t AlertStackdriver) targetOptions() ([]stackdriver.Option, error) {
 	opts := []stackdriver.Option{
 		stackdriver.Legend(t.Legend),
+	}
+
+	if t.Lookback != "" {
+		from, err := time.ParseDuration(t.Lookback)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
+		}
+
+		opts = append(opts, stackdriver.TimeRange(from, 0))
 	}
 
 	filters := t.Filters.toOptions()
