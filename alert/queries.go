@@ -33,10 +33,9 @@ func WithLokiQuery(ref string, query string, options ...loki.Option) Option {
 }
 
 // WithStackdriverQuery adds a Stackdriver query to the alert.
-func WithStackdriverQuery(ref string, query string, options ...stackdriver.Option) Option {
+func WithStackdriverQuery(query *stackdriver.Stackdriver) Option {
 	return func(alert *Alert) {
-		target := stackdriver.New(ref, query, options...)
-		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, target.Builder)
+		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, query.Builder)
 	}
 }
 

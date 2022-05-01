@@ -1,0 +1,16 @@
+title: Loki logs
+editable: true
+shared_crosshair: true
+tags: [dark, generated]
+auto_refresh: 5s
+time: [now-1h, now]
+
+rows:
+  - name: Overview
+    panels:
+      - logs:
+          title: Loki logs
+          datasource: Loki
+          span: 12
+          targets:
+            - loki: { query: '{app="loki"}' }

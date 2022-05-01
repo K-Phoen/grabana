@@ -3,6 +3,7 @@ package timeseries
 import (
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
+	"github.com/K-Phoen/grabana/target/loki"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/K-Phoen/sdk"
@@ -48,5 +49,18 @@ func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 	return func(graph *TimeSeries) {
 		graph.Builder.AddTarget(target.Builder)
+	}
+}
+
+// WithLokiTarget adds a loki query to the graph.
+func WithLokiTarget(query string, options ...loki.Option) Option {
+	target := loki.New(query, options...)
+
+	return func(graph *TimeSeries) {
+		graph.Builder.AddTarget(&sdk.Target{
+			Hide:         target.Hidden,
+			Expr:         target.Expr,
+			LegendFormat: target.LegendFormat,
+		})
 	}
 }

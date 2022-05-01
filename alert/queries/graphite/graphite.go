@@ -27,6 +27,7 @@ func New(ref string, query string, options ...Option) *Graphite {
 			Model: sdk.AlertModel{
 				RefID:  ref,
 				Expr:   query,
+				Target: query,
 				Format: "time_series",
 				Hide:   &nope,
 				Datasource: sdk.AlertDatasourceRef{

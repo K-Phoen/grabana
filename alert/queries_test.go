@@ -3,6 +3,8 @@ package alert
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/alert/queries/stackdriver"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,7 +35,7 @@ func TestLokiQueriesCanBeAdded(t *testing.T) {
 func TestStackdriverQueriesCanBeAdded(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", WithStackdriverQuery("A", "some stackdriver query"))
+	a := New("", WithStackdriverQuery(stackdriver.Gauge("A", "cloudsql.googleapis.com/database/cpu/utilization")))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
 }

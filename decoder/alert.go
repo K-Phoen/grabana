@@ -26,9 +26,13 @@ type Alert struct {
 }
 
 func (a Alert) toOptions() ([]alert.Option, error) {
-	opts := []alert.Option{
-		alert.EvaluateEvery(a.EvaluateEvery),
-		alert.For(a.For),
+	opts := []alert.Option{}
+
+	if a.EvaluateEvery != "" {
+		opts = append(opts, alert.EvaluateEvery(a.EvaluateEvery))
+	}
+	if a.For != "" {
+		opts = append(opts, alert.For(a.For))
 	}
 
 	if a.OnNoData != "" {
@@ -78,7 +82,7 @@ func (a Alert) targetOptions() ([]alert.Option, error) {
 	opts := make([]alert.Option, 0, len(a.Targets))
 
 	for _, alertTarget := range a.Targets {
-		_, opt, err := alertTarget.toOption()
+		opt, err := alertTarget.toOption()
 		if err != nil {
 			return nil, err
 		}

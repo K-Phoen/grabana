@@ -21,6 +21,7 @@ type Target struct {
 	Graphite    *GraphiteTarget    `yaml:",omitempty"`
 	InfluxDB    *InfluxDBTarget    `yaml:"influxdb,omitempty"`
 	Stackdriver *StackdriverTarget `yaml:",omitempty"`
+	Loki        *LokiTarget        `yaml:",omitempty"`
 }
 
 type PrometheusTarget struct {

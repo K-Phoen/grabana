@@ -155,6 +155,9 @@ func (timeseriesPanel DashboardTimeSeries) target(t Target) (timeseries.Option, 
 	if t.InfluxDB != nil {
 		return timeseries.WithInfluxDBTarget(t.InfluxDB.Query, t.InfluxDB.toOptions()...), nil
 	}
+	if t.Loki != nil {
+		return timeseries.WithLokiTarget(t.Loki.Query, t.Loki.toOptions()...), nil
+	}
 	if t.Stackdriver != nil {
 		stackdriverTarget, err := t.Stackdriver.toTarget()
 		if err != nil {
