@@ -9,6 +9,8 @@ import (
 var ErrNoAlertThresholdDefined = fmt.Errorf("no threshold defined")
 var ErrInvalidAlertValueFunc = fmt.Errorf("invalid alert value function")
 var ErrInvalidAlertOperand = fmt.Errorf("invalid alert operand")
+var ErrNoConditionOnAlert = fmt.Errorf("no condition defined on alert")
+var ErrNoTargetOnAlert = fmt.Errorf("no target defined on alert")
 
 type Alert struct {
 	Summary     string
@@ -27,6 +29,13 @@ type Alert struct {
 
 func (a Alert) toOptions() ([]alert.Option, error) {
 	opts := []alert.Option{}
+
+	if len(a.If) == 0 {
+		return nil, ErrNoConditionOnAlert
+	}
+	if len(a.Targets) == 0 {
+		return nil, ErrNoTargetOnAlert
+	}
 
 	if a.EvaluateEvery != "" {
 		opts = append(opts, alert.EvaluateEvery(a.EvaluateEvery))

@@ -329,9 +329,9 @@ func TestDecodingStackdriverPreprocessor(t *testing.T) {
 			if tc.expectedError != nil {
 				req.ErrorIs(tc.expectedError, err)
 				return
-			} else {
-				req.NoError(err)
 			}
+
+			req.NoError(err)
 
 			alert := alertBuilder.New("", opt)
 			query := alert.Builder.Rules[0].GrafanaAlert.Data[0]
@@ -443,9 +443,9 @@ func TestDecodingStackdriverAggregation(t *testing.T) {
 			if tc.expectedError != nil {
 				req.ErrorIs(tc.expectedError, err)
 				return
-			} else {
-				req.NoError(err)
 			}
+
+			req.NoError(err)
 
 			alert := alertBuilder.New("", opt)
 			query := alert.Builder.Rules[0].GrafanaAlert.Data[0]
@@ -585,9 +585,9 @@ func TestDecodingStackdriverAlignment(t *testing.T) {
 			if tc.expectedError != nil {
 				req.ErrorIs(tc.expectedError, err)
 				return
-			} else {
-				req.NoError(err)
 			}
+
+			req.NoError(err)
 
 			alert := alertBuilder.New("", opt)
 			query := alert.Builder.Rules[0].GrafanaAlert.Data[0]

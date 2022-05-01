@@ -206,15 +206,16 @@ rows:
     panels:
       - graph:
           title: Heap allocations
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
           alert:
             summary: Too many heap allocations
             evaluate_every: 1m
             for: 1m
             if:
               - { avg: A }
-
-          targets:
-            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+            targets:
+              - prometheus: { ref: A, query: "go_memstats_heap_alloc_bytes" }
 `
 
 	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
@@ -248,14 +249,16 @@ rows:
     panels:
       - graph:
           title: Heap allocations
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
           alert:
             summary: Too many heap allocations
             evaluate_every: 1m
             for: 1m
             if:
               - { BLOOPER: A, above: 23000000 }
-          targets:
-            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+            targets:
+              - prometheus: { ref: A, query: "go_memstats_heap_alloc_bytes" }
 `
 
 	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
@@ -436,6 +439,8 @@ rows:
               severity: super-critical-stop-the-world-now
             if:
               - { avg: A, above: 23000000 }
+            targets:
+              - prometheus: { ref: A, query: "go_memstats_heap_alloc_bytes" }
           axes:
             left: { unit: short, min: 0, max: 100, label: Requests }
             right: { hidden: true }
