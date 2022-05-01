@@ -32,6 +32,16 @@ func TestTimeSeriesPanelCanHavePrometheusTargets(t *testing.T) {
 	req.Len(panel.Builder.TimeseriesPanel.Targets, 1)
 }
 
+func TestTimeSeriesPanelCanHaveLokiTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", WithLokiTarget(
+		"rate({app=\"loki\"}[$__interval])",
+	))
+
+	req.Len(panel.Builder.TimeseriesPanel.Targets, 1)
+}
+
 func TestTimeSeriesPanelCanHaveGraphiteTargets(t *testing.T) {
 	req := require.New(t)
 

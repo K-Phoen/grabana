@@ -1,0 +1,47 @@
+package prometheus
+
+import (
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+)
+
+func TestPrometheusQueriesCanBeCreated(t *testing.T) {
+	req := require.New(t)
+
+	promQuery := "sum(increase(controller_runtime_reconcile_total{controller=\"grafanadashboard\"}[$interval])) by (result)"
+
+	query := New("A", promQuery)
+
+	builder := query.Builder
+
+	req.Equal("A", builder.RefID)
+	req.Equal("A", builder.Model.RefID)
+	req.Equal("time_series", builder.Model.Format)
+	req.Equal("prometheus", builder.Model.Datasource.Type)
+	req.Equal(promQuery, builder.Model.Expr)
+	req.NotEqual(0, builder.RelativeTimeRange.From)
+	req.Equal(0, builder.RelativeTimeRange.To)
+}
+
+func TestTimeRangeCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	query := New("A", "", TimeRange(5*time.Minute, 0))
+
+	builder := query.Builder
+
+	req.NotEqual((5 * time.Minute).Seconds(), builder.RelativeTimeRange.From)
+	req.Equal(0, builder.RelativeTimeRange.To)
+}
+
+func TestLegendCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	query := New("A", "", Legend("legend"))
+
+	builder := query.Builder
+
+	req.Equal("legend", builder.Model.LegendFormat)
+}
