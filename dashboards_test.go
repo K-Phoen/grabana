@@ -110,7 +110,9 @@ func TestDashboardsCanBeCreated(t *testing.T) {
 
 func TestDashboardsCreationCanFail(t *testing.T) {
 	req := require.New(t)
-	dashboard := builder.New("Dashboard name")
+	dashboard, err := builder.New("Dashboard name")
+	req.NoError(err)
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, _ = fmt.Fprintln(w, `{

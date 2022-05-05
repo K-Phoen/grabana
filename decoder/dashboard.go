@@ -84,7 +84,7 @@ func (d *DashboardModel) toDashboardBuilder() (dashboard.Builder, error) {
 		opts = append(opts, opt)
 	}
 
-	return dashboard.New(d.Title, opts...), nil
+	return dashboard.New(d.Title, opts...)
 }
 
 func (d *DashboardModel) sharedCrossHair() dashboard.Option {

@@ -136,6 +136,6 @@ func TestUnitCanBeConfigured(t *testing.T) {
 	cfg := &sdk.FieldConfig{}
 	_, err := New(cfg, Unit("reqps"))
 
-	req.Error(err)
+	req.NoError(err)
 	req.Equal("reqps", cfg.Defaults.Unit)
 }

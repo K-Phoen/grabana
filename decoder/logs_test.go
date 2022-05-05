@@ -40,7 +40,9 @@ func TestLogsPanelsCanBeDecoded(t *testing.T) {
 
 	req.NoError(err)
 
-	testBoard := dashboard.New("", dashboard.Row("", rowOption))
+	testBoard, err := dashboard.New("", dashboard.Row("", rowOption))
+
+	req.NoError(err)
 	req.Len(testBoard.Internal().Rows, 1)
 	panels := testBoard.Internal().Rows[0].Panels
 	req.Len(panels, 1)
@@ -89,7 +91,8 @@ func TestLogsPanelsWithValidSortOrder(t *testing.T) {
 
 			req.NoError(err)
 
-			testBoard := dashboard.New("", dashboard.Row("", rowOption))
+			testBoard, err := dashboard.New("", dashboard.Row("", rowOption))
+			req.NoError(err)
 			req.Len(testBoard.Internal().Rows, 1)
 			panels := testBoard.Internal().Rows[0].Panels
 			req.Len(panels, 1)
@@ -156,7 +159,8 @@ func TestLogsPanelsWithValidDeduplicationStrategy(t *testing.T) {
 
 			req.NoError(err)
 
-			testBoard := dashboard.New("", dashboard.Row("", rowOption))
+			testBoard, err := dashboard.New("", dashboard.Row("", rowOption))
+			req.NoError(err)
 			req.Len(testBoard.Internal().Rows, 1)
 			panels := testBoard.Internal().Rows[0].Panels
 			req.Len(panels, 1)
@@ -218,7 +222,8 @@ func TestLogsPanelsVisualizationOptionsCanBeSet(t *testing.T) {
 
 	req.NoError(err)
 
-	testBoard := dashboard.New("", dashboard.Row("", rowOption))
+	testBoard, err := dashboard.New("", dashboard.Row("", rowOption))
+	req.NoError(err)
 	req.Len(testBoard.Internal().Rows, 1)
 	panels := testBoard.Internal().Rows[0].Panels
 	req.Len(panels, 1)

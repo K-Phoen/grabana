@@ -122,7 +122,11 @@ func WithTable(title string, options ...table.Option) Option {
 // WithText adds a "text" panel in the row.
 func WithText(title string, options ...text.Option) Option {
 	return func(row *Row) error {
-		panel := text.New(title, options...)
+		panel, err := text.New(title, options...)
+		if err != nil {
+			return err
+		}
+
 		row.builder.Add(panel.Builder)
 
 		return nil

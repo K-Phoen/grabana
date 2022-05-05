@@ -18,8 +18,9 @@ func requireJSON(t *testing.T, payload []byte) {
 func TestNewDashboardsCanBeCreated(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("My dashboard")
+	panel, err := New("My dashboard")
 
+	req.NoError(err)
 	req.Equal(uint(0), panel.board.ID)
 	req.Equal("My dashboard", panel.board.Title)
 	req.Empty(panel.board.Timezone)
@@ -33,7 +34,9 @@ func TestNewDashboardsCanBeCreated(t *testing.T) {
 func TestDashboardCanBeMarshalledIntoJSON(t *testing.T) {
 	req := require.New(t)
 
-	builder := New("Awesome dashboard")
+	builder, err := New("Awesome dashboard")
+	req.NoError(err)
+
 	dashboardJSON, err := builder.MarshalJSON()
 
 	req.NoError(err)
@@ -43,7 +46,9 @@ func TestDashboardCanBeMarshalledIntoJSON(t *testing.T) {
 func TestDashboardCanBeMarshalledIntoIndentedJSON(t *testing.T) {
 	req := require.New(t)
 
-	builder := New("Awesome dashboard")
+	builder, err := New("Awesome dashboard")
+	req.NoError(err)
+
 	dashboardJSON, err := builder.MarshalIndentJSON()
 
 	req.NoError(err)
@@ -53,24 +58,27 @@ func TestDashboardCanBeMarshalledIntoIndentedJSON(t *testing.T) {
 func TestDashboardCanBeMadeEditable(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Editable())
+	panel, err := New("", Editable())
 
+	req.NoError(err)
 	req.True(panel.board.Editable)
 }
 
 func TestDashboardIDCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", ID(42))
+	panel, err := New("", ID(42))
 
+	req.NoError(err)
 	req.Equal(uint(42), panel.board.ID)
 }
 
 func TestDashboardUIDCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", UID("foo"))
+	panel, err := New("", UID("foo"))
 
+	req.NoError(err)
 	req.Equal("foo", panel.board.UID)
 }
 
@@ -78,8 +86,9 @@ func TestDashboardUIDWillBeHashedWhenTooLongForGrafana(t *testing.T) {
 	req := require.New(t)
 
 	originalUID := "this-uid-is-more-than-forty-characters-and-grafana-does-not-like-it"
-	panel := New("", UID(originalUID))
+	panel, err := New("", UID(originalUID))
 
+	req.NoError(err)
 	req.NotEqual(originalUID, panel.board.UID)
 	req.Len(panel.board.UID, 40)
 }
@@ -87,32 +96,36 @@ func TestDashboardUIDWillBeHashedWhenTooLongForGrafana(t *testing.T) {
 func TestDashboardCanBeMadeReadOnly(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", ReadOnly())
+	panel, err := New("", ReadOnly())
 
+	req.NoError(err)
 	req.False(panel.board.Editable)
 }
 
 func TestDashboardCanHaveASharedCrossHair(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", SharedCrossHair())
+	panel, err := New("", SharedCrossHair())
 
+	req.NoError(err)
 	req.True(panel.board.SharedCrosshair)
 }
 
 func TestDashboardCanHaveADefaultTooltip(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", DefaultTooltip())
+	panel, err := New("", DefaultTooltip())
 
+	req.NoError(err)
 	req.False(panel.board.SharedCrosshair)
 }
 
 func TestDashboardCanBeAutoRefreshed(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", AutoRefresh("5s"))
+	panel, err := New("", AutoRefresh("5s"))
 
+	req.NoError(err)
 	req.True(panel.board.Refresh.Flag)
 	req.Equal("5s", panel.board.Refresh.Value)
 }
@@ -120,8 +133,9 @@ func TestDashboardCanBeAutoRefreshed(t *testing.T) {
 func TestDashboardCanHaveTime(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Time("now-6h", "now"))
+	panel, err := New("", Time("now-6h", "now"))
 
+	req.NoError(err)
 	req.Equal("now-6h", panel.board.Time.From)
 	req.Equal("now", panel.board.Time.To)
 }
@@ -129,8 +143,9 @@ func TestDashboardCanHaveTime(t *testing.T) {
 func TestDashboardCanHaveTimezone(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Timezone(UTC))
+	panel, err := New("", Timezone(UTC))
 
+	req.NoError(err)
 	req.Equal("utc", panel.board.Timezone)
 }
 
@@ -138,8 +153,9 @@ func TestDashboardCanHaveTags(t *testing.T) {
 	req := require.New(t)
 	tags := []string{"generated", "grabana"}
 
-	panel := New("", Tags(tags))
+	panel, err := New("", Tags(tags))
 
+	req.NoError(err)
 	req.Len(panel.board.Tags, 2)
 	req.ElementsMatch(tags, panel.board.Tags)
 }
@@ -147,63 +163,71 @@ func TestDashboardCanHaveTags(t *testing.T) {
 func TestDashboardCanHaveVariablesAsConstants(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", VariableAsConst("percentile"))
+	panel, err := New("", VariableAsConst("percentile"))
 
+	req.NoError(err)
 	req.Len(panel.board.Templating.List, 1)
 }
 
 func TestDashboardCanHaveVariablesAsCustom(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", VariableAsCustom("vX"))
+	panel, err := New("", VariableAsCustom("vX"))
 
+	req.NoError(err)
 	req.Len(panel.board.Templating.List, 1)
 }
 
 func TestDashboardCanHaveVariablesAsInterval(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", VariableAsInterval("interval"))
+	panel, err := New("", VariableAsInterval("interval"))
 
+	req.NoError(err)
 	req.Len(panel.board.Templating.List, 1)
 }
 
 func TestDashboardCanHaveVariablesAsQuery(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", VariableAsQuery("status"))
+	panel, err := New("", VariableAsQuery("status"))
 
+	req.NoError(err)
 	req.Len(panel.board.Templating.List, 1)
 }
 
 func TestDashboardCanHaveVariablesAsDatasource(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", VariableAsDatasource("source", datasource.Type("prometheus")))
+	panel, err := New("", VariableAsDatasource("source", datasource.Type("prometheus")))
 
+	req.NoError(err)
 	req.Len(panel.board.Templating.List, 1)
 }
 
 func TestDashboardCanHaveRows(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Row("Prometheus"))
+	panel, err := New("", Row("Prometheus"))
 
+	req.NoError(err)
 	req.Len(panel.board.Rows, 1)
 }
 
 func TestDashboardCanHaveAnnotationsFromTags(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", TagsAnnotation(TagAnnotation{}))
+	panel, err := New("", TagsAnnotation(TagAnnotation{}))
 
+	req.NoError(err)
 	req.Len(panel.board.Annotations.List, 1)
 }
 
 func TestDashboardCanHaveExternalLinks(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", ExternalLinks(ExternalLink{}, ExternalLink{}))
+	panel, err := New("", ExternalLinks(ExternalLink{}, ExternalLink{}))
 
+	req.NoError(err)
 	req.Len(panel.board.Links, 2)
 }

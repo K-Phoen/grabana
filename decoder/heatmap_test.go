@@ -50,7 +50,9 @@ func TestHeatmapTooltipCanBeHidden(t *testing.T) {
 	req.NoError(err)
 
 	builder := sdk.NewBoard("")
-	_ = row.New(builder, "", opts)
+	_, err = row.New(builder, "", opts)
+
+	req.NoError(err)
 
 	req.Len(builder.Rows, 1)
 	req.Len(builder.Rows[0].Panels, 1)
