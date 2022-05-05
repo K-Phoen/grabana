@@ -38,7 +38,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	builder := dashboard.New(
+	builder, err := dashboard.New(
 		"Awesome dashboard test",
 		dashboard.UID("test-dashboard-alerts"),
 		dashboard.AutoRefresh("30s"),
@@ -156,6 +156,10 @@ func main() {
 			),
 		),
 	)
+	if err != nil {
+		fmt.Printf("Could not build dashboard: %s\n", err)
+		os.Exit(1)
+	}
 
 	dash, err := client.UpsertDashboard(ctx, folder, builder)
 	if err != nil {

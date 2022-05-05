@@ -13,7 +13,7 @@ import (
 func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	target := prometheus.New(query, options...)
 
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(&sdk.Target{
 			Hide:           target.Hidden,
 			Expr:           target.Expr,
@@ -24,6 +24,8 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+
+		return nil
 	}
 }
 
@@ -31,8 +33,10 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 	target := graphite.New(query, options...)
 
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
@@ -40,15 +44,19 @@ func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 	target := influxdb.New(query, options...)
 
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // WithStackdriverTarget adds a stackdriver query to the graph.
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
@@ -56,11 +64,13 @@ func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 func WithLokiTarget(query string, options ...loki.Option) Option {
 	target := loki.New(query, options...)
 
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(&sdk.Target{
 			Hide:         target.Hidden,
 			Expr:         target.Expr,
 			LegendFormat: target.LegendFormat,
 		})
+
+		return nil
 	}
 }

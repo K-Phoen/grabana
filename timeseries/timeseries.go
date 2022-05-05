@@ -1,7 +1,10 @@
 package timeseries
 
 import (
+	"fmt"
+
 	"github.com/K-Phoen/grabana/alert"
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/K-Phoen/grabana/timeseries/scheme"
@@ -10,7 +13,7 @@ import (
 )
 
 // Option represents an option that can be used to configure a graph panel.
-type Option func(timeseries *TimeSeries)
+type Option func(timeseries *TimeSeries) error
 
 // TooltipMode configures which series will be displayed in the tooltip.
 type TooltipMode string
@@ -111,15 +114,17 @@ type TimeSeries struct {
 }
 
 // New creates a new time series panel.
-func New(title string, options ...Option) *TimeSeries {
+func New(title string, options ...Option) (*TimeSeries, error) {
 	panel := &TimeSeries{Builder: sdk.NewTimeseries(title)}
 	panel.Builder.IsNew = false
 
 	for _, opt := range append(defaults(), options...) {
-		opt(panel)
+		if err := opt(panel); err != nil {
+			return nil, err
+		}
 	}
 
-	return panel
+	return panel, nil
 }
 
 func defaults() []Option {
@@ -141,42 +146,64 @@ func defaults() []Option {
 
 // DataSource sets the data source to be used by the graph.
 func DataSource(source string) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.Datasource = &source
+
+		return nil
 	}
 }
 
 // Tooltip configures the tooltip content.
 func Tooltip(mode TooltipMode) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.TimeseriesPanel.Options.Tooltip.Mode = string(mode)
+
+		return nil
 	}
 }
 
 // LineWidth defines the width of the line for a series (default 1, max 10, 0 is none).
 func LineWidth(value int) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
+		if value < 0 || value > 10 {
+			return fmt.Errorf("line width must be between 0 and 10: %w", errors.ErrInvalidArgument)
+		}
+
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineWidth = value
+
+		return nil
 	}
 }
 
 // FillOpacity defines the opacity level of the series. The lower the value, the more transparent.
 func FillOpacity(value int) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
+		if value < 0 || value > 100 {
+			return fmt.Errorf("fill opacity must be between 0 and 100: %w", errors.ErrInvalidArgument)
+		}
+
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.FillOpacity = value
+
+		return nil
 	}
 }
 
 // PointSize adjusts the size of points.
 func PointSize(value int) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
+		if value < 0 || value > 40 {
+			return fmt.Errorf("point size must be between 0 and 40: %w", errors.ErrInvalidArgument)
+		}
+
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.PointSize = value
+
+		return nil
 	}
 }
 
 // Lines displays the series as lines, with a given interpolation strategy.
 func Lines(mode LineInterpolationMode) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation = string(mode)
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "line"
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineStyle = struct {
@@ -184,55 +211,69 @@ func Lines(mode LineInterpolationMode) Option {
 		}{
 			Fill: "solid",
 		}
+
+		return nil
 	}
 }
 
 // Bars displays the series as bars, with a given alignment strategy.
 func Bars(alignment BarAlignment) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.BarAlignment = int(alignment)
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "bars"
+
+		return nil
 	}
 }
 
 // Points displays the series as points.
 func Points() Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.DrawStyle = "points"
+
+		return nil
 	}
 }
 
 // GradientMode sets the mode of the gradient fill.
 func GradientMode(mode GradientType) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode = string(mode)
+
+		return nil
 	}
 }
 
 // Axis configures the axis for this time series.
 func Axis(options ...axis.Option) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		axis.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
+
+		return nil
 	}
 }
 
 // Thresholds configures the thresholds for this time series.
 func Thresholds(options ...threshold.Option) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		threshold.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
+
+		return nil
 	}
 }
 
 // ColorScheme configures the color scheme.
 func ColorScheme(options ...scheme.Option) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		scheme.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
+
+		return nil
 	}
 }
 
 // Legend defines what should be shown in the legend.
 func Legend(opts ...LegendOption) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		legend := sdk.TimeseriesLegendOptions{
 			DisplayMode: "list",
 			Placement:   "bottom",
@@ -274,60 +315,80 @@ func Legend(opts ...LegendOption) Option {
 				legend.Calcs = append(legend.Calcs, "sum")
 			case Range:
 				legend.Calcs = append(legend.Calcs, "range")
+			default:
+				return fmt.Errorf("unknown legend option: %w", errors.ErrInvalidArgument)
 			}
 		}
 
 		timeseries.Builder.TimeseriesPanel.Options.Legend = legend
+
+		return nil
 	}
 }
 
 // Span sets the width of the panel, in grid units. Should be a positive
 // number between 1 and 12. Example: 6.
 func Span(span float32) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
+		if span < 1 || span > 12 {
+			return fmt.Errorf("span must be between 1 and 12: %w", errors.ErrInvalidArgument)
+		}
+
 		timeseries.Builder.Span = span
+
+		return nil
 	}
 }
 
 // Height sets the height of the panel, in pixels. Example: "400px".
 func Height(height string) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.Height = &height
+
+		return nil
 	}
 }
 
 // Description annotates the current visualization with a human-readable description.
 func Description(content string) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.Description = &content
+
+		return nil
 	}
 }
 
 // Transparent makes the background transparent.
 func Transparent() Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.Transparent = true
+
+		return nil
 	}
 }
 
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Alert = alert.New(timeseries.Builder.Title, append(opts, alert.Summary(name))...)
 		timeseries.Alert.Builder.Name = timeseries.Builder.Title
+
+		return nil
 	}
 }
 
 // Repeat configures repeating a panel for a variable
 func Repeat(repeat string) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.Repeat = &repeat
+
+		return nil
 	}
 }
 
 // FieldOverride allows overriding visualization options.
 func FieldOverride(m fields.Matcher, opts ...fields.OverrideOption) Option {
-	return func(timeseries *TimeSeries) {
+	return func(timeseries *TimeSeries) error {
 		override := sdk.FieldConfigOverride{}
 
 		m(&override)
@@ -337,5 +398,7 @@ func FieldOverride(m fields.Matcher, opts ...fields.OverrideOption) Option {
 		}
 
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Overrides = append(timeseries.Builder.TimeseriesPanel.FieldConfig.Overrides, override)
+
+		return nil
 	}
 }
