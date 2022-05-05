@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
 )
@@ -25,8 +26,9 @@ func TestAxisPlacementCanBeConfigured(t *testing.T) {
 			req := require.New(t)
 
 			cfg := &sdk.FieldConfig{}
-			New(cfg, Placement(tc.value))
+			_, err := New(cfg, Placement(tc.value))
 
+			req.NoError(err)
 			req.Equal(tc.expected, cfg.Defaults.Custom.AxisPlacement)
 		})
 	}
@@ -49,8 +51,9 @@ func TestAxisScaleCanBeConfigured(t *testing.T) {
 			req := require.New(t)
 
 			cfg := &sdk.FieldConfig{}
-			New(cfg, Scale(tc.value))
+			_, err := New(cfg, Scale(tc.value))
 
+			req.NoError(err)
 			req.Equal(tc.expectedType, cfg.Defaults.Custom.ScaleDistribution.Type)
 			req.Equal(tc.expectedLog, cfg.Defaults.Custom.ScaleDistribution.Log)
 		})
@@ -61,8 +64,9 @@ func TestAxisSoftMinCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	New(cfg, SoftMin(0))
+	_, err := New(cfg, SoftMin(0))
 
+	req.NoError(err)
 	req.Equal(0, *cfg.Defaults.Custom.AxisSoftMin)
 }
 
@@ -70,8 +74,9 @@ func TestAxisSoftMaxCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	New(cfg, SoftMax(0))
+	_, err := New(cfg, SoftMax(0))
 
+	req.NoError(err)
 	req.Equal(0, *cfg.Defaults.Custom.AxisSoftMax)
 }
 
@@ -79,8 +84,9 @@ func TestAxisMinCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	New(cfg, Min(0))
+	_, err := New(cfg, Min(0))
 
+	req.NoError(err)
 	req.Equal(0, *cfg.Defaults.Min)
 }
 
@@ -88,8 +94,9 @@ func TestAxisMaxCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	New(cfg, Max(0))
+	_, err := New(cfg, Max(0))
 
+	req.NoError(err)
 	req.Equal(0, *cfg.Defaults.Max)
 }
 
@@ -97,8 +104,9 @@ func TestLabelCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	New(cfg, Label("Foo"))
+	_, err := New(cfg, Label("Foo"))
 
+	req.NoError(err)
 	req.Equal("Foo", cfg.Defaults.Custom.AxisLabel)
 }
 
@@ -106,16 +114,28 @@ func TestDecimalsCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	New(cfg, Decimals(2))
+	_, err := New(cfg, Decimals(2))
 
+	req.NoError(err)
 	req.Equal(2, *cfg.Defaults.Decimals)
+}
+
+func TestInvalidDecimalsAreRejected(t *testing.T) {
+	req := require.New(t)
+
+	cfg := &sdk.FieldConfig{}
+	_, err := New(cfg, Decimals(-2))
+
+	req.Error(err)
+	req.ErrorIs(err, errors.ErrInvalidArgument)
 }
 
 func TestUnitCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	New(cfg, Unit("reqps"))
+	_, err := New(cfg, Unit("reqps"))
 
+	req.Error(err)
 	req.Equal("reqps", cfg.Defaults.Unit)
 }

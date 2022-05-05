@@ -247,9 +247,9 @@ func GradientMode(mode GradientType) Option {
 // Axis configures the axis for this time series.
 func Axis(options ...axis.Option) Option {
 	return func(timeseries *TimeSeries) error {
-		axis.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
+		_, err := axis.New(&timeseries.Builder.TimeseriesPanel.FieldConfig, options...)
 
-		return nil
+		return err
 	}
 }
 
