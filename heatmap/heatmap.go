@@ -1,6 +1,9 @@
 package heatmap
 
 import (
+	"fmt"
+
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/heatmap/axis"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
@@ -29,7 +32,7 @@ const (
 )
 
 // Option represents an option that can be used to configure a heatmap panel.
-type Option func(stat *Heatmap)
+type Option func(stat *Heatmap) error
 
 // Heatmap represents a heatmap panel.
 type Heatmap struct {
@@ -37,7 +40,7 @@ type Heatmap struct {
 }
 
 // New creates a new heatmap panel.
-func New(title string, options ...Option) *Heatmap {
+func New(title string, options ...Option) (*Heatmap, error) {
 	panel := &Heatmap{Builder: sdk.NewHeatmap(title)}
 	panel.Builder.IsNew = false
 	panel.Builder.HeatmapPanel.Cards = struct {
@@ -79,10 +82,12 @@ func New(title string, options ...Option) *Heatmap {
 	panel.Builder.HeatmapPanel.YBucketBound = "auto"
 
 	for _, opt := range append(defaults(), options...) {
-		opt(panel)
+		if err := opt(panel); err != nil {
+			return nil, err
+		}
 	}
 
-	return panel
+	return panel, nil
 }
 
 func defaults() []Option {
@@ -96,22 +101,28 @@ func defaults() []Option {
 }
 
 func defaultYAxis() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.YAxis = *axis.New().Builder
+
+		return nil
 	}
 }
 
 // DataSource sets the data source to be used by the panel.
 func DataSource(source string) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.Datasource = &source
+
+		return nil
 	}
 }
 
 // DataFormat sets how the data should be interpreted.
 func DataFormat(format DataFormatMode) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.DataFormat = string(format)
+
+		return nil
 	}
 }
 
@@ -119,7 +130,7 @@ func DataFormat(format DataFormatMode) Option {
 func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	target := prometheus.New(query, options...)
 
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.AddTarget(&sdk.Target{
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
@@ -129,6 +140,8 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+
+		return nil
 	}
 }
 
@@ -136,8 +149,10 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 	target := graphite.New(query, options...)
 
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
@@ -145,132 +160,172 @@ func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 	target := influxdb.New(query, options...)
 
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // WithStackdriverTarget adds a stackdriver query to the graph.
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // Span sets the width of the panel, in grid units. Should be a positive
 // number between 1 and 12. Example: 6.
 func Span(span float32) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
+		if span < 1 || span > 12 {
+			return fmt.Errorf("span must be between 1 and 12: %w", errors.ErrInvalidArgument)
+		}
+
 		heatmap.Builder.Span = span
+
+		return nil
 	}
 }
 
 // Height sets the height of the panel, in pixels. Example: "400px".
 func Height(height string) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.Height = &height
+
+		return nil
 	}
 }
 
 // Description annotates the current visualization with a human-readable description.
 func Description(content string) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.Description = &content
+
+		return nil
 	}
 }
 
 // Transparent makes the background transparent.
 func Transparent() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.Transparent = true
+
+		return nil
 	}
 }
 
 // Legend defines what should be shown in the legend.
 func Legend(opts ...LegendOption) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		for _, opt := range opts {
 			if opt == Hide {
 				heatmap.Builder.HeatmapPanel.Legend.Show = false
 			}
 		}
+
+		return nil
 	}
 }
 
 // ShowZeroBuckets forces the display of "zero" buckets.
 func ShowZeroBuckets() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.HideZeroBuckets = false
+
+		return nil
 	}
 }
 
 // HideZeroBuckets hides "zero" buckets.
 func HideZeroBuckets() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.HideZeroBuckets = true
+
+		return nil
 	}
 }
 
 // HighlightCards highlights bucket cards.
 func HighlightCards() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.HighlightCards = true
+
+		return nil
 	}
 }
 
 // NoHighlightCards disables the highlighting of bucket cards.
 func NoHighlightCards() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.HighlightCards = false
+
+		return nil
 	}
 }
 
 // ReverseYBuckets reverses the order of bucket on the Y-axis.
 func ReverseYBuckets() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.ReverseYBuckets = true
+
+		return nil
 	}
 }
 
 // HideTooltip prevents the tooltip from being displayed.
 func HideTooltip() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.Tooltip.Show = false
+
+		return nil
 	}
 }
 
 // HideTooltipHistogram prevents the histograms from being displayed in tooltips.
 // Histogram represents the distribution of the bucket values for the specific timestamp.
 func HideTooltipHistogram() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.Tooltip.ShowHistogram = false
+
+		return nil
 	}
 }
 
 // TooltipDecimals sets the number of decimals to be displayed in tooltips.
 func TooltipDecimals(decimals int) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.TooltipDecimals = decimals
+
+		return nil
 	}
 }
 
 // HideXAxis prevents the X-axis from being displayed.
 func HideXAxis() Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.XAxis.Show = false
+
+		return nil
 	}
 }
 
 // YAxis configures the Y axis.
 func YAxis(opts ...axis.Option) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.YAxis = *axis.New(opts...).Builder
+
+		return nil
 	}
 }
 
 // Repeat configures repeating a panel for a variable
 func Repeat(repeat string) Option {
-	return func(heatmap *Heatmap) {
+	return func(heatmap *Heatmap) error {
 		heatmap.Builder.Repeat = &repeat
+
+		return nil
 	}
 }

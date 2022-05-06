@@ -52,7 +52,7 @@ func WithGraph(title string, options ...graph.Option) Option {
 		if err != nil {
 			return err
 		}
-		
+
 		row.builder.Add(panel.Builder)
 
 		if panel.Alert == nil {
@@ -148,7 +148,11 @@ func WithText(title string, options ...text.Option) Option {
 // WithHeatmap adds a "heatmap" panel in the row.
 func WithHeatmap(title string, options ...heatmap.Option) Option {
 	return func(row *Row) error {
-		panel := heatmap.New(title, options...)
+		panel, err := heatmap.New(title, options...)
+		if err != nil {
+			return err
+		}
+		
 		row.builder.Add(panel.Builder)
 
 		return nil
