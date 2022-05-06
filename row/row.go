@@ -48,7 +48,11 @@ func (row *Row) Alerts() []*alert.Alert {
 // WithGraph adds a "graph" panel in the row.
 func WithGraph(title string, options ...graph.Option) Option {
 	return func(row *Row) error {
-		panel := graph.New(title, options...)
+		panel, err := graph.New(title, options...)
+		if err != nil {
+			return err
+		}
+		
 		row.builder.Add(panel.Builder)
 
 		if panel.Alert == nil {
