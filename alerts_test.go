@@ -49,3 +49,49 @@ func TestConfigureAlertManagerForwardsErrorOnFailure(t *testing.T) {
 	req.Error(err)
 	req.Contains(err.Error(), "something when wrong")
 }
+
+func TestDeleteAlertGroup(t *testing.T) {
+	req := require.New(t)
+	groupDeleted := false
+	groupNamespace := "group namespace"
+	groupName := "group name"
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		groupDeleted = true
+
+		req.Equal(http.MethodDelete, r.Method)
+		req.Equal("/api/ruler/grafana/api/v1/rules/group namespace/group name", r.URL.Path)
+
+		w.WriteHeader(http.StatusAccepted)
+		_, _ = fmt.Fprintln(w, `{}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteAlertGroup(context.TODO(), groupNamespace, groupName)
+
+	req.NoError(err)
+	req.True(groupDeleted)
+}
+
+func TestDeleteAlertGroupThatDoesNotExist(t *testing.T) {
+	req := require.New(t)
+	groupDeleted := false
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		groupDeleted = true
+
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = fmt.Fprintln(w, `{}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteAlertGroup(context.TODO(), "ns", "name")
+
+	req.Error(err)
+	req.ErrorIs(err, ErrAlertNotFound)
+	req.True(groupDeleted)
+}

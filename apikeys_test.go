@@ -61,7 +61,7 @@ func TestDeleteDeleteAPIKeyByName(t *testing.T) {
 	req.True(deleted)
 }
 
-func TestDeleteAPIKeyByNameReturnsKnownErrorIfDatasourceDoesNotExist(t *testing.T) {
+func TestDeleteAPIKeyByNameReturnsKnownErrorIfKeyDoesNotExist(t *testing.T) {
 	req := require.New(t)
 
 	deleted := false
@@ -87,6 +87,34 @@ func TestDeleteAPIKeyByNameReturnsKnownErrorIfDatasourceDoesNotExist(t *testing.
 	req.Error(err)
 	req.Equal(ErrAPIKeyNotFound, err)
 	req.False(deleted)
+}
+
+func TestDeleteAPIKeyByNameReturnsKnownErrorIfGrafanaSaysKeyDoesNotExist(t *testing.T) {
+	req := require.New(t)
+
+	deleted := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// deletion call
+		if strings.HasPrefix(r.URL.Path, "/api/auth/keys/") {
+			deleted = true
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = fmt.Fprintln(w, `{}`)
+			return
+		}
+
+		// API keys list call
+		w.WriteHeader(http.StatusOK)
+		_, _ = fmt.Fprintln(w, `[{"id": 2, "name": "foo"}]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteAPIKeyByName(context.TODO(), "foo")
+
+	req.Error(err)
+	req.Equal(ErrAPIKeyNotFound, err)
+	req.True(deleted)
 }
 
 func TestDeleteAPIKeyByNameForwardsErrorOnFailure(t *testing.T) {

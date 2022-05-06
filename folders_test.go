@@ -11,6 +11,74 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestFindOrCreateFolder_folderExists(t *testing.T) {
+	req := require.New(t)
+	folderName := "Test folder"
+	getFolderCalled := false
+	createFolderCalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			getFolderCalled = true
+			_, _ = fmt.Fprintln(w, `[
+  {
+    "id":1,
+    "uid": "nErXDvCkzz",
+    "title": "Department ABC"
+  },
+  {
+    "id":2,
+    "uid": "nErXDvCkyy",
+    "title": "Test folder"
+  }
+]`)
+			return
+		}
+
+		createFolderCalled = true
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	folder, err := client.FindOrCreateFolder(context.TODO(), folderName)
+
+	req.NoError(err)
+	req.False(createFolderCalled)
+	req.True(getFolderCalled)
+	req.Equal(folderName, folder.Title)
+}
+
+func TestFindOrCreateFolder_folderDoesNotExists(t *testing.T) {
+	req := require.New(t)
+	folderName := "Test folder"
+	getFolderCalled := false
+	createFolderCalled := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			getFolderCalled = true
+			_, _ = fmt.Fprintln(w, `[]`)
+			return
+		}
+
+		createFolderCalled = true
+		_, _ = fmt.Fprintln(w, `{
+  "uid": "nErXDvCkzz",
+  "id": 1,
+  "title": "Test folder"
+}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	folder, err := client.FindOrCreateFolder(context.TODO(), folderName)
+
+	req.NoError(err)
+	req.True(createFolderCalled)
+	req.True(getFolderCalled)
+	req.Equal(folderName, folder.Title)
+}
+
 func TestFoldersCanBeCreated(t *testing.T) {
 	req := require.New(t)
 	folderName := "Test folder"

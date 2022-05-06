@@ -49,7 +49,7 @@ func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*D
 	}
 
 	if len(dashboards) == 0 {
-		return nil, nil
+		return nil, ErrDashboardNotFound
 	}
 
 	for i := range dashboards {

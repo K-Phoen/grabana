@@ -39,7 +39,7 @@ func TestADashboardCanBeFoundByTitle(t *testing.T) {
 	req.Equal(dashboardName, dashboard.Title)
 }
 
-func TestAnExplicitErrorIsReturnedIfTheDashboardIsNotFound(t *testing.T) {
+func TestAnExplicitErrorIsReturnedIfTheDashboardIsNotFoundByTitle(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprintln(w, `[
@@ -66,6 +66,22 @@ func TestAnExplicitErrorIsReturnedIfTheDashboardIsNotFound(t *testing.T) {
 	req.Equal(ErrDashboardNotFound, err)
 }
 
+func TestAnExplicitErrorIsReturnedIfTheDashboardIsNotFoundByTitleByGrafana(t *testing.T) {
+	req := require.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, `[]`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	dashboard, err := client.GetDashboardByTitle(context.TODO(), "dashboard that do not exist")
+
+	req.Error(err)
+	req.Nil(dashboard)
+	req.Equal(ErrDashboardNotFound, err)
+}
+
 func TestGetDashboardByTitleCanFail(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +96,45 @@ func TestGetDashboardByTitleCanFail(t *testing.T) {
 
 	req.Error(err)
 	req.Nil(dashboard)
+}
+
+func TestADashboardCanBeFoundByUID(t *testing.T) {
+	req := require.New(t)
+	dashboardUID := "lala-uid"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, `{
+  "id":1,
+  "dashboard": {
+    "id":1,
+    "uid": "lala-uid",
+    "title": "some title"
+  }
+}`)
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	dashboard, err := client.rawDashboardByUID(context.TODO(), dashboardUID)
+
+	req.NoError(err)
+	req.Equal(dashboardUID, dashboard.UID)
+}
+
+func TestFetchingAnUnknownDashboardByUIDFailsCleanly(t *testing.T) {
+	req := require.New(t)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	_, err := client.rawDashboardByUID(context.TODO(), "uid")
+
+	req.Error(err)
+	req.ErrorIs(err, ErrDashboardNotFound)
 }
 
 /*
