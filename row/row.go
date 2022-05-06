@@ -92,7 +92,11 @@ func WithTimeSeries(title string, options ...timeseries.Option) Option {
 // WithLogs adds a "logs" panel in the row.
 func WithLogs(title string, options ...logs.Option) Option {
 	return func(row *Row) error {
-		panel := logs.New(title, options...)
+		panel, err := logs.New(title, options...)
+		if err != nil {
+			return err
+		}
+
 		row.builder.Add(panel.Builder)
 
 		return nil
@@ -102,7 +106,11 @@ func WithLogs(title string, options ...logs.Option) Option {
 // WithSingleStat adds a "single stat" panel in the row.
 func WithSingleStat(title string, options ...singlestat.Option) Option {
 	return func(row *Row) error {
-		panel := singlestat.New(title, options...)
+		panel, err := singlestat.New(title, options...)
+		if err != nil {
+			return err
+		}
+
 		row.builder.Add(panel.Builder)
 
 		return nil

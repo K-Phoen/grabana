@@ -1,8 +1,10 @@
 package singlestat
 
 import (
+	"fmt"
 	"strings"
 
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -11,7 +13,7 @@ import (
 )
 
 // Option represents an option that can be used to configure a single stat panel.
-type Option func(stat *SingleStat)
+type Option func(stat *SingleStat) error
 
 // StatType let you set the function that your entire query is reduced into a
 // single value with.
@@ -79,7 +81,7 @@ type SingleStat struct {
 }
 
 // New creates a new single stat panel.
-func New(title string, options ...Option) *SingleStat {
+func New(title string, options ...Option) (*SingleStat, error) {
 	panel := &SingleStat{Builder: sdk.NewSinglestat(title)}
 
 	valueToText := "value to text"
@@ -101,10 +103,12 @@ func New(title string, options ...Option) *SingleStat {
 	panel.Builder.SinglestatPanel.SparkLine = sdk.SparkLine{}
 
 	for _, opt := range append(defaults(), options...) {
-		opt(panel)
+		if err := opt(panel); err != nil {
+			return nil, err
+		}
 	}
 
-	return panel
+	return panel, nil
 }
 
 func defaults() []Option {
@@ -126,8 +130,10 @@ func defaults() []Option {
 
 // DataSource sets the data source to be used by the panel.
 func DataSource(source string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.Datasource = &source
+
+		return nil
 	}
 }
 
@@ -135,7 +141,7 @@ func DataSource(source string) Option {
 func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	target := prometheus.New(query, options...)
 
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.AddTarget(&sdk.Target{
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
@@ -145,6 +151,8 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+
+		return nil
 	}
 }
 
@@ -152,8 +160,10 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 	target := graphite.New(query, options...)
 
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
@@ -161,160 +171,212 @@ func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 	target := influxdb.New(query, options...)
 
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // WithStackdriverTarget adds a stackdriver query to the graph.
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // Span sets the width of the panel, in grid units. Should be a positive
 // number between 1 and 12. Example: 6.
 func Span(span float32) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
+		if span < 1 || span > 12 {
+			return fmt.Errorf("span must be between 1 and 12: %w", errors.ErrInvalidArgument)
+		}
+
 		singleStat.Builder.Span = span
+
+		return nil
 	}
 }
 
 // Height sets the height of the panel, in pixels. Example: "400px".
 func Height(height string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.Height = &height
+
+		return nil
 	}
 }
 
 // Description annotates the current visualization with a human-readable description.
 func Description(content string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.Description = &content
+
+		return nil
 	}
 }
 
 // Transparent makes the background transparent.
 func Transparent() Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.Transparent = true
+
+		return nil
 	}
 }
 
 // Unit sets the unit of the data displayed on this axis.
 func Unit(unit string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.Format = unit
+
+		return nil
 	}
 }
 
 // Decimals sets the number of decimals that should be displayed.
 func Decimals(count int) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
+		if count < 0 {
+			return fmt.Errorf("decimals must be greater than 0: %w", errors.ErrInvalidArgument)
+		}
+
 		singleStat.Builder.SinglestatPanel.Decimals = count
+
+		return nil
 	}
 }
 
 // SparkLine displays the spark line summary of the series in addition to the
 // single stat.
 func SparkLine() Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.SparkLine.Show = true
 		singleStat.Builder.SinglestatPanel.SparkLine.Full = false
+
+		return nil
 	}
 }
 
 // FullSparkLine displays a full height spark line summary of the series in
 // addition to the single stat.
 func FullSparkLine() Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.SparkLine.Show = true
 		singleStat.Builder.SinglestatPanel.SparkLine.Full = true
+
+		return nil
 	}
 }
 
 // SparkLineColor sets the line color of the spark line.
 func SparkLineColor(color string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.SparkLine.LineColor = &color
+
+		return nil
 	}
 }
 
 // SparkLineFillColor sets the color the spark line will be filled with.
 func SparkLineFillColor(color string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.SparkLine.FillColor = &color
+
+		return nil
 	}
 }
 
 // SparkLineYMin defines the smallest value expected on the Y axis of the spark line.
 func SparkLineYMin(value float64) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.SparkLine.YMin = &value
+
+		return nil
 	}
 }
 
 // SparkLineYMax defines the largest value expected on the Y axis of the spark line.
 func SparkLineYMax(value float64) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.SparkLine.YMax = &value
+
+		return nil
 	}
 }
 
 // ValueType configures how the series will be reduced to a single value.
 func ValueType(valueType StatType) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.ValueName = string(valueType)
+
+		return nil
 	}
 }
 
 // ValueFontSize sets the font size used to display the value (eg: "100%").
 func ValueFontSize(size string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.ValueFontSize = size
+
+		return nil
 	}
 }
 
 // Prefix sets the text used as prefix of the value.
 func Prefix(prefix string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.Prefix = &prefix
+
+		return nil
 	}
 }
 
 // PrefixFontSize sets the size used for the prefix text (eg: "110%").
 func PrefixFontSize(size string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.PrefixFontSize = &size
+
+		return nil
 	}
 }
 
 // Postfix sets the text used as postfix of the value.
 func Postfix(postfix string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.Postfix = &postfix
+
+		return nil
 	}
 }
 
 // PostfixFontSize sets the size used for the postfix text (eg: "110%")
 func PostfixFontSize(size string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.PostfixFontSize = &size
+
+		return nil
 	}
 }
 
 // ColorValue will show the threshold's colors on the value itself.
 func ColorValue() Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.ColorValue = true
+
+		return nil
 	}
 }
 
 // ColorBackground will show the threshold's colors in the background.
 func ColorBackground() Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.ColorBackground = true
+
+		return nil
 	}
 }
 
@@ -323,23 +385,27 @@ func ColorBackground() Option {
 // values which represent 3 ranges that correspond to the three colors directly
 // to the right.
 func Thresholds(values [2]string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.Thresholds = strings.Join([]string{values[0], values[1]}, ",")
+
+		return nil
 	}
 }
 
 // Colors define which colors will be applied to the single value based on the
 // threshold levels.
 func Colors(values [3]string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.SinglestatPanel.Colors = []string{values[0], values[1], values[2]}
+
+		return nil
 	}
 }
 
 // ValuesToText allows to translate the value of the summary stat into explicit
 // text.
 func ValuesToText(mapping []ValueMap) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		valueMap := make([]sdk.ValueMap, 0, len(mapping))
 
 		for _, entry := range mapping {
@@ -353,13 +419,15 @@ func ValuesToText(mapping []ValueMap) Option {
 		mappingType := uint(valueToTextMapping)
 		singleStat.Builder.SinglestatPanel.MappingType = &mappingType
 		singleStat.Builder.SinglestatPanel.ValueMaps = valueMap
+
+		return nil
 	}
 }
 
 // RangesToText allows to translate the value of the summary stat into explicit
 // text.
 func RangesToText(mapping []RangeMap) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		rangeMap := make([]*sdk.RangeMap, 0, len(mapping))
 
 		for i := range mapping {
@@ -373,12 +441,16 @@ func RangesToText(mapping []RangeMap) Option {
 		mappingType := uint(rangeToTextMapping)
 		singleStat.Builder.SinglestatPanel.MappingType = &mappingType
 		singleStat.Builder.SinglestatPanel.RangeMaps = rangeMap
+
+		return nil
 	}
 }
 
 // Repeat configures repeating a panel for a variable
 func Repeat(repeat string) Option {
-	return func(singleStat *SingleStat) {
+	return func(singleStat *SingleStat) error {
 		singleStat.Builder.Repeat = &repeat
+
+		return nil
 	}
 }

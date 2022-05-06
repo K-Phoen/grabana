@@ -36,8 +36,10 @@ func TestValidValueTypes(t *testing.T) {
 
 			req.NoError(err)
 
-			singleStat := singlestat.New("test")
-			opt(singleStat)
+			singleStat, err := singlestat.New("test")
+			req.NoError(err)
+
+			req.NoError(opt(singleStat))
 
 			req.Equal(tc.input, singleStat.Builder.SinglestatPanel.ValueName)
 		})
