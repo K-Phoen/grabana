@@ -124,7 +124,11 @@ func WithSingleStat(title string, options ...singlestat.Option) Option {
 // WithTable adds a "table" panel in the row.
 func WithTable(title string, options ...table.Option) Option {
 	return func(row *Row) error {
-		panel := table.New(title, options...)
+		panel, err := table.New(title, options...)
+		if err != nil {
+			return err
+		}
+		
 		row.builder.Add(panel.Builder)
 
 		return nil
@@ -152,7 +156,7 @@ func WithHeatmap(title string, options ...heatmap.Option) Option {
 		if err != nil {
 			return err
 		}
-		
+
 		row.builder.Add(panel.Builder)
 
 		return nil
