@@ -13,9 +13,9 @@ type Stackdriver struct {
 	builder *sdk.Datasource
 }
 
-type Option func(datasource *Stackdriver)
+type Option func(datasource *Stackdriver) error
 
-func New(name string, options ...Option) Stackdriver {
+func New(name string, options ...Option) (Stackdriver, error) {
 	stackdriver := &Stackdriver{
 		builder: &sdk.Datasource{
 			Name:           name,
@@ -31,10 +31,12 @@ func New(name string, options ...Option) Stackdriver {
 	}
 
 	for _, opt := range append(defaults, options...) {
-		opt(stackdriver)
+		if err := opt(stackdriver); err != nil {
+			return *stackdriver, err
+		}
 	}
 
-	return *stackdriver
+	return *stackdriver, nil
 }
 
 func (datasource Stackdriver) Name() string {

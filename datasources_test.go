@@ -16,7 +16,9 @@ func TestDatasourceUpsertCanCreateANewDatasource(t *testing.T) {
 	req := require.New(t)
 	datasourcePosted := false
 
-	datasource := prometheus.New("name", "address")
+	datasource, err := prometheus.New("name", "address")
+	req.NoError(err)
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// "Datasource ID by name" call
 		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
@@ -36,7 +38,7 @@ func TestDatasourceUpsertCanCreateANewDatasource(t *testing.T) {
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
-	err := client.UpsertDatasource(context.TODO(), datasource)
+	err = client.UpsertDatasource(context.TODO(), datasource)
 
 	req.NoError(err)
 	req.True(datasourcePosted)
@@ -46,7 +48,9 @@ func TestDatasourceUpsertCanUpdateADatasource(t *testing.T) {
 	req := require.New(t)
 	datasourceUpdated := false
 
-	datasource := prometheus.New("name", "address")
+	datasource, err := prometheus.New("name", "address")
+	req.NoError(err)
+
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// "Datasource ID by name" call
 		if strings.HasPrefix(r.URL.Path, "/api/datasources/id/") {
@@ -67,7 +71,7 @@ func TestDatasourceUpsertCanUpdateADatasource(t *testing.T) {
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
-	err := client.UpsertDatasource(context.TODO(), datasource)
+	err = client.UpsertDatasource(context.TODO(), datasource)
 
 	req.NoError(err)
 	req.True(datasourceUpdated)
@@ -92,7 +96,10 @@ func TestUpsertDatasourceForwardsErrorsOnFailure(t *testing.T) {
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
-	err := client.UpsertDatasource(context.TODO(), prometheus.New("name", "address"))
+	datasource, err := prometheus.New("name", "address")
+	req.NoError(err)
+
+	err = client.UpsertDatasource(context.TODO(), datasource)
 
 	req.Error(err)
 	req.Contains(err.Error(), "something when wrong")

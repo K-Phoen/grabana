@@ -9,16 +9,18 @@ import (
 func TestDefault(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", Default())
+	datasource, err := New("", Default())
 
+	req.NoError(err)
 	req.True(datasource.builder.IsDefault)
 }
 
 func TestGCEAuthentication(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", GCEAuthentication())
+	datasource, err := New("", GCEAuthentication())
 
+	req.NoError(err)
 	req.Equal("gce", datasource.builder.JSONData.(map[string]interface{})["authenticationType"])
 }
 
@@ -37,8 +39,9 @@ func TestJWTAuthentication(t *testing.T) {
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dark-operator%40dark-sandbox.iam.gserviceaccount.com"
 }`
 
-	datasource := New("", JWTAuthentication(jwtKey))
+	datasource, err := New("", JWTAuthentication(jwtKey))
 
+	req.NoError(err)
 	req.Equal("jwt", datasource.builder.JSONData.(map[string]interface{})["authenticationType"])
 	req.Equal("dark-operator@dark-sandbox.iam.gserviceaccount.com", datasource.builder.JSONData.(map[string]interface{})["clientEmail"])
 	req.Equal("dark-sandbox", datasource.builder.JSONData.(map[string]interface{})["defaultProject"])
@@ -46,11 +49,11 @@ func TestJWTAuthentication(t *testing.T) {
 	req.Equal("-----BEGIN PRIVATE KEY-----\nSOMETHING_REALLY_SECRET_HERE\n-----END PRIVATE KEY-----\n", datasource.builder.SecureJSONData.(map[string]interface{})["privateKey"])
 }
 
-func TestJWTAuthenticationUnfortunatelyFailsSilentlyIfJWTIsInvalid(t *testing.T) {
+func TestJWTAuthenticationRejectsInvalidJWTKey(t *testing.T) {
 	req := require.New(t)
-	jwtKey := `{invalid json`
+	jwtKey := `{"not valid JSON`
 
-	datasource := New("", JWTAuthentication(jwtKey))
+	_, err := New("", JWTAuthentication(jwtKey))
 
-	req.Equal("gce", datasource.builder.JSONData.(map[string]interface{})["authenticationType"])
+	req.Error(err)
 }
