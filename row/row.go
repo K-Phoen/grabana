@@ -128,7 +128,7 @@ func WithTable(title string, options ...table.Option) Option {
 		if err != nil {
 			return err
 		}
-		
+
 		row.builder.Add(panel.Builder)
 
 		return nil

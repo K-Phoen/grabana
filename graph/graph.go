@@ -298,7 +298,7 @@ func Fill(value int) Option {
 // LineWidth defines the width of the line for a series (default 1, max 10, 0 is none).
 func LineWidth(value uint) Option {
 	return func(graph *Graph) error {
-		if value < 0 || value > 10 {
+		if value > 10 {
 			return fmt.Errorf("line width must be between 0 and 10: %w", errors.ErrInvalidArgument)
 		}
 
