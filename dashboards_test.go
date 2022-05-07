@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/K-Phoen/sdk"
+
 	"github.com/K-Phoen/grabana/alert"
 
 	"github.com/K-Phoen/grabana/dashboard"
@@ -866,4 +868,31 @@ func TestDashboardsCanBeCreatedWithNewAlertsAndDeletesPreviousAlerts(t *testing.
 	req.True(secondAlertDeleted)
 	req.True(newAlertDeletionAttempt)
 	req.True(newAlertCreated)
+}
+
+func TestClient_panelIDByTitle_panelInBoard(t *testing.T) {
+	req := require.New(t)
+
+	board := sdk.NewBoard("board title")
+	panel := sdk.NewLogs("Logs panel")
+	panel.ID = 42
+
+	board.Panels = append(board.Panels, panel)
+
+	req.Equal("42", panelIDByTitle(board, "Logs panel"))
+	req.Equal("", panelIDByTitle(board, "not found"))
+}
+
+func TestClient_panelIDByTitle_panelInRow(t *testing.T) {
+	req := require.New(t)
+
+	board := sdk.NewBoard("board title")
+	panel := sdk.NewHeatmap("Heamtap panel")
+	panel.ID = 24
+	rowPanel := board.AddRow("Row title")
+
+	rowPanel.Panels = append(rowPanel.Panels, *panel)
+
+	req.Equal("24", panelIDByTitle(board, "Heamtap panel"))
+	req.Equal("", panelIDByTitle(board, "not found"))
 }
