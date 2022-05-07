@@ -25,6 +25,7 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 			GradientMode: "opacity",
 			Tooltip:      "single_series",
 			FillOpacity:  intPtr(5),
+			LineWidth:    intPtr(4),
 		},
 		Axis: &TimeSeriesAxis{
 			SoftMin:  intPtr(1),
@@ -63,6 +64,7 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 	req.Equal("opacity", tsPanel.FieldConfig.Defaults.Custom.GradientMode)
 	req.Equal("single", tsPanel.Options.Tooltip.Mode)
 	req.Equal(5, tsPanel.FieldConfig.Defaults.Custom.FillOpacity)
+	req.Equal(4, tsPanel.FieldConfig.Defaults.Custom.LineWidth)
 
 	// axis
 	req.Equal("Some label", tsPanel.FieldConfig.Defaults.Custom.AxisLabel)

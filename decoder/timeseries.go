@@ -173,6 +173,7 @@ type TimeSeriesVisualization struct {
 	FillOpacity       *int   `yaml:"fill_opacity,omitempty"`
 	PointSize         *int   `yaml:"point_size,omitempty"`
 	LineInterpolation string `yaml:"line_interpolation,omitempty"`
+	LineWidth         *int   `yaml:"line_width,omitempty"`
 	// TODO: draw: {bars: {}, lines: {}}
 }
 
@@ -212,6 +213,9 @@ func (timeseriesViz *TimeSeriesVisualization) toOptions() ([]timeseries.Option, 
 		}
 
 		opts = append(opts, interpolationOpt)
+	}
+	if timeseriesViz.LineWidth != nil {
+		opts = append(opts, timeseries.LineWidth(*timeseriesViz.LineWidth))
 	}
 
 	return opts, nil
