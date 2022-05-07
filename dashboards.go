@@ -90,11 +90,6 @@ func (client *Client) rawDashboardByUID(ctx context.Context, uid string) (*sdk.B
 
 // UpsertDashboard creates or replaces a dashboard, in the given folder.
 func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, builder dashboard.Builder) (*Dashboard, error) {
-	datasourcesMap, err := client.datasourcesUIDMap(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// first pass: save the new dashboard
 	dashboardModel, err := client.persistDashboard(ctx, folder, builder)
 	if err != nil {
@@ -119,6 +114,17 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 
 	// third pass: create new alerts
 	alerts := builder.Alerts()
+
+	// If there are no alerts to create, we can return early
+	if len(alerts) == 0 {
+		return dashboardModel, nil
+	}
+
+	datasourcesMap, err := client.datasourcesUIDMap(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	for i := range alerts {
 		alert := *alerts[i]
 
