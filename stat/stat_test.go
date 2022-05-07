@@ -176,14 +176,116 @@ func TestSparkLineYMaxCanBeSet(t *testing.T) {
 	req.Equal(0, *panel.Builder.StatPanel.FieldConfig.Defaults.Max)
 }
 
+func TestTextModeeCanBeSet(t *testing.T) {
+	testCases := []struct {
+		input    TextMode
+		expected string
+	}{
+		{
+			input:    TextAuto,
+			expected: "auto",
+		},
+		{
+			input:    TextValue,
+			expected: "value",
+		},
+		{
+			input:    TextName,
+			expected: "name",
+		},
+		{
+			input:    TextValueAndName,
+			expected: "value_and_name",
+		},
+		{
+			input:    TextNone,
+			expected: "none",
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.expected, func(t *testing.T) {
+			req := require.New(t)
+
+			panel, err := New("", Text(tc.input))
+
+			req.NoError(err)
+			req.Equal(tc.expected, panel.Builder.StatPanel.Options.TextMode)
+		})
+	}
+}
+
 func TestValueTypeCanBeSet(t *testing.T) {
+	testCases := []struct {
+		input    ReductionType
+		expected string
+	}{
+		{
+			input:    First,
+			expected: "first",
+		},
+		{
+			input:    FirstNonNull,
+			expected: "firstNotNull",
+		},
+		{
+			input:    Last,
+			expected: "last",
+		},
+		{
+			input:    LastNonNull,
+			expected: "lastNotNull",
+		},
+		{
+			input:    Min,
+			expected: "min",
+		},
+		{
+			input:    Max,
+			expected: "max",
+		},
+		{
+			input:    Avg,
+			expected: "mean",
+		},
+		{
+			input:    Count,
+			expected: "count",
+		},
+		{
+			input:    Total,
+			expected: "sum",
+		},
+		{
+			input:    Range,
+			expected: "range",
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.expected, func(t *testing.T) {
+			req := require.New(t)
+
+			panel, err := New("", ValueType(tc.input))
+
+			req.NoError(err)
+			req.Len(panel.Builder.StatPanel.Options.ReduceOptions.Calcs, 1)
+			req.Equal(tc.expected, panel.Builder.StatPanel.Options.ReduceOptions.Calcs[0])
+		})
+	}
+}
+
+func TestInvalidValueTypeIsRejected(t *testing.T) {
 	req := require.New(t)
 
-	panel, err := New("", ValueType(LastNonNull))
+	_, err := New("", ValueType(1000))
 
-	req.NoError(err)
-	req.Len(panel.Builder.StatPanel.Options.ReduceOptions.Calcs, 1)
-	req.Equal("lastNotNull", panel.Builder.StatPanel.Options.ReduceOptions.Calcs[0])
+	req.Error(err)
+	req.ErrorIs(err, errors.ErrInvalidArgument)
 }
 
 func TestValueFontSizeCanBeSet(t *testing.T) {
@@ -243,4 +345,58 @@ func TestRangeToTextMappingsCanBeConfigured(t *testing.T) {
 
 	req.NoError(err)
 	req.Len(panel.Builder.StatPanel.RangeMaps, 3)
+}
+
+func TestAbsoluteThresholdsCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", AbsoluteThresholds([]ThresholdStep{
+		{
+			Color: "green",
+			Value: nil,
+		},
+		{
+			Color: "orange",
+			Value: float64Ptr(26000000),
+		},
+		{
+			Color: "red",
+			Value: float64Ptr(28000000),
+		},
+	}))
+
+	req.NoError(err)
+
+	thresholds := panel.Builder.StatPanel.FieldConfig.Defaults.Thresholds
+	req.Equal("absolute", thresholds.Mode)
+	req.Len(thresholds.Steps, 3)
+}
+
+func TestRelativeThresholdsCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", RelativeThresholds([]ThresholdStep{
+		{
+			Color: "green",
+			Value: nil,
+		},
+		{
+			Color: "orange",
+			Value: float64Ptr(60),
+		},
+		{
+			Color: "red",
+			Value: float64Ptr(80),
+		},
+	}))
+
+	req.NoError(err)
+
+	thresholds := panel.Builder.StatPanel.FieldConfig.Defaults.Thresholds
+	req.Equal("percentage", thresholds.Mode)
+	req.Len(thresholds.Steps, 3)
+}
+
+func float64Ptr(input float64) *float64 {
+	return &input
 }
