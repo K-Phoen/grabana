@@ -5,9 +5,9 @@ import (
 
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/scheme"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
-	"github.com/K-Phoen/grabana/timeseries/scheme"
 	"github.com/K-Phoen/grabana/timeseries/threshold"
 	"github.com/K-Phoen/sdk"
 )

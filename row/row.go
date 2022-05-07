@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/heatmap"
 	"github.com/K-Phoen/grabana/logs"
 	"github.com/K-Phoen/grabana/singlestat"
+	"github.com/K-Phoen/grabana/stat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/timeseries"
@@ -46,6 +47,7 @@ func (row *Row) Alerts() []*alert.Alert {
 }
 
 // WithGraph adds a "graph" panel in the row.
+// Deprecated: use WithTimeSeries() instead.
 func WithGraph(title string, options ...graph.Option) Option {
 	return func(row *Row) error {
 		panel, err := graph.New(title, options...)
@@ -108,9 +110,24 @@ func WithLogs(title string, options ...logs.Option) Option {
 }
 
 // WithSingleStat adds a "single stat" panel in the row.
+// Deprecated: use WithStat() instead
 func WithSingleStat(title string, options ...singlestat.Option) Option {
 	return func(row *Row) error {
 		panel, err := singlestat.New(title, options...)
+		if err != nil {
+			return err
+		}
+
+		row.builder.Add(panel.Builder)
+
+		return nil
+	}
+}
+
+// WithStat adds a "stat" panel in the row.
+func WithStat(title string, options ...stat.Option) Option {
+	return func(row *Row) error {
+		panel, err := stat.New(title, options...)
 		if err != nil {
 			return err
 		}

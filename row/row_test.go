@@ -147,6 +147,16 @@ func TestRowsCanHaveSingleStatPanels(t *testing.T) {
 	req.Len(panel.builder.Panels, 1)
 }
 
+func TestRowsCanHaveStatPanels(t *testing.T) {
+	req := require.New(t)
+	board := sdk.NewBoard("")
+
+	panel, err := New(board, "", WithStat("Some stat"))
+
+	req.NoError(err)
+	req.Len(panel.builder.Panels, 1)
+}
+
 func TestRowsCanHaveHeatmapPanels(t *testing.T) {
 	req := require.New(t)
 	board := sdk.NewBoard("")

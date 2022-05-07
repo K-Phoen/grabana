@@ -138,19 +138,25 @@ type (
 		Overrides []FieldConfigOverride `json:"overrides"`
 	}
 	Options struct {
-		Orientation   string `json:"orientation"`
-		TextMode      string `json:"textMode"`
-		ColorMode     string `json:"colorMode"`
-		GraphMode     string `json:"graphMode"`
-		JustifyMode   string `json:"justifyMode"`
-		DisplayMode   string `json:"displayMode"`
-		Content       string `json:"content"`
-		Mode          string `json:"mode"`
-		ReduceOptions struct {
-			Values bool     `json:"values"`
-			Fields string   `json:"fields"`
-			Calcs  []string `json:"calcs"`
-		} `json:"reduceOptions"`
+		Orientation   string        `json:"orientation"`
+		TextMode      string        `json:"textMode"`
+		ColorMode     string        `json:"colorMode"`
+		GraphMode     string        `json:"graphMode"`
+		JustifyMode   string        `json:"justifyMode"`
+		DisplayMode   string        `json:"displayMode"`
+		Content       string        `json:"content"`
+		Mode          string        `json:"mode"`
+		ReduceOptions ReduceOptions `json:"reduceOptions"`
+		Text          *TextOptions  `json:"text,omitempty"`
+	}
+	TextOptions struct {
+		ValueSize int `json:"valueSize,omitempty"`
+		TitleSize int `json:"titleSize,omitempty"`
+	}
+	ReduceOptions struct {
+		Values bool     `json:"values"`
+		Fields string   `json:"fields"`
+		Calcs  []string `json:"calcs"`
 	}
 	Threshold struct {
 		// the alert threshold value, we do not omitempty, since 0 is a valid
@@ -244,6 +250,7 @@ type (
 		ValueMaps       []ValueMap  `json:"valueMaps"`
 		ValueName       string      `json:"valueName"`
 		Options         Options     `json:"options"`
+		FieldConfig     FieldConfig `json:"fieldConfig"`
 	}
 	DashlistPanel struct {
 		Mode     string   `json:"mode"`
@@ -341,6 +348,7 @@ type (
 	}
 	FieldConfigDefaults struct {
 		Unit       string            `json:"unit"`
+		NoValue    string            `json:"noValue,omitempty"`
 		Decimals   *int              `json:"decimals,omitempty"`
 		Min        *int              `json:"min,omitempty"`
 		Max        *int              `json:"max,omitempty"`
@@ -809,7 +817,18 @@ func NewStat(title string) *Panel {
 			Type:     "stat",
 			Renderer: &render,
 			IsNew:    true},
-		StatPanel: &StatPanel{}}
+		StatPanel: &StatPanel{
+			FieldConfig: FieldConfig{
+				Defaults: FieldConfigDefaults{
+					Color: FieldConfigColor{
+						Mode:       "palette-classic",
+						FixedColor: "green",
+						SeriesBy:   "last",
+					},
+				},
+			},
+		},
+	}
 }
 
 // NewPluginlist initializes panel with a stat panel.

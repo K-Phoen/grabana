@@ -9,9 +9,8 @@ import (
 	"github.com/K-Phoen/grabana"
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/dashboard"
-	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
-	"github.com/K-Phoen/grabana/singlestat"
+	"github.com/K-Phoen/grabana/stat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
@@ -87,12 +86,12 @@ func main() {
 		),
 		dashboard.Row(
 			"Prometheus",
-			row.WithGraph(
+			row.WithTimeSeries(
 				"HTTP Rate",
-				graph.Span(6),
-				graph.Height("400px"),
-				graph.DataSource("Prometheus"),
-				graph.WithPrometheusTarget(
+				timeseries.Span(6),
+				timeseries.Height("400px"),
+				timeseries.DataSource("Prometheus"),
+				timeseries.WithPrometheusTarget(
 					"sum(rate(promhttp_metric_handler_requests_total[$interval])) by (code)",
 					prometheus.Legend("{{ code }}"),
 				),
@@ -129,6 +128,7 @@ func main() {
 			),
 			row.WithTable(
 				"Threads",
+				table.DataSource("Prometheus"),
 				table.WithPrometheusTarget("sum(go_threads{app!=\"\"}) by (app)", prometheus.Legend("{{ app }}")),
 				table.HideColumn("Time"),
 				table.AsTimeSeriesAggregations([]table.Aggregation{
@@ -136,12 +136,26 @@ func main() {
 					{Label: "Current", Type: table.Current},
 				}),
 			),
-			row.WithSingleStat(
+			row.WithStat(
 				"Heap Allocations",
-				singlestat.Unit("bytes"),
-				singlestat.ColorValue(),
-				singlestat.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes)"),
-				singlestat.Thresholds([2]string{"26000000", "28000000"}),
+				stat.DataSource("Prometheus"),
+				stat.Unit("bytes"),
+				stat.ColorValue(),
+				stat.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes)"),
+				stat.AbsoluteThresholds([]stat.ThresholdStep{
+					{
+						Color: "green",
+						Value: nil,
+					},
+					{
+						Color: "orange",
+						Value: float64Ptr(26000000),
+					},
+					{
+						Color: "red",
+						Value: float64Ptr(28000000),
+					},
+				}),
 			),
 		),
 		dashboard.Row(
@@ -168,4 +182,8 @@ func main() {
 	}
 
 	fmt.Printf("The deed is done:\n%s\n", os.Args[1]+dash.URL)
+}
+
+func float64Ptr(input float64) *float64 {
+	return &input
 }

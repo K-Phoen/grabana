@@ -210,8 +210,9 @@ func TestTimeSeriesLineInterpolationModeCanBeDecoded(t *testing.T) {
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", opts...)
+			tsPanel, err := timeseries.New("", opts...)
 
+			req.NoError(err)
 			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation)
 		})
 	}
