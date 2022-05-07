@@ -9,6 +9,7 @@ import (
 )
 
 var ErrInvalidGradientMode = fmt.Errorf("invalid gradient mode")
+var ErrInvalidLineInterpolationMode = fmt.Errorf("invalid line interpolation mode")
 var ErrInvalidTooltipMode = fmt.Errorf("invalid tooltip mode")
 var ErrInvalidAxisDisplay = fmt.Errorf("invalid axis display")
 var ErrInvalidAxisScale = fmt.Errorf("invalid axis scale")
@@ -167,10 +168,11 @@ func (timeseriesPanel DashboardTimeSeries) target(t Target) (timeseries.Option, 
 }
 
 type TimeSeriesVisualization struct {
-	GradientMode string `yaml:"gradient_mode,omitempty"`
-	Tooltip      string `yaml:"tooltip,omitempty"`
-	FillOpacity  *int   `yaml:"fill_opacity,omitempty"`
-	PointSize    *int   `yaml:"point_size,omitempty"`
+	GradientMode      string `yaml:"gradient_mode,omitempty"`
+	Tooltip           string `yaml:"tooltip,omitempty"`
+	FillOpacity       *int   `yaml:"fill_opacity,omitempty"`
+	PointSize         *int   `yaml:"point_size,omitempty"`
+	LineInterpolation string `yaml:"line_interpolation,omitempty"`
 	// TODO: draw: {bars: {}, lines: {}}
 }
 
@@ -203,8 +205,34 @@ func (timeseriesViz *TimeSeriesVisualization) toOptions() ([]timeseries.Option, 
 
 		opts = append(opts, gradient)
 	}
+	if timeseriesViz.LineInterpolation != "" {
+		interpolationOpt, err := timeseriesViz.lineInterpolationOption()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, interpolationOpt)
+	}
 
 	return opts, nil
+}
+
+func (timeseriesViz *TimeSeriesVisualization) lineInterpolationOption() (timeseries.Option, error) {
+	var mode timeseries.LineInterpolationMode
+	switch timeseriesViz.LineInterpolation {
+	case "linear":
+		mode = timeseries.Linear
+	case "smooth":
+		mode = timeseries.Smooth
+	case "step_before":
+		mode = timeseries.StepBefore
+	case "step_after":
+		mode = timeseries.StepAfter
+	default:
+		return nil, ErrInvalidLineInterpolationMode
+	}
+
+	return timeseries.Lines(mode), nil
 }
 
 func (timeseriesViz *TimeSeriesVisualization) gradientModeOption() (timeseries.Option, error) {
@@ -219,7 +247,7 @@ func (timeseriesViz *TimeSeriesVisualization) gradientModeOption() (timeseries.O
 	case "scheme":
 		mode = timeseries.Scheme
 	default:
-		return timeseries.GradientMode(mode), ErrInvalidGradientMode
+		return nil, ErrInvalidGradientMode
 	}
 
 	return timeseries.GradientMode(mode), nil

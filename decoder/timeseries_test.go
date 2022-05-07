@@ -170,7 +170,61 @@ func TestTimeSeriesVisualizationCanBeConfigured(t *testing.T) {
 	req.Equal("single", tsPanel.Builder.TimeseriesPanel.Options.Tooltip.Mode)
 }
 
-func TestTimeSeriesGradientModeCanBeDecided(t *testing.T) {
+func TestTimeSeriesLineInterpolationModeCanBeDecoded(t *testing.T) {
+	testCases := []struct {
+		mode         string
+		expectedMode timeseries.LineInterpolationMode
+	}{
+		{
+			mode:         "linear",
+			expectedMode: timeseries.Linear,
+		},
+		{
+			mode:         "smooth",
+			expectedMode: timeseries.Smooth,
+		},
+		{
+			mode:         "step_before",
+			expectedMode: timeseries.StepBefore,
+		},
+		{
+			mode:         "step_after",
+			expectedMode: timeseries.StepAfter,
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.mode, func(t *testing.T) {
+			req := require.New(t)
+
+			viz := TimeSeriesVisualization{
+				LineInterpolation: tc.mode,
+			}
+			opts, err := viz.toOptions()
+
+			req.NoError(err)
+
+			tsPanel := timeseries.New("", opts...)
+
+			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation)
+		})
+	}
+}
+
+func TestTimeSeriesLineInterpolationModeRejectsInvalidValues(t *testing.T) {
+	req := require.New(t)
+
+	viz := TimeSeriesVisualization{
+		LineInterpolation: "invalid",
+	}
+	_, err := viz.toOptions()
+
+	req.Equal(ErrInvalidLineInterpolationMode, err)
+}
+
+func TestTimeSeriesGradientModeCanBeDecoded(t *testing.T) {
 	testCases := []struct {
 		mode         string
 		expectedMode timeseries.GradientType
