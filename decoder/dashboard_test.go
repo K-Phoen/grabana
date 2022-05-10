@@ -38,6 +38,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		timeseriesPanel(),
 		collapseRow(),
 		logsPanel(),
+		statPanel(),
 	}
 
 	for _, testCase := range testCases {
@@ -556,9 +557,47 @@ rows:
 `
 
 	return testCase{
-		name:                "single row with single graph panel",
+		name:                "single row with one singlestat panel",
 		yaml:                yaml,
 		expectedGrafanaJSON: "singlestat_panel.json",
+	}
+}
+
+func statPanel() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Kubelet
+    panels:
+      - stat:
+          title: HTTP requests
+          description: Some description
+          height: 400px
+          span: 4
+          transparent: true
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "count(kubelet_http_requests_total) by (method, path)"
+                legend: "{{ method }} - {{ path }}"
+          orientation: horizontal
+          text: value_and_name
+          sparkline: true
+          unit: short
+          decimals: 2
+          title_font_size: 100
+          value_font_size: 150
+          color_mode: background
+          thresholds:
+            - {color: green}
+            - {value: 1, color: orange}
+            - {value: 4, color: red}
+`
+
+	return testCase{
+		name:                "single row with one stat panel",
+		yaml:                yaml,
+		expectedGrafanaJSON: "stat_panel.json",
 	}
 }
 

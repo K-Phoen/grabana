@@ -82,13 +82,7 @@ type RangeMap struct {
 	Text string
 }
 
-// nolint: gochecknoglobals
-var valueToTextMapping = 1
-
-// nolint: gochecknoglobals
-var rangeToTextMapping = 2
-
-// SingleStat represents a stat panel.
+// Stat represents a stat panel.
 type Stat struct {
 	Builder *sdk.Panel
 }
@@ -97,24 +91,10 @@ type Stat struct {
 func New(title string, options ...Option) (*Stat, error) {
 	panel := &Stat{Builder: sdk.NewStat(title)}
 
-	valueToText := "value to text"
-	rangeToText := "range to text"
-
 	panel.Builder.IsNew = false
-	mappingType := uint(valueToTextMapping)
-	panel.Builder.StatPanel.MappingType = &mappingType
 	panel.Builder.StatPanel.Options.GraphMode = "none"
+	panel.Builder.StatPanel.FieldConfig.Defaults.Color.Mode = "thresholds"
 	panel.Builder.StatPanel.Options.Text = &sdk.TextOptions{}
-	panel.Builder.StatPanel.MappingTypes = []*sdk.MapType{
-		{
-			Name:  &valueToText,
-			Value: &valueToTextMapping,
-		},
-		{
-			Name:  &rangeToText,
-			Value: &rangeToTextMapping,
-		},
-	}
 	panel.Builder.StatPanel.SparkLine = sdk.SparkLine{}
 	panel.Builder.StatPanel.Options.ReduceOptions = sdk.ReduceOptions{
 		Values: false,
@@ -139,12 +119,6 @@ func defaults() []Option {
 		Span(6),
 		ValueType(Last),
 		NoValue("N/A"),
-		ValuesToText([]ValueMap{
-			{
-				Value: "null",
-				Text:  "N/A",
-			},
-		}),
 		ColorScheme(scheme.ThresholdsValue(scheme.Last)),
 	}
 }
@@ -412,28 +386,6 @@ func RelativeThresholds(steps []ThresholdStep) Option {
 			Mode:  "percentage",
 			Steps: sdkSteps,
 		}
-
-		return nil
-	}
-}
-
-// ValuesToText allows to translate the value of the summary stat into explicit
-// text.
-func ValuesToText(mapping []ValueMap) Option {
-	return func(stat *Stat) error {
-		valueMap := make([]sdk.ValueMap, 0, len(mapping))
-
-		for _, entry := range mapping {
-			valueMap = append(valueMap, sdk.ValueMap{
-				Op:       "=",
-				TextType: entry.Text,
-				Value:    entry.Value,
-			})
-		}
-
-		mappingType := uint(valueToTextMapping)
-		stat.Builder.StatPanel.MappingType = &mappingType
-		stat.Builder.StatPanel.ValueMaps = valueMap
 
 		return nil
 	}
