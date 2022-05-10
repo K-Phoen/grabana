@@ -12,6 +12,7 @@ var version = "SNAPSHOT"
 func main() {
 	root := &cobra.Command{Use: "grabana"}
 	root.Version = version
+	root.SilenceUsage = true
 
 	root.AddCommand(cmd.Apply())
 	root.AddCommand(cmd.Validate())

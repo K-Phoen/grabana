@@ -1,0 +1,25 @@
+title: Dashboard with stat panel
+
+editable: true
+shared_crosshair: true
+tags: [generated, yaml, stat]
+auto_refresh: 10s
+
+rows:
+  - name: Kubelet
+    panels:
+      - stat:
+          title: HTTP requests
+          height: 400px
+          datasource: Prometheus
+          targets:
+            - prometheus:
+                query: "count(kubelet_http_requests_total) by (method, path)"
+                legend: "{{ method }} - {{ path }}"
+          orientation: horizontal
+          text: value_and_name
+          sparkline: true
+          thresholds:
+            - {color: green}
+            - {value: 1, color: orange}
+            - {value: 4, color: red}

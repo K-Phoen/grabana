@@ -31,6 +31,15 @@ const (
 	TextNone         TextMode = "none"
 )
 
+// OrientationMode controls the layout.
+type OrientationMode string
+
+const (
+	OrientationAuto       OrientationMode = ""
+	OrientationHorizontal OrientationMode = "horizontal"
+	OrientationVertical   OrientationMode = "vertical"
+)
+
 // ReductionType lets you set the function that your entire query is reduced into a
 // single value with.
 type ReductionType int
@@ -125,6 +134,8 @@ func New(title string, options ...Option) (*Stat, error) {
 func defaults() []Option {
 	return []Option{
 		Text(TextValue),
+		ColorValue(),
+		Orientation(OrientationVertical),
 		Span(6),
 		ValueType(Last),
 		NoValue("N/A"),
@@ -428,28 +439,6 @@ func ValuesToText(mapping []ValueMap) Option {
 	}
 }
 
-// RangesToText allows to translate the value of the summary stat into explicit
-// text.
-func RangesToText(mapping []RangeMap) Option {
-	return func(stat *Stat) error {
-		rangeMap := make([]*sdk.RangeMap, 0, len(mapping))
-
-		for i := range mapping {
-			rangeMap = append(rangeMap, &sdk.RangeMap{
-				From: &mapping[i].From,
-				To:   &mapping[i].To,
-				Text: &mapping[i].Text,
-			})
-		}
-
-		mappingType := uint(rangeToTextMapping)
-		stat.Builder.StatPanel.MappingType = &mappingType
-		stat.Builder.StatPanel.RangeMaps = rangeMap
-
-		return nil
-	}
-}
-
 // Repeat configures repeating a panel for a variable
 func Repeat(repeat string) Option {
 	return func(stat *Stat) error {
@@ -463,6 +452,15 @@ func Repeat(repeat string) Option {
 func Text(mode TextMode) Option {
 	return func(stat *Stat) error {
 		stat.Builder.StatPanel.Options.TextMode = string(mode)
+
+		return nil
+	}
+}
+
+// Orientation changes the orientation of the layout.
+func Orientation(mode OrientationMode) Option {
+	return func(stat *Stat) error {
+		stat.Builder.StatPanel.Options.Orientation = string(mode)
 
 		return nil
 	}

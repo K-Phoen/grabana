@@ -176,7 +176,7 @@ func TestSparkLineYMaxCanBeSet(t *testing.T) {
 	req.Equal(0, *panel.Builder.StatPanel.FieldConfig.Defaults.Max)
 }
 
-func TestTextModeeCanBeSet(t *testing.T) {
+func TestTextModeCanBeSet(t *testing.T) {
 	testCases := []struct {
 		input    TextMode
 		expected string
@@ -213,6 +213,39 @@ func TestTextModeeCanBeSet(t *testing.T) {
 
 			req.NoError(err)
 			req.Equal(tc.expected, panel.Builder.StatPanel.Options.TextMode)
+		})
+	}
+}
+
+func TestOrientationCanBeSet(t *testing.T) {
+	testCases := []struct {
+		input    OrientationMode
+		expected string
+	}{
+		{
+			input:    OrientationAuto,
+			expected: "",
+		},
+		{
+			input:    OrientationHorizontal,
+			expected: "horizontal",
+		},
+		{
+			input:    OrientationVertical,
+			expected: "vertical",
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.expected, func(t *testing.T) {
+			req := require.New(t)
+
+			panel, err := New("", Orientation(tc.input))
+
+			req.NoError(err)
+			req.Equal(tc.expected, panel.Builder.StatPanel.Options.Orientation)
 		})
 	}
 }
@@ -322,29 +355,6 @@ func TestBackgroundCanBeColored(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("background", panel.Builder.StatPanel.Options.ColorMode)
-}
-
-func TestRangeToTextMappingsCanBeConfigured(t *testing.T) {
-	req := require.New(t)
-
-	panel, err := New("", RangesToText([]RangeMap{
-		{
-			From: "0",
-			To:   "20",
-			Text: "Low",
-		}, {
-			From: "20",
-			To:   "30",
-			Text: "Average",
-		}, {
-			From: "30",
-			To:   "",
-			Text: "High",
-		},
-	}))
-
-	req.NoError(err)
-	req.Len(panel.Builder.StatPanel.RangeMaps, 3)
 }
 
 func TestAbsoluteThresholdsCanBeConfigured(t *testing.T) {
