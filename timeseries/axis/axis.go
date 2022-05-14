@@ -1,6 +1,9 @@
 package axis
 
 import (
+	"fmt"
+
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -24,7 +27,7 @@ const (
 )
 
 // Option represents an option that can be used to configure an axis.
-type Option func(axis *Axis)
+type Option func(axis *Axis) error
 
 // Axis represents a visualization axis.
 type Axis struct {
@@ -32,61 +35,75 @@ type Axis struct {
 }
 
 // New creates a new Axis configuration.
-func New(fieldConfig *sdk.FieldConfig, options ...Option) *Axis {
+func New(fieldConfig *sdk.FieldConfig, options ...Option) (*Axis, error) {
 	axis := &Axis{fieldConfig: fieldConfig}
 
 	for _, opt := range options {
-		opt(axis)
+		if err := opt(axis); err != nil {
+			return nil, err
+		}
 	}
 
-	return axis
+	return axis, nil
 }
 
 // Placement defines how the axis should be placed in the panel.
 func Placement(placement PlacementMode) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Custom.AxisPlacement = string(placement)
+
+		return nil
 	}
 }
 
 // SoftMin defines a soft minimum value for the axis.
 func SoftMin(value int) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Custom.AxisSoftMin = &value
+
+		return nil
 	}
 }
 
 // SoftMax defines a soft maximum value for the axis.
 func SoftMax(value int) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Custom.AxisSoftMax = &value
+
+		return nil
 	}
 }
 
 // Min defines a hard minimum value for the axis.
 func Min(value int) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Min = &value
+
+		return nil
 	}
 }
 
 // SoftMax defines a hard maximum value for the axis.
 func Max(value int) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Max = &value
+
+		return nil
 	}
 }
 
 // Unit sets the unit of the data displayed in this series.
 func Unit(unit string) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Unit = unit
+
+		return nil
 	}
 }
 
 // Scale sets the scale to use for the Y-axis values..
 func Scale(mode ScaleMode) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		scaleConfig := struct {
 			Type string `json:"type"`
 			Log  int    `json:"log,omitempty"`
@@ -106,19 +123,29 @@ func Scale(mode ScaleMode) Option {
 		}
 
 		axis.fieldConfig.Defaults.Custom.ScaleDistribution = scaleConfig
+
+		return nil
 	}
 }
 
 // Label sets a Y-axis text label.
 func Label(label string) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Custom.AxisLabel = label
+
+		return nil
 	}
 }
 
 // Decimals sets how many decimal points should be displayed.
 func Decimals(decimals int) Option {
-	return func(axis *Axis) {
+	return func(axis *Axis) error {
+		if decimals < 0 {
+			return fmt.Errorf("decimals must be greater than 0: %w", errors.ErrInvalidArgument)
+		}
+
 		axis.fieldConfig.Defaults.Decimals = &decimals
+
+		return nil
 	}
 }

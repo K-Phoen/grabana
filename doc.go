@@ -19,9 +19,9 @@ creation of dashboards, this library is meant for you.
 		),
 		dashboard.Row(
 			"Prometheus",
-			row.WithGraph(
+			row.WithTimeSeries(
 				"HTTP Rate",
-				graph.WithPrometheusTarget(
+				timeseries.WithPrometheusTarget(
 					"rate(promhttp_metric_handler_requests_total[$interval])",
 					prometheus.Legend("{{handler}} - {{ code }}"),
 				),
@@ -35,10 +35,10 @@ creation of dashboards, this library is meant for you.
 					{Label: "Current", Type: table.Current},
 				}),
 			),
-			row.WithSingleStat(
+			row.WithStat(
 				"Heap Allocations",
-				singlestat.Unit("bytes"),
-				singlestat.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
+				stat.Unit("bytes"),
+				stat.WithPrometheusTarget("go_memstats_heap_alloc_bytes"),
 			),
 		),
 		dashboard.Row(

@@ -1,8 +1,11 @@
 package graph
 
 import (
+	"fmt"
+
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/graph/series"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
@@ -12,7 +15,7 @@ import (
 )
 
 // Option represents an option that can be used to configure a graph panel.
-type Option func(graph *Graph)
+type Option func(graph *Graph) error
 
 // DrawMode represents a type of visualization that will be drawn in the graph
 // (lines, bars, points)
@@ -70,10 +73,11 @@ const (
 // Graph represents a graph panel.
 type Graph struct {
 	Builder *sdk.Panel
+	Alert   *alert.Alert
 }
 
 // New creates a new graph panel.
-func New(title string, options ...Option) *Graph {
+func New(title string, options ...Option) (*Graph, error) {
 	panel := &Graph{Builder: sdk.NewGraph(title)}
 
 	panel.Builder.AliasColors = make(map[string]interface{})
@@ -82,10 +86,12 @@ func New(title string, options ...Option) *Graph {
 	panel.Builder.GraphPanel.Tooltip.Shared = true
 
 	for _, opt := range append(defaults(), options...) {
-		opt(panel)
+		if err := opt(panel); err != nil {
+			return nil, err
+		}
 	}
 
-	return panel
+	return panel, nil
 }
 
 func defaults() []Option {
@@ -101,7 +107,7 @@ func defaults() []Option {
 }
 
 func defaultAxes() Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.GraphPanel.YAxis = true
 		graph.Builder.GraphPanel.XAxis = true
 		graph.Builder.GraphPanel.Yaxes = []sdk.Axis{
@@ -109,6 +115,8 @@ func defaultAxes() Option {
 			*axis.New(axis.Hide()).Builder,
 		}
 		graph.Builder.GraphPanel.Xaxis = *axis.New(axis.Unit("time")).Builder
+
+		return nil
 	}
 }
 
@@ -116,9 +124,8 @@ func defaultAxes() Option {
 func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	target := prometheus.New(query, options...)
 
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.AddTarget(&sdk.Target{
-			RefID:          target.Ref,
 			Hide:           target.Hidden,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
@@ -128,6 +135,8 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+
+		return nil
 	}
 }
 
@@ -135,8 +144,10 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 	target := graphite.New(query, options...)
 
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
@@ -144,85 +155,112 @@ func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 	target := influxdb.New(query, options...)
 
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // WithStackdriverTarget adds a stackdriver query to the graph.
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // DataSource sets the data source to be used by the graph.
 func DataSource(source string) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.Datasource = &source
+
+		return nil
 	}
 }
 
 // Span sets the width of the panel, in grid units. Should be a positive
 // number between 1 and 12. Example: 6.
 func Span(span float32) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
+		if span < 1 || span > 12 {
+			return fmt.Errorf("span must be between 1 and 12: %w", errors.ErrInvalidArgument)
+		}
+
 		graph.Builder.Span = span
+
+		return nil
 	}
 }
 
 // Height sets the height of the panel, in pixels. Example: "400px".
 func Height(height string) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.Height = &height
+
+		return nil
 	}
 }
 
 // Description annotates the current visualization with a human-readable description.
 func Description(content string) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.Description = &content
+
+		return nil
 	}
 }
 
 // Transparent makes the background transparent.
 func Transparent() Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.Transparent = true
+
+		return nil
 	}
 }
 
 // LeftYAxis configures the left Y axis.
 func LeftYAxis(opts ...axis.Option) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.GraphPanel.Yaxes[0] = *axis.New(opts...).Builder
+
+		return nil
 	}
 }
 
 // RightYAxis configures the right Y axis.
 func RightYAxis(opts ...axis.Option) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.GraphPanel.Yaxes[1] = *axis.New(opts...).Builder
+
+		return nil
 	}
 }
 
 // XAxis configures the X axis.
 func XAxis(opts ...axis.Option) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.GraphPanel.Xaxis = *axis.New(opts...).Builder
+
+		return nil
 	}
 }
 
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
-	return func(graph *Graph) {
-		graph.Builder.Alert = alert.New(name, opts...).Builder
+	return func(graph *Graph) error {
+		graph.Alert = alert.New(graph.Builder.Title, append(opts, alert.Summary(name))...)
+		graph.Alert.Builder.Name = graph.Builder.Title
+
+		return nil
 	}
 }
 
 // Draw specifies how the graph will be drawn.
 func Draw(modes ...DrawMode) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.Bars = false
 		graph.Builder.Lines = false
 		graph.Builder.Points = false
@@ -235,70 +273,102 @@ func Draw(modes ...DrawMode) Option {
 				graph.Builder.Lines = true
 			case Points:
 				graph.Builder.Points = true
+			default:
+				return errors.ErrInvalidArgument
 			}
 		}
+
+		return nil
 	}
 }
 
 // Fill defines the amount of color fill for a series (default 1, max 10, 0 is none).
 func Fill(value int) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
+		if value < 0 || value > 10 {
+			return fmt.Errorf("fill must be between 0 and 10: %w", errors.ErrInvalidArgument)
+		}
+
 		graph.Builder.Fill = value
+
+		return nil
 	}
 }
 
 // LineWidth defines the width of the line for a series (default 1, max 10, 0 is none).
 func LineWidth(value uint) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
+		if value > 10 {
+			return fmt.Errorf("line width must be between 0 and 10: %w", errors.ErrInvalidArgument)
+		}
+
 		graph.Builder.Linewidth = value
+
+		return nil
 	}
 }
 
 // Staircase draws adjacent points as staircase.
 func Staircase() Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.GraphPanel.SteppedLine = true
+
+		return nil
 	}
 }
 
 // PointRadius adjusts the size of points when Points are selected as Draw Mode.
 func PointRadius(value float32) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
+		if value < 0 || value > 10 {
+			return fmt.Errorf("point radius must be between 0 and 10: %w", errors.ErrInvalidArgument)
+		}
+
 		graph.Builder.Pointradius = value
+
+		return nil
 	}
 }
 
 // Null configures how null values are displayed.
 func Null(mode NullValue) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.GraphPanel.NullPointMode = string(mode)
+
+		return nil
 	}
 }
 
 // Repeat configures repeating a panel for a variable
 func Repeat(repeat string) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		graph.Builder.Repeat = &repeat
+
+		return nil
 	}
 }
 
 // SeriesOverride configures how null values are displayed.
 // See https://grafana.com/docs/grafana/latest/panels/field-options/
 func SeriesOverride(opts ...series.OverrideOption) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		override := sdk.SeriesOverride{}
 
 		for _, opt := range opts {
-			opt(&override)
+			if err := opt(&override); err != nil {
+				return err
+			}
 		}
 
 		graph.Builder.GraphPanel.SeriesOverrides = append(graph.Builder.GraphPanel.SeriesOverrides, override)
+
+		return nil
 	}
 }
 
 // Legend defines what should be shown in the legend.
 func Legend(opts ...LegendOption) Option {
-	return func(graph *Graph) {
+	return func(graph *Graph) error {
 		legend := sdk.Legend{Show: true}
 
 		for _, opt := range opts {
@@ -328,9 +398,13 @@ func Legend(opts ...LegendOption) Option {
 				legend.HideEmpty = true
 			case NoZeroSeries:
 				legend.HideZero = true
+			default:
+				return errors.ErrInvalidArgument
 			}
 		}
 
 		graph.Builder.GraphPanel.Legend = legend
+
+		return nil
 	}
 }

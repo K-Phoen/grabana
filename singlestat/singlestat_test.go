@@ -3,6 +3,7 @@ package singlestat
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
 )
@@ -10,8 +11,9 @@ import (
 func TestNewSingleStatPanelsCanBeCreated(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("SingleStat panel")
+	panel, err := New("SingleStat panel")
 
+	req.NoError(err)
 	req.False(panel.Builder.IsNew)
 	req.Equal("SingleStat panel", panel.Builder.Title)
 	req.Equal(float32(6), panel.Builder.Span)
@@ -20,66 +22,83 @@ func TestNewSingleStatPanelsCanBeCreated(t *testing.T) {
 func TestSingleStatPanelCanHavePrometheusTargets(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", WithPrometheusTarget(
+	panel, err := New("", WithPrometheusTarget(
 		"rate(prometheus_http_requests_total[30s])",
 	))
 
+	req.NoError(err)
 	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
 }
 
 func TestSingleStatPanelCanHaveGraphiteTargets(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", WithGraphiteTarget("stats_counts.statsd.packets_received"))
+	panel, err := New("", WithGraphiteTarget("stats_counts.statsd.packets_received"))
 
+	req.NoError(err)
 	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
 }
 
 func TestSingleStatPanelCanHaveInfluxDBTargets(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", WithInfluxDBTarget("buckets()"))
+	panel, err := New("", WithInfluxDBTarget("buckets()"))
 
+	req.NoError(err)
 	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
 }
 
 func TestSingleStatPanelCanHaveStackdriverTargets(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", WithStackdriverTarget(stackdriver.Gauge("pubsub.googleapis.com/subscription/ack_message_count")))
+	panel, err := New("", WithStackdriverTarget(stackdriver.Gauge("pubsub.googleapis.com/subscription/ack_message_count")))
 
+	req.NoError(err)
 	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
 }
 
 func TestSingleStatPanelWidthCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Span(6))
+	panel, err := New("", Span(6))
 
+	req.NoError(err)
 	req.Equal(float32(6), panel.Builder.Span)
+}
+
+func TestSingleStatRejectsInvalidSpans(t *testing.T) {
+	req := require.New(t)
+
+	_, err := New("", Span(16))
+
+	req.Error(err)
+	req.ErrorIs(err, errors.ErrInvalidArgument)
 }
 
 func TestSingleStatPanelHeightCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Height("400px"))
+	panel, err := New("", Height("400px"))
 
+	req.NoError(err)
 	req.Equal("400px", *(panel.Builder.Height).(*string))
 }
 
 func TestSingleStatPanelBackgroundCanBeTransparent(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Transparent())
+	panel, err := New("", Transparent())
 
+	req.NoError(err)
 	req.True(panel.Builder.Transparent)
 }
 
 func TestSingleStatPanelDescriptionCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Description("lala"))
+	panel, err := New("", Description("lala"))
 
+	req.NoError(err)
 	req.NotNil(panel.Builder.Description)
 	req.Equal("lala", *panel.Builder.Description)
 }
@@ -87,16 +106,18 @@ func TestSingleStatPanelDescriptionCanBeSet(t *testing.T) {
 func TestSingleStatPanelDataSourceCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", DataSource("prometheus-default"))
+	panel, err := New("", DataSource("prometheus-default"))
 
+	req.NoError(err)
 	req.Equal("prometheus-default", *panel.Builder.Datasource)
 }
 
 func TestRepeatCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Repeat("ds"))
+	panel, err := New("", Repeat("ds"))
 
+	req.NoError(err)
 	req.NotNil(panel.Builder.Repeat)
 	req.Equal("ds", *panel.Builder.Repeat)
 }
@@ -104,24 +125,36 @@ func TestRepeatCanBeConfigured(t *testing.T) {
 func TestUnitCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Unit("bytes"))
+	panel, err := New("", Unit("bytes"))
 
+	req.NoError(err)
 	req.Equal("bytes", panel.Builder.SinglestatPanel.Format)
 }
 
 func TestDecimalsCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Decimals(3))
+	panel, err := New("", Decimals(3))
 
+	req.NoError(err)
 	req.Equal(3, panel.Builder.SinglestatPanel.Decimals)
+}
+
+func TestInvalidDecimalsAreRejected(t *testing.T) {
+	req := require.New(t)
+
+	_, err := New("", Decimals(-3))
+
+	req.Error(err)
+	req.ErrorIs(err, errors.ErrInvalidArgument)
 }
 
 func TestSparkLineCanBeDisplayed(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", SparkLine())
+	panel, err := New("", SparkLine())
 
+	req.NoError(err)
 	req.True(panel.Builder.SinglestatPanel.SparkLine.Show)
 	req.False(panel.Builder.SinglestatPanel.SparkLine.Full)
 }
@@ -129,8 +162,9 @@ func TestSparkLineCanBeDisplayed(t *testing.T) {
 func TestFullSparkLineCanBeDisplayed(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", FullSparkLine())
+	panel, err := New("", FullSparkLine())
 
+	req.NoError(err)
 	req.True(panel.Builder.SinglestatPanel.SparkLine.Show)
 	req.True(panel.Builder.SinglestatPanel.SparkLine.Full)
 }
@@ -139,8 +173,9 @@ func TestSparkLineColorCanBeSet(t *testing.T) {
 	req := require.New(t)
 	color := "rgb(31, 120, 193)"
 
-	panel := New("", SparkLineColor(color))
+	panel, err := New("", SparkLineColor(color))
 
+	req.NoError(err)
 	req.Equal(color, *panel.Builder.SinglestatPanel.SparkLine.LineColor)
 }
 
@@ -148,96 +183,108 @@ func TestSparkLineFillColorCanBeSet(t *testing.T) {
 	req := require.New(t)
 	color := "rgb(31, 120, 193)"
 
-	panel := New("", SparkLineFillColor(color))
+	panel, err := New("", SparkLineFillColor(color))
 
+	req.NoError(err)
 	req.Equal(color, *panel.Builder.SinglestatPanel.SparkLine.FillColor)
 }
 
 func TestSparkLineYMinCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", SparkLineYMin(0))
+	panel, err := New("", SparkLineYMin(0))
 
+	req.NoError(err)
 	req.Equal(float64(0), *panel.Builder.SinglestatPanel.SparkLine.YMin)
 }
 
 func TestSparkLineYMaxCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", SparkLineYMax(0))
+	panel, err := New("", SparkLineYMax(0))
 
+	req.NoError(err)
 	req.Equal(float64(0), *panel.Builder.SinglestatPanel.SparkLine.YMax)
 }
 
 func TestValueTypeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", ValueType(Current))
+	panel, err := New("", ValueType(Current))
 
+	req.NoError(err)
 	req.Equal(string(Current), panel.Builder.SinglestatPanel.ValueName)
 }
 
 func TestValueFontSizeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", ValueFontSize("120%"))
+	panel, err := New("", ValueFontSize("120%"))
 
+	req.NoError(err)
 	req.Equal("120%", panel.Builder.SinglestatPanel.ValueFontSize)
 }
 
 func TestPrefixCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Prefix("joe"))
+	panel, err := New("", Prefix("joe"))
 
+	req.NoError(err)
 	req.Equal("joe", *panel.Builder.SinglestatPanel.Prefix)
 }
 
 func TestPrefixFontSizeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", PrefixFontSize("120%"))
+	panel, err := New("", PrefixFontSize("120%"))
 
+	req.NoError(err)
 	req.Equal("120%", *panel.Builder.SinglestatPanel.PrefixFontSize)
 }
 
 func TestPostfixCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Postfix("joe"))
+	panel, err := New("", Postfix("joe"))
 
+	req.NoError(err)
 	req.Equal("joe", *panel.Builder.SinglestatPanel.Postfix)
 }
 
 func TestPostfixFontSizeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", PostfixFontSize("120%"))
+	panel, err := New("", PostfixFontSize("120%"))
 
+	req.NoError(err)
 	req.Equal("120%", *panel.Builder.SinglestatPanel.PostfixFontSize)
 }
 
 func TestValueCanBeColored(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", ColorValue())
+	panel, err := New("", ColorValue())
 
+	req.NoError(err)
 	req.True(panel.Builder.SinglestatPanel.ColorValue)
 }
 
 func TestBackgroundCanBeColored(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", ColorBackground())
+	panel, err := New("", ColorBackground())
 
+	req.NoError(err)
 	req.True(panel.Builder.SinglestatPanel.ColorBackground)
 }
 
 func TestThresholdsCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Thresholds([2]string{"20", "30"}))
+	panel, err := New("", Thresholds([2]string{"20", "30"}))
 
+	req.NoError(err)
 	req.Equal("20,30", panel.Builder.SinglestatPanel.Thresholds)
 }
 
@@ -245,15 +292,16 @@ func TestThresholdColorsCanBeSet(t *testing.T) {
 	req := require.New(t)
 	colors := [3]string{"#299c46", "rgba(237, 129, 40, 0.89)", "#d44a3a"}
 
-	panel := New("", Colors(colors))
+	panel, err := New("", Colors(colors))
 
+	req.NoError(err)
 	req.Equal([]string{colors[0], colors[1], colors[2]}, panel.Builder.SinglestatPanel.Colors)
 }
 
 func TestRangeToTextMappingsCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", RangesToText([]RangeMap{
+	panel, err := New("", RangesToText([]RangeMap{
 		{
 			From: "0",
 			To:   "20",
@@ -269,5 +317,6 @@ func TestRangeToTextMappingsCanBeConfigured(t *testing.T) {
 		},
 	}))
 
+	req.NoError(err)
 	req.Len(panel.Builder.SinglestatPanel.RangeMaps, 3)
 }

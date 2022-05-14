@@ -24,7 +24,11 @@ func main() {
 		prometheus.SkipTLSVerify(),
 	}
 
-	datasource := prometheus.New("grabana-prometheus", "http://172.17.0.1:9090", options...)
+	datasource, err := prometheus.New("grabana-prometheus", "http://172.17.0.1:9090", options...)
+	if err != nil {
+		fmt.Printf("Could not build datasource: %s\n", err)
+		os.Exit(1)
+	}
 
 	if err := client.UpsertDatasource(ctx, datasource); err != nil {
 		fmt.Printf("Could not create datasource: %s\n", err)

@@ -3,9 +3,11 @@ package decoder
 import (
 	"bytes"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 )
 
 type testCase struct {
@@ -36,6 +38,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		timeseriesPanel(),
 		collapseRow(),
 		logsPanel(),
+		statPanel(),
 	}
 
 	for _, testCase := range testCases {
@@ -204,16 +207,16 @@ rows:
     panels:
       - graph:
           title: Heap allocations
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
           alert:
-            title: Too many heap allocations
+            summary: Too many heap allocations
             evaluate_every: 1m
             for: 1m
             if:
-              - operand: and
-                value: {func: avg, ref: A, from: 1m, to: now}
-
-          targets:
-            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+              - { avg: A }
+            targets:
+              - prometheus: { ref: A, query: "go_memstats_heap_alloc_bytes" }
 `
 
 	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
@@ -247,22 +250,22 @@ rows:
     panels:
       - graph:
           title: Heap allocations
+          targets:
+            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
           alert:
-            title: Too many heap allocations
+            summary: Too many heap allocations
             evaluate_every: 1m
             for: 1m
             if:
-              - operand: and
-                value: {func: BLOOPER, ref: A, from: 1m, to: now}
-                threshold: {above: 23000000}
-          targets:
-            - prometheus: { query: "go_memstats_heap_alloc_bytes" }
+              - { BLOOPER: A, above: 23000000 }
+            targets:
+              - prometheus: { ref: A, query: "go_memstats_heap_alloc_bytes" }
 `
 
 	_, err := UnmarshalYAML(bytes.NewBufferString(payload))
 
 	require.Error(t, err)
-	require.Equal(t, ErrInvalidAlertValueFunc, err)
+	require.True(t, strings.HasPrefix(err.Error(), (&yaml.TypeError{}).Error()))
 }
 
 func TestUnmarshalYAMLWithInvalidStackdriverAggregation(t *testing.T) {
@@ -427,19 +430,18 @@ rows:
           datasource: prometheus-default
           legend: [avg, current, min, max, as_table, no_null_series, no_zero_series]
           alert:
-            title: Too many heap allocations
+            summary: Too many heap allocations
+            description: "Wow, a we're allocating a lot."
             evaluate_every: 1m
-            for: 1m
-            notify: P-N3fxuZz
-            message: "Wow, a we're allocating a lot."
+            for: 2m
             on_no_data: alerting
             on_execution_error: alerting
             tags:
               severity: super-critical-stop-the-world-now
             if:
-              - operand: and
-                value: {func: avg, ref: A, from: 1m, to: now}
-                threshold: {above: 23000000}
+              - { avg: A, above: 23000000 }
+            targets:
+              - prometheus: { ref: A, query: "go_memstats_heap_alloc_bytes" }
           axes:
             left: { unit: short, min: 0, max: 100, label: Requests }
             right: { hidden: true }
@@ -448,7 +450,6 @@ rows:
             - prometheus:
                 query: "go_memstats_heap_alloc_bytes"
                 legend: "{{job}}"
-                ref: A
 `
 
 	return testCase{
@@ -469,7 +470,6 @@ rows:
           datasource: voi-stage-stackdriver
           targets:
             - stackdriver:
-                ref: A
                 legend: Ack-ed messages
                 type: delta
                 metric: pubsub.googleapis.com/subscription/ack_message_count
@@ -498,7 +498,6 @@ rows:
           datasource: graphite-test
           targets:
             - graphite:
-                ref: A
                 query: stats_counts.statsd.packets_received
 `
 
@@ -520,7 +519,6 @@ rows:
           datasource: influxdb-test
           targets:
             - influxdb:
-                ref: A
                 query: buckets()
 `
 
@@ -559,9 +557,47 @@ rows:
 `
 
 	return testCase{
-		name:                "single row with single graph panel",
+		name:                "single row with one singlestat panel",
 		yaml:                yaml,
 		expectedGrafanaJSON: "singlestat_panel.json",
+	}
+}
+
+func statPanel() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Kubelet
+    panels:
+      - stat:
+          title: HTTP requests
+          description: Some description
+          height: 400px
+          span: 4
+          transparent: true
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "count(kubelet_http_requests_total) by (method, path)"
+                legend: "{{ method }} - {{ path }}"
+          orientation: horizontal
+          text: value_and_name
+          sparkline: true
+          unit: short
+          decimals: 2
+          title_font_size: 100
+          value_font_size: 150
+          color_mode: background
+          thresholds:
+            - {color: green}
+            - {value: 1, color: orange}
+            - {value: 4, color: red}
+`
+
+	return testCase{
+		name:                "single row with one stat panel",
+		yaml:                yaml,
+		expectedGrafanaJSON: "stat_panel.json",
 	}
 }
 
@@ -614,7 +650,6 @@ rows:
         - prometheus:
             query: sum(increase(argocd_app_reconcile_bucket{namespace=~"$namespace"}[$interval])) by (le)
             legend: '{{le}}'
-            ref: A
             format: heatmap
             interval_factor: 10
         tooltip:
@@ -643,7 +678,6 @@ rows:
         targets:
         - prometheus:
             query: "go_memstats_heap_alloc_bytes"
-            ref: A
 `
 
 	return testCase{
@@ -668,7 +702,6 @@ rows:
         targets:
         - loki:
             query: "{namespace=\"default\"}"
-            ref: A
 `
 
 	return testCase{

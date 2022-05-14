@@ -4,7 +4,8 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/heatmap/axis"
-
+	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,6 +31,37 @@ func TestHeatmapCanBeDecoded(t *testing.T) {
 
 	_, err := panel.toOption()
 	req.NoError(err)
+}
+
+func TestHeatmapTooltipCanBeHidden(t *testing.T) {
+	req := require.New(t)
+
+	decimals := 2
+
+	panel := DashboardHeatmap{
+		Tooltip: &HeatmapTooltip{
+			Show:          false,
+			ShowHistogram: false,
+			Decimals:      &decimals,
+		},
+	}
+
+	opts, err := panel.toOption()
+	req.NoError(err)
+
+	builder := sdk.NewBoard("")
+	_, err = row.New(builder, "", opts)
+
+	req.NoError(err)
+
+	req.Len(builder.Rows, 1)
+	req.Len(builder.Rows[0].Panels, 1)
+
+	sdkPanel := builder.Rows[0].Panels[0]
+
+	req.False(sdkPanel.HeatmapPanel.Tooltip.Show)
+	req.False(sdkPanel.HeatmapPanel.Tooltip.ShowHistogram)
+	req.Equal(decimals, sdkPanel.HeatmapPanel.TooltipDecimals)
 }
 
 func TestHeatmapYAxisCanBeDecoded(t *testing.T) {

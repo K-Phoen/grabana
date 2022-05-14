@@ -7,16 +7,15 @@ import (
 	"os"
 
 	"github.com/K-Phoen/grabana"
+	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/dashboard"
-	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/row"
-	"github.com/K-Phoen/grabana/singlestat"
+	"github.com/K-Phoen/grabana/stat"
 	"github.com/K-Phoen/grabana/table"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
-	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
@@ -38,9 +37,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	builder := dashboard.New(
-		"Awesome dashboard",
+	builder, err := dashboard.New(
+		"Awesome dashboard test",
+		dashboard.UID("test-dashboard-alerts"),
 		dashboard.AutoRefresh("30s"),
+		dashboard.Time("now-30m", "now"),
 		dashboard.Tags([]string{"generated"}),
 		dashboard.TagsAnnotation(dashboard.TagAnnotation{
 			Name:       "Deployments",
@@ -51,7 +52,7 @@ func main() {
 		dashboard.VariableAsInterval(
 			"interval",
 			interval.Values([]string{"30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"}),
-			interval.Default("30s"),
+			interval.Default("5m"),
 		),
 		dashboard.VariableAsQuery(
 			"status",
@@ -59,10 +60,10 @@ func main() {
 			query.Request("label_values(prometheus_http_requests_total, code)"),
 			query.Sort(query.NumericalAsc),
 		),
-		dashboard.VariableAsConst(
+		dashboard.VariableAsCustom(
 			"percentile",
-			constant.Label("Percentile"),
-			constant.Values(map[string]string{
+			custom.Label("Percentile"),
+			custom.Values(map[string]string{
 				"50th": "50",
 				"75th": "75",
 				"80th": "80",
@@ -71,7 +72,7 @@ func main() {
 				"95th": "95",
 				"99th": "99",
 			}),
-			constant.Default("80"),
+			custom.Default("80"),
 		),
 		dashboard.VariableAsCustom(
 			"vX",
@@ -85,14 +86,14 @@ func main() {
 		),
 		dashboard.Row(
 			"Prometheus",
-			row.WithGraph(
+			row.WithTimeSeries(
 				"HTTP Rate",
-				graph.Span(6),
-				graph.Height("400px"),
-				graph.DataSource("Prometheus"),
-				graph.WithPrometheusTarget(
-					"sum(rate(promhttp_metric_handler_requests_total[$interval])) by (app, code)",
-					prometheus.Legend("{{ app }} - {{ code }}"),
+				timeseries.Span(6),
+				timeseries.Height("400px"),
+				timeseries.DataSource("Prometheus"),
+				timeseries.WithPrometheusTarget(
+					"sum(rate(promhttp_metric_handler_requests_total[$interval])) by (code)",
+					prometheus.Legend("{{ code }}"),
 				),
 			),
 			row.WithTimeSeries(
@@ -100,16 +101,34 @@ func main() {
 				timeseries.Span(6),
 				timeseries.Height("400px"),
 				timeseries.DataSource("Prometheus"),
-				timeseries.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)", prometheus.Legend("{{ app }}")),
+				timeseries.WithPrometheusTarget(
+					"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+					prometheus.Legend("{{ app }}"),
+				),
 				timeseries.Axis(
 					axis.Unit("bytes"),
 					axis.Label("Memory"),
 					axis.SoftMin(0),
 				),
 				timeseries.Legend(timeseries.Last, timeseries.AsTable),
+				timeseries.Alert(
+					"Too many heap allocations",
+					alert.Description("Yup, too much of {{ app }}"),
+					alert.Runbook("https://google.com"),
+					alert.Tags(map[string]string{
+						"service": "amazing-service",
+						"owner":   "team-b",
+					}),
+					alert.WithPrometheusQuery(
+						"A",
+						"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+					),
+					alert.If(alert.Avg, "A", alert.IsAbove(3)),
+				),
 			),
 			row.WithTable(
 				"Threads",
+				table.DataSource("Prometheus"),
 				table.WithPrometheusTarget("sum(go_threads{app!=\"\"}) by (app)", prometheus.Legend("{{ app }}")),
 				table.HideColumn("Time"),
 				table.AsTimeSeriesAggregations([]table.Aggregation{
@@ -117,12 +136,26 @@ func main() {
 					{Label: "Current", Type: table.Current},
 				}),
 			),
-			row.WithSingleStat(
+			row.WithStat(
 				"Heap Allocations",
-				singlestat.Unit("bytes"),
-				singlestat.ColorValue(),
-				singlestat.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes)"),
-				singlestat.Thresholds([2]string{"26000000", "28000000"}),
+				stat.DataSource("Prometheus"),
+				stat.Unit("bytes"),
+				stat.ColorValue(),
+				stat.WithPrometheusTarget("sum(go_memstats_heap_alloc_bytes)"),
+				stat.AbsoluteThresholds([]stat.ThresholdStep{
+					{
+						Color: "green",
+						Value: nil,
+					},
+					{
+						Color: "orange",
+						Value: float64Ptr(26000000),
+					},
+					{
+						Color: "red",
+						Value: float64Ptr(28000000),
+					},
+				}),
 			),
 		),
 		dashboard.Row(
@@ -137,10 +170,20 @@ func main() {
 			),
 		),
 	)
-	if _, err := client.UpsertDashboard(ctx, folder, builder); err != nil {
+	if err != nil {
+		fmt.Printf("Could not build dashboard: %s\n", err)
+		os.Exit(1)
+	}
+
+	dash, err := client.UpsertDashboard(ctx, folder, builder)
+	if err != nil {
 		fmt.Printf("Could not create dashboard: %s\n", err)
 		os.Exit(1)
 	}
 
-	fmt.Println("The deed is done.")
+	fmt.Printf("The deed is done:\n%s\n", os.Args[1]+dash.URL)
+}
+
+func float64Ptr(input float64) *float64 {
+	return &input
 }

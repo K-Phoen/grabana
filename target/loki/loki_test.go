@@ -24,15 +24,6 @@ func TestLegendCanBeConfigured(t *testing.T) {
 	req.Equal(legend, target.LegendFormat)
 }
 
-func TestRefCanBeConfigured(t *testing.T) {
-	req := require.New(t)
-
-	target := New("", Ref("A"))
-
-	req.Equal("A", target.Ref)
-	req.False(target.Hidden)
-}
-
 func TestTargetCanBeHidden(t *testing.T) {
 	req := require.New(t)
 

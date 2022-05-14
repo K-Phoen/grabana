@@ -6,7 +6,7 @@ jobs:
     name: Linters
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
@@ -14,15 +14,16 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           golangci_lint_flags: "--config=.golangci.yaml"
           reporter: github-pr-review
+          go_version: '^1.17'
 
   doc:
     name: Documentation
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: nosborn/github-action-markdown-cli@v3.0.0
+      - uses: nosborn/github-action-markdown-cli@v3.0.1
         with:
           files: ./doc/
           config_file: .markdownlint.json
@@ -40,19 +41,27 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
-          go-version: '^1.16'
+          go-version: '^1.17'
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - run: make tests
         env:
           WITH_COVERAGE: true
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.txt
-          fail_ci_if_error: false
+          files: ./coverage.txt

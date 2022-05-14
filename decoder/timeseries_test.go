@@ -43,7 +43,8 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 	rowOption, err := panel.toOption()
 	req.NoError(err)
 
-	testBoard := dashboard.New("test-board", dashboard.Row("test row", rowOption))
+	testBoard, err := dashboard.New("test-board", dashboard.Row("test row", rowOption))
+	req.NoError(err)
 	req.Len(testBoard.Internal().Rows, 1)
 	panels := testBoard.Internal().Rows[0].Panels
 	req.Len(panels, 1)
@@ -164,8 +165,9 @@ func TestTimeSeriesVisualizationCanBeConfigured(t *testing.T) {
 	opts, err := tsViz.toOptions()
 	req.NoError(err)
 
-	tsPanel := timeseries.New("", opts...)
+	tsPanel, err := timeseries.New("", opts...)
 
+	req.NoError(err)
 	req.Equal("opacity", tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode)
 	req.Equal(30, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.FillOpacity)
 	req.Equal(4, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.PointSize)
@@ -208,8 +210,9 @@ func TestTimeSeriesLineInterpolationModeCanBeDecoded(t *testing.T) {
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", opts...)
+			tsPanel, err := timeseries.New("", opts...)
 
+			req.NoError(err)
 			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineInterpolation)
 		})
 	}
@@ -262,8 +265,9 @@ func TestTimeSeriesGradientModeCanBeDecoded(t *testing.T) {
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", opts...)
+			tsPanel, err := timeseries.New("", opts...)
 
+			req.NoError(err)
 			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.GradientMode)
 		})
 	}
@@ -312,8 +316,9 @@ func TestTimeSeriesTooltipCanBeDecided(t *testing.T) {
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", opts...)
+			tsPanel, err := timeseries.New("", opts...)
 
+			req.NoError(err)
 			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.Options.Tooltip.Mode)
 		})
 	}
@@ -366,8 +371,9 @@ func TestTimeSeriesAxisSupportsDisplay(t *testing.T) {
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", timeseries.Axis(opt...))
+			tsPanel, err := timeseries.New("", timeseries.Axis(opt...))
 
+			req.NoError(err)
 			req.Equal(string(tc.expected), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.AxisPlacement)
 		})
 	}
@@ -419,8 +425,9 @@ func TestTimeSeriesAxisSupportsScale(t *testing.T) {
 
 			req.NoError(err)
 
-			tsPanel := timeseries.New("", timeseries.Axis(opt...))
+			tsPanel, err := timeseries.New("", timeseries.Axis(opt...))
 
+			req.NoError(err)
 			req.Equal(tc.expectedType, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.ScaleDistribution.Type)
 			req.Equal(tc.expectedLog, tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.ScaleDistribution.Log)
 		})

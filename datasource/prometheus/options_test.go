@@ -5,22 +5,25 @@ import (
 	"testing"
 	"time"
 
+	"github.com/K-Phoen/grabana/errors"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDefault(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", Default())
+	datasource, err := New("", "", Default())
 
+	req.NoError(err)
 	req.True(datasource.builder.IsDefault)
 }
 
 func TestBasicAuth(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", BasicAuth("joe", "lafrite"))
+	datasource, err := New("", "", BasicAuth("joe", "lafrite"))
 
+	req.NoError(err)
 	req.True(*datasource.builder.BasicAuth)
 	req.Equal("joe", *datasource.builder.BasicAuthUser)
 	req.Equal("lafrite", *datasource.builder.BasicAuthPassword)
@@ -47,8 +50,9 @@ func TestAccessMode(t *testing.T) {
 		t.Run(tc.expected, func(t *testing.T) {
 			req := require.New(t)
 
-			datasource := New("", "", AccessMode(tc.mode))
+			datasource, err := New("", "", AccessMode(tc.mode))
 
+			req.NoError(err)
 			req.Equal(tc.expected, datasource.builder.Access)
 		})
 	}
@@ -57,40 +61,54 @@ func TestAccessMode(t *testing.T) {
 func TestHTTPMethod(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", HTTPMethod(http.MethodGet))
+	datasource, err := New("", "", HTTPMethod(http.MethodGet))
 
+	req.NoError(err)
 	req.Equal(http.MethodGet, datasource.builder.JSONData.(map[string]interface{})["httpMethod"])
+}
+
+func TestHTTPMethodRejectsInvalidValues(t *testing.T) {
+	req := require.New(t)
+
+	_, err := New("", "", HTTPMethod(http.MethodPut))
+
+	req.Error(err)
+	req.ErrorIs(err, errors.ErrInvalidArgument)
 }
 
 func TestScrapeInterval(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", ScrapeInterval(10*time.Second))
+	datasource, err := New("", "", ScrapeInterval(10*time.Second))
 
+	req.NoError(err)
 	req.Equal("10s", datasource.builder.JSONData.(map[string]interface{})["timeInterval"])
 }
 
 func TestQueryTimeout(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", QueryTimeout(30*time.Second))
+	datasource, err := New("", "", QueryTimeout(30*time.Second))
 
+	req.NoError(err)
 	req.Equal("30s", datasource.builder.JSONData.(map[string]interface{})["queryTimeout"])
 }
 
 func TestSkipTlsVerify(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", SkipTLSVerify())
+	datasource, err := New("", "", SkipTLSVerify())
 
+	req.NoError(err)
 	req.Equal(true, datasource.builder.JSONData.(map[string]interface{})["tlsSkipVerify"])
 }
 
 func TestWithCertificate(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", WithCertificate("certificate-content"))
+	datasource, err := New("", "", WithCertificate("certificate-content"))
 
+	req.NoError(err)
 	req.Equal(false, datasource.builder.JSONData.(map[string]interface{})["tlsSkipVerify"])
 	req.Equal(true, datasource.builder.JSONData.(map[string]interface{})["tlsAuthWithCACert"])
 	req.Equal("certificate-content", datasource.builder.SecureJSONData.(map[string]interface{})["tlsCACert"])
@@ -99,24 +117,27 @@ func TestWithCertificate(t *testing.T) {
 func TestWithCredentials(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", WithCredentials())
+	datasource, err := New("", "", WithCredentials())
 
+	req.NoError(err)
 	req.True(datasource.builder.WithCredentials)
 }
 
 func TestForwardOauthIdentity(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", ForwardOauthIdentity())
+	datasource, err := New("", "", ForwardOauthIdentity())
 
+	req.NoError(err)
 	req.Equal(true, datasource.builder.JSONData.(map[string]interface{})["oauthPassThru"])
 }
 
 func TestForwardCookies(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("", "", ForwardCookies("foo", "bar"))
+	datasource, err := New("", "", ForwardCookies("foo", "bar"))
 
+	req.NoError(err)
 	req.ElementsMatch([]string{"foo", "bar"}, datasource.builder.JSONData.(map[string]interface{})["keepCookies"])
 }
 
@@ -128,7 +149,8 @@ func TestExemplars(t *testing.T) {
 		DatasourceUID: "tempo",
 	}
 
-	datasource := New("", "", Exemplars(traceIDExemplar))
+	datasource, err := New("", "", Exemplars(traceIDExemplar))
 
+	req.NoError(err)
 	req.ElementsMatch([]Exemplar{traceIDExemplar}, datasource.builder.JSONData.(map[string]interface{})["exemplarTraceIdDestinations"])
 }

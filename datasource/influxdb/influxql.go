@@ -11,9 +11,9 @@ type InfluxQL struct {
 	builder *sdk.Datasource
 }
 
-type Option func(datasource *InfluxQL)
+type Option func(datasource *InfluxQL) error
 
-func New(name, url string, options ...Option) InfluxQL {
+func New(name, url string, options ...Option) (InfluxQL, error) {
 	datasource := InfluxQL{
 		builder: &sdk.Datasource{
 			Name:   name,
@@ -34,10 +34,12 @@ func New(name, url string, options ...Option) InfluxQL {
 	}
 
 	for _, opt := range append(defaultOptions, options...) {
-		opt(&datasource)
+		if err := opt(&datasource); err != nil {
+			return datasource, err
+		}
 	}
 
-	return datasource
+	return datasource, nil
 }
 
 func (datasource InfluxQL) Name() string {

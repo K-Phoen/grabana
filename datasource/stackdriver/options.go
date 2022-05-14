@@ -4,21 +4,25 @@ import "encoding/json"
 
 // Default configures this datasource to be the default one.
 func Default() Option {
-	return func(datasource *Stackdriver) {
+	return func(datasource *Stackdriver) error {
 		datasource.builder.IsDefault = true
+
+		return nil
 	}
 }
 
 // GCEAuthentication uses GCE default Service Account to authenticate to Stackdriver API.
 func GCEAuthentication() Option {
-	return func(datasource *Stackdriver) {
+	return func(datasource *Stackdriver) error {
 		datasource.builder.JSONData.(map[string]interface{})["authenticationType"] = "gce"
+
+		return nil
 	}
 }
 
 // JWTAuthentication uses the given ServiceAccount key file to authenticate to Stackdriver API.
 func JWTAuthentication(jwt string) Option {
-	return func(datasource *Stackdriver) {
+	return func(datasource *Stackdriver) error {
 		parsedJwt := struct {
 			ClientEmail    string `json:"client_email"`
 			DefaultProject string `json:"project_id"`
@@ -26,9 +30,8 @@ func JWTAuthentication(jwt string) Option {
 			PrivateKey     string `json:"private_key"`
 		}{}
 
-		// FIXME: we have no way of handling errors in options :(
 		if err := json.Unmarshal([]byte(jwt), &parsedJwt); err != nil {
-			return
+			return err
 		}
 
 		datasource.builder.JSONData.(map[string]interface{})["authenticationType"] = "jwt"
@@ -36,5 +39,7 @@ func JWTAuthentication(jwt string) Option {
 		datasource.builder.JSONData.(map[string]interface{})["defaultProject"] = parsedJwt.DefaultProject
 		datasource.builder.JSONData.(map[string]interface{})["tokenUri"] = parsedJwt.TokenURI
 		datasource.builder.SecureJSONData.(map[string]interface{})["privateKey"] = parsedJwt.PrivateKey
+
+		return nil
 	}
 }

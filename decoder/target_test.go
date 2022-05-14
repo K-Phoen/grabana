@@ -327,12 +327,10 @@ func TestGraphiteTarget(t *testing.T) {
 
 	opts := GraphiteTarget{
 		Query: "stats_counts.statsd.packets_received",
-		Ref:   "A",
 	}.toOptions()
 	target := graphite.New("query", opts...)
 
 	req.False(target.Builder.Hide)
-	req.Equal("A", target.Builder.RefID)
 }
 
 func TestGraphiteHiddenTarget(t *testing.T) {

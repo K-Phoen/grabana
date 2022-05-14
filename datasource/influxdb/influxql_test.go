@@ -9,8 +9,9 @@ import (
 func TestNewInfluxQL(t *testing.T) {
 	req := require.New(t)
 
-	datasource := New("ds-name", "http://localhost:9090")
+	datasource, err := New("ds-name", "http://localhost:9090")
 
+	req.NoError(err)
 	req.Equal("ds-name", datasource.Name())
 	req.Equal("http://localhost:9090", datasource.builder.URL)
 	req.Equal("influxdb", datasource.builder.Type)
@@ -25,6 +26,6 @@ func TestNewInfluxQL(t *testing.T) {
 	)
 	req.NotNil(datasource.builder.SecureJSONData)
 
-	_, err := datasource.MarshalJSON()
+	_, err = datasource.MarshalJSON()
 	req.NoError(err)
 }

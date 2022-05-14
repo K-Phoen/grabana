@@ -16,10 +16,11 @@ variables:
       name: interval
       label: Interval
       values: ["30s", "1m", "5m", "10m", "30m", "1h", "6h", "12h"]
+      default: 5m
   - query:
       name: status
       label: HTTP status
-      datasource: prometheus-default
+      datasource: Prometheus
       request: "label_values(prometheus_http_requests_total, code)"
   - const:
       name: percentile
@@ -46,39 +47,56 @@ rows:
       - graph:
           title: HTTP Rate
           height: 400px
-          datasource: prometheus-default
+          datasource: Prometheus
           targets:
             - prometheus:
-                query: "rate(promhttp_metric_handler_requests_total[$interval])"
-                legend: "{{handler}} - {{ code }}"
+                query: "sum(rate(promhttp_metric_handler_requests_total[$interval])) by (code)"
+                legend: "{{ code }}"
           axes:
             left: { unit: short, min: 0, label: Requests }
-            right: { hidden: true }
+          alert:
+            summary: Too many successes
+            description: "Wow wow wow, why are you complaining?"
+            evaluate_every: 1m
+            for: 2m
+            on_no_data: alerting
+            on_execution_error: alerting
+            if:
+              - { avg: A, above: 0 }
+            targets:
+              - prometheus:
+                  ref: A
+                  query: "sum(rate(promhttp_metric_handler_requests_total{code=\"200\"}[5m])) by (code)"
+                  legend: "{{ code }}"
+                  lookback: 5m
       - graph:
           title: Heap allocations
           height: 400px
-          datasource: prometheus-default
+          datasource: Prometheus
           targets:
             - prometheus:
                 query: "go_memstats_heap_alloc_bytes"
                 legend: "{{job}}"
-                ref: A
           alert:
-            title: Too many heap allocations
+            summary: Too many heap allocations
+            description: "Wow wow wow, a we're allocating a lot."
             evaluate_every: 1m
-            for: 1m
-            notify: 1
-            message: "Wow, a we're allocating a lot."
+            for: 2m
             on_no_data: alerting
             on_execution_error: alerting
+            tags:
+              foo: bar
             if:
-              - operand: and
-                value: {func: avg, ref: A, from: 1m, to: now}
-                threshold: {above: 23000000}
+              - { avg: A, above: 23000000}
+            targets:
+              - prometheus:
+                  ref: A
+                  query: go_memstats_heap_alloc_bytes
+                  legend: "{{ job }}"
 
       - table:
           title: Threads
-          datasource: prometheus-default
+          datasource: Prometheus
           targets:
             - prometheus:
                 query: "go_threads"
@@ -90,7 +108,7 @@ rows:
               type: current
       - single_stat:
           title: Heap Allocations
-          datasource: prometheus-default
+          datasource: Prometheus
           targets:
             - prometheus:
                 query: 'go_memstats_heap_alloc_bytes{job="prometheus"}'
@@ -105,7 +123,6 @@ rows:
           datasource: voi-stage-stackdriver
           targets:
             - stackdriver:
-                ref: A
                 legend: Ack-ed messages
                 type: delta
                 metric: pubsub.googleapis.com/subscription/ack_message_count

@@ -3,6 +3,7 @@ package timeseries
 import (
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
+	"github.com/K-Phoen/grabana/target/loki"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/K-Phoen/sdk"
@@ -12,9 +13,8 @@ import (
 func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	target := prometheus.New(query, options...)
 
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(&sdk.Target{
-			RefID:          target.Ref,
 			Hide:           target.Hidden,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
@@ -24,6 +24,8 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 			Instant:        target.Instant,
 			Format:         target.Format,
 		})
+
+		return nil
 	}
 }
 
@@ -31,8 +33,10 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 	target := graphite.New(query, options...)
 
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
@@ -40,14 +44,33 @@ func WithGraphiteTarget(query string, options ...graphite.Option) Option {
 func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 	target := influxdb.New(query, options...)
 
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
 	}
 }
 
 // WithStackdriverTarget adds a stackdriver query to the graph.
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
-	return func(graph *TimeSeries) {
+	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
+	}
+}
+
+// WithLokiTarget adds a loki query to the graph.
+func WithLokiTarget(query string, options ...loki.Option) Option {
+	target := loki.New(query, options...)
+
+	return func(graph *TimeSeries) error {
+		graph.Builder.AddTarget(&sdk.Target{
+			Hide:         target.Hidden,
+			Expr:         target.Expr,
+			LegendFormat: target.LegendFormat,
+		})
+
+		return nil
 	}
 }

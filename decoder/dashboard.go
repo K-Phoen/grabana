@@ -84,7 +84,7 @@ func (d *DashboardModel) toDashboardBuilder() (dashboard.Builder, error) {
 		opts = append(opts, opt)
 	}
 
-	return dashboard.New(d.Title, opts...), nil
+	return dashboard.New(d.Title, opts...)
 }
 
 func (d *DashboardModel) sharedCrossHair() dashboard.Option {
@@ -107,6 +107,7 @@ type DashboardPanel struct {
 	Graph      *DashboardGraph      `yaml:",omitempty"`
 	Table      *DashboardTable      `yaml:",omitempty"`
 	SingleStat *DashboardSingleStat `yaml:"single_stat,omitempty"`
+	Stat       *DashboardStat       `yaml:"stat,omitempty"`
 	Text       *DashboardText       `yaml:",omitempty"`
 	Heatmap    *DashboardHeatmap    `yaml:",omitempty"`
 	TimeSeries *DashboardTimeSeries `yaml:"timeseries,omitempty"`
@@ -125,6 +126,9 @@ func (panel DashboardPanel) toOption() (row.Option, error) {
 	}
 	if panel.SingleStat != nil {
 		return panel.SingleStat.toOption()
+	}
+	if panel.Stat != nil {
+		return panel.Stat.toOption()
 	}
 	if panel.Text != nil {
 		return panel.Text.toOption(), nil

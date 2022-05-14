@@ -1,8 +1,11 @@
 package influxdb
 
 import (
+	"fmt"
 	"strings"
 	"time"
+
+	"github.com/K-Phoen/grabana/errors"
 )
 
 type Access string
@@ -14,8 +17,10 @@ const (
 
 // Default configures this datasource to be the default one.
 func Default() Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		datasource.builder.IsDefault = true
+
+		return nil
 	}
 }
 
@@ -23,15 +28,23 @@ func Default() Option {
 // The POST verb allows heavy queries that would return an error using the GET verb.
 // Default is GET.
 func HTTPMethod(method string) Option {
-	return setJSONData("httpMethod", strings.ToUpper(method))
+	normalizedMethod := strings.ToUpper(method)
+
+	if normalizedMethod != "GET" && normalizedMethod != "POST" {
+		return invalidArgument(fmt.Errorf("HTTP method must be GET or POST: %w", errors.ErrInvalidArgument))
+	}
+
+	return setJSONData("httpMethod", normalizedMethod)
 }
 
 // AccessMode controls how requests to the data source will be handled. Proxy
 // should be the preferred way if nothing else is stated. Browser will let your
 // browser send the requests (deprecated).
 func AccessMode(mode Access) Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		datasource.builder.Access = string(mode)
+
+		return nil
 	}
 }
 
@@ -49,15 +62,19 @@ func Timeout(timeout time.Duration) Option {
 // Database sets the ID of the bucket you want to query from,
 // copied from the Buckets page of the InfluxDB UI.
 func Database(database string) Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		datasource.builder.Database = &database
+
+		return nil
 	}
 }
 
 // User sets username to use to sign into InfluxDB.
 func User(user string) Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		datasource.builder.User = &user
+
+		return nil
 	}
 }
 
@@ -82,18 +99,22 @@ func MaxSeries(max int) Option {
 
 // BasicAuth configures basic authentication for this datasource.
 func BasicAuth(username string, password string) Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		yep := true
 		datasource.builder.BasicAuth = &yep
 		datasource.builder.BasicAuthUser = &username
 		datasource.builder.BasicAuthPassword = &password
+
+		return nil
 	}
 }
 
 // WithCredentials joins credentials such as cookies or auth headers to cross-site requests.
 func WithCredentials() Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		datasource.builder.WithCredentials = true
+
+		return nil
 	}
 }
 
@@ -108,7 +129,7 @@ func ForwardOauthIdentity() Option {
 }
 
 // TLSClientAuth enables TLS client side authentication. Expects PEM encoded content.
-func TLSClientAuth(cert, key string) Option {
+func TLSClientAuth(cert string, key string) Option {
 	return multiOption(
 		setJSONData("tlsAuth", true),
 		setSecureJSONData("tlsClientCert", cert),
@@ -125,21 +146,35 @@ func WithCACert(cert string) Option {
 }
 
 func multiOption(opts ...Option) Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		for _, opt := range opts {
-			opt(datasource)
+			if err := opt(datasource); err != nil {
+				return err
+			}
 		}
+
+		return nil
 	}
 }
 
 func setJSONData(key string, value interface{}) Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		datasource.builder.JSONData.(map[string]interface{})[key] = value
+
+		return nil
 	}
 }
 
 func setSecureJSONData(key string, value interface{}) Option {
-	return func(datasource *InfluxQL) {
+	return func(datasource *InfluxQL) error {
 		datasource.builder.SecureJSONData.(map[string]interface{})[key] = value
+
+		return nil
+	}
+}
+
+func invalidArgument(err error) Option {
+	return func(datasource *InfluxQL) error {
+		return err
 	}
 }

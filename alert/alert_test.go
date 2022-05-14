@@ -8,54 +8,92 @@ import (
 
 func TestNewAlertCanBeCreated(t *testing.T) {
 	req := require.New(t)
+	alertTitle := "some alert"
 
-	a := New("some alert")
+	a := New(alertTitle)
 
-	req.Equal("some alert", a.Builder.Name)
-	req.Equal(string(LastState), a.Builder.ExecutionErrorState)
-	req.Equal(string(KeepLastState), a.Builder.NoDataState)
+	req.Len(a.Builder.Rules, 1)
+
+	req.Equal(alertTitle, a.Builder.Name)
+	req.Equal(alertTitle, a.Builder.Rules[0].GrafanaAlert.Title)
+
+	req.Equal(string(NoDataEmpty), a.Builder.Rules[0].GrafanaAlert.NoDataState)
+	req.Equal(string(ErrorAlerting), a.Builder.Rules[0].GrafanaAlert.ExecutionErrorState)
 }
 
-func TestMessageCanBeSet(t *testing.T) {
+func TestPanelIDCanBeHooked(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", Message("content"))
+	a := New("")
 
-	req.Equal("content", a.Builder.Message)
+	a.HookPanelID("id")
+
+	req.Equal("id", a.Builder.Rules[0].Annotations["__panelId__"])
 }
 
-func TestNotificationCanBeSet(t *testing.T) {
+func TestDashboardUIDCanBeHooked(t *testing.T) {
 	req := require.New(t)
-	channel := &Channel{ID: 1, UID: "channel"}
 
-	a := New("", Notify(channel))
+	a := New("")
 
-	req.Len(a.Builder.Notifications, 1)
-	req.Equal("channel", a.Builder.Notifications[0].UID)
-	req.Empty(a.Builder.Notifications[0].ID)
+	a.HookDashboardUID("uid")
+
+	req.Equal("uid", a.Builder.Rules[0].Annotations["__dashboardUid__"])
 }
 
-func TestNotificationCanBeSetInBulk(t *testing.T) {
+func TestDatasourceUIDCanBeHooked(t *testing.T) {
 	req := require.New(t)
-	channel := &Channel{ID: 1, UID: "channel"}
-	otherChannel := &Channel{ID: 2, UID: "other-channel"}
 
-	a := New("", NotifyChannels(channel, otherChannel))
+	a := New(
+		"",
+		WithPrometheusQuery("A", "some prometheus query"),
+		IfOr(Avg, "1", IsBelow(10)),
+	)
+	a.HookDatasourceUID("ds-uid")
 
-	req.Len(a.Builder.Notifications, 2)
-	req.ElementsMatch([]string{"channel", "other-channel"}, []string{a.Builder.Notifications[0].UID, a.Builder.Notifications[1].UID})
-	req.Empty(a.Builder.Notifications[0].ID)
-	req.Empty(a.Builder.Notifications[1].ID)
+	hooked := false
+	for _, rule := range a.Builder.Rules {
+		for i := range rule.GrafanaAlert.Data {
+			query := &rule.GrafanaAlert.Data[i]
+
+			if query.RefID == alertConditionRef {
+				req.Equal("-100", query.DatasourceUID)
+				req.Equal("-100", query.Model.Datasource.UID)
+				continue
+			}
+
+			hooked = true
+
+			req.Equal("ds-uid", query.DatasourceUID)
+			req.Equal("ds-uid", query.Model.Datasource.UID)
+		}
+	}
+
+	req.True(hooked)
 }
 
-func TestNotificationCanBeSetByChannelID(t *testing.T) {
+func TestSummaryCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", NotifyChannel("P-N3fxuZz"))
+	a := New("", Summary("summary content"))
 
-	req.Len(a.Builder.Notifications, 1)
-	req.Equal("P-N3fxuZz", a.Builder.Notifications[0].UID)
-	req.Empty(a.Builder.Notifications[0].ID)
+	req.Equal("summary content", a.Builder.Rules[0].Annotations["summary"])
+}
+
+func TestDescriptionCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	a := New("", Description("description content"))
+
+	req.Equal("description content", a.Builder.Rules[0].Annotations["description"])
+}
+
+func TestRunbookCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	a := New("", Runbook("runbook url"))
+
+	req.Equal("runbook url", a.Builder.Rules[0].Annotations["runbook_url"])
 }
 
 func TestForIntervalCanBeSet(t *testing.T) {
@@ -63,7 +101,7 @@ func TestForIntervalCanBeSet(t *testing.T) {
 
 	a := New("", For("1m"))
 
-	req.Equal("1m", a.Builder.For)
+	req.Equal("1m", a.Builder.Rules[0].For)
 }
 
 func TestFrequencyCanBeSet(t *testing.T) {
@@ -71,32 +109,23 @@ func TestFrequencyCanBeSet(t *testing.T) {
 
 	a := New("", EvaluateEvery("1m"))
 
-	req.Equal("1m", a.Builder.Frequency)
+	req.Equal("1m", a.Builder.Interval)
 }
 
 func TestErrorModeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", OnExecutionError(Alerting))
+	a := New("", OnExecutionError(ErrorKO))
 
-	req.Equal(string(Alerting), a.Builder.ExecutionErrorState)
+	req.Equal(string(ErrorKO), a.Builder.Rules[0].GrafanaAlert.ExecutionErrorState)
 }
 
 func TestNoDataModeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", OnNoData(OK))
+	a := New("", OnNoData(NoDataAlerting))
 
-	req.Equal(string(OK), a.Builder.NoDataState)
-}
-
-func TestConditionsCanBeSet(t *testing.T) {
-	req := require.New(t)
-
-	a := New("", If(And))
-
-	req.Len(a.Builder.Conditions, 1)
-	req.Equal(string(And), a.Builder.Conditions[0].Operator.Type)
+	req.Equal(string(NoDataAlerting), a.Builder.Rules[0].GrafanaAlert.NoDataState)
 }
 
 func TestTagsCanBeSet(t *testing.T) {
@@ -106,6 +135,22 @@ func TestTagsCanBeSet(t *testing.T) {
 		"severity": "warning",
 	}))
 
-	req.Len(a.Builder.AlertRuleTags, 1)
-	req.Equal("warning", a.Builder.AlertRuleTags["severity"])
+	req.Len(a.Builder.Rules[0].Labels, 1)
+	req.Equal("warning", a.Builder.Rules[0].Labels["severity"])
+}
+
+func TestConditionsCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	a := New("", If(Avg, "1", IsBelow(10)))
+
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
+}
+
+func TestOrConditionsCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	a := New("", IfOr(Avg, "1", IsBelow(10)))
+
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
 }

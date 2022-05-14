@@ -27,9 +27,9 @@ type Prometheus struct {
 	builder *sdk.Datasource
 }
 
-type Option func(datasource *Prometheus)
+type Option func(datasource *Prometheus) error
 
-func New(name string, url string, options ...Option) Prometheus {
+func New(name string, url string, options ...Option) (Prometheus, error) {
 	prometheus := &Prometheus{
 		builder: &sdk.Datasource{
 			Name:           name,
@@ -47,10 +47,12 @@ func New(name string, url string, options ...Option) Prometheus {
 	}
 
 	for _, opt := range append(defaults, options...) {
-		opt(prometheus)
+		if err := opt(prometheus); err != nil {
+			return *prometheus, err
+		}
 	}
 
-	return *prometheus
+	return *prometheus, nil
 }
 
 func (datasource Prometheus) Name() string {

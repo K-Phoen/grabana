@@ -11,7 +11,6 @@ linters:
     - unused
     - varcheck
     - depguard
-    - dupl
     - gochecknoinits
     - gocritic
     - gocyclo
@@ -28,6 +27,7 @@ linters:
     - revive
     - gochecknoglobals
   disable:
+    - dupl
     - lll
     - maligned
     - goconst
