@@ -228,29 +228,18 @@ type (
 		ValueName       string      `json:"valueName"`
 	}
 	StatPanel struct {
-		Colors          []string    `json:"colors"`
-		ColorValue      bool        `json:"colorValue"`
-		ColorBackground bool        `json:"colorBackground"`
-		Decimals        int         `json:"decimals"`
-		Format          string      `json:"format"`
-		Gauge           Gauge       `json:"gauge,omitempty"`
-		MappingType     *uint       `json:"mappingType,omitempty"`
-		MappingTypes    []*MapType  `json:"mappingTypes,omitempty"`
-		MaxDataPoints   *IntString  `json:"maxDataPoints,omitempty"`
-		NullPointMode   string      `json:"nullPointMode"`
-		Postfix         *string     `json:"postfix,omitempty"`
-		PostfixFontSize *string     `json:"postfixFontSize,omitempty"`
-		Prefix          *string     `json:"prefix,omitempty"`
-		PrefixFontSize  *string     `json:"prefixFontSize,omitempty"`
-		RangeMaps       []*RangeMap `json:"rangeMaps,omitempty"`
-		SparkLine       SparkLine   `json:"sparkline,omitempty"`
-		Targets         []Target    `json:"targets,omitempty"`
-		Thresholds      string      `json:"thresholds"`
-		ValueFontSize   string      `json:"valueFontSize"`
-		ValueMaps       []ValueMap  `json:"valueMaps"`
-		ValueName       string      `json:"valueName"`
-		Options         Options     `json:"options"`
-		FieldConfig     FieldConfig `json:"fieldConfig"`
+		Targets     []Target    `json:"targets,omitempty"`
+		Options     StatOptions `json:"options"`
+		FieldConfig FieldConfig `json:"fieldConfig"`
+	}
+	StatOptions struct {
+		Orientation   string        `json:"orientation"`
+		TextMode      string        `json:"textMode"`
+		ColorMode     string        `json:"colorMode"`
+		GraphMode     string        `json:"graphMode"`
+		JustifyMode   string        `json:"justifyMode"`
+		ReduceOptions ReduceOptions `json:"reduceOptions"`
+		Text          *TextOptions  `json:"text,omitempty"`
 	}
 	DashlistPanel struct {
 		Mode     string   `json:"mode"`
@@ -434,27 +423,6 @@ type (
 
 // for a graph panel
 type (
-	// TODO look at schema versions carefully
-	// grid was obsoleted by xaxis and yaxes
-	grid struct { // nolint: unused,deadcode
-		LeftLogBase     *int     `json:"leftLogBase"`
-		LeftMax         *int     `json:"leftMax"`
-		LeftMin         *int     `json:"leftMin"`
-		RightLogBase    *int     `json:"rightLogBase"`
-		RightMax        *int     `json:"rightMax"`
-		RightMin        *int     `json:"rightMin"`
-		Threshold1      *float64 `json:"threshold1"`
-		Threshold1Color string   `json:"threshold1Color"`
-		Threshold2      *float64 `json:"threshold2"`
-		Threshold2Color string   `json:"threshold2Color"`
-		ThresholdLine   bool     `json:"thresholdLine"`
-	}
-	xaxis struct { //nolint:unused,deadcode
-		Mode   string      `json:"mode"`
-		Name   interface{} `json:"name"` // TODO what is this?
-		Show   bool        `json:"show"`
-		Values *[]string   `json:"values,omitempty"`
-	}
 	Axis struct {
 		Format   string       `json:"format"`
 		LogBase  int          `json:"logBase"`
@@ -816,12 +784,20 @@ func NewStat(title string) *Panel {
 			Title:    title,
 			Type:     "stat",
 			Renderer: &render,
-			IsNew:    true},
+			IsNew:    true,
+		},
 		StatPanel: &StatPanel{
+			Options: StatOptions{
+				GraphMode: "none",
+				ReduceOptions: ReduceOptions{
+					Calcs: []string{"lastNotNull"},
+				},
+				Text: &TextOptions{},
+			},
 			FieldConfig: FieldConfig{
 				Defaults: FieldConfigDefaults{
 					Color: FieldConfigColor{
-						Mode:       "palette-classic",
+						Mode:       "thresholds",
 						FixedColor: "green",
 						SeriesBy:   "last",
 					},

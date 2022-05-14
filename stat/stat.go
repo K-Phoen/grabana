@@ -92,15 +92,6 @@ func New(title string, options ...Option) (*Stat, error) {
 	panel := &Stat{Builder: sdk.NewStat(title)}
 
 	panel.Builder.IsNew = false
-	panel.Builder.StatPanel.Options.GraphMode = "none"
-	panel.Builder.StatPanel.FieldConfig.Defaults.Color.Mode = "thresholds"
-	panel.Builder.StatPanel.Options.Text = &sdk.TextOptions{}
-	panel.Builder.StatPanel.SparkLine = sdk.SparkLine{}
-	panel.Builder.StatPanel.Options.ReduceOptions = sdk.ReduceOptions{
-		Values: false,
-		Fields: "",
-		Calcs:  []string{"lastNotNull"},
-	}
 
 	for _, opt := range append(defaults(), options...) {
 		if err := opt(panel); err != nil {

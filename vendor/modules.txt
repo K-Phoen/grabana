@@ -1,4 +1,4 @@
-# github.com/K-Phoen/sdk v0.9.2
+# github.com/K-Phoen/sdk v0.10.0
 ## explicit
 github.com/K-Phoen/sdk
 # github.com/blang/semver v3.5.1+incompatible

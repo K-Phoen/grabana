@@ -22,9 +22,6 @@
       "showTitle": true,
       "panels": [
         {
-          "colorBackground": false,
-          "colorValue": false,
-          "colors": null,
           "description": "Some description",
           "datasource": "prometheus-default",
           "editable": false,
@@ -89,26 +86,13 @@
             },
             "overrides": null
           },
-          "decimals": 0,
-          "format": "",
-          "gauge": {
-            "minValue": 0,
-            "maxValue": 0,
-            "show": false,
-            "thresholdLabels": false,
-            "thresholdMarkers": false
-          },
           "height": "400px",
           "isNew": false,
           "id": 13,
-          "nullPointMode": "",
           "options": {
-            "content": "",
-            "displayMode": "",
             "colorMode": "background",
             "graphMode": "area",
             "justifyMode": "",
-            "mode": "",
             "orientation": "horizontal",
             "reduceOptions": {
               "calcs": [
@@ -133,14 +117,9 @@
           ],
           "renderer": "flot",
           "span": 4,
-          "sparkline": {},
           "gridPos": {},
           "title": "HTTP requests",
           "transparent": true,
-          "valueName": "",
-          "thresholds": "",
-          "valueFontSize": "",
-          "valueMaps": null,
           "type": "stat"
         }
       ]
