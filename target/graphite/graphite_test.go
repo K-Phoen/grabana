@@ -15,6 +15,14 @@ func TestQueriesCanBeCreated(t *testing.T) {
 	req.Equal("stats_counts.statsd.packets_received", target.Builder.Target)
 }
 
+func TestRefCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	target := graphite.New("", graphite.Ref("A"))
+
+	req.Equal("A", target.Builder.RefID)
+}
+
 func TestTargetCanBeHidden(t *testing.T) {
 	req := require.New(t)
 

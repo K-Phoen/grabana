@@ -27,6 +27,7 @@ type Target struct {
 type PrometheusTarget struct {
 	Query          string
 	Legend         string `yaml:",omitempty"`
+	Ref            string `yaml:",omitempty"`
 	Hidden         bool   `yaml:",omitempty"`
 	Format         string `yaml:",omitempty"`
 	Instant        bool   `yaml:",omitempty"`
@@ -36,6 +37,7 @@ type PrometheusTarget struct {
 func (t PrometheusTarget) toOptions() []prometheus.Option {
 	opts := []prometheus.Option{
 		prometheus.Legend(t.Legend),
+		prometheus.Ref(t.Ref),
 	}
 
 	if t.Hidden {
@@ -64,12 +66,14 @@ func (t PrometheusTarget) toOptions() []prometheus.Option {
 type LokiTarget struct {
 	Query  string
 	Legend string `yaml:",omitempty"`
+	Ref    string `yaml:",omitempty"`
 	Hidden bool   `yaml:",omitempty"`
 }
 
 func (t LokiTarget) toOptions() []loki.Option {
 	opts := []loki.Option{
 		loki.Legend(t.Legend),
+		loki.Ref(t.Ref),
 	}
 
 	if t.Hidden {
@@ -81,11 +85,14 @@ func (t LokiTarget) toOptions() []loki.Option {
 
 type GraphiteTarget struct {
 	Query  string
-	Hidden bool `yaml:",omitempty"`
+	Ref    string `yaml:",omitempty"`
+	Hidden bool   `yaml:",omitempty"`
 }
 
 func (t GraphiteTarget) toOptions() []graphite.Option {
-	opts := []graphite.Option{}
+	opts := []graphite.Option{
+		graphite.Ref(t.Ref),
+	}
 
 	if t.Hidden {
 		opts = append(opts, graphite.Hide())
@@ -96,11 +103,14 @@ func (t GraphiteTarget) toOptions() []graphite.Option {
 
 type InfluxDBTarget struct {
 	Query  string
-	Hidden bool `yaml:",omitempty"`
+	Ref    string `yaml:",omitempty"`
+	Hidden bool   `yaml:",omitempty"`
 }
 
 func (t InfluxDBTarget) toOptions() []influxdb.Option {
-	opts := []influxdb.Option{}
+	opts := []influxdb.Option{
+		influxdb.Ref(t.Ref),
+	}
 
 	if t.Hidden {
 		opts = append(opts, influxdb.Hide())
@@ -118,6 +128,7 @@ type StackdriverTarget struct {
 	Alignment    *StackdriverAlignment `yaml:",omitempty"`
 	Legend       string                `yaml:",omitempty"`
 	Preprocessor string                `yaml:",omitempty"`
+	Ref          string                `yaml:",omitempty"`
 	Hidden       bool                  `yaml:",omitempty"`
 	GroupBy      []string              `yaml:"group_by,omitempty"`
 }
@@ -155,6 +166,7 @@ func (t StackdriverTarget) toTarget() (*stackdriver.Stackdriver, error) {
 func (t StackdriverTarget) toOptions() ([]stackdriver.Option, error) {
 	opts := []stackdriver.Option{
 		stackdriver.Legend(t.Legend),
+		stackdriver.Ref(t.Ref),
 	}
 
 	if t.Hidden {

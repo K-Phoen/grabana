@@ -52,6 +52,14 @@ func TestProjectCanBeConfigured(t *testing.T) {
 	req.Equal(project, target.Builder.ProjectName)
 }
 
+func TestRefCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	target := stackdriver.Delta("", stackdriver.Ref("A"))
+
+	req.Equal("A", target.Builder.RefID)
+}
+
 func TestTargetCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
