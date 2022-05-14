@@ -39,7 +39,7 @@ type DashboardStat struct {
 	TitleFontSize int    `yaml:"title_font_size,omitempty"`
 	ValueFontSize int    `yaml:"value_font_size,omitempty"`
 
-	ThresholdMode string              `json:"threshold_mode,omitempty"`
+	ThresholdMode string              `yaml:"threshold_mode,omitempty"`
 	Thresholds    []StatThresholdStep `yaml:",omitempty"`
 }
 
