@@ -15,6 +15,14 @@ func TestQueriesCanBeCreated(t *testing.T) {
 	req.Equal("buckets()", target.Builder.Query)
 }
 
+func TestRefCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	target := influxdb.New("", influxdb.Ref("A"))
+
+	req.Equal("A", target.Builder.RefID)
+}
+
 func TestTargetCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
