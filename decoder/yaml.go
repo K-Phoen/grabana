@@ -16,5 +16,5 @@ func UnmarshalYAML(input io.Reader) (dashboard.Builder, error) {
 		return dashboard.Builder{}, err
 	}
 
-	return parsed.toDashboardBuilder()
+	return parsed.ToBuilder()
 }
