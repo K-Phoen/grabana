@@ -27,7 +27,7 @@ type DashboardModel struct {
 	Rows []DashboardRow
 }
 
-func (d *DashboardModel) toDashboardBuilder() (dashboard.Builder, error) {
+func (d *DashboardModel) ToBuilder() (dashboard.Builder, error) {
 	emptyDashboard := dashboard.Builder{}
 	opts := []dashboard.Option{
 		d.editable(),
