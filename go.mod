@@ -5,9 +5,9 @@ go 1.16
 require (
 	github.com/K-Phoen/sdk v0.11.0
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/prometheus/common v0.32.0
+	github.com/prometheus/common v0.34.0
 	github.com/rhysd/go-github-selfupdate v1.2.3
-	github.com/spf13/cobra v1.2.1
+	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.0
 )
