@@ -198,7 +198,7 @@ func AsTimeSeriesAggregations(aggregations []Aggregation) Option {
 // DataSource sets the data source to be used by the table.
 func DataSource(source string) Option {
 	return func(table *Table) error {
-		table.Builder.Datasource = &source
+		table.Builder.Datasource = &sdk.DatasourceRef{LegacyName: source}
 
 		return nil
 	}

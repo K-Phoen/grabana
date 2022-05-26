@@ -147,7 +147,7 @@ func defaults() []Option {
 // DataSource sets the data source to be used by the graph.
 func DataSource(source string) Option {
 	return func(timeseries *TimeSeries) error {
-		timeseries.Builder.Datasource = &source
+		timeseries.Builder.Datasource = &sdk.DatasourceRef{LegacyName: source}
 
 		return nil
 	}

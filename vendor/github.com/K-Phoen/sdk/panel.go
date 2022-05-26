@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 // Each panel may be one of these types.
@@ -68,9 +69,9 @@ type (
 	}
 	panelType   int8
 	CommonPanel struct {
-		Datasource *string `json:"datasource,omitempty"` // metrics
-		Editable   bool    `json:"editable"`
-		Error      bool    `json:"error"`
+		Datasource *DatasourceRef `json:"datasource,omitempty"` // metrics
+		Editable   bool           `json:"editable"`
+		Error      bool           `json:"error"`
 		GridPos    struct {
 			H *int `json:"h,omitempty"`
 			W *int `json:"w,omitempty"`
@@ -339,8 +340,8 @@ type (
 		Unit       string            `json:"unit"`
 		NoValue    string            `json:"noValue,omitempty"`
 		Decimals   *int              `json:"decimals,omitempty"`
-		Min        *int              `json:"min,omitempty"`
-		Max        *int              `json:"max,omitempty"`
+		Min        *float64          `json:"min,omitempty"`
+		Max        *float64          `json:"max,omitempty"`
 		Color      FieldConfigColor  `json:"color"`
 		Thresholds Thresholds        `json:"thresholds"`
 		Custom     FieldConfigCustom `json:"custom"`
@@ -519,9 +520,9 @@ type (
 
 // for an any panel
 type Target struct {
-	RefID      string `json:"refId"`
-	Datasource string `json:"datasource,omitempty"`
-	Hide       bool   `json:"hide,omitempty"`
+	RefID      string         `json:"refId"`
+	Datasource *DatasourceRef `json:"datasource,omitempty"`
+	Hide       bool           `json:"hide,omitempty"`
 
 	// For PostgreSQL
 	Table        string `json:"table,omitempty"`
@@ -956,7 +957,7 @@ func (p *Panel) RepeatDatasourcesForEachTarget(dsNames ...string) {
 			for _, ds := range dsNames {
 				newTarget := target
 				newTarget.RefID = refID
-				newTarget.Datasource = ds
+				newTarget.Datasource = &DatasourceRef{LegacyName: ds}
 				refID = incRefID(refID)
 				*targets = append(*targets, newTarget)
 			}
@@ -989,13 +990,13 @@ func (p *Panel) RepeatTargetsForDatasources(dsNames ...string) {
 		lenTargets := len(*targets)
 		for i, name := range dsNames {
 			if i < lenTargets {
-				(*targets)[i].Datasource = name
+				(*targets)[i].Datasource = &DatasourceRef{LegacyName: name}
 				lastRefID = (*targets)[i].RefID
 			} else {
 				newTarget := (*targets)[i%lenTargets]
 				lastRefID = incRefID(lastRefID)
 				newTarget.RefID = lastRefID
-				newTarget.Datasource = name
+				newTarget.Datasource = &DatasourceRef{LegacyName: name}
 				*targets = append(*targets, newTarget)
 			}
 		}
@@ -1048,86 +1049,95 @@ type probePanel struct {
 	//	json.RawMessage
 }
 
-func (p *Panel) UnmarshalJSON(b []byte) (err error) {
+func (p *Panel) UnmarshalJSON(b []byte) error {
 	var probe probePanel
-	if err = json.Unmarshal(b, &probe); err == nil {
-		p.CommonPanel = probe.CommonPanel
-		switch probe.Type {
-		case "graph":
-			var graph GraphPanel
-			p.OfType = GraphType
-			if err = json.Unmarshal(b, &graph); err == nil {
-				p.GraphPanel = &graph
-			}
-		case "table":
-			var table TablePanel
-			p.OfType = TableType
-			if err = json.Unmarshal(b, &table); err == nil {
-				p.TablePanel = &table
-			}
-		case "text":
-			var text TextPanel
-			p.OfType = TextType
-			if err = json.Unmarshal(b, &text); err == nil {
-				p.TextPanel = &text
-			}
-		case "singlestat":
-			var singlestat SinglestatPanel
-			p.OfType = SinglestatType
-			if err = json.Unmarshal(b, &singlestat); err == nil {
-				p.SinglestatPanel = &singlestat
-			}
-		case "stat":
-			var stat StatPanel
-			p.OfType = StatType
-			if err = json.Unmarshal(b, &stat); err == nil {
-				p.StatPanel = &stat
-			}
-		case "dashlist":
-			var dashlist DashlistPanel
-			p.OfType = DashlistType
-			if err = json.Unmarshal(b, &dashlist); err == nil {
-				p.DashlistPanel = &dashlist
-			}
-		case "bargauge":
-			var bargauge BarGaugePanel
-			p.OfType = BarGaugeType
-			if err = json.Unmarshal(b, &bargauge); err == nil {
-				p.BarGaugePanel = &bargauge
-			}
-		case "heatmap":
-			var heatmap HeatmapPanel
-			p.OfType = HeatmapType
-			if err = json.Unmarshal(b, &heatmap); err == nil {
-				p.HeatmapPanel = &heatmap
-			}
-		case "timeseries":
-			var timeseries TimeseriesPanel
-			p.OfType = TimeseriesType
-			if err = json.Unmarshal(b, &timeseries); err == nil {
-				p.TimeseriesPanel = &timeseries
-			}
-		case "logs":
-			var logs LogsPanel
-			p.OfType = LogsType
-			if err = json.Unmarshal(b, &logs); err == nil {
-				p.LogsPanel = &logs
-			}
-		case "row":
-			var rowpanel RowPanel
-			p.OfType = RowType
-			if err = json.Unmarshal(b, &rowpanel); err == nil {
-				p.RowPanel = &rowpanel
-			}
-		default:
-			var custom = make(CustomPanel)
-			p.OfType = CustomType
-			if err = json.Unmarshal(b, &custom); err == nil {
-				p.CustomPanel = &custom
-			}
+	var err error
+
+	if err = json.Unmarshal(b, &probe); err != nil {
+		return err
+	}
+
+	p.CommonPanel = probe.CommonPanel
+	switch probe.Type {
+	case "graph":
+		var graph GraphPanel
+		p.OfType = GraphType
+		if err = json.Unmarshal(b, &graph); err == nil {
+			p.GraphPanel = &graph
+		}
+	case "table":
+		var table TablePanel
+		p.OfType = TableType
+		if err = json.Unmarshal(b, &table); err == nil {
+			p.TablePanel = &table
+		}
+	case "text":
+		var text TextPanel
+		p.OfType = TextType
+		if err = json.Unmarshal(b, &text); err == nil {
+			p.TextPanel = &text
+		}
+	case "singlestat":
+		var singlestat SinglestatPanel
+		p.OfType = SinglestatType
+		if err = json.Unmarshal(b, &singlestat); err == nil {
+			p.SinglestatPanel = &singlestat
+		}
+	case "stat":
+		var stat StatPanel
+		p.OfType = StatType
+		if err = json.Unmarshal(b, &stat); err == nil {
+			p.StatPanel = &stat
+		}
+	case "dashlist":
+		var dashlist DashlistPanel
+		p.OfType = DashlistType
+		if err = json.Unmarshal(b, &dashlist); err == nil {
+			p.DashlistPanel = &dashlist
+		}
+	case "bargauge":
+		var bargauge BarGaugePanel
+		p.OfType = BarGaugeType
+		if err = json.Unmarshal(b, &bargauge); err == nil {
+			p.BarGaugePanel = &bargauge
+		}
+	case "heatmap":
+		var heatmap HeatmapPanel
+		p.OfType = HeatmapType
+		if err = json.Unmarshal(b, &heatmap); err == nil {
+			p.HeatmapPanel = &heatmap
+		}
+	case "timeseries":
+		var timeseries TimeseriesPanel
+		p.OfType = TimeseriesType
+		if err = json.Unmarshal(b, &timeseries); err == nil {
+			p.TimeseriesPanel = &timeseries
+		}
+	case "logs":
+		var logs LogsPanel
+		p.OfType = LogsType
+		if err = json.Unmarshal(b, &logs); err == nil {
+			p.LogsPanel = &logs
+		}
+	case "row":
+		var rowpanel RowPanel
+		p.OfType = RowType
+		if err = json.Unmarshal(b, &rowpanel); err == nil {
+			p.RowPanel = &rowpanel
+		}
+	default:
+		var custom = make(CustomPanel)
+		p.OfType = CustomType
+		if err = json.Unmarshal(b, &custom); err == nil {
+			p.CustomPanel = &custom
 		}
 	}
-	return
+
+	if err != nil && (probe.Title != "" || probe.Type != "") {
+		err = fmt.Errorf("%w (panel %q of type %q)", err, probe.Title, probe.Type)
+	}
+
+	return err
 }
 
 func (p *Panel) MarshalJSON() ([]byte, error) {

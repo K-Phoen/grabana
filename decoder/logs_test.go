@@ -56,7 +56,7 @@ func TestLogsPanelsCanBeDecoded(t *testing.T) {
 	req.Equal(panel.Description, *sdkPanel.Description)
 	req.Equal(panel.Span, sdkPanel.Span)
 	req.True(sdkPanel.Transparent)
-	req.Equal(panel.Datasource, *sdkPanel.Datasource)
+	req.Equal(panel.Datasource, sdkPanel.Datasource.LegacyName)
 	req.Equal(panel.Repeat, *sdkPanel.Repeat)
 }
 

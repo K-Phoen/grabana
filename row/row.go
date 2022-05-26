@@ -62,7 +62,7 @@ func WithGraph(title string, options ...graph.Option) Option {
 		}
 
 		if panel.Builder.Datasource != nil {
-			panel.Alert.Datasource = *panel.Builder.Datasource
+			panel.Alert.Datasource = panel.Builder.Datasource.LegacyName
 		}
 
 		row.alerts = append(row.alerts, panel.Alert)
@@ -86,7 +86,7 @@ func WithTimeSeries(title string, options ...timeseries.Option) Option {
 		}
 
 		if panel.Builder.Datasource != nil {
-			panel.Alert.Datasource = *panel.Builder.Datasource
+			panel.Alert.Datasource = panel.Builder.Datasource.LegacyName
 		}
 
 		row.alerts = append(row.alerts, panel.Alert)

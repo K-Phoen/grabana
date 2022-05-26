@@ -84,20 +84,20 @@ func TestAxisMinCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	_, err := New(cfg, Min(0))
+	_, err := New(cfg, Min(1.1))
 
 	req.NoError(err)
-	req.Equal(0, *cfg.Defaults.Min)
+	req.Equal(1.1, *cfg.Defaults.Min)
 }
 
 func TestAxisMaxCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
 	cfg := &sdk.FieldConfig{}
-	_, err := New(cfg, Max(0))
+	_, err := New(cfg, Max(2.2))
 
 	req.NoError(err)
-	req.Equal(0, *cfg.Defaults.Max)
+	req.Equal(2.2, *cfg.Defaults.Max)
 }
 
 func TestLabelCanBeConfigured(t *testing.T) {

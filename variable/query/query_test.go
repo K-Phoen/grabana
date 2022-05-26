@@ -96,7 +96,7 @@ func TestDataSourceCanBeSet(t *testing.T) {
 
 	panel := New("", DataSource("prometheus-default"))
 
-	req.Equal("prometheus-default", *panel.Builder.Datasource)
+	req.Equal("prometheus-default", panel.Builder.Datasource.LegacyName)
 }
 
 func TestRequestCanBeSet(t *testing.T) {

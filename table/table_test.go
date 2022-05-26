@@ -51,7 +51,7 @@ func TestTablePanelDataSourceCanBeConfigured(t *testing.T) {
 	panel, err := New("", DataSource("prometheus-default"))
 
 	req.NoError(err)
-	req.Equal("prometheus-default", *panel.Builder.Datasource)
+	req.Equal("prometheus-default", panel.Builder.Datasource.LegacyName)
 }
 
 func TestTablePanelCanHavePrometheusTargets(t *testing.T) {

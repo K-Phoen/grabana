@@ -235,7 +235,7 @@ func TagsAnnotation(annotation TagAnnotation) Option {
 	return func(builder *Builder) error {
 		builder.board.Annotations.List = append(builder.board.Annotations.List, sdk.Annotation{
 			Name:       annotation.Name,
-			Datasource: &annotation.Datasource,
+			Datasource: &sdk.DatasourceRef{LegacyName: annotation.Datasource},
 			IconColor:  annotation.IconColor,
 			Enable:     true,
 			Tags:       annotation.Tags,

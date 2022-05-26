@@ -109,7 +109,7 @@ func TestStatPanelDataSourceCanBeConfigured(t *testing.T) {
 	panel, err := New("", DataSource("prometheus-default"))
 
 	req.NoError(err)
-	req.Equal("prometheus-default", *panel.Builder.Datasource)
+	req.Equal("prometheus-default", panel.Builder.Datasource.LegacyName)
 }
 
 func TestRepeatCanBeConfigured(t *testing.T) {
@@ -161,19 +161,19 @@ func TestSparkLineCanBeDisplayed(t *testing.T) {
 func TestSparkLineYMinCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel, err := New("", SparkLineYMin(0))
+	panel, err := New("", SparkLineYMin(1.1))
 
 	req.NoError(err)
-	req.Equal(0, *panel.Builder.StatPanel.FieldConfig.Defaults.Min)
+	req.Equal(1.1, *panel.Builder.StatPanel.FieldConfig.Defaults.Min)
 }
 
 func TestSparkLineYMaxCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel, err := New("", SparkLineYMax(0))
+	panel, err := New("", SparkLineYMax(2.2))
 
 	req.NoError(err)
-	req.Equal(0, *panel.Builder.StatPanel.FieldConfig.Defaults.Max)
+	req.Equal(2.2, *panel.Builder.StatPanel.FieldConfig.Defaults.Max)
 }
 
 func TestTextModeCanBeSet(t *testing.T) {

@@ -117,7 +117,7 @@ func defaults() []Option {
 // DataSource sets the data source to be used by the panel.
 func DataSource(source string) Option {
 	return func(stat *Stat) error {
-		stat.Builder.Datasource = &source
+		stat.Builder.Datasource = &sdk.DatasourceRef{LegacyName: source}
 
 		return nil
 	}
@@ -248,7 +248,7 @@ func SparkLine() Option {
 }
 
 // SparkLineYMin defines the smallest value expected on the Y axis of the spark line.
-func SparkLineYMin(value int) Option {
+func SparkLineYMin(value float64) Option {
 	return func(stat *Stat) error {
 		stat.Builder.StatPanel.FieldConfig.Defaults.Min = &value
 
@@ -257,7 +257,7 @@ func SparkLineYMin(value int) Option {
 }
 
 // SparkLineYMax defines the largest value expected on the Y axis of the spark line.
-func SparkLineYMax(value int) Option {
+func SparkLineYMax(value float64) Option {
 	return func(stat *Stat) error {
 		stat.Builder.StatPanel.FieldConfig.Defaults.Max = &value
 
