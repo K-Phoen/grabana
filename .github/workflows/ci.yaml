@@ -28,11 +28,13 @@ jobs:
           files: ./doc/
           config_file: .markdownlint.json
 
-      - uses: K-Phoen/action-misspell@master
+      - uses: reviewdog/action-misspell@v1
         with:
           github_token: ${{ github.token }}
           reporter: github-pr-review
           locale: "US"
+          exclude: |
+            ./vendor/*
 
       - name: alexjs
         uses: theashraf/alex-action@master
