@@ -72,7 +72,7 @@ func New(name string, options ...Option) *Query {
 // DataSource sets the data source to be used by the query.
 func DataSource(source string) Option {
 	return func(query *Query) {
-		query.Builder.Datasource = &source
+		query.Builder.Datasource = &sdk.DatasourceRef{LegacyName: source}
 	}
 }
 

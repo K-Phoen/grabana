@@ -277,10 +277,10 @@ func (timeseriesViz *TimeSeriesVisualization) tooltipOption() (timeseries.Option
 }
 
 type TimeSeriesAxis struct {
-	SoftMin *int `yaml:"soft_min,omitempty"`
-	SoftMax *int `yaml:"soft_max,omitempty"`
-	Min     *int `yaml:",omitempty"`
-	Max     *int `yaml:",omitempty"`
+	SoftMin *int     `yaml:"soft_min,omitempty"`
+	SoftMax *int     `yaml:"soft_max,omitempty"`
+	Min     *float64 `yaml:",omitempty"`
+	Max     *float64 `yaml:",omitempty"`
 
 	Decimals *int `yaml:",omitempty"`
 

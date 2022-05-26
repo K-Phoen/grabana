@@ -30,8 +30,8 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 		Axis: &TimeSeriesAxis{
 			SoftMin:  intPtr(1),
 			SoftMax:  intPtr(10),
-			Min:      intPtr(0),
-			Max:      intPtr(11),
+			Min:      float64Ptr(0),
+			Max:      float64Ptr(11),
 			Decimals: intPtr(2),
 			Display:  "auto",
 			Scale:    "linear",
@@ -55,7 +55,7 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 	req.NotNil(tsPanel)
 	req.Equal(panel.Title, sdkPanel.Title)
 	req.Equal(panel.Description, *sdkPanel.Description)
-	req.Equal(panel.Datasource, *sdkPanel.Datasource)
+	req.Equal(panel.Datasource, sdkPanel.Datasource.LegacyName)
 	req.Equal(panel.Repeat, *sdkPanel.Repeat)
 	req.Equal(panel.Span, sdkPanel.Span)
 	req.True(sdkPanel.Transparent)
@@ -70,8 +70,8 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 	// axis
 	req.Equal("Some label", tsPanel.FieldConfig.Defaults.Custom.AxisLabel)
 	req.Equal(2, *tsPanel.FieldConfig.Defaults.Decimals)
-	req.Equal(0, *tsPanel.FieldConfig.Defaults.Min)
-	req.Equal(11, *tsPanel.FieldConfig.Defaults.Max)
+	req.Equal(float64(0), *tsPanel.FieldConfig.Defaults.Min)
+	req.Equal(float64(11), *tsPanel.FieldConfig.Defaults.Max)
 	req.Equal(1, *tsPanel.FieldConfig.Defaults.Custom.AxisSoftMin)
 	req.Equal(10, *tsPanel.FieldConfig.Defaults.Custom.AxisSoftMax)
 	req.Equal("short", tsPanel.FieldConfig.Defaults.Unit)

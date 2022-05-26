@@ -111,7 +111,7 @@ func defaultYAxis() Option {
 // DataSource sets the data source to be used by the panel.
 func DataSource(source string) Option {
 	return func(heatmap *Heatmap) error {
-		heatmap.Builder.Datasource = &source
+		heatmap.Builder.Datasource = &sdk.DatasourceRef{LegacyName: source}
 
 		return nil
 	}

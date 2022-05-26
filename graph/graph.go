@@ -175,7 +175,7 @@ func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 // DataSource sets the data source to be used by the graph.
 func DataSource(source string) Option {
 	return func(graph *Graph) error {
-		graph.Builder.Datasource = &source
+		graph.Builder.Datasource = &sdk.DatasourceRef{LegacyName: source}
 
 		return nil
 	}

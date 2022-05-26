@@ -59,7 +59,7 @@ func defaults() []Option {
 // DataSource sets the data source to be used by the panel.
 func DataSource(source string) Option {
 	return func(logs *Logs) error {
-		logs.Builder.Datasource = &source
+		logs.Builder.Datasource = &sdk.DatasourceRef{LegacyName: source}
 
 		return nil
 	}

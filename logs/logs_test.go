@@ -81,7 +81,7 @@ func TestLogsPanelDataSourceCanBeConfigured(t *testing.T) {
 	panel, err := New("", DataSource("loki-default"))
 
 	req.NoError(err)
-	req.Equal("loki-default", *panel.Builder.Datasource)
+	req.Equal("loki-default", panel.Builder.Datasource.LegacyName)
 }
 
 func TestRepeatCanBeConfigured(t *testing.T) {

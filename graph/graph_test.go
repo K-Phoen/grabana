@@ -111,7 +111,7 @@ func TestGraphPanelDataSourceCanBeConfigured(t *testing.T) {
 	panel, err := New("", DataSource("prometheus-default"))
 
 	req.NoError(err)
-	req.Equal("prometheus-default", *panel.Builder.Datasource)
+	req.Equal("prometheus-default", panel.Builder.Datasource.LegacyName)
 }
 
 func TestLeftYAxisCanBeConfigured(t *testing.T) {
