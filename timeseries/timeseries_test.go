@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/scheme"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/K-Phoen/grabana/timeseries/axis"
@@ -22,6 +23,15 @@ func TestNewTimeSeriesPanelsCanBeCreated(t *testing.T) {
 	req.False(panel.Builder.IsNew)
 	req.Equal("TimeSeries panel", panel.Builder.Title)
 	req.Equal(float32(6), panel.Builder.Span)
+}
+
+func TestTimeSeriesPanelCanHaveLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Links(links.New("", "")))
+
+	req.NoError(err)
+	req.Len(panel.Builder.Links, 1)
 }
 
 func TestTimeSeriesPanelCanHavePrometheusTargets(t *testing.T) {

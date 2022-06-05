@@ -5,6 +5,7 @@ import (
 
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/scheme"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
@@ -141,6 +142,19 @@ func defaults() []Option {
 			axis.Placement(axis.Auto),
 			axis.Scale(axis.Linear),
 		),
+	}
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(timeseries *TimeSeries) error {
+		timeseries.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			timeseries.Builder.Links = append(timeseries.Builder.Links, link.Builder)
+		}
+
+		return nil
 	}
 }
 
