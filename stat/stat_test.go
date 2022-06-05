@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
 )
@@ -17,6 +18,15 @@ func TestNewStatPanelsCanBeCreated(t *testing.T) {
 	req.False(panel.Builder.IsNew)
 	req.Equal("Stat panel", panel.Builder.Title)
 	req.Equal(float32(6), panel.Builder.Span)
+}
+
+func TestStatPanelCanHaveLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Links(links.New("", "")))
+
+	req.NoError(err)
+	req.Len(panel.Builder.Links, 1)
 }
 
 func TestStatPanelCanHavePrometheusTargets(t *testing.T) {

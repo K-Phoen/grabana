@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/scheme"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
@@ -111,6 +112,19 @@ func defaults() []Option {
 		ValueType(Last),
 		NoValue("N/A"),
 		ColorScheme(scheme.ThresholdsValue(scheme.Last)),
+	}
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(stat *Stat) error {
+		stat.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			stat.Builder.Links = append(stat.Builder.Links, link.Builder)
+		}
+
+		return nil
 	}
 }
 
