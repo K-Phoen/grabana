@@ -13,12 +13,13 @@ var ErrInvalidSingleStatValueType = fmt.Errorf("invalid single stat value type")
 
 type DashboardSingleStat struct {
 	Title           string
-	Description     string  `yaml:",omitempty"`
-	Span            float32 `yaml:",omitempty"`
-	Height          string  `yaml:",omitempty"`
-	Transparent     bool    `yaml:",omitempty"`
-	Datasource      string  `yaml:",omitempty"`
-	Repeat          string  `yaml:",omitempty"`
+	Description     string              `yaml:",omitempty"`
+	Span            float32             `yaml:",omitempty"`
+	Height          string              `yaml:",omitempty"`
+	Transparent     bool                `yaml:",omitempty"`
+	Datasource      string              `yaml:",omitempty"`
+	Repeat          string              `yaml:",omitempty"`
+	Links           DashboardPanelLinks `yaml:",omitempty"`
 	Unit            string
 	Decimals        *int   `yaml:",omitempty"`
 	ValueType       string `yaml:"value_type"`
@@ -53,6 +54,9 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	}
 	if singleStatPanel.Repeat != "" {
 		opts = append(opts, singlestat.Repeat(singleStatPanel.Repeat))
+	}
+	if len(singleStatPanel.Links) != 0 {
+		opts = append(opts, singlestat.Links(singleStatPanel.Links.toModel()...))
 	}
 	if singleStatPanel.Unit != "" {
 		opts = append(opts, singlestat.Unit(singleStatPanel.Unit))

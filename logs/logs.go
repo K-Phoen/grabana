@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/loki"
 	"github.com/K-Phoen/sdk"
 )
@@ -53,6 +54,19 @@ func defaults() []Option {
 	return []Option{
 		Span(6),
 		Order(Desc),
+	}
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(logs *Logs) error {
+		logs.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			logs.Builder.Links = append(logs.Builder.Links, link.Builder)
+		}
+
+		return nil
 	}
 }
 

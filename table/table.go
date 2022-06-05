@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -72,6 +73,19 @@ func defaults() []Option {
 	return []Option{
 		Span(6),
 		TimeSeriesToRows(),
+	}
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(table *Table) error {
+		table.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			table.Builder.Links = append(table.Builder.Links, link.Builder)
+		}
+
+		return nil
 	}
 }
 

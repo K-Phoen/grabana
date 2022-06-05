@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -125,6 +126,19 @@ func defaults() []Option {
 		}),
 		SparkLineColor("rgb(31, 120, 193)"),
 		SparkLineFillColor("rgba(31, 118, 189, 0.18)"),
+	}
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(singleStat *SingleStat) error {
+		singleStat.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			singleStat.Builder.Links = append(singleStat.Builder.Links, link.Builder)
+		}
+
+		return nil
 	}
 }
 

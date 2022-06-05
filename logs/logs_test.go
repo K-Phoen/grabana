@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,6 +19,15 @@ func TestNewLogsPanelsCanBeCreated(t *testing.T) {
 	req.Equal(float32(6), panel.Builder.Span)
 	req.Equal("Descending", panel.Builder.LogsPanel.Options.SortOrder)
 	req.True(panel.Builder.LogsPanel.Options.EnableLogDetails)
+}
+
+func TestLogsPanelCanHaveLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Links(links.New("", "")))
+
+	req.NoError(err)
+	req.Len(panel.Builder.Links, 1)
 }
 
 func TestLogsPanelCanHaveLokiTargets(t *testing.T) {

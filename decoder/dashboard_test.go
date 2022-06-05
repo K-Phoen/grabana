@@ -675,6 +675,8 @@ rows:
         title: Total Request per Second
         description: Does it perform?
         span: 12
+        links:
+        - { title: linky, url: http://linky }
         targets:
         - prometheus:
             query: "go_memstats_heap_alloc_bytes"

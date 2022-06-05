@@ -20,12 +20,13 @@ type StatThresholdStep struct {
 
 type DashboardStat struct {
 	Title       string
-	Description string  `yaml:",omitempty"`
-	Span        float32 `yaml:",omitempty"`
-	Height      string  `yaml:",omitempty"`
-	Transparent bool    `yaml:",omitempty"`
-	Datasource  string  `yaml:",omitempty"`
-	Repeat      string  `yaml:",omitempty"`
+	Description string              `yaml:",omitempty"`
+	Span        float32             `yaml:",omitempty"`
+	Height      string              `yaml:",omitempty"`
+	Transparent bool                `yaml:",omitempty"`
+	Datasource  string              `yaml:",omitempty"`
+	Repeat      string              `yaml:",omitempty"`
+	Links       DashboardPanelLinks `yaml:",omitempty"`
 	Targets     []Target
 
 	Unit     string `yaml:",omitempty"`
@@ -63,6 +64,9 @@ func (statPanel DashboardStat) toOption() (row.Option, error) {
 	}
 	if statPanel.Repeat != "" {
 		opts = append(opts, stat.Repeat(statPanel.Repeat))
+	}
+	if len(statPanel.Links) != 0 {
+		opts = append(opts, stat.Links(statPanel.Links.toModel()...))
 	}
 	if statPanel.Unit != "" {
 		opts = append(opts, stat.Unit(statPanel.Unit))

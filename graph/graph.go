@@ -7,6 +7,7 @@ import (
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/graph/series"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -115,6 +116,19 @@ func defaultAxes() Option {
 			*axis.New(axis.Hide()).Builder,
 		}
 		graph.Builder.GraphPanel.Xaxis = *axis.New(axis.Unit("time")).Builder
+
+		return nil
+	}
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(graph *Graph) error {
+		graph.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			graph.Builder.Links = append(graph.Builder.Links, link.Builder)
+		}
 
 		return nil
 	}

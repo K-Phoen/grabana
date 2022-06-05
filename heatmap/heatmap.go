@@ -5,6 +5,7 @@ import (
 
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/heatmap/axis"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -103,6 +104,19 @@ func defaults() []Option {
 func defaultYAxis() Option {
 	return func(heatmap *Heatmap) error {
 		heatmap.Builder.HeatmapPanel.YAxis = *axis.New().Builder
+
+		return nil
+	}
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(heatmap *Heatmap) error {
+		heatmap.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			heatmap.Builder.Links = append(heatmap.Builder.Links, link.Builder)
+		}
 
 		return nil
 	}

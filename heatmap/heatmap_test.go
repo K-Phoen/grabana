@@ -5,6 +5,7 @@ import (
 
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/heatmap/axis"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
 )
@@ -18,6 +19,15 @@ func TestNewHeatmapPanelsCanBeCreated(t *testing.T) {
 	req.False(panel.Builder.IsNew)
 	req.Equal("Heatmap panel", panel.Builder.Title)
 	req.Equal(float32(6), panel.Builder.Span)
+}
+
+func TestHeatmapPanelCanHaveLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Links(links.New("", "")))
+
+	req.NoError(err)
+	req.Len(panel.Builder.Links, 1)
 }
 
 func TestHeatmapPanelCanHavePrometheusTargets(t *testing.T) {

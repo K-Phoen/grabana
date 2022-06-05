@@ -77,6 +77,14 @@
           "description": "Does it perform?",
           "transparent": false,
           "type": "timeseries",
+          "links":  [
+            {
+              "includeVars": false,
+              "title": "linky",
+              "url": "http://linky",
+              "type": ""
+            }
+          ],
           "targets": [
             {
               "refId": "",
