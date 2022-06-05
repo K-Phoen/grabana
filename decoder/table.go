@@ -8,11 +8,12 @@ import (
 // DashboardTable represents a table panel.
 type DashboardTable struct {
 	Title                  string
-	Description            string  `yaml:",omitempty"`
-	Span                   float32 `yaml:",omitempty"`
-	Height                 string  `yaml:",omitempty"`
-	Transparent            bool    `yaml:",omitempty"`
-	Datasource             string  `yaml:",omitempty"`
+	Description            string              `yaml:",omitempty"`
+	Span                   float32             `yaml:",omitempty"`
+	Height                 string              `yaml:",omitempty"`
+	Transparent            bool                `yaml:",omitempty"`
+	Datasource             string              `yaml:",omitempty"`
+	Links                  DashboardPanelLinks `yaml:",omitempty"`
 	Targets                []Target
 	HiddenColumns          []string            `yaml:"hidden_columns,flow"`
 	TimeSeriesAggregations []table.Aggregation `yaml:"time_series_aggregations"`
@@ -35,6 +36,9 @@ func (tablePanel DashboardTable) toOption() (row.Option, error) {
 	}
 	if tablePanel.Datasource != "" {
 		opts = append(opts, table.DataSource(tablePanel.Datasource))
+	}
+	if len(tablePanel.Links) != 0 {
+		opts = append(opts, table.Links(tablePanel.Links.toModel()...))
 	}
 
 	for _, t := range tablePanel.Targets {

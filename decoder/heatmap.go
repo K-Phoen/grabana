@@ -13,15 +13,16 @@ var ErrInvalidDataFormat = fmt.Errorf("invalid data format")
 // DashboardHeatmap represents a heatmap panel.
 type DashboardHeatmap struct {
 	Title           string
-	Description     string  `yaml:",omitempty"`
-	Span            float32 `yaml:",omitempty"`
-	Height          string  `yaml:",omitempty"`
-	Transparent     bool    `yaml:",omitempty"`
-	Datasource      string  `yaml:",omitempty"`
-	Repeat          string  `yaml:",omitempty"`
-	DataFormat      string  `yaml:"data_format,omitempty"`
-	HideZeroBuckets bool    `yaml:"hide_zero_buckets"`
-	HighlightCards  bool    `yaml:"highlight_cards"`
+	Description     string              `yaml:",omitempty"`
+	Span            float32             `yaml:",omitempty"`
+	Height          string              `yaml:",omitempty"`
+	Transparent     bool                `yaml:",omitempty"`
+	Datasource      string              `yaml:",omitempty"`
+	Repeat          string              `yaml:",omitempty"`
+	DataFormat      string              `yaml:"data_format,omitempty"`
+	HideZeroBuckets bool                `yaml:"hide_zero_buckets"`
+	HighlightCards  bool                `yaml:"highlight_cards"`
+	Links           DashboardPanelLinks `yaml:",omitempty"`
 	Targets         []Target
 	ReverseYBuckets bool            `yaml:"reverse_y_buckets,omitempty"`
 	Tooltip         *HeatmapTooltip `yaml:",omitempty"`
@@ -107,6 +108,9 @@ func (heatmapPanel DashboardHeatmap) toOption() (row.Option, error) {
 	}
 	if heatmapPanel.Repeat != "" {
 		opts = append(opts, heatmap.Repeat(heatmapPanel.Repeat))
+	}
+	if len(heatmapPanel.Links) != 0 {
+		opts = append(opts, heatmap.Links(heatmapPanel.Links.toModel()...))
 	}
 	if heatmapPanel.DataFormat != "" {
 		switch heatmapPanel.DataFormat {

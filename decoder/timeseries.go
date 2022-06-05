@@ -16,12 +16,13 @@ var ErrInvalidAxisScale = fmt.Errorf("invalid axis scale")
 
 type DashboardTimeSeries struct {
 	Title         string
-	Description   string  `yaml:",omitempty"`
-	Span          float32 `yaml:",omitempty"`
-	Height        string  `yaml:",omitempty"`
-	Transparent   bool    `yaml:",omitempty"`
-	Datasource    string  `yaml:",omitempty"`
-	Repeat        string  `yaml:",omitempty"`
+	Description   string              `yaml:",omitempty"`
+	Span          float32             `yaml:",omitempty"`
+	Height        string              `yaml:",omitempty"`
+	Transparent   bool                `yaml:",omitempty"`
+	Datasource    string              `yaml:",omitempty"`
+	Repeat        string              `yaml:",omitempty"`
+	Links         DashboardPanelLinks `yaml:",omitempty"`
 	Targets       []Target
 	Legend        []string                 `yaml:",omitempty,flow"`
 	Alert         *Alert                   `yaml:",omitempty"`
@@ -49,6 +50,9 @@ func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
 	}
 	if timeseriesPanel.Repeat != "" {
 		opts = append(opts, timeseries.Repeat(timeseriesPanel.Repeat))
+	}
+	if len(timeseriesPanel.Links) != 0 {
+		opts = append(opts, timeseries.Links(timeseriesPanel.Links.toModel()...))
 	}
 	if len(timeseriesPanel.Legend) != 0 {
 		legendOpts, err := timeseriesPanel.legend()

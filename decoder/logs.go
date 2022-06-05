@@ -12,14 +12,15 @@ var ErrInvalidDeduplicationStrategy = fmt.Errorf("invalid deduplication strategy
 
 type DashboardLogs struct {
 	Title         string
-	Description   string             `yaml:",omitempty"`
-	Span          float32            `yaml:",omitempty"`
-	Height        string             `yaml:",omitempty"`
-	Transparent   bool               `yaml:",omitempty"`
-	Datasource    string             `yaml:",omitempty"`
-	Repeat        string             `yaml:",omitempty"`
-	Targets       []LogsTarget       `yaml:",omitempty"`
-	Visualization *LogsVisualization `yaml:",omitempty"`
+	Description   string              `yaml:",omitempty"`
+	Span          float32             `yaml:",omitempty"`
+	Height        string              `yaml:",omitempty"`
+	Transparent   bool                `yaml:",omitempty"`
+	Datasource    string              `yaml:",omitempty"`
+	Repeat        string              `yaml:",omitempty"`
+	Links         DashboardPanelLinks `yaml:",omitempty"`
+	Targets       []LogsTarget        `yaml:",omitempty"`
+	Visualization *LogsVisualization  `yaml:",omitempty"`
 }
 
 type LogsTarget struct {
@@ -46,6 +47,9 @@ func (panel DashboardLogs) toOption() (row.Option, error) {
 	}
 	if panel.Repeat != "" {
 		opts = append(opts, logs.Repeat(panel.Repeat))
+	}
+	if len(panel.Links) != 0 {
+		opts = append(opts, logs.Links(panel.Links.toModel()...))
 	}
 	for _, t := range panel.Targets {
 		opt, err := panel.target(t)
