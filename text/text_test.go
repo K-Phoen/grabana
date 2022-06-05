@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,6 +19,15 @@ func TestNewTextPanelsCanBeCreated(t *testing.T) {
 	req.Equal(float32(6), panel.Builder.Span)
 	req.Empty(panel.Builder.TextPanel.Content)
 	req.Empty(panel.Builder.TextPanel.Mode)
+}
+
+func TestTextPanelCanHaveLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Links(links.New("", "")))
+
+	req.NoError(err)
+	req.Len(panel.Builder.Links, 1)
 }
 
 func TestTextPanelsCanBeHTML(t *testing.T) {

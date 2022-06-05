@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/K-Phoen/grabana/errors"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -29,6 +30,19 @@ func New(title string, options ...Option) (*Text, error) {
 	}
 
 	return panel, nil
+}
+
+// Links adds links to be displayed on this panel.
+func Links(panelLinks ...links.Link) Option {
+	return func(text *Text) error {
+		text.Builder.Links = make([]sdk.Link, 0, len(panelLinks))
+
+		for _, link := range panelLinks {
+			text.Builder.Links = append(text.Builder.Links, link.Builder)
+		}
+
+		return nil
+	}
 }
 
 // HTML sets the content of the panel, to be rendered as HTML.
