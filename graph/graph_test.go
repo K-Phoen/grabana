@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/graph/series"
+	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
 )
@@ -19,6 +20,15 @@ func TestNewGraphPanelsCanBeCreated(t *testing.T) {
 	req.False(panel.Builder.IsNew)
 	req.Equal("Graph panel", panel.Builder.Title)
 	req.Equal(float32(6), panel.Builder.Span)
+}
+
+func TestGraphPanelCanHaveLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Links(links.New("", "")))
+
+	req.NoError(err)
+	req.Len(panel.Builder.Links, 1)
 }
 
 func TestGraphPanelCanHavePrometheusTargets(t *testing.T) {
