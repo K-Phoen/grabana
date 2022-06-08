@@ -3,6 +3,7 @@ package alertmanager
 import (
 	"testing"
 
+	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
 )
 
@@ -59,6 +60,20 @@ func TestRouting(t *testing.T) {
 	)
 
 	req.Len(manager.builder.Config.Route.Routes, 1)
+}
+
+func TestTemplates(t *testing.T) {
+	req := require.New(t)
+
+	manager := New(
+		Templates(map[string]string{
+			"custom_template": "lala",
+		}),
+	)
+
+	req.Equal(sdk.MessageTemplate{
+		"custom_template": "lala",
+	}, manager.builder.TemplateFiles)
 }
 
 func TestMarshalJSON(t *testing.T) {
