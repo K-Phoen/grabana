@@ -54,6 +54,15 @@ func DefaultContactPoint(contactPoint string) Option {
 	}
 }
 
+// Templates defines templates that can be used when sending messages to
+// contact points.
+// See https://prometheus.io/blog/2016/03/03/custom-alertmanager-templates/
+func Templates(templates map[string]string) Option {
+	return func(manager *Manager) {
+		manager.builder.TemplateFiles = templates
+	}
+}
+
 // Routing configures the routing policies to apply on alerts.
 func Routing(policies ...RoutingPolicy) Option {
 	return func(manager *Manager) {
