@@ -21,6 +21,18 @@ func TestNewAlertCanBeCreated(t *testing.T) {
 	req.Equal(string(ErrorAlerting), a.Builder.Rules[0].GrafanaAlert.ExecutionErrorState)
 }
 
+func TestConditionsCanBeCombined(t *testing.T) {
+	req := require.New(t)
+
+	a := New(
+		"",
+		IfOr(Avg, "A", IsBelow(10)),
+		IfOr(Avg, "B", IsBelow(8)),
+	)
+
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
+}
+
 func TestPanelIDCanBeHooked(t *testing.T) {
 	req := require.New(t)
 

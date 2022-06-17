@@ -779,26 +779,6 @@ func TestDashboardsCanBeCreatedWithNewAlertsAndDeletesPreviousAlerts(t *testing.
         "exec_err_state": "Alerting",
         "data": [
           {
-            "refId": "A",
-            "queryType": "",
-            "relativeTimeRange": {
-              "from": 600,
-              "to": 0
-            },
-            "datasourceUid": "prom-uid",
-            "model": {
-              "refId": "A",
-              "expr": "sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
-              "format": "time_series",
-              "datasource": {
-                "uid": "prom-uid",
-                "type": "prometheus"
-              },
-              "intervalMs": 15000,
-              "hide": false
-            }
-          },
-          {
             "refId": "_alert_condition_",
             "queryType": "",
             "datasourceUid": "-100",
@@ -832,6 +812,26 @@ func TestDashboardsCanBeCreatedWithNewAlertsAndDeletesPreviousAlerts(t *testing.
                   }
                 }
               ]
+            }
+          },
+          {
+            "refId": "A",
+            "queryType": "",
+            "relativeTimeRange": {
+              "from": 600,
+              "to": 0
+            },
+            "datasourceUid": "prom-uid",
+            "model": {
+              "refId": "A",
+              "expr": "sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+              "format": "time_series",
+              "datasource": {
+                "uid": "prom-uid",
+                "type": "prometheus"
+              },
+              "intervalMs": 15000,
+              "hide": false
             }
           }
         ]

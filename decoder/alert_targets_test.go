@@ -48,9 +48,9 @@ func TestDecodingAPrometheusTarget(t *testing.T) {
 	alert := alertBuilder.New("", opt)
 
 	req.Len(alert.Builder.Rules, 1)
-	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
 
-	promQuery := alert.Builder.Rules[0].GrafanaAlert.Data[0]
+	promQuery := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 	req.Equal("A", promQuery.RefID)
 	req.Equal("A", promQuery.Model.RefID)
@@ -104,9 +104,9 @@ func TestDecodingALokiTarget(t *testing.T) {
 	alert := alertBuilder.New("", opt)
 
 	req.Len(alert.Builder.Rules, 1)
-	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
 
-	promQuery := alert.Builder.Rules[0].GrafanaAlert.Data[0]
+	promQuery := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 	req.Equal("A", promQuery.RefID)
 	req.Equal("A", promQuery.Model.RefID)
@@ -159,9 +159,9 @@ func TestDecodingAGraphiteTarget(t *testing.T) {
 	alert := alertBuilder.New("", opt)
 
 	req.Len(alert.Builder.Rules, 1)
-	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
 
-	promQuery := alert.Builder.Rules[0].GrafanaAlert.Data[0]
+	promQuery := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 	req.Equal("A", promQuery.RefID)
 	req.Equal("A", promQuery.Model.RefID)
@@ -271,9 +271,9 @@ func TestDecodingStackdriverTarget(t *testing.T) {
 	alert := alertBuilder.New("", opt)
 
 	req.Len(alert.Builder.Rules, 1)
-	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
 
-	query := alert.Builder.Rules[0].GrafanaAlert.Data[0]
+	query := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 	stackdriverData := query.Model.MetricQuery
 
 	req.Equal("A", query.RefID)
@@ -334,7 +334,7 @@ func TestDecodingStackdriverPreprocessor(t *testing.T) {
 			req.NoError(err)
 
 			alert := alertBuilder.New("", opt)
-			query := alert.Builder.Rules[0].GrafanaAlert.Data[0]
+			query := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 			req.Equal(tc.expected, query.Model.MetricQuery.Preprocessor)
 		})
@@ -448,7 +448,7 @@ func TestDecodingStackdriverAggregation(t *testing.T) {
 			req.NoError(err)
 
 			alert := alertBuilder.New("", opt)
-			query := alert.Builder.Rules[0].GrafanaAlert.Data[0]
+			query := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 			req.Equal(string(tc.expected), query.Model.MetricQuery.CrossSeriesReducer)
 		})
@@ -590,7 +590,7 @@ func TestDecodingStackdriverAlignment(t *testing.T) {
 			req.NoError(err)
 
 			alert := alertBuilder.New("", opt)
-			query := alert.Builder.Rules[0].GrafanaAlert.Data[0]
+			query := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 			req.Equal(string(tc.expected), query.Model.MetricQuery.PerSeriesAligner)
 			req.Equal("stackdriver-auto", query.Model.MetricQuery.AlignmentPeriod)
