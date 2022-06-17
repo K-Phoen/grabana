@@ -13,7 +13,7 @@ func TestPrometheusQueriesCanBeAdded(t *testing.T) {
 
 	a := New("", WithPrometheusQuery("A", "some prometheus query"))
 
-	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
 
 func TestGraphiteQueriesCanBeAdded(t *testing.T) {
@@ -21,7 +21,7 @@ func TestGraphiteQueriesCanBeAdded(t *testing.T) {
 
 	a := New("", WithGraphiteQuery("A", "some graphite query"))
 
-	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
 
 func TestLokiQueriesCanBeAdded(t *testing.T) {
@@ -29,7 +29,7 @@ func TestLokiQueriesCanBeAdded(t *testing.T) {
 
 	a := New("", WithLokiQuery("A", "some loki query"))
 
-	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
 
 func TestStackdriverQueriesCanBeAdded(t *testing.T) {
@@ -37,7 +37,7 @@ func TestStackdriverQueriesCanBeAdded(t *testing.T) {
 
 	a := New("", WithStackdriverQuery(stackdriver.Gauge("A", "cloudsql.googleapis.com/database/cpu/utilization")))
 
-	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
 
 func TestInfluxDBQueriesCanBeAdded(t *testing.T) {
@@ -45,5 +45,5 @@ func TestInfluxDBQueriesCanBeAdded(t *testing.T) {
 
 	a := New("", WithInfluxDBQuery("A", "some influxdb query"))
 
-	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
+	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }

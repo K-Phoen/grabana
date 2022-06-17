@@ -55,6 +55,8 @@ type Alert struct {
 
 // New creates a new alert.
 func New(name string, options ...Option) *Alert {
+	nope := false
+
 	alert := &Alert{
 		Builder: &sdk.Alert{
 			Name: name,
@@ -63,7 +65,23 @@ func New(name string, options ...Option) *Alert {
 					GrafanaAlert: &sdk.GrafanaAlert{
 						Title:     name,
 						Condition: alertConditionRef,
-						Data:      nil,
+						Data: []sdk.AlertQuery{
+							{
+								RefID:         alertConditionRef,
+								QueryType:     "",
+								DatasourceUID: "-100",
+								Model: sdk.AlertModel{
+									RefID: alertConditionRef,
+									Type:  "classic_conditions",
+									Hide:  &nope,
+									Datasource: sdk.AlertDatasourceRef{
+										UID:  "-100",
+										Type: "__expr__",
+									},
+									Conditions: []sdk.AlertCondition{},
+								},
+							},
+						},
 					},
 					Annotations: map[string]string{},
 					Labels:      map[string]string{},
@@ -185,25 +203,7 @@ func ifOperand(operand Operator, reducer QueryReducer, queryRef string, evaluato
 		cond := newCondition(reducer, queryRef, evaluator)
 		cond.builder.Operator = sdk.AlertOperator{Type: string(operand)}
 
-		nope := false
-
-		alertQuery := sdk.AlertQuery{
-			RefID:         alertConditionRef,
-			QueryType:     "",
-			DatasourceUID: "-100",
-			Model: sdk.AlertModel{
-				RefID: alertConditionRef,
-				Type:  "classic_conditions",
-				Hide:  &nope,
-				Datasource: sdk.AlertDatasourceRef{
-					UID:  "-100",
-					Type: "__expr__",
-				},
-				Conditions: []sdk.AlertCondition{*cond.builder},
-			},
-		}
-
-		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, alertQuery)
+		alert.Builder.Rules[0].GrafanaAlert.Data[0].Model.Conditions = append(alert.Builder.Rules[0].GrafanaAlert.Data[0].Model.Conditions, *cond.builder)
 	}
 }
 
