@@ -108,7 +108,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 	}
 	for _, ref := range alertRefs {
 		if err := client.DeleteAlertGroup(ctx, ref.Namespace, ref.RuleGroup); err != nil {
-			return nil, fmt.Errorf("could not delete of previous alerts for dashboard: %w", err)
+			return nil, fmt.Errorf("could not delete previous alerts for dashboard: %w", err)
 		}
 	}
 
@@ -174,6 +174,18 @@ func (client *Client) persistDashboard(ctx context.Context, folder *Folder, buil
 
 // DeleteDashboard deletes a dashboard given its UID.
 func (client *Client) DeleteDashboard(ctx context.Context, uid string) error {
+	// first: delete existing alerts associated to that dashboard
+	alertRefs, err := client.listAlertsForDashboard(ctx, uid)
+	if err != nil {
+		return fmt.Errorf("could not prepare deletion of alerts for dashboard: %w", err)
+	}
+	for _, ref := range alertRefs {
+		if err := client.DeleteAlertGroup(ctx, ref.Namespace, ref.RuleGroup); err != nil {
+			return fmt.Errorf("could not delete alerts for dashboard: %w", err)
+		}
+	}
+
+	// then: delete the dashboard itself
 	resp, err := client.delete(ctx, "/api/dashboards/uid/"+uid)
 	if err != nil {
 		return err

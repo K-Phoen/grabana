@@ -145,19 +145,85 @@ func TestFetchingAnUnknownDashboardByUIDFailsCleanly(t *testing.T) {
 	req.ErrorIs(err, ErrDashboardNotFound)
 }
 
-func TestDeleteDashboard(t *testing.T) {
+func TestDeleteDashboardWithNoAlerts(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = fmt.Fprintln(w, `{"title": "Production Overview"}`)
+		// Potential existing alerts retrieval
+		if r.Method == http.MethodGet && r.URL.String() == "/api/ruler/grafana/api/v1/rules?dashboard_uid=some-uid" {
+			_, _ = fmt.Fprintln(w, `{}`)
+			return
+		}
+
+		// Dashboard deletion
+		if r.Method == http.MethodDelete && r.URL.String() == "/api/dashboards/uid/some-uid" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = fmt.Fprintln(w, `{"title": "Production Overview"}`)
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprintf(w, `{"message": "oh noes, we should not get here", "method": "%s", "path": "%s"}\n`, r.Method, r.URL.String())
 	}))
 	defer ts.Close()
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
-	err := client.DeleteDashboard(context.TODO(), "some uid")
+	err := client.DeleteDashboard(context.TODO(), "some-uid")
 
 	req.NoError(err)
+}
+
+func TestDeleteDashboardWithAlerts(t *testing.T) {
+	req := require.New(t)
+	firstAlertDeleted := false
+	secondAlertDeleted := false
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Potential existing alerts retrieval
+		if r.Method == http.MethodGet && r.URL.String() == "/api/ruler/grafana/api/v1/rules?dashboard_uid=some-uid" {
+			_, _ = fmt.Fprintln(w, `{
+  "test ns 1": [
+    {"name": "alert 1"}
+  ],
+  "test ns 2": [
+    {"name": "alert 2"}
+  ]
+}`)
+			return
+		}
+
+		// First alert deletion
+		if r.Method == http.MethodDelete && r.URL.String() == "/api/ruler/grafana/api/v1/rules/test%20ns%201/alert%201" {
+			firstAlertDeleted = true
+			w.WriteHeader(http.StatusAccepted)
+			return
+		}
+
+		// Second alert deletion
+		if r.Method == http.MethodDelete && r.URL.String() == "/api/ruler/grafana/api/v1/rules/test%20ns%202/alert%202" {
+			secondAlertDeleted = true
+			w.WriteHeader(http.StatusAccepted)
+			return
+		}
+
+		// Dashboard deletion
+		if r.Method == http.MethodDelete && r.URL.String() == "/api/dashboards/uid/some-uid" {
+			w.WriteHeader(http.StatusOK)
+			_, _ = fmt.Fprintln(w, `{"title": "Production Overview"}`)
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprintf(w, `{"message": "oh noes, we should not get here", "method": "%s", "path": "%s"}\n`, r.Method, r.URL.String())
+	}))
+	defer ts.Close()
+
+	client := NewClient(http.DefaultClient, ts.URL)
+
+	err := client.DeleteDashboard(context.TODO(), "some-uid")
+
+	req.NoError(err)
+	req.True(firstAlertDeleted)
+	req.True(secondAlertDeleted)
 }
 
 func TestDeleteDashboardCanFail(t *testing.T) {
@@ -178,14 +244,27 @@ func TestDeleteDashboardCanFail(t *testing.T) {
 func TestDeletingANonExistingDashboardReturnsSpecificError(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		_, _ = fmt.Fprintln(w, `{"message": "oh noes, does not exist"}`)
+		// Potential existing alerts retrieval
+		if r.Method == http.MethodGet && r.URL.String() == "/api/ruler/grafana/api/v1/rules?dashboard_uid=some-uid" {
+			_, _ = fmt.Fprintln(w, `{}`)
+			return
+		}
+
+		// Dashboard deletion
+		if r.Method == http.MethodDelete && r.URL.String() == "/api/dashboards/uid/some-uid" {
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = fmt.Fprintln(w, `{"message": "oh noes, does not exist"}`)
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = fmt.Fprintf(w, `{"message": "oh noes, we should not get here", "method": "%s", "path": "%s"}\n`, r.Method, r.URL.String())
 	}))
 	defer ts.Close()
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
-	err := client.DeleteDashboard(context.TODO(), "some uid")
+	err := client.DeleteDashboard(context.TODO(), "some-uid")
 
 	req.Equal(ErrDashboardNotFound, err)
 }
