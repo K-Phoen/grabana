@@ -14,6 +14,8 @@ creation of dashboards, this library is meant for you.
 * expose a developer-friendly API
 * allow IDE assistance and auto-completion
 
+**Note**: Grafana 8+ is required, with [unified alerting](https://grafana.com/blog/2021/06/14/the-new-unified-alerting-system-for-grafana-everything-you-need-to-know/) enabled.
+
 ## Dashboard as code
 
 Dashboard configuration:
