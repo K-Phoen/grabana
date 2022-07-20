@@ -54,6 +54,13 @@ func DefaultContactPoint(contactPoint string) Option {
 	}
 }
 
+// DefaultGroupBys sets the default labels that alerts should be grouped by.
+func DefaultGroupBys(labels ...string) Option {
+	return func(manager *Manager) {
+		manager.builder.Config.Route.GroupBy = labels
+	}
+}
+
 // Templates defines templates that can be used when sending messages to
 // contact points.
 // See https://prometheus.io/blog/2016/03/03/custom-alertmanager-templates/
