@@ -21,6 +21,16 @@ func TestDefaultContactPoint(t *testing.T) {
 	req.Equal("team-a", manager.builder.Config.Route.Receiver)
 }
 
+func TestDefaultGroupBy(t *testing.T) {
+	req := require.New(t)
+
+	manager := New(
+		DefaultGroupBys("priority", "service"),
+	)
+
+	req.ElementsMatch([]string{"priority", "service"}, manager.builder.Config.Route.GroupBy)
+}
+
 func TestDefaultContactPointCanBeImplicit(t *testing.T) {
 	req := require.New(t)
 

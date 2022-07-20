@@ -50,6 +50,10 @@ type MessageTemplate map[string]string
 type NotificationPolicies struct {
 	// Default alert receiver
 	Receiver string `json:"receiver"`
+
+	// Default group bys
+	GroupBy []string `json:"group_by,omitempty"`
+
 	// Default timing settings
 	GroupInterval  string `json:"group_interval,omitempty"`
 	GroupWait      string `json:"group_wait,omitempty"`
