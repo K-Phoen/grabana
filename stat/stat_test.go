@@ -349,6 +349,15 @@ func TestTitleFontSizeCanBeSet(t *testing.T) {
 	req.Equal(120, panel.Builder.StatPanel.Options.Text.TitleSize)
 }
 
+func TestColorsCanBeDisabled(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", ColorNone())
+
+	req.NoError(err)
+	req.Equal("none", panel.Builder.StatPanel.Options.ColorMode)
+}
+
 func TestValueCanBeColored(t *testing.T) {
 	req := require.New(t)
 

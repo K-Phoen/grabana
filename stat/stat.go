@@ -335,6 +335,15 @@ func TitleFontSize(size int) Option {
 	}
 }
 
+// ColorNone will not color the value or the background.
+func ColorNone() Option {
+	return func(stat *Stat) error {
+		stat.Builder.StatPanel.Options.ColorMode = "none"
+
+		return nil
+	}
+}
+
 // ColorValue will show the threshold's colors on the value itself.
 func ColorValue() Option {
 	return func(stat *Stat) error {
