@@ -2,6 +2,7 @@ package row
 
 import (
 	"github.com/K-Phoen/grabana/alert"
+	"github.com/K-Phoen/grabana/gauge"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/heatmap"
 	"github.com/K-Phoen/grabana/logs"
@@ -90,6 +91,20 @@ func WithTimeSeries(title string, options ...timeseries.Option) Option {
 		}
 
 		row.alerts = append(row.alerts, panel.Alert)
+
+		return nil
+	}
+}
+
+// WithGauge adds a "gauge" panel in the row.
+func WithGauge(title string, options ...gauge.Option) Option {
+	return func(row *Row) error {
+		panel, err := gauge.New(title, options...)
+		if err != nil {
+			return err
+		}
+
+		row.builder.Add(panel.Builder)
 
 		return nil
 	}

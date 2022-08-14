@@ -177,6 +177,16 @@ func TestRowsCanHaveLogsPanels(t *testing.T) {
 	req.Len(panel.builder.Panels, 1)
 }
 
+func TestRowsCanHaveGaugePanels(t *testing.T) {
+	req := require.New(t)
+	board := sdk.NewBoard("")
+
+	panel, err := New(board, "", WithGauge("Some gauge"))
+
+	req.NoError(err)
+	req.Len(panel.builder.Panels, 1)
+}
+
 func TestRowsCanHaveRepeatedPanels(t *testing.T) {
 	req := require.New(t)
 	board := sdk.NewBoard("")
