@@ -45,3 +45,34 @@ func TestStatValidValueTypes(t *testing.T) {
 		})
 	}
 }
+func TestStatValidColorMode(t *testing.T) {
+	testCases := []struct {
+		input    string
+		expected string
+	}{
+		{input: "background", expected: "background"},
+		{input: "value", expected: "value"},
+		{input: "none", expected: "none"},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.input, func(t *testing.T) {
+			req := require.New(t)
+
+			panel := DashboardStat{ColorMode: tc.input}
+
+			opt, err := panel.colorMode()
+
+			req.NoError(err)
+
+			statPanel, err := stat.New("")
+			req.NoError(err)
+
+			req.NoError(opt(statPanel))
+
+			req.Equal(tc.expected, statPanel.Builder.StatPanel.Options.ColorMode)
+		})
+	}
+}

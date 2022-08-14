@@ -169,6 +169,8 @@ func (statPanel DashboardStat) colorMode() (stat.Option, error) {
 		return stat.ColorBackground(), nil
 	case "value":
 		return stat.ColorValue(), nil
+	case "none":
+		return stat.ColorNone(), nil
 	default:
 		return nil, ErrInvalidStatColorMode
 	}
