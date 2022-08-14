@@ -39,6 +39,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		collapseRow(),
 		logsPanel(),
 		statPanel(),
+		gaugePanel(),
 	}
 
 	for _, testCase := range testCases {
@@ -598,6 +599,40 @@ rows:
 		name:                "single row with one stat panel",
 		yaml:                yaml,
 		expectedGrafanaJSON: "stat_panel.json",
+	}
+}
+
+func gaugePanel() testCase {
+	yaml := `title: Awesome dashboard
+
+rows:
+  - name: Kubernetes
+    panels:
+      - gauge:
+          title: Cluster Pod Usage
+          description: Some description
+          height: 400px
+          span: 4
+          transparent: true
+          datasource: prometheus-default
+          targets:
+            - prometheus:
+                query: "sum(kube_pod_info{}) / sum(kube_node_status_allocatable{resource=\"pods\"})"
+          orientation: horizontal
+          unit: short
+          decimals: 2
+          title_font_size: 100
+          value_font_size: 150
+          thresholds:
+            - {color: green}
+            - {value: 1, color: orange}
+            - {value: 4, color: red}
+`
+
+	return testCase{
+		name:                "single row with one gauge panel",
+		yaml:                yaml,
+		expectedGrafanaJSON: "gauge_panel.json",
 	}
 }
 

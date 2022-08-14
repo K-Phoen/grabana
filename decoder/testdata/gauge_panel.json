@@ -1,0 +1,133 @@
+{
+  "slug": "",
+  "title": "Awesome dashboard",
+  "originalTitle": "",
+  "tags": null,
+  "style": "dark",
+  "timezone": "",
+  "editable": false,
+  "hideControls": false,
+  "sharedCrosshair": false,
+  "templating": {"list": null},
+  "annotations": {"list": null},
+  "links": null,
+  "panels": null,
+  "rows": [
+    {
+      "title": "Kubernetes",
+      "collapse": false,
+      "editable": true,
+      "height": "250px",
+      "repeat": null,
+      "showTitle": true,
+      "panels": [
+        {
+          "description": "Some description",
+          "datasource": "prometheus-default",
+          "editable": false,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "green",
+                "seriesBy": "last",
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisPlacement": "",
+                "barAlignment": 0,
+                "drawStyle": "",
+                "fillOpacity": 0,
+                "gradientMode": "",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "",
+                "lineStyle": {
+                  "fill": ""
+                },
+                "lineWidth": 0,
+                "pointSize": 0,
+                "scaleDistribution": {
+                  "type": ""
+                },
+                "showPoints": "",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "",
+                  "mode": ""
+                },
+                "thresholdsStyle": {
+                  "mode": ""
+                }
+              },
+              "decimals": 2,
+              "noValue": "N/A",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 4
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": null
+          },
+          "height": "400px",
+          "isNew": false,
+          "id": 14,
+          "options": {
+            "colorMode": "",
+            "graphMode": "none",
+            "justifyMode": "",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "text": {
+              "titleSize": 100,
+              "valueSize": 150
+            },
+            "textMode": ""
+          },
+          "targets": [
+            {
+              "expr": "sum(kube_pod_info{}) / sum(kube_node_status_allocatable{resource=\"pods\"})",
+              "format": "time_series",
+              "refId": ""
+            }
+          ],
+          "span": 4,
+          "gridPos": {},
+          "title": "Cluster Pod Usage",
+          "transparent": true,
+          "type": "gauge"
+        }
+      ]
+    }
+  ],
+  "time": {"from": "now-3h", "to": "now"},
+  "timepicker": {
+    "refresh_intervals": ["5s","10s","30s","1m","5m","15m","30m","1h","2h","1d"],
+    "time_options": ["5m","15m","1h","6h","12h","24h","2d","7d","30d"]
+  },
+  "schemaVersion": 0,
+  "version": 0
+}

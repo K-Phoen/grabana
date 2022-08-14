@@ -136,18 +136,6 @@ func (statPanel DashboardStat) toOption() (row.Option, error) {
 }
 
 func (statPanel DashboardStat) thresholds() (stat.Option, error) {
-	var thresholdMode string
-
-	switch statPanel.ThresholdMode {
-	case "absolute":
-	case "":
-		thresholdMode = "absolute"
-	case "relative":
-		thresholdMode = "relative"
-	default:
-		return nil, ErrInvalidStatThresholdMode
-	}
-
 	thresholds := make([]stat.ThresholdStep, 0, len(statPanel.Thresholds))
 	for _, threshold := range statPanel.Thresholds {
 		thresholds = append(thresholds, stat.ThresholdStep{
@@ -156,11 +144,16 @@ func (statPanel DashboardStat) thresholds() (stat.Option, error) {
 		})
 	}
 
-	if thresholdMode == "absolute" {
+	switch statPanel.ThresholdMode {
+	case "absolute":
 		return stat.AbsoluteThresholds(thresholds), nil
+	case "":
+		return stat.AbsoluteThresholds(thresholds), nil
+	case "relative":
+		return stat.RelativeThresholds(thresholds), nil
 	}
 
-	return stat.RelativeThresholds(thresholds), nil
+	return nil, fmt.Errorf("got mode '%s': %w", statPanel.ThresholdMode, ErrInvalidStatThresholdMode)
 }
 
 func (statPanel DashboardStat) colorMode() (stat.Option, error) {
