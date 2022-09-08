@@ -28,6 +28,18 @@ const (
 	NoSeries TooltipMode = "none"
 )
 
+// StackMode configures mode of series stacking.
+type StackMode string
+
+const (
+	// Unstacked will not stack series
+	Unstacked StackMode = "none"
+	// Normal will stack series as absolute numbers
+	Normal StackMode = "normal"
+	// Percent will stack series as percents
+	Percent StackMode = "percent"
+)
+
 // LineInterpolationMode defines how Grafana interpolates series lines when drawn as lines.
 type LineInterpolationMode string
 
@@ -184,6 +196,15 @@ func LineWidth(value int) Option {
 		}
 
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineWidth = value
+
+		return nil
+	}
+}
+
+// Stack defines if the series should be stacked and using which mode (default not stacked). the opacity level of the series. The lower the value, the more transparent.
+func Stack(value StackMode) Option {
+	return func(timeseries *TimeSeries) error {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode = string(value)
 
 		return nil
 	}

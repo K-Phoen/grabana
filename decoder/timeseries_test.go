@@ -335,6 +335,57 @@ func TestTimeSeriesTooltipRejectsInvalidValues(t *testing.T) {
 	req.Equal(ErrInvalidTooltipMode, err)
 }
 
+func TestTimeSeriesStackCanBeDecided(t *testing.T) {
+	testCases := []struct {
+		mode         string
+		expectedMode timeseries.StackMode
+	}{
+		{
+			mode:         "none",
+			expectedMode: timeseries.Unstacked,
+		},
+		{
+			mode:         "normal",
+			expectedMode: timeseries.Normal,
+		},
+		{
+			mode:         "percent",
+			expectedMode: timeseries.Percent,
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.mode, func(t *testing.T) {
+			req := require.New(t)
+
+			viz := TimeSeriesVisualization{
+				Stack: tc.mode,
+			}
+			opts, err := viz.toOptions()
+
+			req.NoError(err)
+
+			tsPanel, err := timeseries.New("", opts...)
+
+			req.NoError(err)
+			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode)
+		})
+	}
+}
+
+func TestTimeSeriesStackRejectsInvalidValues(t *testing.T) {
+	req := require.New(t)
+
+	viz := TimeSeriesVisualization{
+		Stack: "invalid",
+	}
+	_, err := viz.toOptions()
+
+	req.Equal(ErrInvalidStackMode, err)
+}
+
 func TestTimeSeriesAxisSupportsDisplay(t *testing.T) {
 	testCases := []struct {
 		value    string
