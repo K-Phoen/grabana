@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/variable/datasource"
+	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,6 +14,18 @@ func requireJSON(t *testing.T, payload []byte) {
 	if err := json.Unmarshal(payload, &receiver); err != nil {
 		t.Fatalf("invalid json: %s", err)
 	}
+}
+
+func TestNewDashboardsCanBeCreatedFromSdkBoard(t *testing.T) {
+	req := require.New(t)
+
+	testBoard := sdk.NewBoard("My dashboard")
+	testBoard.Timezone = "UTC"
+
+	builder := NewFromBoard(testBoard)
+
+	req.Equal("My dashboard", builder.board.Title)
+	req.Equal("UTC", builder.board.Timezone)
 }
 
 func TestNewDashboardsCanBeCreated(t *testing.T) {

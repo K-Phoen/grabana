@@ -51,6 +51,12 @@ type Builder struct {
 	alerts []*alert.Alert
 }
 
+func NewFromBoard(board *sdk.Board) Builder {
+	return Builder{
+		board: board,
+	}
+}
+
 // New creates a new dashboard builder.
 func New(title string, options ...Option) (Builder, error) {
 	board := sdk.NewBoard(title)
