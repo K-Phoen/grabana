@@ -21,6 +21,14 @@ up:
         -p 9090:9090 \
         -v $(shell pwd)/testdata/prometheus.yml:/etc/prometheus/prometheus.yml \
         prom/prometheus
+	docker run -d \
+      -p 3000:3000 \
+      --name=grabana_grafana \
+      -e "GF_SECURITY_ADMIN_PASSWORD=secret" \
+      grafana/grafana:8.3.2
+
+.PHONY: up-all
+up-all: up
 	docker run -d\
 		 --name grabana_graphite\
 		 --restart=always\
@@ -41,18 +49,16 @@ up:
 		-e DOCKER_INFLUXDB_INIT_RETENTION=1w \
 		-e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-super-secret-auth-token \
         influxdb:2.0
-	docker run -d \
-      -p 3000:3000 \
-      --name=grabana_grafana \
-      -e "GF_SECURITY_ADMIN_PASSWORD=secret" \
-      grafana/grafana:8.3.2
 
 .PHONY: down
 down:
 	docker rm -f grabana_grafana
+	docker rm -f grabana_prometheus
+
+.PHONY: down-all
+down-all: down
 	docker rm -f grabana_graphite
 	docker rm -f grabana_influxdb
-	docker rm -f grabana_prometheus
 
 install_goreleaser:
 	go install github.com/goreleaser/goreleaser@latest
