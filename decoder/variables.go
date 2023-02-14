@@ -85,6 +85,7 @@ type VariableCustom struct {
 	IncludeAll bool              `yaml:"include_all"`
 	AllValue   string            `yaml:"all_value,omitempty"`
 	Hide       string            `yaml:",omitempty"`
+	Multi      bool              `yaml:",omitempty"`
 }
 
 func (variable *VariableCustom) toOption() (dashboard.Option, error) {
@@ -103,6 +104,9 @@ func (variable *VariableCustom) toOption() (dashboard.Option, error) {
 	}
 	if variable.IncludeAll {
 		opts = append(opts, custom.IncludeAll())
+	}
+	if variable.Multi {
+		opts = append(opts, custom.Multi())
 	}
 
 	switch variable.Hide {
@@ -167,6 +171,7 @@ type VariableQuery struct {
 	DefaultAll bool   `yaml:"default_all"`
 	AllValue   string `yaml:"all_value,omitempty"`
 	Hide       string `yaml:",omitempty"`
+	Multi      bool   `yaml:",omitempty"`
 }
 
 func (variable *VariableQuery) toOption() (dashboard.Option, error) {
@@ -191,6 +196,9 @@ func (variable *VariableQuery) toOption() (dashboard.Option, error) {
 	}
 	if variable.DefaultAll {
 		opts = append(opts, query.DefaultAll())
+	}
+	if variable.Multi {
+		opts = append(opts, query.Multi())
 	}
 
 	switch variable.Hide {
@@ -217,6 +225,7 @@ type VariableDatasource struct {
 	Regex      string
 	IncludeAll bool   `yaml:"include_all"`
 	Hide       string `yaml:",omitempty"`
+	Multi      bool   `yaml:",omitempty"`
 }
 
 func (variable *VariableDatasource) toOption() (dashboard.Option, error) {
@@ -232,6 +241,9 @@ func (variable *VariableDatasource) toOption() (dashboard.Option, error) {
 	}
 	if variable.IncludeAll {
 		opts = append(opts, datasource.IncludeAll())
+	}
+	if variable.Multi {
+		opts = append(opts, datasource.Multi())
 	}
 
 	switch variable.Hide {

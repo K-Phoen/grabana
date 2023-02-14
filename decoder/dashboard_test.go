@@ -27,6 +27,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		generalOptions(),
 		tagAnnotations(),
 		variables(),
+		variablesMulti(),
 		textPanel(),
 		graphPanel(),
 		singleStatPanel(),
@@ -388,6 +389,42 @@ variables:
 		name:                "variables",
 		yaml:                yaml,
 		expectedGrafanaJSON: "variables.json",
+	}
+}
+
+func variablesMulti() testCase {
+	yaml := `title: Awesome dashboard
+
+timezone: browser
+
+variables:
+  - query:
+      name: status
+      label: HTTP status
+      datasource: prometheus-default
+      include_all: true
+      default_all: true
+      request: "label_values(prometheus_http_requests_total, code)"
+      multi: true
+  - custom:
+      name: vX
+      label: vX
+      default: v1
+      values_map:
+        v1: v1
+      multi: true
+  - datasource:
+      name: datasource
+      label: datasource
+      type: prometheus
+      regex: /applications-(?!staging)/
+      include_all: true
+      multi: true
+`
+	return testCase{
+		name:                "variables_multi",
+		yaml:                yaml,
+		expectedGrafanaJSON: "variables_multi.json",
 	}
 }
 
