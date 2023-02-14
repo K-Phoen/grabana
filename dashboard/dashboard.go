@@ -155,6 +155,15 @@ func UID(uid string) Option {
 	}
 }
 
+// Slug sets the Slug used by the dashboard.
+func Slug(slug string) Option {
+	return func(builder *Builder) error {
+		builder.board.Slug = slug
+
+		return nil
+	}
+}
+
 // VariableAsCustom adds a templated variable, defined as a set of custom
 // values.
 // See https://grafana.com/docs/grafana/latest/reference/templating/#variable-types

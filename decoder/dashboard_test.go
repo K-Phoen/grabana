@@ -314,6 +314,8 @@ rows:
 func generalOptions() testCase {
 	yaml := `title: Awesome dashboard
 
+slug: this_is_a_slug
+uid: my_uid
 editable: true
 shared_crosshair: true
 tags: [generated, yaml]
