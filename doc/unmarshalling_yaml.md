@@ -11,7 +11,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/K-Phoen/grabana/decoder"
@@ -20,7 +19,7 @@ import (
 func main() {
 	filePath := "some/awesome/dashboard.yaml"
 
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Could not read file: %s\n", err)
 		os.Exit(1)

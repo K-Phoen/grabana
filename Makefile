@@ -8,7 +8,7 @@ endif
 
 .PHONY: lint
 lint:
-	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:v1.43.0 golangci-lint run -c .golangci.yaml
+	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:v1.51.1 golangci-lint run -c .golangci.yaml
 
 .PHONY: tests
 tests:
