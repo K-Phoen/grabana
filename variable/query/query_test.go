@@ -44,7 +44,7 @@ func TestVariableCanBeHidden(t *testing.T) {
 func TestMultipleVariablesCanBeSelected(t *testing.T) {
 	req := require.New(t)
 
-	panel := New("", Multi())
+	panel := New("", Multiple())
 
 	req.True(panel.Builder.Multi)
 }

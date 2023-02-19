@@ -76,7 +76,7 @@ func main() {
 		),
 		dashboard.VariableAsCustom(
 			"vX",
-			custom.Multi(),
+			custom.Multiple(),
 			custom.IncludeAll(),
 			custom.Values(map[string]string{
 				"v1": "v1",

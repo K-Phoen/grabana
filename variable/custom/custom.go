@@ -103,8 +103,8 @@ func Hide() Option {
 	}
 }
 
-// Multi allows several values to be selected.
-func Multi() Option {
+// Multiple allows several values to be selected.
+func Multiple() Option {
 	return func(custom *Custom) {
 		custom.Builder.Multi = true
 	}
