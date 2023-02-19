@@ -12,6 +12,8 @@ var ErrInvalidTimezone = fmt.Errorf("invalid timezone")
 
 type DashboardModel struct {
 	Title           string
+	Slug            string `yaml:",omitempty"`
+	UID             string `yaml:"uid,omitempty"`
 	Editable        bool
 	SharedCrosshair bool `yaml:"shared_crosshair"`
 	Tags            []string
@@ -36,6 +38,14 @@ func (d *DashboardModel) ToBuilder() (dashboard.Builder, error) {
 
 	if len(d.Tags) != 0 {
 		opts = append(opts, dashboard.Tags(d.Tags))
+	}
+
+	if d.Slug != "" {
+		opts = append(opts, dashboard.Slug(d.Slug))
+	}
+
+	if d.UID != "" {
+		opts = append(opts, dashboard.UID(d.UID))
 	}
 
 	for _, externalLink := range d.ExternalLinks {

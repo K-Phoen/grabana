@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/K-Phoen/grabana/variable/datasource"
 	"github.com/stretchr/testify/require"
+
+	"github.com/K-Phoen/grabana/variable/datasource"
 )
 
 func requireJSON(t *testing.T, payload []byte) {
@@ -80,6 +81,15 @@ func TestDashboardUIDCanBeSet(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("foo", panel.board.UID)
+}
+
+func TestDashboardSlugCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Slug("super-slug"))
+
+	req.NoError(err)
+	req.Equal("super-slug", panel.board.Slug)
 }
 
 func TestDashboardUIDWillBeHashedWhenTooLongForGrafana(t *testing.T) {

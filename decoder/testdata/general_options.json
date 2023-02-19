@@ -1,5 +1,6 @@
 {
-  "slug": "",
+  "slug": "this_is_a_slug",
+  "uid": "my_uid",
   "title": "Awesome dashboard",
   "originalTitle": "",
   "tags": ["generated", "yaml"],
