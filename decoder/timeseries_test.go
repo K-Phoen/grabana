@@ -3,10 +3,11 @@ package decoder
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
-	"github.com/stretchr/testify/require"
 )
 
 func TestTimeSeriesCanBeDecoded(t *testing.T) {
@@ -333,6 +334,57 @@ func TestTimeSeriesTooltipRejectsInvalidValues(t *testing.T) {
 	_, err := viz.toOptions()
 
 	req.Equal(ErrInvalidTooltipMode, err)
+}
+
+func TestTimeSeriesStackCanBeDecided(t *testing.T) {
+	testCases := []struct {
+		mode         string
+		expectedMode timeseries.StackMode
+	}{
+		{
+			mode:         "none",
+			expectedMode: timeseries.Unstacked,
+		},
+		{
+			mode:         "normal",
+			expectedMode: timeseries.NormalStack,
+		},
+		{
+			mode:         "percent",
+			expectedMode: timeseries.PercentStack,
+		},
+	}
+
+	for _, testCase := range testCases {
+		tc := testCase
+
+		t.Run(tc.mode, func(t *testing.T) {
+			req := require.New(t)
+
+			viz := TimeSeriesVisualization{
+				Stack: tc.mode,
+			}
+			opts, err := viz.toOptions()
+
+			req.NoError(err)
+
+			tsPanel, err := timeseries.New("", opts...)
+
+			req.NoError(err)
+			req.Equal(string(tc.expectedMode), tsPanel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode)
+		})
+	}
+}
+
+func TestTimeSeriesStackRejectsInvalidValues(t *testing.T) {
+	req := require.New(t)
+
+	viz := TimeSeriesVisualization{
+		Stack: "invalid",
+	}
+	_, err := viz.toOptions()
+
+	req.Equal(ErrInvalidStackMode, err)
 }
 
 func TestTimeSeriesAxisSupportsDisplay(t *testing.T) {

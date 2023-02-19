@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/scheme"
@@ -11,7 +13,6 @@ import (
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/K-Phoen/grabana/timeseries/threshold"
-	"github.com/stretchr/testify/require"
 )
 
 func TestNewTimeSeriesPanelsCanBeCreated(t *testing.T) {
@@ -444,4 +445,13 @@ func TestColorSchemeCanBeDefined(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("fixed", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Color.Mode)
+}
+
+func TestValuesCanBeStacked(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", Stack(PercentStack))
+
+	req.NoError(err)
+	req.Equal("percent", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode)
 }

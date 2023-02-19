@@ -3,6 +3,8 @@ package timeseries
 import (
 	"fmt"
 
+	"github.com/K-Phoen/sdk"
+
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/links"
@@ -10,7 +12,6 @@ import (
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/K-Phoen/grabana/timeseries/threshold"
-	"github.com/K-Phoen/sdk"
 )
 
 // Option represents an option that can be used to configure a graph panel.
@@ -26,6 +27,18 @@ const (
 	AllSeries TooltipMode = "multi"
 	// NoSeries will hide the tooltip completely.
 	NoSeries TooltipMode = "none"
+)
+
+// StackMode configures mode of series stacking.
+type StackMode string
+
+const (
+	// Unstacked will not stack series
+	Unstacked StackMode = "none"
+	// NormalStack will stack series as absolute numbers
+	NormalStack StackMode = "normal"
+	// PercentStack will stack series as percents
+	PercentStack StackMode = "percent"
 )
 
 // LineInterpolationMode defines how Grafana interpolates series lines when drawn as lines.
@@ -184,6 +197,15 @@ func LineWidth(value int) Option {
 		}
 
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.LineWidth = value
+
+		return nil
+	}
+}
+
+// Stack defines if the series should be stacked and using which mode (default not stacked). the opacity level of the series. The lower the value, the more transparent.
+func Stack(value StackMode) Option {
+	return func(timeseries *TimeSeries) error {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode = string(value)
 
 		return nil
 	}
