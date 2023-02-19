@@ -3,6 +3,8 @@ package timeseries
 import (
 	"fmt"
 
+	"github.com/K-Phoen/sdk"
+
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/links"
@@ -10,7 +12,6 @@ import (
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/K-Phoen/grabana/timeseries/threshold"
-	"github.com/K-Phoen/sdk"
 )
 
 // Option represents an option that can be used to configure a graph panel.
@@ -34,10 +35,10 @@ type StackMode string
 const (
 	// Unstacked will not stack series
 	Unstacked StackMode = "none"
-	// Normal will stack series as absolute numbers
-	Normal StackMode = "normal"
-	// Percent will stack series as percents
-	Percent StackMode = "percent"
+	// NormalStack will stack series as absolute numbers
+	NormalStack StackMode = "normal"
+	// PercentStack will stack series as percents
+	PercentStack StackMode = "percent"
 )
 
 // LineInterpolationMode defines how Grafana interpolates series lines when drawn as lines.

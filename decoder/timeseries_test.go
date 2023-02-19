@@ -3,10 +3,11 @@ package decoder
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
-	"github.com/stretchr/testify/require"
 )
 
 func TestTimeSeriesCanBeDecoded(t *testing.T) {
@@ -346,11 +347,11 @@ func TestTimeSeriesStackCanBeDecided(t *testing.T) {
 		},
 		{
 			mode:         "normal",
-			expectedMode: timeseries.Normal,
+			expectedMode: timeseries.NormalStack,
 		},
 		{
 			mode:         "percent",
-			expectedMode: timeseries.Percent,
+			expectedMode: timeseries.PercentStack,
 		},
 	}
 

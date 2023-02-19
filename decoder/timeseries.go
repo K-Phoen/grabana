@@ -294,9 +294,9 @@ func (timeseriesViz *TimeSeriesVisualization) stackOption() (timeseries.Option, 
 	var mode timeseries.StackMode
 	switch timeseriesViz.Stack {
 	case "normal":
-		mode = timeseries.Normal
+		mode = timeseries.NormalStack
 	case "percent":
-		mode = timeseries.Percent
+		mode = timeseries.PercentStack
 	case "none":
 		mode = timeseries.Unstacked
 	default:
