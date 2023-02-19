@@ -2,11 +2,21 @@ name: CI
 on: [pull_request]
 
 jobs:
-  lint:
-    name: Linters
+  tests:
+    name: Tests
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go: ['1.16', '1.17', '1.18', '1.19', '1.20']
+
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
 
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
@@ -14,7 +24,20 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           golangci_lint_flags: "--config=.golangci.yaml"
           reporter: github-pr-review
-          go_version: '^1.17'
+          go_version: ${{ matrix.go }}
+          cache: false # managed by actions/setup-go
+
+      - name: Tests
+        run: make tests
+        env:
+          WITH_COVERAGE: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: ${{ matrix.go }} == '^1.20'
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.txt
 
   doc:
     name: Documentation
@@ -23,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: nosborn/github-action-markdown-cli@v3.0.1
+      - uses: nosborn/github-action-markdown-cli@v3.2.0
         with:
           files: ./doc/
           config_file: .markdownlint.json
@@ -37,33 +60,9 @@ jobs:
             ./vendor/*
 
       - name: alexjs
-        uses: theashraf/alex-action@master
-
-  tests:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-go@v3
+        uses: reviewdog/action-alex@v1
         with:
-          go-version: '^1.17'
-
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - run: make tests
-        env:
-          WITH_COVERAGE: true
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.txt
+          workdir: ./doc/
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          level: warning
