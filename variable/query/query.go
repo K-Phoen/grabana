@@ -126,8 +126,8 @@ func Hide() Option {
 	}
 }
 
-// Multi allows several values to be selected.
-func Multi() Option {
+// Multiple allows several values to be selected.
+func Multiple() Option {
 	return func(query *Query) {
 		query.Builder.Multi = true
 	}
