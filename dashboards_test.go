@@ -3,21 +3,20 @@ package grabana
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/K-Phoen/sdk"
+	"github.com/stretchr/testify/require"
 
 	"github.com/K-Phoen/grabana/alert"
-
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/timeseries"
-	"github.com/stretchr/testify/require"
 )
 
 func TestADashboardCanBeFoundByTitle(t *testing.T) {
@@ -842,7 +841,7 @@ func TestDashboardsCanBeCreatedWithNewAlertsAndDeletesPreviousAlerts(t *testing.
 		// new alert creation
 		if r.Method == http.MethodPost && r.URL.String() == "/api/ruler/grafana/api/v1/rules/Folder%20name" {
 			newAlertCreated = true
-			body, err := ioutil.ReadAll(r.Body)
+			body, err := io.ReadAll(r.Body)
 			req.NoError(err)
 
 			req.JSONEq(`{

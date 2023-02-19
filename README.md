@@ -98,7 +98,7 @@ rows:
 Dashboard creation (or [automatically as a Kubernetes Resource, using DARK](https://github.com/K-Phoen/dark)):
 
 ```go
-content, err := ioutil.ReadFile("dashboard.yaml")
+content, err := os.ReadFile("dashboard.yaml")
 if err != nil {
     fmt.Fprintf(os.Stderr, "Could not read file: %s\n", err)
     os.Exit(1)
