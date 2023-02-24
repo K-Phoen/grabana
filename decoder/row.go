@@ -7,10 +7,11 @@ import (
 
 // DashboardRow represents a dashboard row.
 type DashboardRow struct {
-	Name     string
-	Repeat   string `yaml:"repeat_for,omitempty"`
-	Collapse bool   `yaml:",omitempty"`
-	Panels   []DashboardPanel
+	Name      string
+	Repeat    string `yaml:"repeat_for,omitempty"`
+	Collapse  bool   `yaml:",omitempty"`
+	HideTitle bool   `yaml:"hide_title,omitempty"`
+	Panels    []DashboardPanel
 }
 
 func (r DashboardRow) toOption() (dashboard.Option, error) {
@@ -21,6 +22,9 @@ func (r DashboardRow) toOption() (dashboard.Option, error) {
 	}
 	if r.Collapse {
 		opts = append(opts, row.Collapse())
+	}
+	if r.HideTitle {
+		opts = append(opts, row.HideTitle())
 	}
 
 	for _, panel := range r.Panels {
