@@ -11,6 +11,8 @@ func TestExternalLink(t *testing.T) {
 
 	yamlLink := DashboardExternalLink{
 		Title:                 "joe",
+		Type:                  "link",
+		Tags:                  make([]string, 0),
 		URL:                   "http://foo",
 		Description:           "bar",
 		Icon:                  "cloud",
@@ -22,6 +24,8 @@ func TestExternalLink(t *testing.T) {
 	model := yamlLink.toModel()
 
 	req.Equal("joe", model.Title)
+	req.Equal("link", model.Type)
+	req.Equal(0, len(model.Tags))
 	req.Equal("http://foo", model.URL)
 	req.Equal("bar", model.Description)
 	req.Equal("cloud", string(model.Icon))

@@ -18,6 +18,8 @@ const (
 // See https://grafana.com/docs/grafana/latest/linking/dashboard-links/
 type ExternalLink struct {
 	Title                 string
+	Type                  string
+	Tags                  []string
 	Description           string
 	URL                   string
 	Icon                  LinkIcon
@@ -41,8 +43,8 @@ func (link ExternalLink) asSdk() sdk.Link {
 		Icon:        &icon,
 		IncludeVars: link.IncludeVariableValues,
 		KeepTime:    &link.IncludeTimeRange,
-		Tags:        make([]string, 0),
+		Tags:        link.Tags,
 		TargetBlank: &link.OpenInNewTab,
-		Type:        "link",
+		Type:        link.Type,
 	}
 }
