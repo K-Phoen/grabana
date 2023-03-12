@@ -15,7 +15,7 @@ const (
 )
 
 // ExternalLink describes dashboard-level external link.
-// See https://grafana.com/docs/grafana/latest/linking/dashboard-links/
+// See https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/manage-dashboard-links/#add-a-url-link-to-a-dashboard
 type ExternalLink struct {
 	Title                 string
 	Description           string
@@ -44,5 +44,29 @@ func (link ExternalLink) asSdk() sdk.Link {
 		Tags:        make([]string, 0),
 		TargetBlank: &link.OpenInNewTab,
 		Type:        "link",
+	}
+}
+
+// DashboardLink describes dashboard-level links to other dashboards.
+// See https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/manage-dashboard-links/#dashboard-links
+type DashboardLink struct {
+	Title string
+	Tags  []string
+
+	AsDropdown            bool
+	IncludeTimeRange      bool
+	IncludeVariableValues bool
+	OpenInNewTab          bool
+}
+
+func (link DashboardLink) asSdk() sdk.Link {
+	return sdk.Link{
+		Title:       link.Title,
+		Tags:        link.Tags,
+		AsDropdown:  &link.AsDropdown,
+		IncludeVars: link.IncludeVariableValues,
+		KeepTime:    &link.IncludeTimeRange,
+		TargetBlank: &link.OpenInNewTab,
+		Type:        "dashboards",
 	}
 }

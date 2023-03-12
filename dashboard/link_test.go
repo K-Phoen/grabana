@@ -38,3 +38,25 @@ func TestExternalLinkIconHasDefault(t *testing.T) {
 
 	req.Equal("external", *sdkLink.Icon)
 }
+
+func TestDashboardLinkAsSdk(t *testing.T) {
+	req := require.New(t)
+
+	link := DashboardLink{
+		Title:                 "my link",
+		Tags:                  []string{"my-service"},
+		AsDropdown:            true,
+		IncludeTimeRange:      true,
+		IncludeVariableValues: true,
+		OpenInNewTab:          true,
+	}
+	sdkLink := link.asSdk()
+
+	req.Equal("my link", sdkLink.Title)
+	req.ElementsMatch([]string{"my-service"}, link.Tags)
+	req.True(*sdkLink.AsDropdown)
+	req.True(sdkLink.IncludeVars)
+	req.True(*sdkLink.KeepTime)
+	req.True(*sdkLink.TargetBlank)
+	req.Equal("dashboards", sdkLink.Type)
+}
