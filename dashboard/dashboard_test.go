@@ -241,3 +241,12 @@ func TestDashboardCanHaveExternalLinks(t *testing.T) {
 	req.NoError(err)
 	req.Len(panel.board.Links, 2)
 }
+
+func TestDashboardCanHaveDashboardLinks(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", DashboardLinks(DashboardLink{}, DashboardLink{}))
+
+	req.NoError(err)
+	req.Len(panel.board.Links, 2)
+}
