@@ -131,6 +131,7 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	return func(gauge *Gauge) error {
 		gauge.Builder.AddTarget(&sdk.Target{
 			RefID:          target.Ref,
+			Hide:           target.Hidden,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
 			Interval:       target.Interval,
