@@ -83,7 +83,7 @@ func Min(value float64) Option {
 	}
 }
 
-// SoftMax defines a hard maximum value for the axis.
+// Max defines a hard maximum value for the axis.
 func Max(value float64) Option {
 	return func(axis *Axis) error {
 		axis.fieldConfig.Defaults.Max = &value

@@ -397,6 +397,10 @@ func TestTimeSeriesAxisSupportsDisplay(t *testing.T) {
 			expected: axis.Hidden,
 		},
 		{
+			value:    "hidden",
+			expected: axis.Hidden,
+		},
+		{
 			value:    "auto",
 			expected: axis.Auto,
 		},

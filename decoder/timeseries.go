@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
+	"github.com/K-Phoen/grabana/timeseries/fields"
 )
 
 var ErrInvalidGradientMode = fmt.Errorf("invalid gradient mode")
@@ -14,6 +15,7 @@ var ErrInvalidTooltipMode = fmt.Errorf("invalid tooltip mode")
 var ErrInvalidStackMode = fmt.Errorf("invalid stack mode")
 var ErrInvalidAxisDisplay = fmt.Errorf("invalid axis display")
 var ErrInvalidAxisScale = fmt.Errorf("invalid axis scale")
+var ErrInvalidOverrideMatcher = fmt.Errorf("invalid override matcher")
 
 type DashboardTimeSeries struct {
 	Title         string
@@ -29,6 +31,7 @@ type DashboardTimeSeries struct {
 	Alert         *Alert                   `yaml:",omitempty"`
 	Visualization *TimeSeriesVisualization `yaml:",omitempty"`
 	Axis          *TimeSeriesAxis          `yaml:",omitempty"`
+	Overrides     []TimeSeriesOverride     `yaml:",omitempty"`
 }
 
 func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
@@ -86,6 +89,15 @@ func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
 		}
 
 		opts = append(opts, timeseries.Axis(axisOpts...))
+	}
+
+	for _, override := range timeseriesPanel.Overrides {
+		opt, err := override.toOption()
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, opt)
 	}
 
 	for _, t := range timeseriesPanel.Targets {
@@ -367,22 +379,29 @@ func (tsAxis *TimeSeriesAxis) toOptions() ([]axis.Option, error) {
 }
 
 func (tsAxis *TimeSeriesAxis) placementOption() (axis.Option, error) {
-	var placementMode axis.PlacementMode
-
-	switch tsAxis.Display {
-	case "none":
-		placementMode = axis.Hidden
-	case "auto":
-		placementMode = axis.Auto
-	case "left":
-		placementMode = axis.Left
-	case "right":
-		placementMode = axis.Right
-	default:
-		return nil, ErrInvalidAxisDisplay
+	placementMode, err := axisPlacementFromString(tsAxis.Display)
+	if err != nil {
+		return nil, err
 	}
 
 	return axis.Placement(placementMode), nil
+}
+
+func axisPlacementFromString(input string) (axis.PlacementMode, error) {
+	switch input {
+	case "none":
+		return axis.Hidden, nil
+	case "hidden":
+		return axis.Hidden, nil
+	case "auto":
+		return axis.Auto, nil
+	case "left":
+		return axis.Left, nil
+	case "right":
+		return axis.Right, nil
+	default:
+		return axis.Auto, ErrInvalidAxisDisplay
+	}
 }
 
 func (tsAxis *TimeSeriesAxis) scaleOption() (axis.Option, error) {
@@ -400,4 +419,86 @@ func (tsAxis *TimeSeriesAxis) scaleOption() (axis.Option, error) {
 	}
 
 	return axis.Scale(scaleMode), nil
+}
+
+type TimeSeriesOverride struct {
+	Matcher    TimeSeriesOverrideMatcher `yaml:"match,flow"`
+	Properties TimeSeriesOverrideProperties
+}
+
+func (override TimeSeriesOverride) toOption() (timeseries.Option, error) {
+	matcher, err := override.Matcher.toOption()
+	if err != nil {
+		return nil, err
+	}
+
+	overrideOpts, err := override.Properties.toOptions()
+	if err != nil {
+		return nil, err
+	}
+
+	return timeseries.FieldOverride(matcher, overrideOpts...), nil
+}
+
+type TimeSeriesOverrideMatcher struct {
+	FieldName *string `yaml:"field_name,omitempty"`
+	QueryRef  *string `yaml:"query_ref,omitempty"`
+	Regex     *string `yaml:"regex,omitempty"`
+	Type      *string `yaml:"field_type,omitempty"`
+}
+
+func (matcher TimeSeriesOverrideMatcher) toOption() (fields.Matcher, error) {
+	if matcher.FieldName != nil {
+		return fields.ByName(*matcher.FieldName), nil
+	}
+	if matcher.QueryRef != nil {
+		return fields.ByQuery(*matcher.QueryRef), nil
+	}
+	if matcher.Regex != nil {
+		return fields.ByRegex(*matcher.Regex), nil
+	}
+	if matcher.Type != nil {
+		return fields.ByType(fields.FieldType(*matcher.Type)), nil
+	}
+
+	return nil, ErrInvalidOverrideMatcher
+}
+
+type TimeSeriesOverrideProperties struct {
+	Unit        *string `yaml:",omitempty"`
+	Color       *string `yaml:"color,omitempty"`
+	FillOpacity *int    `yaml:"fill_opacity,omitempty"`
+	NegativeY   *bool   `yaml:"negative_Y,omitempty"`
+	AxisDisplay *string `yaml:"axis_display,omitempty"`
+	Stack       *string `yaml:",omitempty"`
+}
+
+func (properties TimeSeriesOverrideProperties) toOptions() ([]fields.OverrideOption, error) {
+	var opts []fields.OverrideOption
+
+	if properties.Unit != nil {
+		opts = append(opts, fields.Unit(*properties.Unit))
+	}
+	if properties.Color != nil {
+		opts = append(opts, fields.FixedColorScheme(*properties.Color))
+	}
+	if properties.FillOpacity != nil {
+		opts = append(opts, fields.FillOpacity(*properties.FillOpacity))
+	}
+	if properties.NegativeY != nil && *properties.NegativeY {
+		opts = append(opts, fields.NegativeY())
+	}
+	if properties.AxisDisplay != nil {
+		axisPlacement, err := axisPlacementFromString(*properties.AxisDisplay)
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, fields.AxisPlacement(axisPlacement))
+	}
+	if properties.Stack != nil {
+		opts = append(opts, fields.Stack(fields.StackMode(*properties.Stack)))
+	}
+
+	return opts, nil
 }

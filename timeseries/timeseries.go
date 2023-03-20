@@ -202,7 +202,7 @@ func LineWidth(value int) Option {
 	}
 }
 
-// Stack defines if the series should be stacked and using which mode (default not stacked). the opacity level of the series. The lower the value, the more transparent.
+// Stack defines if the series should be stacked and using which mode (default not stacked).
 func Stack(value StackMode) Option {
 	return func(timeseries *TimeSeries) error {
 		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode = string(value)
