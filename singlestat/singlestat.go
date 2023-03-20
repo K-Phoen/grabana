@@ -158,6 +158,7 @@ func WithPrometheusTarget(query string, options ...prometheus.Option) Option {
 	return func(singleStat *SingleStat) error {
 		singleStat.Builder.AddTarget(&sdk.Target{
 			RefID:          target.Ref,
+			Hide:           target.Hidden,
 			Expr:           target.Expr,
 			IntervalFactor: target.IntervalFactor,
 			Interval:       target.Interval,
