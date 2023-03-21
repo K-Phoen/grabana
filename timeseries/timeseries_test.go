@@ -216,6 +216,7 @@ func TestLegendCanBeHidden(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("hidden", panel.Builder.TimeseriesPanel.Options.Legend.DisplayMode)
+	req.Equal(false, *panel.Builder.TimeseriesPanel.Options.Legend.Show)
 }
 
 func TestLegendCanBeDisplayedAsATable(t *testing.T) {
@@ -225,6 +226,7 @@ func TestLegendCanBeDisplayedAsATable(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("table", panel.Builder.TimeseriesPanel.Options.Legend.DisplayMode)
+	req.Equal(true, *panel.Builder.TimeseriesPanel.Options.Legend.Show)
 }
 
 func TestLegendCanBeDisplayedAsAList(t *testing.T) {
@@ -234,6 +236,7 @@ func TestLegendCanBeDisplayedAsAList(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("list", panel.Builder.TimeseriesPanel.Options.Legend.DisplayMode)
+	req.Equal(true, *panel.Builder.TimeseriesPanel.Options.Legend.Show)
 }
 
 func TestLegendCanBeShownToTheRight(t *testing.T) {

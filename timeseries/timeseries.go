@@ -310,7 +310,9 @@ func ColorScheme(options ...scheme.Option) Option {
 // Legend defines what should be shown in the legend.
 func Legend(opts ...LegendOption) Option {
 	return func(timeseries *TimeSeries) error {
+		yup := true
 		legend := sdk.TimeseriesLegendOptions{
+			Show:        &yup,
 			DisplayMode: "list",
 			Placement:   "bottom",
 			Calcs:       make([]string, 0),
@@ -319,7 +321,9 @@ func Legend(opts ...LegendOption) Option {
 		for _, opt := range opts {
 			switch opt {
 			case Hide:
+				nope := false
 				legend.DisplayMode = "hidden"
+				legend.Show = &nope
 			case AsList:
 				legend.DisplayMode = "list"
 			case AsTable:

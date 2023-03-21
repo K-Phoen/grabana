@@ -332,6 +332,7 @@ type (
 	}
 	TimeseriesLegendOptions struct {
 		Calcs       []string `json:"calcs"`
+		Show        *bool    `json:"showLegend,omitempty"`
 		DisplayMode string   `json:"displayMode"`
 		Placement   string   `json:"placement"`
 	}
