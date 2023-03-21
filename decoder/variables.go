@@ -9,6 +9,7 @@ import (
 	"github.com/K-Phoen/grabana/variable/datasource"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
+	"github.com/K-Phoen/grabana/variable/text"
 )
 
 var ErrVariableNotConfigured = fmt.Errorf("variable not configured")
@@ -20,6 +21,7 @@ type DashboardVariable struct {
 	Query      *VariableQuery      `yaml:",omitempty"`
 	Const      *VariableConst      `yaml:",omitempty"`
 	Datasource *VariableDatasource `yaml:",omitempty"`
+	Text       *VariableText       `yaml:",omitempty"`
 }
 
 func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
@@ -37,6 +39,9 @@ func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
 	}
 	if variable.Datasource != nil {
 		return variable.Datasource.toOption()
+	}
+	if variable.Text != nil {
+		return variable.Text.toOption()
 	}
 
 	return nil, ErrVariableNotConfigured
@@ -259,4 +264,32 @@ func (variable *VariableDatasource) toOption() (dashboard.Option, error) {
 	}
 
 	return dashboard.VariableAsDatasource(variable.Name, opts...), nil
+}
+
+type VariableText struct {
+	Name  string
+	Label string
+	Hide  string `yaml:",omitempty"`
+}
+
+func (variable *VariableText) toOption() (dashboard.Option, error) {
+	var opts []text.Option
+
+	if variable.Label != "" {
+		opts = append(opts, text.Label(variable.Label))
+	}
+
+	switch variable.Hide {
+	case "":
+		// Nothing to do
+		break
+	case "label":
+		opts = append(opts, text.HideLabel())
+	case "variable":
+		opts = append(opts, text.Hide())
+	default:
+		return dashboard.VariableAsQuery(variable.Name), ErrInvalidHideValue
+	}
+
+	return dashboard.VariableAsText(variable.Name, opts...), nil
 }
