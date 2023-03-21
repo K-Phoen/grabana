@@ -49,8 +49,8 @@ func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
 
 type VariableInterval struct {
 	Name    string
-	Label   string
-	Default string
+	Label   string   `yaml:",omitempty"`
+	Default string   `yaml:",omitempty"`
 	Values  []string `yaml:",flow"`
 	Hide    string   `yaml:",omitempty"`
 }
@@ -84,8 +84,8 @@ func (variable *VariableInterval) toOption() (dashboard.Option, error) {
 
 type VariableCustom struct {
 	Name       string
-	Label      string
-	Default    string
+	Label      string            `yaml:",omitempty"`
+	Default    string            `yaml:",omitempty"`
 	ValuesMap  map[string]string `yaml:"values_map"`
 	IncludeAll bool              `yaml:"include_all"`
 	AllValue   string            `yaml:"all_value,omitempty"`
@@ -131,8 +131,8 @@ func (variable *VariableCustom) toOption() (dashboard.Option, error) {
 
 type VariableConst struct {
 	Name      string
-	Label     string
-	Default   string
+	Label     string            `yaml:",omitempty"`
+	Default   string            `yaml:",omitempty"`
 	ValuesMap map[string]string `yaml:"values_map"`
 	Hide      string            `yaml:",omitempty"`
 }
@@ -166,12 +166,12 @@ func (variable *VariableConst) toOption() (dashboard.Option, error) {
 
 type VariableQuery struct {
 	Name  string
-	Label string
+	Label string `yaml:",omitempty"`
 
-	Datasource string
+	Datasource string `yaml:",omitempty"`
 	Request    string
 
-	Regex      string
+	Regex      string `yaml:",omitempty"`
 	IncludeAll bool   `yaml:"include_all"`
 	DefaultAll bool   `yaml:"default_all"`
 	AllValue   string `yaml:"all_value,omitempty"`
@@ -223,11 +223,11 @@ func (variable *VariableQuery) toOption() (dashboard.Option, error) {
 
 type VariableDatasource struct {
 	Name  string
-	Label string
+	Label string `yaml:",omitempty"`
 
 	Type string
 
-	Regex      string
+	Regex      string `yaml:",omitempty"`
 	IncludeAll bool   `yaml:"include_all"`
 	Hide       string `yaml:",omitempty"`
 	Multiple   bool   `yaml:",omitempty"`
@@ -268,7 +268,7 @@ func (variable *VariableDatasource) toOption() (dashboard.Option, error) {
 
 type VariableText struct {
 	Name  string
-	Label string
+	Label string `yaml:",omitempty"`
 	Hide  string `yaml:",omitempty"`
 }
 
