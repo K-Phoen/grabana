@@ -95,6 +95,7 @@
           "options": {
             "legend": {
               "calcs": [],
+              "showLegend": true,
               "placement": "bottom",
               "displayMode": "list"
             },
