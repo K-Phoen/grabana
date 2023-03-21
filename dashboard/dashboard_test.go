@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/K-Phoen/grabana/variable/datasource"
+	"github.com/K-Phoen/grabana/variable/text"
+	"github.com/stretchr/testify/require"
 )
 
 func requireJSON(t *testing.T, payload []byte) {
@@ -210,6 +210,15 @@ func TestDashboardCanHaveVariablesAsDatasource(t *testing.T) {
 	req := require.New(t)
 
 	panel, err := New("", VariableAsDatasource("source", datasource.Type("prometheus")))
+
+	req.NoError(err)
+	req.Len(panel.board.Templating.List, 1)
+}
+
+func TestDashboardCanHaveVariablesAsText(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", VariableAsText("filter", text.Label("Filter")))
 
 	req.NoError(err)
 	req.Len(panel.board.Templating.List, 1)

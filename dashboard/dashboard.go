@@ -8,13 +8,13 @@ import (
 	"encoding/json"
 
 	"github.com/K-Phoen/grabana/alert"
-
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/variable/constant"
 	"github.com/K-Phoen/grabana/variable/custom"
 	"github.com/K-Phoen/grabana/variable/datasource"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
+	"github.com/K-Phoen/grabana/variable/text"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -206,6 +206,18 @@ func VariableAsQuery(name string, options ...query.Option) Option {
 func VariableAsDatasource(name string, options ...datasource.Option) Option {
 	return func(builder *Builder) error {
 		templatedVar := datasource.New(name, options...)
+
+		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
+
+		return nil
+	}
+}
+
+// VariableAsText adds a templated variable, defined as a free text input.
+// See https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#add-a-text-box-variable
+func VariableAsText(name string, options ...text.Option) Option {
+	return func(builder *Builder) error {
+		templatedVar := text.New(name, options...)
 
 		builder.board.Templating.List = append(builder.board.Templating.List, templatedVar.Builder)
 

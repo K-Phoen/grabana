@@ -9,6 +9,7 @@ import (
 	"github.com/K-Phoen/grabana/variable/datasource"
 	"github.com/K-Phoen/grabana/variable/interval"
 	"github.com/K-Phoen/grabana/variable/query"
+	"github.com/K-Phoen/grabana/variable/text"
 )
 
 var ErrVariableNotConfigured = fmt.Errorf("variable not configured")
@@ -20,6 +21,7 @@ type DashboardVariable struct {
 	Query      *VariableQuery      `yaml:",omitempty"`
 	Const      *VariableConst      `yaml:",omitempty"`
 	Datasource *VariableDatasource `yaml:",omitempty"`
+	Text       *VariableText       `yaml:",omitempty"`
 }
 
 func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
@@ -38,14 +40,17 @@ func (variable *DashboardVariable) toOption() (dashboard.Option, error) {
 	if variable.Datasource != nil {
 		return variable.Datasource.toOption()
 	}
+	if variable.Text != nil {
+		return variable.Text.toOption()
+	}
 
 	return nil, ErrVariableNotConfigured
 }
 
 type VariableInterval struct {
 	Name    string
-	Label   string
-	Default string
+	Label   string   `yaml:",omitempty"`
+	Default string   `yaml:",omitempty"`
 	Values  []string `yaml:",flow"`
 	Hide    string   `yaml:",omitempty"`
 }
@@ -79,8 +84,8 @@ func (variable *VariableInterval) toOption() (dashboard.Option, error) {
 
 type VariableCustom struct {
 	Name       string
-	Label      string
-	Default    string
+	Label      string            `yaml:",omitempty"`
+	Default    string            `yaml:",omitempty"`
 	ValuesMap  map[string]string `yaml:"values_map"`
 	IncludeAll bool              `yaml:"include_all"`
 	AllValue   string            `yaml:"all_value,omitempty"`
@@ -126,8 +131,8 @@ func (variable *VariableCustom) toOption() (dashboard.Option, error) {
 
 type VariableConst struct {
 	Name      string
-	Label     string
-	Default   string
+	Label     string            `yaml:",omitempty"`
+	Default   string            `yaml:",omitempty"`
 	ValuesMap map[string]string `yaml:"values_map"`
 	Hide      string            `yaml:",omitempty"`
 }
@@ -161,12 +166,12 @@ func (variable *VariableConst) toOption() (dashboard.Option, error) {
 
 type VariableQuery struct {
 	Name  string
-	Label string
+	Label string `yaml:",omitempty"`
 
-	Datasource string
+	Datasource string `yaml:",omitempty"`
 	Request    string
 
-	Regex      string
+	Regex      string `yaml:",omitempty"`
 	IncludeAll bool   `yaml:"include_all"`
 	DefaultAll bool   `yaml:"default_all"`
 	AllValue   string `yaml:"all_value,omitempty"`
@@ -218,11 +223,11 @@ func (variable *VariableQuery) toOption() (dashboard.Option, error) {
 
 type VariableDatasource struct {
 	Name  string
-	Label string
+	Label string `yaml:",omitempty"`
 
 	Type string
 
-	Regex      string
+	Regex      string `yaml:",omitempty"`
 	IncludeAll bool   `yaml:"include_all"`
 	Hide       string `yaml:",omitempty"`
 	Multiple   bool   `yaml:",omitempty"`
@@ -259,4 +264,32 @@ func (variable *VariableDatasource) toOption() (dashboard.Option, error) {
 	}
 
 	return dashboard.VariableAsDatasource(variable.Name, opts...), nil
+}
+
+type VariableText struct {
+	Name  string
+	Label string `yaml:",omitempty"`
+	Hide  string `yaml:",omitempty"`
+}
+
+func (variable *VariableText) toOption() (dashboard.Option, error) {
+	var opts []text.Option
+
+	if variable.Label != "" {
+		opts = append(opts, text.Label(variable.Label))
+	}
+
+	switch variable.Hide {
+	case "":
+		// Nothing to do
+		break
+	case "label":
+		opts = append(opts, text.HideLabel())
+	case "variable":
+		opts = append(opts, text.Hide())
+	default:
+		return dashboard.VariableAsQuery(variable.Name), ErrInvalidHideValue
+	}
+
+	return dashboard.VariableAsText(variable.Name, opts...), nil
 }
