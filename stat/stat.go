@@ -70,19 +70,6 @@ const (
 	Range
 )
 
-// ValueMap allows to map a value into explicit text.
-type ValueMap struct {
-	Value string
-	Text  string
-}
-
-// RangeMap allows to map a range of values into explicit text.
-type RangeMap struct {
-	From string
-	To   string
-	Text string
-}
-
 // Stat represents a stat panel.
 type Stat struct {
 	Builder *sdk.Panel
@@ -407,6 +394,136 @@ func RelativeThresholds(steps []ThresholdStep) Option {
 	}
 }
 
+type StatValueMapping struct {
+	sdk.ValueMapping
+}
+
+type ValueMappingBuilder struct {
+	options       func(*StatValueMapping)
+	resultOptions []ValueMappingResultOption
+	resultKey     string
+	result        struct {
+		text  *string
+		color *string
+	}
+}
+
+func (vmb *ValueMappingBuilder) build() *StatValueMapping {
+	vm := &StatValueMapping{}
+	vmb.options(vm)
+	vm.Options[vmb.resultKey] = &sdk.ValueMappingResult{}
+	for _, resultOption := range vmb.resultOptions {
+		resultOption(vm)
+	}
+	return vm
+}
+
+type ValueMappingResultOption func(*StatValueMapping)
+
+func (vmb *ValueMappingBuilder) Text(text string) *ValueMappingBuilder {
+	resultFunc := func(mapping *StatValueMapping) {
+		result, ok := mapping.Options[vmb.resultKey].(*sdk.ValueMappingResult)
+		if ok {
+			result.Text = &text
+		}
+	}
+	vmb.resultOptions = append(vmb.resultOptions, resultFunc)
+	return vmb
+}
+
+func (vmb *ValueMappingBuilder) Color(color string) *ValueMappingBuilder {
+	resultFunc := func(mapping *StatValueMapping) {
+		result, ok := mapping.Options[vmb.resultKey].(*sdk.ValueMappingResult)
+		if ok {
+			result.Color = &color
+		}
+	}
+	vmb.resultOptions = append(vmb.resultOptions, resultFunc)
+	return vmb
+}
+
+func ValueMappings(options ...*ValueMappingBuilder) Option {
+	return func(stat *Stat) error {
+		mappings := make([]sdk.ValueMapping, 0, len(options))
+
+		for idx, option := range options {
+			mapping := option.build()
+			result, ok := mapping.Options[option.resultKey].(*sdk.ValueMappingResult)
+			if ok {
+				result.Index = &idx
+			}
+			mappings = append(mappings, mapping.ValueMapping)
+		}
+		stat.Builder.StatPanel.FieldConfig.Defaults.ValueMappings = mappings
+		return nil
+	}
+}
+
+// RangeMapping allows to translate a range of values from the summary stat into explicit
+// text or color.
+func RangeMapping(from float64, to float64) *ValueMappingBuilder {
+	builder := &ValueMappingBuilder{}
+	builder.resultKey = "result"
+	builder.options = func(vm *StatValueMapping) {
+		vm.MappingType = string(sdk.MappingTypeRange)
+		vm.Options = map[string]interface{}{
+			sdk.MappingOptionFrom: from,
+			sdk.MappingOptionTo:   to,
+		}
+	}
+	return builder
+}
+
+// RegexMapping allows to translate the value of the summary stat matching a regexp into explicit
+// text or color.
+func RegexMapping(pattern string) *ValueMappingBuilder {
+	builder := &ValueMappingBuilder{}
+	builder.resultKey = "result"
+	builder.options = func(vm *StatValueMapping) {
+		vm.MappingType = string(sdk.MappingTypeRegex)
+		vm.Options = map[string]interface{}{
+			sdk.MappingOptionPattern: pattern,
+		}
+	}
+	return builder
+}
+
+// ValueMapping allows to translate the value of the summary stat into explicit
+// text or color, using a list of mapping functions.
+func ValueMapping(match string) *ValueMappingBuilder {
+	builder := &ValueMappingBuilder{}
+	builder.resultKey = match
+	builder.options = func(vm *StatValueMapping) {
+		vm.MappingType = string(sdk.MappingTypeValue)
+		vm.Options = map[string]interface{}{}
+	}
+	return builder
+}
+
+type SpecialValue string
+
+const SpecialNull = SpecialValue("null")
+const SpecialNullOrNaN = SpecialValue("null+nan")
+const SpecialNaN = SpecialValue("nan")
+const SpecialTrue = SpecialValue("true")
+const SpecialFalse = SpecialValue("false")
+const SpecialEmpty = SpecialValue("empty")
+
+// SpecialMapping allows to translate special values of the summary stat into explicit
+// text or color.
+func SpecialMapping(value SpecialValue) *ValueMappingBuilder {
+	builder := &ValueMappingBuilder{}
+	builder.resultKey = "result"
+	valueStr := string(value)
+	builder.options = func(vm *StatValueMapping) {
+		vm.MappingType = string(sdk.MappingTypeSpecial)
+		vm.Options = map[string]interface{}{
+			sdk.MappingOptionMatch: valueStr,
+		}
+	}
+	return builder
+}
+
 // Repeat configures repeating a panel for a variable
 func Repeat(repeat string) Option {
 	return func(stat *Stat) error {
@@ -450,4 +567,8 @@ func NoValue(text string) Option {
 
 		return nil
 	}
+}
+
+func float64Ptr(input float64) *float64 {
+	return &input
 }

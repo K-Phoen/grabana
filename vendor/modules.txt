@@ -1,4 +1,4 @@
-# github.com/K-Phoen/sdk v0.12.2
+# github.com/K-Phoen/sdk v0.12.2 => github.com/AndersSoee/grabana-sdk v0.0.0-20230502052338-319fd6875a4a
 ## explicit; go 1.19
 github.com/K-Phoen/sdk
 # github.com/blang/semver v3.5.1+incompatible

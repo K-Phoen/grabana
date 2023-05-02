@@ -31,3 +31,5 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
+
+replace github.com/K-Phoen/sdk v0.12.2 => github.com/AndersSoee/grabana-sdk v0.0.0-20230502052338-319fd6875a4a
