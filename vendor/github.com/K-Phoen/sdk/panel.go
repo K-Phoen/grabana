@@ -47,6 +47,15 @@ const (
 
 const MixedSource = "-- Mixed --"
 
+type MappingType string
+
+const (
+	MappingTypeRange   MappingType = "range"
+	MappingTypeRegex   MappingType = "regex"
+	MappingTypeSpecial MappingType = "special"
+	MappingTypeValue   MappingType = "value"
+)
+
 type (
 	// Panel represents panels of different types defined in Grafana.
 	Panel struct {
@@ -340,15 +349,16 @@ type (
 		Mode string `json:"mode"`
 	}
 	FieldConfigDefaults struct {
-		Unit       string            `json:"unit"`
-		NoValue    string            `json:"noValue,omitempty"`
-		Decimals   *int              `json:"decimals,omitempty"`
-		Min        *float64          `json:"min,omitempty"`
-		Max        *float64          `json:"max,omitempty"`
-		Color      FieldConfigColor  `json:"color"`
-		Thresholds Thresholds        `json:"thresholds"`
-		Custom     FieldConfigCustom `json:"custom"`
-		Links      []Link            `json:"links,omitempty"`
+		Unit          string            `json:"unit"`
+		NoValue       string            `json:"noValue,omitempty"`
+		Decimals      *int              `json:"decimals,omitempty"`
+		Min           *float64          `json:"min,omitempty"`
+		Max           *float64          `json:"max,omitempty"`
+		Color         FieldConfigColor  `json:"color"`
+		Thresholds    Thresholds        `json:"thresholds"`
+		Custom        FieldConfigCustom `json:"custom"`
+		Links         []Link            `json:"links,omitempty"`
+		ValueMappings []ValueMapping    `json:"mappings,omitempty"`
 	}
 	FieldConfigOverrideProperty struct {
 		ID    string      `json:"id"`
@@ -524,7 +534,29 @@ type (
 		YMin      *float64 `json:"ymin,omitempty"`
 		YMax      *float64 `json:"ymax,omitempty"`
 	}
+	ValueMapping struct {
+		MappingType string                 `json:"type,omitempty"`
+		Options     map[string]interface{} `json:"options,omitempty"`
+	}
+	ValueMappingsOptions struct {
+		From    *float64           `json:"from,omitempty"`
+		To      *float64           `json:"to,omitempty"`
+		Pattern *string            `json:"pattern,omitempty"`
+		Match   *string            `json:"match,omitempty"`
+		Result  ValueMappingResult `json:"result,omitempty"`
+	}
+	ValueMappingResult struct {
+		Text  *string `json:"text,omitempty"`
+		Color *string `json:"color,omitempty"`
+		Index *int    `json:"index,omitempty"`
+	}
 )
+
+const MappingOptionFrom = "from"
+const MappingOptionTo = "to"
+const MappingOptionPattern = "pattern"
+const MappingOptionMatch = "match"
+const MappingOptionResult = "result"
 
 // for an any panel
 type Target struct {

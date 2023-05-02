@@ -1,6 +1,7 @@
 package stat
 
 import (
+	"github.com/K-Phoen/sdk"
 	"testing"
 
 	"github.com/K-Phoen/grabana/errors"
@@ -426,6 +427,33 @@ func TestRelativeThresholdsCanBeConfigured(t *testing.T) {
 	req.Len(thresholds.Steps, 3)
 }
 
-func float64Ptr(input float64) *float64 {
-	return &input
+func TestValueMappingsCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("",
+		ValueMappings(
+			RangeMapping(0.0, 0.9).Text("DOWN"),
+			RangeMapping(1, 1.0).Text("UP"),
+			ValueMapping("UP").Color("red"),
+			SpecialMapping(SpecialNaN).Color("yellow"),
+			RegexMapping(".*").Color("blue"),
+		),
+	)
+
+	req.NoError(err)
+
+	mappings := panel.Builder.StatPanel.FieldConfig.Defaults.ValueMappings
+
+	req.Len(mappings, 5)
+
+	req.Equal("range", mappings[0].MappingType)
+	req.Equal(0.9, mappings[0].Options["to"])
+	result0, ok := mappings[0].Options["result"].(*sdk.ValueMappingResult)
+	req.True(ok)
+	req.Equal("DOWN", *result0.Text)
+
+	req.Equal("value", mappings[2].MappingType)
+	result2, ok := mappings[2].Options["UP"].(*sdk.ValueMappingResult)
+	req.True(ok)
+	req.Equal("red", *result2.Color)
 }

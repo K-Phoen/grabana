@@ -1,5 +1,5 @@
-github.com/K-Phoen/sdk v0.12.2 h1:0QofDlKE+lloyBOzhjEEMW21061zts/WIpfpQ5NLLAs=
-github.com/K-Phoen/sdk v0.12.2/go.mod h1:qmM0wO23CtoDux528MXPpYvS4XkRWkWX6rvX9Za8EVU=
+github.com/AndersSoee/grabana-sdk v0.0.0-20230502052338-319fd6875a4a h1:1WbX3BNVuvi9b/XjA+k3WaiOFh5PVtFUneZpx+4mQSs=
+github.com/AndersSoee/grabana-sdk v0.0.0-20230502052338-319fd6875a4a/go.mod h1:qmM0wO23CtoDux528MXPpYvS4XkRWkWX6rvX9Za8EVU=
 github.com/blang/semver v3.5.1+incompatible h1:cQNTCjp13qL8KC3Nbxr/y2Bqb63oX6wdnnjpJbkM4JQ=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
