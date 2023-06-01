@@ -59,7 +59,7 @@ func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*D
 }
 
 // GetDashboardByUID finds a dashboard, given its UID.
-func (client *Client) rawDashboardByUID(ctx context.Context, uid string) (*sdk.Board, error) {
+func (client *Client) RawDashboardByUID(ctx context.Context, uid string) (*sdk.Board, error) {
 	resp, err := client.get(ctx, "/api/dashboards/uid/"+url.PathEscape(uid))
 	if err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		return nil, err
 	}
 
-	dashboardFromGrafana, err := client.rawDashboardByUID(ctx, dashboardModel.UID)
+	dashboardFromGrafana, err := client.RawDashboardByUID(ctx, dashboardModel.UID)
 	if err != nil {
 		return nil, err
 	}

@@ -122,7 +122,7 @@ func TestADashboardCanBeFoundByUID(t *testing.T) {
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
-	dash, err := client.rawDashboardByUID(context.TODO(), dashboardUID)
+	dash, err := client.RawDashboardByUID(context.TODO(), dashboardUID)
 
 	req.NoError(err)
 	req.Equal(dashboardUID, dash.UID)
@@ -138,7 +138,7 @@ func TestFetchingAnUnknownDashboardByUIDFailsCleanly(t *testing.T) {
 
 	client := NewClient(http.DefaultClient, ts.URL)
 
-	_, err := client.rawDashboardByUID(context.TODO(), "uid")
+	_, err := client.RawDashboardByUID(context.TODO(), "uid")
 
 	req.Error(err)
 	req.ErrorIs(err, ErrDashboardNotFound)
