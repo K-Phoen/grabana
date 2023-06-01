@@ -18,13 +18,16 @@ var ErrDashboardNotFound = errors.New("dashboard not found")
 
 // Dashboard represents a Grafana dashboard.
 type Dashboard struct {
-	*sdk.Board
-	URL         string `json:"url"`
-	IsStarred   bool   `json:"isStarred"`
-	FolderID    int    `json:"folderId"`
-	FolderUID   string `json:"folderUid"`
-	FolderTitle string `json:"folderTitle"`
-	FolderURL   string `json:"folderUrl"`
+	ID          int      `json:"id"`
+	UID         string   `json:"uid"`
+	Title       string   `json:"title"`
+	URL         string   `json:"url"`
+	Tags        []string `json:"tags"`
+	IsStarred   bool     `json:"isStarred"`
+	FolderID    int      `json:"folderId"`
+	FolderUID   string   `json:"folderUid"`
+	FolderTitle string   `json:"folderTitle"`
+	FolderURL   string   `json:"folderUrl"`
 }
 
 // GetDashboardByTitle finds a dashboard, given its title.
