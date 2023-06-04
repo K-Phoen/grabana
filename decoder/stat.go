@@ -246,6 +246,9 @@ func (statPanel DashboardStat) target(t Target) (stat.Option, error) {
 
 		return stat.WithStackdriverTarget(stackdriverTarget), nil
 	}
+	if t.Cloudwatch != nil {
+		return stat.WithCloudwatchTarget(t.Cloudwatch.QueryParams, t.Cloudwatch.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

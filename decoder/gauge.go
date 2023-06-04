@@ -194,6 +194,9 @@ func (gaugePanel DashboardGauge) target(t Target) (gauge.Option, error) {
 
 		return gauge.WithStackdriverTarget(stackdriverTarget), nil
 	}
+	if t.Cloudwatch != nil {
+		return gauge.WithCloudwatchTarget(t.Cloudwatch.QueryParams, t.Cloudwatch.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

@@ -170,6 +170,9 @@ func (heatmapPanel DashboardHeatmap) target(t Target) (heatmap.Option, error) {
 
 		return heatmap.WithStackdriverTarget(stackdriverTarget), nil
 	}
+	if t.Cloudwatch != nil {
+		return heatmap.WithCloudwatchTarget(t.Cloudwatch.QueryParams, t.Cloudwatch.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

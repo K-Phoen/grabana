@@ -3,6 +3,7 @@ package decoder
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/influxdb"
 
 	"github.com/K-Phoen/grabana/target/graphite"
@@ -338,6 +339,29 @@ func TestGraphiteHiddenTarget(t *testing.T) {
 
 	opts := GraphiteTarget{Hidden: true}.toOptions()
 	target := graphite.New("query", opts...)
+
+	req.True(target.Builder.Hide)
+}
+
+func TestCloudwatchTarget(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.CloudwatchQueryParams{}
+	opts := CloudwatchTarget{
+		QueryParams: query,
+	}.toOptions()
+	target := cloudwatch.New(query, opts...)
+
+	req.False(target.Builder.Hide)
+}
+
+func TestCloudwatchHiddenTarget(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.CloudwatchQueryParams{}
+
+	opts := CloudwatchTarget{Hidden: true}.toOptions()
+	target := cloudwatch.New(query, opts...)
 
 	req.True(target.Builder.Hide)
 }

@@ -71,6 +71,8 @@ func (tablePanel *DashboardTable) target(t Target) (table.Option, error) {
 	if t.InfluxDB != nil {
 		return table.WithInfluxDBTarget(t.InfluxDB.Query, t.InfluxDB.toOptions()...), nil
 	}
-
+	if t.Cloudwatch != nil {
+		return table.WithCloudwatchTarget(t.Cloudwatch.QueryParams, t.Cloudwatch.toOptions()...), nil
+	}
 	return nil, ErrTargetNotConfigured
 }

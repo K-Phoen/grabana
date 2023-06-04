@@ -10,29 +10,33 @@ import (
 func TestQueriesCanBeCreated(t *testing.T) {
 	req := require.New(t)
 
-	dimensions := map[string]string{
-		"QueueName": "test-queue",
+	query := &cloudwatch.CloudwatchQueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		MetricName: "NumberOfMessagesReceived",
+		Period:     "30",
+		Region:     "us-east-1",
 	}
-	statistics := []string{"Sum"}
-	namespace := "AWS/SQS"
-	metricName := "NumberOfMessagesReceived"
-	period := "30"
-	region := "us-east-1"
 
-	target := cloudwatch.New(dimensions, statistics, namespace, metricName, period, region)
+	target := cloudwatch.New(*query)
 
-	req.Equal(dimensions, target.Builder.Dimensions)
-	req.Equal(statistics, target.Builder.Statistics)
-	req.Equal(namespace, target.Builder.Namespace)
-	req.Equal(metricName, target.Builder.MetricName)
-	req.Equal(period, target.Builder.Period)
-	req.Equal(region, target.Builder.Region)
+	req.Equal(query.Dimensions, target.Builder.Dimensions)
+	req.Equal(query.Statistics, target.Builder.Statistics)
+	req.Equal(query.Namespace, target.Builder.Namespace)
+	req.Equal(query.MetricName, target.Builder.MetricName)
+	req.Equal(query.Period, target.Builder.Period)
+	req.Equal(query.Region, target.Builder.Region)
 }
 
 func TestRefCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	target := cloudwatch.New(nil, nil, "", "", "", "", cloudwatch.Ref("A"))
+	query := &cloudwatch.CloudwatchQueryParams{}
+
+	target := cloudwatch.New(*query, cloudwatch.Ref("A"))
 
 	req.Equal("A", target.Builder.RefID)
 }
@@ -40,7 +44,9 @@ func TestRefCanBeConfigured(t *testing.T) {
 func TestRefCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
-	target := cloudwatch.New(nil, nil, "", "", "", "", cloudwatch.Hide())
+	query := &cloudwatch.CloudwatchQueryParams{}
+
+	target := cloudwatch.New(*query, cloudwatch.Hide())
 
 	req.True(target.Builder.Hide)
 }

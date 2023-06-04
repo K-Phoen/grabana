@@ -10,15 +10,24 @@ type Cloudwatch struct {
 	Builder *sdk.Target
 }
 
-func New(dimensions map[string]string, statistics []string, namespace, metricName, period, region string, options ...Option) *Cloudwatch {
+type CloudwatchQueryParams struct {
+	Dimensions map[string]string `yaml:",omitempty"`
+	Statistics []string          `yaml:",omitempty"`
+	Namespace  string            `yaml:",omitempty"`
+	MetricName string            `yaml:",omitempty"`
+	Period     string            `yaml:",omitempty"`
+	Region     string            `yaml:",omitempty"`
+}
+
+func New(target CloudwatchQueryParams, options ...Option) *Cloudwatch {
 	cloudwatch := &Cloudwatch{
 		Builder: &sdk.Target{
-			Namespace:  namespace,
-			MetricName: metricName,
-			Dimensions: dimensions,
-			Statistics: statistics,
-			Period:     period,
-			Region:     region,
+			Namespace:  target.Namespace,
+			MetricName: target.MetricName,
+			Dimensions: target.Dimensions,
+			Statistics: target.Statistics,
+			Period:     target.Period,
+			Region:     target.Region,
 		},
 	}
 
