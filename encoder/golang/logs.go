@@ -12,8 +12,6 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 		jen.Lit(panel.Title),
 	}
 
-	// TODO: links
-
 	span := panelSpan(panel)
 	if span != 0 {
 		settings = append(
@@ -56,7 +54,16 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 	for _, target := range panel.LogsPanel.Targets {
 		settings = append(
 			settings,
-			encoder.convertLogsTarget(target),
+			encoder.encodeLogsTarget(target),
+		)
+	}
+
+	if len(panel.Links) != 0 {
+		settings = append(
+			settings,
+			jen.Qual(packageImportPath+"/logs", "Links").Call(
+				encoder.encodePanelLinks(panel.Links)...,
+			),
 		)
 	}
 
@@ -160,7 +167,7 @@ func (encoder *Encoder) encodeLogsSortOrder(sdkSortOrder string) jen.Code {
 	return jen.Qual(packageImportPath+"/logs", constantName)
 }
 
-func (encoder *Encoder) convertLogsTarget(target sdk.Target) jen.Code {
+func (encoder *Encoder) encodeLogsTarget(target sdk.Target) jen.Code {
 	settings := []jen.Code{
 		jen.Lit(target.Expr),
 	}
