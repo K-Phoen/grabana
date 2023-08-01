@@ -12,58 +12,15 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 		jen.Lit(panel.Title),
 	}
 
-	span := panelSpan(panel)
-	if span != 0 {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "Span").Call(jen.Lit(span)),
-		)
-	}
-
-	if panel.Description != nil {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "Description").Call(jen.Lit(*panel.Description)),
-		)
-	}
-	if panel.Height != nil {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "Height").Call(jen.Lit(*(panel.Height).(*string))),
-		)
-	}
-	if panel.Transparent {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "Transparent").Call(jen.Lit(panel.Transparent)),
-		)
-	}
-	if panel.Repeat != nil {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "Repeat").Call(jen.Lit(*panel.Repeat)),
-		)
-	}
-	if panel.Datasource != nil && panel.Datasource.LegacyName != "" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "DataSource").Call(jen.Lit(panel.Datasource.LegacyName)),
-		)
-	}
+	settings = append(
+		settings,
+		encoder.encodeCommonPanelProperties(panel, "logs")...,
+	)
 
 	for _, target := range panel.LogsPanel.Targets {
 		settings = append(
 			settings,
 			encoder.encodeLogsTarget(target),
-		)
-	}
-
-	if len(panel.Links) != 0 {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "Links").Call(
-				encoder.encodePanelLinks(panel.Links)...,
-			),
 		)
 	}
 
