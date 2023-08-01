@@ -1,8 +1,10 @@
 package golang
 
 import (
+	"github.com/K-Phoen/grabana/logs"
 	"github.com/K-Phoen/sdk"
 	"github.com/dave/jennifer/jen"
+	"go.uber.org/zap"
 )
 
 func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
@@ -10,7 +12,7 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 		jen.Lit(panel.Title),
 	}
 
-	// TODO: links, logs-specific options
+	// TODO: links
 
 	span := panelSpan(panel)
 	if span != 0 {
@@ -38,6 +40,12 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 			jen.Qual(packageImportPath+"/logs", "Transparent").Call(jen.Lit(panel.Transparent)),
 		)
 	}
+	if panel.Repeat != nil {
+		settings = append(
+			settings,
+			jen.Qual(packageImportPath+"/logs", "Repeat").Call(jen.Lit(*panel.Repeat)),
+		)
+	}
 	if panel.Datasource != nil && panel.Datasource.LegacyName != "" {
 		settings = append(
 			settings,
@@ -59,8 +67,6 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 
 func (encoder *Encoder) encodeLogsVizualizationSettings(panel sdk.Panel) []jen.Code {
 	var settings []jen.Code
-
-	// TODO: logs order, dedup strategy
 
 	if panel.LogsPanel.Options.ShowTime {
 		settings = append(
@@ -98,8 +104,60 @@ func (encoder *Encoder) encodeLogsVizualizationSettings(panel sdk.Panel) []jen.C
 			jen.Qual(packageImportPath+"/logs", "HideLogDetails").Call(),
 		)
 	}
+	if panel.LogsPanel.Options.SortOrder != "" {
+		settings = append(
+			settings,
+			jen.Qual(packageImportPath+"/logs", "Order").Call(
+				encoder.encodeLogsSortOrder(panel.LogsPanel.Options.SortOrder),
+			),
+		)
+	}
+	if panel.LogsPanel.Options.DedupStrategy != "" {
+		settings = append(
+			settings,
+			jen.Qual(packageImportPath+"/logs", "Deduplication").Call(
+				encoder.encodeLogsDedupStrategy(panel.LogsPanel.Options.DedupStrategy),
+			),
+		)
+	}
 
 	return settings
+}
+
+func (encoder *Encoder) encodeLogsDedupStrategy(sdkDedupStrategy string) jen.Code {
+	var constantName string
+
+	switch sdkDedupStrategy {
+	case "none":
+		constantName = "None"
+	case "exact":
+		constantName = "Exact"
+	case "numbers":
+		constantName = "Numbers"
+	case "signature":
+		constantName = "Signature"
+	default:
+		encoder.logger.Warn("unhandled logs dedup strategy: using none as default", zap.String("strategy", sdkDedupStrategy))
+		constantName = "none"
+	}
+
+	return jen.Qual(packageImportPath+"/logs", constantName)
+}
+
+func (encoder *Encoder) encodeLogsSortOrder(sdkSortOrder string) jen.Code {
+	var constantName string
+
+	switch sdkSortOrder {
+	case string(logs.Asc):
+		constantName = "Asc"
+	case string(logs.Desc):
+		constantName = "Desc"
+	default:
+		encoder.logger.Warn("unhandled sort order: using desc as default", zap.String("order", sdkSortOrder))
+		constantName = "Desc"
+	}
+
+	return jen.Qual(packageImportPath+"/logs", constantName)
 }
 
 func (encoder *Encoder) convertLogsTarget(target sdk.Target) jen.Code {
