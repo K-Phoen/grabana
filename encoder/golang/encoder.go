@@ -26,6 +26,7 @@ func (encoder *Encoder) EncodeDashboard(dashboard sdk.Board) (string, error) {
 	}
 
 	dashboardStatements = append(dashboardStatements, encoder.encodeGeneralSettings(dashboard)...)
+	dashboardStatements = append(dashboardStatements, encoder.encodeVariables(dashboard.Templating.List)...)
 	dashboardStatements = append(dashboardStatements, encoder.encodePanels(dashboard)...)
 
 	file := jen.NewFile("main")
