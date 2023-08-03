@@ -8,14 +8,7 @@ import (
 )
 
 func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
-	settings := []jen.Code{
-		jen.Lit(panel.Title),
-	}
-
-	settings = append(
-		settings,
-		encoder.encodeCommonPanelProperties(panel, "logs")...,
-	)
+	settings := encoder.encodeCommonPanelProperties(panel, "logs")
 
 	for _, target := range panel.LogsPanel.Targets {
 		settings = append(

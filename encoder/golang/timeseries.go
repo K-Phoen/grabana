@@ -6,13 +6,11 @@ import (
 )
 
 func (encoder *Encoder) encodeTimeseries(panel sdk.Panel) jen.Code {
-	settings := []jen.Code{
-		jen.Lit(panel.Title),
-	}
+	settings := encoder.encodeCommonPanelProperties(panel, "timeseries")
 
 	settings = append(
 		settings,
-		encoder.encodeCommonPanelProperties(panel, "timeseries")...,
+		encoder.encodeTargets(panel.TimeseriesPanel.Targets, "timeseries")...,
 	)
 
 	return jen.Qual(packageImportPath+"/row", "WithTimeSeries").Call(
