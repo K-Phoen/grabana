@@ -1,13 +1,39 @@
 package timeseries
 
 import (
+	"github.com/K-Phoen/grabana/packages"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/loki"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/K-Phoen/sdk"
+	"github.com/mitchellh/mapstructure"
 )
+
+// WithTargetFromPackage adds a target defined in a Polly package.
+func WithTargetFromPackage(pkg packages.NormalizedPackage, reference packages.Reference) Option {
+	return func(graph *TimeSeries) error {
+		manifest, err := pkg.Locate(reference)
+		if err != nil {
+			return err
+		}
+
+		denormalizedManifest, err := packages.DenormalizeQuery(manifest, pkg)
+		if err != nil {
+			return err
+		}
+
+		target := &sdk.Target{}
+		if err := mapstructure.Decode(denormalizedManifest.Spec, target); err != nil {
+			return err
+		}
+
+		graph.Builder.AddTarget(target)
+
+		return nil
+	}
+}
 
 // WithPrometheusTarget adds a prometheus query to the graph.
 func WithPrometheusTarget(query string, options ...prometheus.Option) Option {

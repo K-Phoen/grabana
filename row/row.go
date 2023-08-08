@@ -1,11 +1,14 @@
 package row
 
 import (
+	"encoding/json"
+
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/gauge"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/heatmap"
 	"github.com/K-Phoen/grabana/logs"
+	"github.com/K-Phoen/grabana/packages"
 	"github.com/K-Phoen/grabana/singlestat"
 	"github.com/K-Phoen/grabana/stat"
 	"github.com/K-Phoen/grabana/table"
@@ -67,6 +70,37 @@ func WithGraph(title string, options ...graph.Option) Option {
 		}
 
 		row.alerts = append(row.alerts, panel.Alert)
+
+		return nil
+	}
+}
+
+// WithPanelFromPackage adds a panel defined in a Polly package.
+func WithPanelFromPackage(pkg packages.NormalizedPackage, reference packages.Reference) Option {
+	return func(row *Row) error {
+		manifest, err := pkg.Locate(reference)
+		if err != nil {
+			return err
+		}
+
+		denormalizedManifest, err := packages.DenormalizePanel(manifest, pkg)
+		if err != nil {
+			return err
+		}
+
+		// quickest way to map a map[string]interface{} to the weird sdk.Panel struct
+		// is to json-encode and json-decode it :|
+		jsonPanel, err := json.Marshal(denormalizedManifest.Spec)
+		if err != nil {
+			return err
+		}
+
+		panel := &sdk.Panel{}
+		if err := json.Unmarshal(jsonPanel, panel); err != nil {
+			return err
+		}
+
+		row.builder.Add(panel)
 
 		return nil
 	}

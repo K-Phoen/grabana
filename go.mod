@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/K-Phoen/sdk v0.12.2
 	github.com/blang/semver v3.5.1+incompatible
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/prometheus/common v0.39.0
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/spf13/cobra v1.6.1
