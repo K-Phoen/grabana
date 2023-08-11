@@ -12,3 +12,13 @@ func panelSpan(panel sdk.Panel) float32 {
 
 	return span
 }
+
+func stringInSlice(search string, haystack []string) bool {
+	for _, item := range haystack {
+		if item == search {
+			return true
+		}
+	}
+
+	return false
+}
