@@ -126,6 +126,8 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 		return encoder.convertLogs(panel), true
 	case "timeseries":
 		return encoder.encodeTimeseries(panel), true
+	case "gauge":
+		return encoder.encodeGauge(panel), true
 	/*
 		case "graph":
 			return converter.convertGraph(panel), true
