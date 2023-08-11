@@ -51,37 +51,37 @@ func (encoder *Encoder) encodeTarget(target sdk.Target, grabanaPackage string) j
 
 func (encoder *Encoder) encodePrometheusTarget(target sdk.Target, grabanaPackage string) jen.Code {
 	settings := []jen.Code{
-		jen.Lit(target.Expr),
+		lit(target.Expr),
 	}
 
 	if target.LegendFormat != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/target/prometheus", "Legend").Call(jen.Lit(target.LegendFormat)),
+			qual("target/prometheus", "Legend").Call(lit(target.LegendFormat)),
 		)
 	}
 	if target.RefID != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/target/prometheus", "Ref").Call(jen.Lit(target.RefID)),
+			qual("target/prometheus", "Ref").Call(lit(target.RefID)),
 		)
 	}
 	if target.Hide {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/target/prometheus", "Hide").Call(),
+			qual("target/prometheus", "Hide").Call(),
 		)
 	}
 	if target.Instant {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/target/prometheus", "Instant").Call(),
+			qual("target/prometheus", "Instant").Call(),
 		)
 	}
 	if target.IntervalFactor != 0 {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/target/prometheus", "IntervalFactor").Call(jen.Lit(target.IntervalFactor)),
+			qual("target/prometheus", "IntervalFactor").Call(lit(target.IntervalFactor)),
 		)
 	}
 
@@ -102,13 +102,11 @@ func (encoder *Encoder) encodePrometheusTarget(target sdk.Target, grabanaPackage
 	if formatConstName != "FormatTimeSeries" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/target/prometheus", "Format").Call(
-				jen.Qual(packageImportPath+"/target/prometheus", formatConstName),
+			qual("target/prometheus", "Format").Call(
+				qual("target/prometheus", formatConstName),
 			),
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/"+grabanaPackage, "WithPrometheusTarget").MultiLineCall(
-		settings...,
-	)
+	return qual(grabanaPackage, "WithPrometheusTarget").MultiLineCall(settings...)
 }

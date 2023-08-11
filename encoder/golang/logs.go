@@ -17,7 +17,7 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/row", "WithLogs").MultiLineCall(
+	return rowQual("WithLogs").MultiLineCall(
 		append(settings, encoder.encodeLogsVizualizationSettings(panel)...)...,
 	)
 }
@@ -26,55 +26,33 @@ func (encoder *Encoder) encodeLogsVizualizationSettings(panel sdk.Panel) []jen.C
 	var settings []jen.Code
 
 	if panel.LogsPanel.Options.ShowTime {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "Time").Call(),
-		)
+		settings = append(settings, logsQual("Time").Call())
 	}
 	if panel.LogsPanel.Options.ShowLabels {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "UniqueLabels").Call(),
-		)
+		settings = append(settings, logsQual("UniqueLabels").Call())
 	}
 	if panel.LogsPanel.Options.ShowCommonLabels {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "CommonLabels").Call(),
-		)
+		settings = append(settings, logsQual("CommonLabels").Call())
 	}
 	if panel.LogsPanel.Options.WrapLogMessage {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "WrapLines").Call(),
-		)
+		settings = append(settings, logsQual("WrapLines").Call())
 	}
 	if panel.LogsPanel.Options.PrettifyLogMessage {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "PrettifyJSON").Call(),
-		)
+		settings = append(settings, logsQual("PrettifyJSON").Call())
 	}
 	if !panel.LogsPanel.Options.EnableLogDetails {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/logs", "HideLogDetails").Call(),
-		)
+		settings = append(settings, logsQual("HideLogDetails").Call())
 	}
 	if panel.LogsPanel.Options.SortOrder != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/logs", "Order").Call(
-				encoder.encodeLogsSortOrder(panel.LogsPanel.Options.SortOrder),
-			),
+			logsQual("Order").Call(encoder.encodeLogsSortOrder(panel.LogsPanel.Options.SortOrder)),
 		)
 	}
 	if panel.LogsPanel.Options.DedupStrategy != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/logs", "Deduplication").Call(
-				encoder.encodeLogsDedupStrategy(panel.LogsPanel.Options.DedupStrategy),
-			),
+			logsQual("Deduplication").Call(encoder.encodeLogsDedupStrategy(panel.LogsPanel.Options.DedupStrategy)),
 		)
 	}
 
@@ -98,7 +76,7 @@ func (encoder *Encoder) encodeLogsDedupStrategy(sdkDedupStrategy string) jen.Cod
 		constantName = "none"
 	}
 
-	return jen.Qual(packageImportPath+"/logs", constantName)
+	return logsQual(constantName)
 }
 
 func (encoder *Encoder) encodeLogsSortOrder(sdkSortOrder string) jen.Code {
@@ -114,34 +92,27 @@ func (encoder *Encoder) encodeLogsSortOrder(sdkSortOrder string) jen.Code {
 		constantName = "Desc"
 	}
 
-	return jen.Qual(packageImportPath+"/logs", constantName)
+	return logsQual(constantName)
 }
 
 func (encoder *Encoder) encodeLogsTarget(target sdk.Target) jen.Code {
 	settings := []jen.Code{
-		jen.Lit(target.Expr),
+		lit(target.Expr),
 	}
 
 	if target.RefID != "" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/target/loki", "Ref").Call(jen.Lit(target.RefID)),
-		)
+		settings = append(settings, qual("target/loki", "Ref").Call(lit(target.RefID)))
 	}
 	if target.LegendFormat != "" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/target/loki", "Legend").Call(jen.Lit(target.LegendFormat)),
-		)
+		settings = append(settings, qual("target/loki", "Legend").Call(lit(target.LegendFormat)))
 	}
 	if target.Hide {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/target/loki", "Hide").Call(),
-		)
+		settings = append(settings, qual("target/loki", "Hide").Call())
 	}
 
-	return jen.Qual(packageImportPath+"/logs", "WithLokiTarget").Call(
-		settings...,
-	)
+	return logsQual("WithLokiTarget").Call(settings...)
+}
+
+func logsQual(name string) *jen.Statement {
+	return jen.Qual(packageImportPath+"/logs", name)
 }

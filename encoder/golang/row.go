@@ -13,28 +13,24 @@ type RowIR struct {
 
 func (encoder *Encoder) encodeRow(row RowIR) *jen.Statement {
 	rowSettings := []jen.Code{
-		jen.Lit(row.Title),
+		lit(row.Title),
 	}
 
 	if row.RepeatFor != nil {
-		rowSettings = append(
-			rowSettings,
-			jen.Qual(packageImportPath+"/row", "RepeatFor").Call(jen.Lit(*row.RepeatFor)),
-		)
+		rowSettings = append(rowSettings, rowQual("RepeatFor").Call(lit(*row.RepeatFor)))
 	}
 
 	if row.Collapsed {
-		rowSettings = append(
-			rowSettings,
-			jen.Qual(packageImportPath+"/row", "Collapse").Call(),
-		)
+		rowSettings = append(rowSettings, rowQual("Collapse").Call())
 	}
 
 	for _, panel := range row.Panels {
 		rowSettings = append(rowSettings, panel)
 	}
 
-	return jen.Qual(packageImportPath+"/dashboard", "Row").MultiLineCall(
-		rowSettings...,
-	)
+	return dashboardQual("Row").MultiLineCall(rowSettings...)
+}
+
+func rowQual(name string) *jen.Statement {
+	return qual("row", name)
 }

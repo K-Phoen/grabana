@@ -19,7 +19,12 @@ func (encoder *Encoder) encodeTimeseries(panel sdk.Panel) jen.Code {
 		encoder.encodeTimeseriesLegend(panel.TimeseriesPanel.Options.Legend),
 	)
 
-	return jen.Qual(packageImportPath+"/row", "WithTimeSeries").MultiLineCall(
+	settings = append(
+		settings,
+		encoder.encodeTimeseriesVizualization(panel)...,
+	)
+
+	return qual("row", "WithTimeSeries").MultiLineCall(
 		settings...,
 	)
 }
@@ -29,23 +34,23 @@ func (encoder *Encoder) encodeTimeseriesLegend(legend sdk.TimeseriesLegendOption
 
 	// Hidden legend?
 	if legend.Show != nil && !*legend.Show {
-		legendOpts = append(legendOpts, jen.Qual(packageImportPath+"/timeseries", "Hide"))
+		legendOpts = append(legendOpts, timeseriesQual("Hide"))
 	} else {
 		// Display mode
 		switch legend.DisplayMode {
 		case "list":
-			legendOpts = append(legendOpts, jen.Qual(packageImportPath+"/timeseries", "AsList"))
+			legendOpts = append(legendOpts, timeseriesQual("AsList"))
 		case "hidden":
-			legendOpts = append(legendOpts, jen.Qual(packageImportPath+"/timeseries", "Hide"))
+			legendOpts = append(legendOpts, timeseriesQual("Hide"))
 		default:
-			legendOpts = append(legendOpts, jen.Qual(packageImportPath+"/timeseries", "AsTable"))
+			legendOpts = append(legendOpts, timeseriesQual("AsTable"))
 		}
 
 		// Placement
 		if legend.Placement == "right" {
-			legendOpts = append(legendOpts, jen.Qual(packageImportPath+"/timeseries", "ToTheRight"))
+			legendOpts = append(legendOpts, timeseriesQual("ToTheRight"))
 		} else {
-			legendOpts = append(legendOpts, jen.Qual(packageImportPath+"/timeseries", "Bottom"))
+			legendOpts = append(legendOpts, timeseriesQual("Bottom"))
 		}
 	}
 
@@ -72,10 +77,33 @@ func (encoder *Encoder) encodeTimeseriesLegend(legend sdk.TimeseriesLegendOption
 			continue
 		}
 
-		legendOpts = append(legendOpts, jen.Qual(packageImportPath+"/timeseries", constName))
+		legendOpts = append(legendOpts, timeseriesQual(constName))
 	}
 
-	return jen.Qual(packageImportPath+"/timeseries", "Legend").Call(
-		legendOpts...,
+	return timeseriesQual("Legend").Call(legendOpts...)
+}
+
+func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Code {
+	var settings []jen.Code
+
+	// Tooltip mode
+	toolTipModeConst := "SingleSeries"
+	switch panel.TimeseriesPanel.Options.Tooltip.Mode {
+	case "none":
+		toolTipModeConst = "NoSeries"
+	case "multi":
+		toolTipModeConst = "AllSeries"
+	default:
+		toolTipModeConst = "SingleSeries"
+	}
+	settings = append(
+		settings,
+		timeseriesQual("Tooltip").MultiLineCall(timeseriesQual(toolTipModeConst)),
 	)
+
+	return settings
+}
+
+func timeseriesQual(name string) *jen.Statement {
+	return qual("timeseries", name)
 }

@@ -17,16 +17,16 @@ func (encoder *Encoder) encodePanelLinks(links []sdk.Link) []jen.Code {
 
 func (encoder *Encoder) encodePanelLink(link sdk.Link) jen.Code {
 	settings := []jen.Code{
-		jen.Lit(link.Title),
-		jen.Lit(*link.URL),
+		lit(link.Title),
+		lit(*link.URL),
 	}
 
 	if link.TargetBlank != nil && *link.TargetBlank {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/links", "OpenBlank").Call(),
+			qual("links", "OpenBlank").Call(),
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/links", "New").Call(settings...)
+	return qual("links", "New").Call(settings...)
 }

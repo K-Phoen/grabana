@@ -44,62 +44,44 @@ func (encoder *Encoder) encodeVariable(variable sdk.TemplateVar) jen.Code {
 
 func (encoder *Encoder) encodeQueryVar(variable sdk.TemplateVar) jen.Code {
 	settings := []jen.Code{
-		jen.Lit(variable.Name),
+		lit(variable.Name),
 	}
 
 	if variable.Label != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/variable/query", "Label").Call(jen.Lit(variable.Label)),
+			qual("variable/query", "Label").Call(lit(variable.Label)),
 		)
 	}
 	if variable.IncludeAll {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/query", "IncludeAll").Call(),
-		)
+		settings = append(settings, qual("variable/query", "IncludeAll").Call())
 	}
 	if variable.Multi {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/query", "Multiple").Call(),
-		)
+		settings = append(settings, qual("variable/query", "Multiple").Call())
 	}
 	if variable.Hide == 1 {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/query", "HideLabel").Call(),
-		)
+		settings = append(settings, qual("variable/query", "HideLabel").Call())
 	}
 	if variable.Hide == 2 {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/query", "Hide").Call(),
-		)
+		settings = append(settings, qual("variable/query", "Hide").Call())
 	}
 	if variable.Regex != "" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/query", "Regex").Call(jen.Lit(variable.Regex)),
-		)
+		settings = append(settings, qual("variable/query", "Regex").Call(lit(variable.Regex)))
 	}
 	// TODO: eventually we should stop using legacy stuff... :|
 	if variable.Datasource != nil && variable.Datasource.LegacyName != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/variable/query", "Datasource").Call(jen.Lit(variable.Datasource.LegacyName)),
+			qual("variable/query", "Datasource").Call(lit(variable.Datasource.LegacyName)),
 		)
 	}
 	if variable.Current.Value == "$__all" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/query", "DefaultAll").Call(),
-		)
+		settings = append(settings, qual("variable/query", "DefaultAll").Call())
 	}
 	if variable.AllValue != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/variable/query", "AllValue").Call(jen.Lit(variable.AllValue)),
+			qual("variable/query", "AllValue").Call(lit(variable.AllValue)),
 		)
 	}
 	if variable.Refresh.Value != nil {
@@ -115,8 +97,8 @@ func (encoder *Encoder) encodeQueryVar(variable sdk.TemplateVar) jen.Code {
 
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/variable/query", "Refresh").Call(
-				jen.Qual(packageImportPath+"/variable/query", refreshConstName),
+			qual("variable/query", "Refresh").Call(
+				qual("variable/query", refreshConstName),
 			),
 		)
 	}
@@ -124,13 +106,13 @@ func (encoder *Encoder) encodeQueryVar(variable sdk.TemplateVar) jen.Code {
 		if request, ok := variable.Query.(string); ok {
 			settings = append(
 				settings,
-				jen.Qual(packageImportPath+"/variable/query", "Request").Call(jen.Lit(request)),
+				qual("variable/query", "Request").Call(lit(request)),
 			)
 		}
 		if request, ok := variable.Query.(map[string]interface{}); ok {
 			settings = append(
 				settings,
-				jen.Qual(packageImportPath+"/variable/query", "Request").Call(jen.Lit(request["query"].(string))),
+				qual("variable/query", "Request").Call(lit(request["query"].(string))),
 			)
 		}
 	}
@@ -155,66 +137,44 @@ func (encoder *Encoder) encodeQueryVar(variable sdk.TemplateVar) jen.Code {
 
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/variable/query", "Sort").Call(
-				jen.Qual(packageImportPath+"/variable/query", sortConstName),
+			qual("variable/query", "Sort").Call(
+				qual("variable/query", sortConstName),
 			),
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/dashboard", "VariableAsQuery").MultiLineCall(
-		settings...,
-	)
+	return dashboardQual("VariableAsQuery").MultiLineCall(settings...)
 }
 
 func (encoder *Encoder) encodeDatasourceVar(variable sdk.TemplateVar) jen.Code {
 	settings := []jen.Code{
-		jen.Lit(variable.Name),
+		lit(variable.Name),
 	}
 
 	if variable.Label != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/variable/datasource", "Label").Call(jen.Lit(variable.Label)),
+			qual("variable/datasource", "Label").Call(lit(variable.Label)),
 		)
 	}
 	if variable.IncludeAll {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/datasource", "IncludeAll").Call(),
-		)
+		settings = append(settings, qual("variable/datasource", "IncludeAll").Call())
 	}
 	if variable.Multi {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/datasource", "Multiple").Call(),
-		)
+		settings = append(settings, qual("variable/datasource", "Multiple").Call())
 	}
 	if variable.Hide == 1 {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/datasource", "HideLabel").Call(),
-		)
+		settings = append(settings, qual("variable/datasource", "HideLabel").Call())
 	}
 	if variable.Hide == 2 {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/datasource", "Hide").Call(),
-		)
+		settings = append(settings, qual("variable/datasource", "Hide").Call())
 	}
 	if variable.Query != nil {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/datasource", "Type").Call(jen.Lit(variable.Query.(string))),
-		)
+		settings = append(settings, qual("variable/datasource", "Type").Call(lit(variable.Query.(string))))
 	}
 	if variable.Regex != "" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/variable/datasource", "Regex").Call(jen.Lit(variable.Regex)),
-		)
+		settings = append(settings, qual("variable/datasource", "Regex").Call(lit(variable.Regex)))
 	}
 
-	return jen.Qual(packageImportPath+"/dashboard", "VariableAsDatasource").MultiLineCall(
-		settings...,
-	)
+	return dashboardQual("VariableAsDatasource").MultiLineCall(settings...)
 }

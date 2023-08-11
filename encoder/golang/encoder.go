@@ -22,7 +22,7 @@ func NewEncoder(logger *zap.Logger) *Encoder {
 
 func (encoder *Encoder) EncodeDashboard(dashboard sdk.Board) (string, error) {
 	dashboardStatements := []jen.Code{
-		jen.Lit(dashboard.Title),
+		lit(dashboard.Title),
 	}
 
 	dashboardStatements = append(dashboardStatements, encoder.encodeGeneralSettings(dashboard)...)
@@ -48,47 +48,32 @@ func (encoder *Encoder) encodeGeneralSettings(dashboard sdk.Board) []jen.Code {
 	var settings []jen.Code
 
 	if dashboard.UID != "" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/dashboard", "UID").Call(jen.Lit(dashboard.UID)),
-		)
+		settings = append(settings, dashboardQual("UID").Call(lit(dashboard.UID)))
 	}
 
 	if dashboard.Slug != "" {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/dashboard", "Slug").Call(jen.Lit(dashboard.Slug)),
-		)
+		settings = append(settings, dashboardQual("Slug").Call(lit(dashboard.Slug)))
 	}
 
 	if dashboard.SharedCrosshair {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/dashboard", "SharedCrossHair").Call(),
-		)
+		settings = append(settings, dashboardQual("SharedCrossHair").Call())
 	}
 
 	if !dashboard.Editable {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/dashboard", "ReadOnly").Call(),
-		)
+		settings = append(settings, dashboardQual("ReadOnly").Call())
 	}
 
 	if dashboard.Refresh != nil {
-		settings = append(
-			settings,
-			jen.Qual(packageImportPath+"/dashboard", "AutoRefresh").Call(jen.Lit(dashboard.Refresh.Value)),
-		)
+		settings = append(settings, dashboardQual("AutoRefresh").Call(lit(dashboard.Refresh.Value)))
 	}
 
 	// TODO: timezone, tags
 
 	settings = append(
 		settings,
-		jen.Qual(packageImportPath+"/dashboard", "Time").Call(
-			jen.Lit(dashboard.Time.From),
-			jen.Lit(dashboard.Time.To),
+		dashboardQual("Time").Call(
+			lit(dashboard.Time.From),
+			lit(dashboard.Time.To),
 		),
 	)
 
@@ -162,5 +147,8 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 	}
 
 	return nil, false
+}
 
+func dashboardQual(name string) *jen.Statement {
+	return qual("dashboard", name)
 }

@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"github.com/K-Phoen/jennifer/jen"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -13,12 +14,10 @@ func panelSpan(panel sdk.Panel) float32 {
 	return span
 }
 
-func stringInSlice(search string, haystack []string) bool {
-	for _, item := range haystack {
-		if item == search {
-			return true
-		}
-	}
+func qual(pkg string, name string) *jen.Statement {
+	return jen.Qual(packageImportPath+"/"+pkg, name)
+}
 
-	return false
+func lit(v interface{}) *jen.Statement {
+	return jen.Lit(v)
 }

@@ -7,13 +7,13 @@ import (
 
 func (encoder *Encoder) encodeCommonPanelProperties(panel sdk.Panel, grabanaPackage string) []jen.Code {
 	settings := []jen.Code{
-		jen.Lit(panel.Title),
+		lit(panel.Title),
 	}
 
 	if len(panel.Links) != 0 {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/"+grabanaPackage, "Links").Call(
+			qual(grabanaPackage, "Links").Call(
 				encoder.encodePanelLinks(panel.Links)...,
 			),
 		)
@@ -23,38 +23,38 @@ func (encoder *Encoder) encodeCommonPanelProperties(panel sdk.Panel, grabanaPack
 	if span != 0 {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/"+grabanaPackage, "Span").Call(jen.Lit(span)),
+			qual(grabanaPackage, "Span").Call(lit(span)),
 		)
 	}
 
 	if panel.Description != nil {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/"+grabanaPackage, "Description").Call(jen.Lit(*panel.Description)),
+			qual(grabanaPackage, "Description").Call(lit(*panel.Description)),
 		)
 	}
 	if panel.Height != nil {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/"+grabanaPackage, "Height").Call(jen.Lit(*(panel.Height).(*string))),
+			qual(grabanaPackage, "Height").Call(lit(*(panel.Height).(*string))),
 		)
 	}
 	if panel.Transparent {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/"+grabanaPackage, "Transparent").Call(jen.Lit(panel.Transparent)),
+			qual(grabanaPackage, "Transparent").Call(lit(panel.Transparent)),
 		)
 	}
 	if panel.Repeat != nil {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/"+grabanaPackage, "Repeat").Call(jen.Lit(*panel.Repeat)),
+			qual(grabanaPackage, "Repeat").Call(lit(*panel.Repeat)),
 		)
 	}
 	if panel.Datasource != nil && panel.Datasource.LegacyName != "" {
 		settings = append(
 			settings,
-			jen.Qual(packageImportPath+"/"+grabanaPackage, "DataSource").Call(jen.Lit(panel.Datasource.LegacyName)),
+			qual(grabanaPackage, "DataSource").Call(lit(panel.Datasource.LegacyName)),
 		)
 	}
 
