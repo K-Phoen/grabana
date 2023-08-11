@@ -1,8 +1,8 @@
 package golang
 
 import (
+	"github.com/K-Phoen/jennifer/jen"
 	"github.com/K-Phoen/sdk"
-	"github.com/dave/jennifer/jen"
 	"go.uber.org/zap"
 )
 
@@ -161,7 +161,7 @@ func (encoder *Encoder) encodeQueryVar(variable sdk.TemplateVar) jen.Code {
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/dashboard", "VariableAsQuery").Call(
+	return jen.Qual(packageImportPath+"/dashboard", "VariableAsQuery").MultiLineCall(
 		settings...,
 	)
 }
@@ -214,7 +214,7 @@ func (encoder *Encoder) encodeDatasourceVar(variable sdk.TemplateVar) jen.Code {
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/dashboard", "VariableAsDatasource").Call(
+	return jen.Qual(packageImportPath+"/dashboard", "VariableAsDatasource").MultiLineCall(
 		settings...,
 	)
 }

@@ -1,8 +1,8 @@
 package golang
 
 import (
+	"github.com/K-Phoen/jennifer/jen"
 	"github.com/K-Phoen/sdk"
-	"github.com/dave/jennifer/jen"
 )
 
 func (encoder *Encoder) encodeTimeseries(panel sdk.Panel) jen.Code {
@@ -13,7 +13,7 @@ func (encoder *Encoder) encodeTimeseries(panel sdk.Panel) jen.Code {
 		encoder.encodeTargets(panel.TimeseriesPanel.Targets, "timeseries")...,
 	)
 
-	return jen.Qual(packageImportPath+"/row", "WithTimeSeries").Call(
+	return jen.Qual(packageImportPath+"/row", "WithTimeSeries").MultiLineCall(
 		settings...,
 	)
 }

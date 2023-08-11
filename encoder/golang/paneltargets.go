@@ -1,8 +1,8 @@
 package golang
 
 import (
+	"github.com/K-Phoen/jennifer/jen"
 	"github.com/K-Phoen/sdk"
-	"github.com/dave/jennifer/jen"
 	"go.uber.org/zap"
 )
 
@@ -108,7 +108,7 @@ func (encoder *Encoder) encodePrometheusTarget(target sdk.Target, grabanaPackage
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/"+grabanaPackage, "WithPrometheusTarget").Call(
+	return jen.Qual(packageImportPath+"/"+grabanaPackage, "WithPrometheusTarget").MultiLineCall(
 		settings...,
 	)
 }

@@ -1,11 +1,13 @@
+github.com/K-Phoen/jennifer v0.0.0-20230811102814-e6c78cf40086 h1:cvgm5R+2OIaCzMqyA8YAHuybHEbdvBIC3OAziNiMbEU=
+github.com/K-Phoen/jennifer v0.0.0-20230811102814-e6c78cf40086/go.mod h1:rm3gx5yYxh/Q3ynk+qaNoN6nQiII0Vn/uz46bIgj0P0=
 github.com/K-Phoen/sdk v0.12.4 h1:j2EYuBJm3zDTD0fGKACVFWxAXtkR0q5QzfVqxmHSeGQ=
 github.com/K-Phoen/sdk v0.12.4/go.mod h1:qmM0wO23CtoDux528MXPpYvS4XkRWkWX6rvX9Za8EVU=
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
 github.com/blang/semver v3.5.1+incompatible h1:cQNTCjp13qL8KC3Nbxr/y2Bqb63oX6wdnnjpJbkM4JQ=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/dave/jennifer v1.6.1 h1:T4T/67t6RAA5AIV6+NP8Uk/BIsXgDoqEowgycdQQLuk=
-github.com/dave/jennifer v1.6.1/go.mod h1:nXbxhEmQfOZhWml3D1cDK5M1FLnMSozpbFN/m3RmGZc=
+github.com/dave/jennifer v1.7.0 h1:uRbSBH9UTS64yXbh4FrMHfgfY762RD+C7bUPKODpSJE=
+github.com/dave/jennifer v1.7.0/go.mod h1:nXbxhEmQfOZhWml3D1cDK5M1FLnMSozpbFN/m3RmGZc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

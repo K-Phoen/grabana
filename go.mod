@@ -3,9 +3,9 @@ module github.com/K-Phoen/grabana
 go 1.19
 
 require (
+	github.com/K-Phoen/jennifer v0.0.0-20230811102814-e6c78cf40086
 	github.com/K-Phoen/sdk v0.12.4
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/dave/jennifer v1.6.1
 	github.com/prometheus/common v0.45.0
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/spf13/cobra v1.8.0
@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	github.com/dave/jennifer v1.7.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-github/v30 v30.1.0 // indirect

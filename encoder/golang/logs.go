@@ -2,8 +2,8 @@ package golang
 
 import (
 	"github.com/K-Phoen/grabana/logs"
+	"github.com/K-Phoen/jennifer/jen"
 	"github.com/K-Phoen/sdk"
-	"github.com/dave/jennifer/jen"
 	"go.uber.org/zap"
 )
 
@@ -17,7 +17,7 @@ func (encoder *Encoder) convertLogs(panel sdk.Panel) jen.Code {
 		)
 	}
 
-	return jen.Qual(packageImportPath+"/row", "WithLogs").Call(
+	return jen.Qual(packageImportPath+"/row", "WithLogs").MultiLineCall(
 		append(settings, encoder.encodeLogsVizualizationSettings(panel)...)...,
 	)
 }

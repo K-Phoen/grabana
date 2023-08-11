@@ -1,7 +1,7 @@
 package golang
 
 import (
-	"github.com/dave/jennifer/jen"
+	"github.com/K-Phoen/jennifer/jen"
 )
 
 type RowIR struct {
@@ -34,7 +34,7 @@ func (encoder *Encoder) encodeRow(row RowIR) *jen.Statement {
 		rowSettings = append(rowSettings, panel)
 	}
 
-	return jen.Qual(packageImportPath+"/dashboard", "Row").Call(
+	return jen.Qual(packageImportPath+"/dashboard", "Row").MultiLineCall(
 		rowSettings...,
 	)
 }

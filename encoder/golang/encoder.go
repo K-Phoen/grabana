@@ -3,8 +3,8 @@ package golang
 import (
 	"bytes"
 
+	"github.com/K-Phoen/jennifer/jen"
 	"github.com/K-Phoen/sdk"
-	"github.com/dave/jennifer/jen"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +31,7 @@ func (encoder *Encoder) EncodeDashboard(dashboard sdk.Board) (string, error) {
 
 	file := jen.NewFile("main")
 	file.Func().Id("main").Params().Block(
-		jen.Id("builder, err").Op(":=").Qual(packageImportPath+"/dashboard", "New").Call(
+		jen.Id("builder, err").Op(":=").Qual(packageImportPath+"/dashboard", "New").MultiLineCall(
 			dashboardStatements...,
 		),
 	)
