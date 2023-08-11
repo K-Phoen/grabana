@@ -24,9 +24,82 @@ func (encoder *Encoder) encodeTimeseries(panel sdk.Panel) jen.Code {
 		encoder.encodeTimeseriesVizualization(panel)...,
 	)
 
+	settings = append(
+		settings,
+		encoder.encodeTimeseriesAxis(panel),
+	)
+
+	// TODO: overrides
+
 	return qual("row", "WithTimeSeries").MultiLineCall(
 		settings...,
 	)
+}
+
+func (encoder *Encoder) encodeTimeseriesAxis(panel sdk.Panel) jen.Code {
+	fieldConfig := panel.TimeseriesPanel.FieldConfig
+	defaults := fieldConfig.Defaults
+	settings := []jen.Code{
+		tsAxisQual("Unit").Call(lit(defaults.Unit)),
+	}
+
+	// label
+	if defaults.Custom.AxisLabel != "" {
+		settings = append(settings, tsAxisQual("Label").Call(lit(defaults.Custom.AxisLabel)))
+	}
+
+	// decimals
+	if defaults.Decimals != nil {
+		settings = append(settings, tsAxisQual("Decimals").Call(lit(*defaults.Decimals)))
+	}
+
+	// boundaries
+	if fieldConfig.Defaults.Min != nil {
+		settings = append(settings, tsAxisQual("Min").Call(lit(*defaults.Min)))
+	}
+	if fieldConfig.Defaults.Max != nil {
+		settings = append(settings, tsAxisQual("Max").Call(lit(*defaults.Max)))
+	}
+	if fieldConfig.Defaults.Custom.AxisSoftMin != nil {
+		settings = append(settings, tsAxisQual("SoftMin").Call(lit(*defaults.Custom.AxisSoftMin)))
+	}
+	if fieldConfig.Defaults.Custom.AxisSoftMax != nil {
+		settings = append(settings, tsAxisQual("SoftMax").Call(lit(*defaults.Custom.AxisSoftMax)))
+	}
+
+	// placement
+	placementConst := "Auto"
+	switch defaults.Custom.AxisPlacement {
+	case "hidden":
+		placementConst = "Hidden"
+	case "left":
+		placementConst = "Left"
+	case "right":
+		placementConst = "Right"
+	case "auto":
+		placementConst = "Auto"
+	}
+	if placementConst != "Auto" {
+		settings = append(settings, tsAxisQual("Placement").Call(tsAxisQual(placementConst)))
+	}
+
+	// scale
+	scaleDistributionConst := "Linear"
+	switch defaults.Custom.ScaleDistribution.Type {
+	case "linear":
+		scaleDistributionConst = "Linear"
+	case "log":
+		if fieldConfig.Defaults.Custom.ScaleDistribution.Log == 2 {
+			scaleDistributionConst = "Log2"
+		} else {
+			scaleDistributionConst = "Log10"
+		}
+	}
+	if scaleDistributionConst != "Linear" {
+		settings = append(settings, tsAxisQual("Scale").Call(tsAxisQual(scaleDistributionConst)))
+	}
+
+	return timeseriesQual("Axis").Call(settings...)
 }
 
 func (encoder *Encoder) encodeTimeseriesLegend(legend sdk.TimeseriesLegendOptions) jen.Code {
@@ -182,4 +255,8 @@ func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Cod
 
 func timeseriesQual(name string) *jen.Statement {
 	return qual("timeseries", name)
+}
+
+func tsAxisQual(name string) *jen.Statement {
+	return qual("timeseries/axis", name)
 }
