@@ -3,7 +3,7 @@ module github.com/K-Phoen/grabana
 go 1.19
 
 require (
-	github.com/K-Phoen/sdk v0.12.2
+	github.com/K-Phoen/sdk v0.12.3-0.20230811095259-e77b6356006c
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/prometheus/common v0.39.0
 	github.com/rhysd/go-github-selfupdate v1.2.3

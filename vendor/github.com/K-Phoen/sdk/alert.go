@@ -74,6 +74,7 @@ type AlertModel struct {
 }
 
 type StackdriverAlertQuery struct {
+	ProjectName        string                    `json:"projectName,omitempty"`
 	AlignOptions       []StackdriverAlignOptions `json:"alignOptions,omitempty"`
 	AliasBy            string                    `json:"aliasBy,omitempty"`
 	MetricType         string                    `json:"metricType,omitempty"`
