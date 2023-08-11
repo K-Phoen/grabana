@@ -84,7 +84,40 @@ func (encoder *Encoder) encodeTimeseriesLegend(legend sdk.TimeseriesLegendOption
 }
 
 func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Code {
-	var settings []jen.Code
+	fieldConfig := panel.TimeseriesPanel.FieldConfig
+
+	settings := []jen.Code{
+		timeseriesQual("FillOpacity").Call(lit(fieldConfig.Defaults.Custom.FillOpacity)),
+		timeseriesQual("PointSize").Call(lit(fieldConfig.Defaults.Custom.PointSize)),
+		timeseriesQual("LineWidth").Call(lit(fieldConfig.Defaults.Custom.LineWidth)),
+	}
+
+	// Line interpolation mode
+	if fieldConfig.Defaults.Custom.DrawStyle == "line" {
+		lineInterpolationConst := "Linear"
+
+		switch fieldConfig.Defaults.Custom.LineInterpolation {
+		case "smooth":
+			lineInterpolationConst = "Smooth"
+		case "linear":
+			lineInterpolationConst = "Linear"
+		case "stepBefore":
+			lineInterpolationConst = "StepBefore"
+		case "stepAfter":
+			lineInterpolationConst = "StepAfter"
+		default:
+			encoder.logger.Warn("invalid line interpolation mode, defaulting to Linear", zap.String("interpolation_mode", fieldConfig.Defaults.Custom.LineInterpolation))
+			lineInterpolationConst = "Linear"
+		}
+
+		// don't generate code for the default
+		if lineInterpolationConst != "Linear" {
+			settings = append(
+				settings,
+				timeseriesQual("Lines").Call(timeseriesQual(lineInterpolationConst)),
+			)
+		}
+	}
 
 	// Tooltip mode
 	toolTipModeConst := "SingleSeries"
@@ -96,10 +129,53 @@ func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Cod
 	default:
 		toolTipModeConst = "SingleSeries"
 	}
-	settings = append(
-		settings,
-		timeseriesQual("Tooltip").MultiLineCall(timeseriesQual(toolTipModeConst)),
-	)
+	// don't generate code for the default
+	if toolTipModeConst != "SingleSeries" {
+		settings = append(
+			settings,
+			timeseriesQual("Tooltip").Call(timeseriesQual(toolTipModeConst)),
+		)
+	}
+
+	// Gradient mode
+	gradientModeConst := "Opacity"
+	switch fieldConfig.Defaults.Custom.GradientMode {
+	case "none":
+		gradientModeConst = "NoGradient"
+	case "hue":
+		gradientModeConst = "Hue"
+	case "scheme":
+		gradientModeConst = "Scheme"
+	default:
+		gradientModeConst = "Opacity"
+	}
+	// don't generate code for the default
+	if gradientModeConst != "Opacity" {
+		settings = append(
+			settings,
+			timeseriesQual("GradientMode").Call(timeseriesQual(gradientModeConst)),
+		)
+	}
+
+	// Stacking mode
+	stackingModeConst := "Unstacked"
+	switch fieldConfig.Defaults.Custom.Stacking.Mode {
+	case "none":
+		stackingModeConst = "Unstacked"
+	case "normal":
+		stackingModeConst = "NormalStack"
+	case "percent":
+		stackingModeConst = "PercentStack"
+	default:
+		stackingModeConst = "Unstacked"
+	}
+	// don't generate code for the default
+	if stackingModeConst != "Unstacked" {
+		settings = append(
+			settings,
+			timeseriesQual("Stack").Call(timeseriesQual(stackingModeConst)),
+		)
+	}
 
 	return settings
 }
