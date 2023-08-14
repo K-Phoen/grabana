@@ -252,6 +252,7 @@ func TestDecodingStackdriverTarget(t *testing.T) {
 	target := AlertTarget{
 		Stackdriver: &AlertStackdriver{
 			Ref:         "A",
+			Project:     "some-project",
 			Lookback:    "15m",
 			Type:        "gauge",
 			Metric:      "cloudsql.googleapis.com/database/cpu/utilization",
@@ -279,6 +280,7 @@ func TestDecodingStackdriverTarget(t *testing.T) {
 	req.Equal("A", query.RefID)
 	req.Equal("A", query.Model.RefID)
 	req.Equal("GAUGE", stackdriverData.MetricKind)
+	req.Equal("some-project", stackdriverData.ProjectName)
 	req.Equal("cloudsql.googleapis.com/database/cpu/utilization", stackdriverData.MetricType)
 	req.ElementsMatch([]string{"resource.label.database_id"}, stackdriverData.GroupBys)
 	req.Equal("REDUCE_MEAN", stackdriverData.CrossSeriesReducer)

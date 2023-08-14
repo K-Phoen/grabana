@@ -7,6 +7,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestProjectCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+	
+	project := "some-gcp-project-id"
+
+	query := Delta("A", "some metric", Project(project))
+
+	builder := query.Builder
+
+	req.Equal(project, builder.Model.MetricQuery.ProjectName)
+}
+
 func TestDeltaQueriesCanBeCreated(t *testing.T) {
 	req := require.New(t)
 
