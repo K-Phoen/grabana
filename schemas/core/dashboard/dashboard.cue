@@ -32,7 +32,7 @@ Dashboard: {
 
 	// Theme of dashboard.
 	// Default value: dark.
-	style: "light" | *"dark"
+	style: #Style
 
 	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
 	timezone?: string | *"browser"
@@ -90,6 +90,8 @@ Dashboard: {
 	// Snapshot options. They are present only if the dashboard is a snapshot.
 	snapshot?: #Snapshot 
 } @cuetsy(kind="type") @grafana(TSVeneer="type")
+
+#Style: "light" | "dark" @cuetsy(kind="enum")
 
 #DashboardTemplating: {
 	// List of configured template variables with their saved values along with some other metadata
@@ -196,9 +198,7 @@ Dashboard: {
 	// Description of variable. It can be defined but `null`.
 	description?: string
 	// Query used to fetch values for a variable
-	query?: string | {
-		...
-	}
+	query?: { ... }
 	// Data source used to fetch values for a variable. It can be defined but `null`.
 	datasource?: #DataSourceRef
 	// Format to use while fetching all values from data source, eg: wildcard, glob, regex, pipe, etc.
@@ -555,7 +555,7 @@ Dashboard: {
 
 	// Direction to repeat in if 'repeat' is set.
 	// `h` for horizontal, `v` for vertical.
-	repeatDirection?: *"h" | "v"
+	repeatDirection?: #PanelRepeatDirection
 
 	// Id of the repeating panel.
 	repeatPanelId?: int64
@@ -601,6 +601,8 @@ Dashboard: {
 	// Field options allow you to change how the data is displayed in your visualizations.
 	fieldConfig: #FieldConfigSource
 } @cuetsy(kind="type") @grafana(TSVeneer="type") 
+
+#PanelRepeatDirection: "h" | "v" @cuetsy(kind="enum",memberNames="horizontal|vertical")
 
 // The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.
 // Each column within this structure is called a field. A field can represent a single time series or table column.
