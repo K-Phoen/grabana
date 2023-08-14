@@ -1,0 +1,16 @@
+"{{.Name}}": schema.{{.AttributeType}}Attribute{
+    MarkdownDescription: `{{.Description}}`,
+    Computed: {{.Computed}},
+    Optional: {{.Optional}},
+    Required: {{not .Optional}},
+    {{ if .ElementType }}ElementType: {{.ElementType}},{{ end }}
+    {{- if .DeprecationMessage }}DeprecationMessage: `{{.DeprecationMessage}}`,{{ end }}
+    {{- if .NestedAttributes }}Attributes: map[string]schema.Attribute{
+        {{.NestedAttributes}}
+    },{{ end }}
+    {{- if .NestedObjectAttributes }}NestedObject: schema.NestedAttributeObject{
+        Attributes: map[string]schema.Attribute{
+            {{.NestedObjectAttributes}}
+        },
+    },{{ end }}
+},
