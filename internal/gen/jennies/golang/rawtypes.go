@@ -111,7 +111,7 @@ func (jenny GoRawTypes) formatField(def simplecue.FieldDefinition) ([]byte, erro
 	buffer.WriteString(fmt.Sprintf(
 		"%s %s `json:\"%s%s\"`\n",
 		strings.Title(def.Name),
-		jenny.formatType(def.Type),
+		formatType(def.Type),
 		def.Name,
 		jsonOmitEmpty,
 	))
@@ -119,24 +119,24 @@ func (jenny GoRawTypes) formatField(def simplecue.FieldDefinition) ([]byte, erro
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoRawTypes) formatType(def simplecue.FieldType) string {
+func formatType(def simplecue.FieldType) string {
 	if def.Type == "unknown" {
 		return "any"
 	}
 
 	if def.Type == "disjunction" {
-		return jenny.formatDisjunction(def)
+		return formatDisjunction(def)
 	}
 
 	if def.Type == "array" {
-		return jenny.formatArray(def)
+		return formatArray(def)
 	}
 
 	typeName := stripHashtag(string(def.Type))
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {
-			subTypes = append(subTypes, jenny.formatType(subType))
+			subTypes = append(subTypes, formatType(subType))
 		}
 
 		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
@@ -149,27 +149,27 @@ func (jenny GoRawTypes) formatType(def simplecue.FieldType) string {
 	return typeName
 }
 
-func (jenny GoRawTypes) formatArray(def simplecue.FieldType) string {
+func formatArray(def simplecue.FieldType) string {
 	var subTypeString string
 
 	// we don't know what to do here (yet)
 	if len(def.SubType) != 1 {
-		subTypeString = jenny.formatDisjunction(simplecue.FieldType{
+		subTypeString = formatDisjunction(simplecue.FieldType{
 			SubType: def.SubType,
 		})
 	} else {
-		subTypeString = jenny.formatType(def.SubType[0])
+		subTypeString = formatType(def.SubType[0])
 	}
 
 	return fmt.Sprintf("[]%s", subTypeString)
 }
 
-func (jenny GoRawTypes) formatDisjunction(def simplecue.FieldType) string {
+func formatDisjunction(def simplecue.FieldType) string {
 	typeName := stripHashtag(string(def.Type))
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {
-			subTypes = append(subTypes, jenny.formatType(subType))
+			subTypes = append(subTypes, formatType(subType))
 		}
 
 		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))

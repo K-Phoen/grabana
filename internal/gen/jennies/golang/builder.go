@@ -59,5 +59,81 @@ func (jenny GoBuilder) generateFile(file *simplecue.File) ([]byte, error) {
 }
 `)
 
+	// (un)marshaling utilities
+	buffer.WriteString(`
+// MarshalJSON implements the encoding/json.Marshaler interface.
+//
+// This method can be used to render the dashboard as JSON
+// which your configuration management tool of choice can then feed into
+// Grafana's dashboard via its provisioning support.
+// See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+func (builder *Builder) MarshalJSON() ([]byte, error) {
+	return json.Marshal(builder.internal)
+}
+
+// MarshalIndentJSON renders the dashboard as indented JSON
+// which your configuration management tool of choice can then feed into
+// Grafana's dashboard via its provisioning support.
+// See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
+	return json.MarshalIndent(builder.internal, "", "  ")
+}
+`)
+
+	for _, typeDef := range tr.sortedTypes() {
+		typeDefGen, err := jenny.formatTypeDef(typeDef)
+		if err != nil {
+			return nil, err
+		}
+		if typeDefGen == nil {
+			continue
+		}
+
+		buffer.Write(typeDefGen)
+		buffer.WriteString("\n")
+	}
+
 	return []byte(buffer.String()), nil
+}
+
+func (jenny GoBuilder) formatTypeDef(def simplecue.TypeDefinition) ([]byte, error) {
+	// nothing to do for enums & other non-struct types
+	if def.Type != simplecue.DefinitionStruct {
+		return nil, nil
+	}
+
+	// What to do? I'll decide later.
+	if def.Name != "Dashboard" {
+		return nil, nil
+	}
+
+	return jenny.formatMainTypeOptions(def)
+}
+
+func (jenny GoBuilder) formatMainTypeOptions(def simplecue.TypeDefinition) ([]byte, error) {
+	var buffer strings.Builder
+
+	for _, fieldDef := range def.Fields {
+		buffer.WriteString(jenny.fieldToOption(fieldDef))
+	}
+
+	return []byte(buffer.String()), nil
+}
+
+func (jenny GoBuilder) fieldToOption(def simplecue.FieldDefinition) string {
+	var buffer strings.Builder
+
+	fieldName := strings.Title(def.Name)
+
+	buffer.WriteString(fmt.Sprintf(`
+func %[1]s(%[2]s %[3]s) Option {
+	return func(builder *Builder) error {
+		builder.internal.%[1]s = %[2]s
+
+		return nil
+	}
+}
+`, fieldName, def.Name, formatType(def.Type)))
+
+	return buffer.String()
 }
