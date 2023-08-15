@@ -156,7 +156,7 @@ func (g *generator) genEnumDefinition(name string, v cue.Value) *TypeDefinition 
 	return &TypeDefinition{
 		Type:     DefinitionEnum,
 		SubType:  string(subType),
-		Name:     name,
+		Name:     strings.TrimPrefix(name, "#"),
 		Comments: commentsFromCueValue(v),
 		Values:   exprs,
 	}
@@ -422,7 +422,7 @@ func orEnumDef(v cue.Value) ([]EnumValue, error) {
 }
 
 func (g *generator) genTypeDefinition(name string, v cue.Value) *TypeDefinition {
-	fmt.Printf("→ genTypeDefinition()\n")
+	fmt.Printf("→ genTypeDefinition(%s)\n", name)
 	// We restrict the derivation of type definitions to struct kinds.
 	// (More than just a struct literal match this, though.)
 	if v.IncompleteKind() != cue.StructKind {
@@ -435,9 +435,9 @@ func (g *generator) genTypeDefinition(name string, v cue.Value) *TypeDefinition 
 
 	iter, _ := v.Fields(cue.Optional(true), cue.Definitions(true))
 	for iter != nil && iter.Next() {
-		fmt.Println("iter")
+		fmt.Println("struct fields iter")
 		if iter.Selector().PkgPath() != "" {
-			g.addErr(valError(iter.Value(), "cannot generate hidden fields; typescript has no corresponding concept"))
+			g.addErr(valError(iter.Value(), "cannot generate hidden fields"))
 			return nil
 		}
 
@@ -456,7 +456,7 @@ func (g *generator) genTypeDefinition(name string, v cue.Value) *TypeDefinition 
 
 	return &TypeDefinition{
 		Type:     DefinitionStruct,
-		Name:     name,
+		Name:     strings.TrimPrefix(name, "#"),
 		Comments: commentsFromCueValue(v),
 		Fields:   elems,
 	}
@@ -464,11 +464,12 @@ func (g *generator) genTypeDefinition(name string, v cue.Value) *TypeDefinition 
 
 // Generate a typeRef for the cue.Value
 func (g *generator) genFieldDefinition(v cue.Value) (*FieldDefinition, error) {
-	fmt.Printf("→ genFieldDefinition()\n")
 	label, ok := v.Label()
 	if !ok {
 		return nil, fmt.Errorf("could not extract field label")
 	}
+
+	fmt.Printf("→ genFieldDefinition(%s)\n", label)
 
 	var fieldTypeDef *FieldType
 	var err error
@@ -582,7 +583,7 @@ func (g *generator) genEnumReferenceDef(v cue.Value) (*FieldType, error) {
 			dstr, _ = dvals[1].String()
 		}
 		if _, ok := dvals[1].Source().(*ast.Ident); ok && targetsKind(deref) {
-			return &FieldType{Type: TypeID(dstr)}, nil
+			return &FieldType{Type: TypeID(strings.TrimPrefix(dstr, "#"))}, nil
 			//return ts.Ident(dstr), nil
 		}
 		// This case is when we have a union of enums which we need to iterate them to get their values or has a default value.
@@ -949,6 +950,8 @@ func (g generator) simplifiedFieldType(v cue.Value, isType bool, isDefault bool)
 		}, nil
 	}
 
+	var constraints []TypeConstraint
+
 	// Handler for disjunctions
 	disj := func(dvals []cue.Value) ([]FieldType, error) {
 		parts := make([]FieldType, 0, len(dvals))
@@ -1025,7 +1028,7 @@ func (g generator) simplifiedFieldType(v cue.Value, isType bool, isDefault bool)
 			// unreachable?
 			return nil, errors.New("open list must have a type")
 		}
-	case cue.NumberKind, cue.StringKind:
+	case cue.StringKind:
 		// It appears there are only three cases in which we can have an
 		// incomplete NumberKind or StringKind:
 		//
@@ -1059,7 +1062,7 @@ func (g generator) simplifiedFieldType(v cue.Value, isType bool, isDefault bool)
 			}, nil
 		}
 		fallthrough
-	case cue.FloatKind, cue.IntKind, cue.BoolKind, cue.StructKind:
+	case cue.NumberKind, cue.FloatKind, cue.IntKind, cue.BoolKind, cue.StructKind:
 		// Having eliminated the possibility of bounds/constraints, we're left
 		// with disjunctions and basic types.
 		switch op {
@@ -1078,9 +1081,18 @@ func (g generator) simplifiedFieldType(v cue.Value, isType bool, isDefault bool)
 				SubType: subTypes,
 			}, nil
 		case cue.AndOp:
-		// There's no op for simple unification; it's a basic type, and can
-		// be trivially rendered.
+			// There's no op for simple unification; it's a basic type, and can
+			// be trivially rendered.
+			fmt.Println("AndOp")
 		case cue.NoOp:
+			// Can be something like uint8 & <12 | *0 (type with constraints + defaults)
+
+			subOp, _ := dvals[0].Expr()
+			switch subOp {
+			case cue.AndOp:
+				constraints = append(constraints, extractConstraints(dvals[0])...)
+			}
+
 			// Something a list of two items like #Enum & "default" struct reaches this point.
 			// The problem is that "default" is not detected as value, only by default, and we need
 			// to add this value manually.
@@ -1091,8 +1103,9 @@ func (g generator) simplifiedFieldType(v cue.Value, isType bool, isDefault bool)
 				}
 
 				return &FieldType{
-					Type:    TypeDisjunction,
-					SubType: subTypes,
+					Type:        TypeDisjunction,
+					SubType:     subTypes,
+					Constraints: constraints,
 				}, nil
 			}
 		default:
@@ -1101,11 +1114,12 @@ func (g generator) simplifiedFieldType(v cue.Value, isType bool, isDefault bool)
 		fallthrough
 
 	case cue.TopKind:
-		fType := scalarFieldType(ik)
+		fType := scalarFieldType(v, ik, constraints...)
 		return &fType, nil
 	case cue.BytesKind:
 		return &FieldType{
-			Type: TypeBytes,
+			Type:        TypeBytes,
+			Constraints: constraints,
 		}, nil
 	}
 	// Having more than one possible kind entails a disjunction, TopKind, or
@@ -1119,8 +1133,9 @@ func (g generator) simplifiedFieldType(v cue.Value, isType bool, isDefault bool)
 		}
 
 		return &FieldType{
-			Type:    TypeDisjunction,
-			SubType: subTypes,
+			Type:        TypeDisjunction,
+			SubType:     subTypes,
+			Constraints: constraints,
 		}, nil
 	}
 
@@ -1183,38 +1198,39 @@ func cueConcreteToScalar(v cue.Value) (interface{}, error) {
 // ONLY call this function if it has been established that the provided Value is
 // Concrete.
 func concreteScalarType(v cue.Value) (FieldType, error) {
+	fmt.Printf("concreteScalarType()\n")
 	switch v.Kind() {
 	case cue.NullKind:
 		return FieldType{Type: TypeNull, Constraints: []TypeConstraint{{
-			Op:   "eq",
+			Op:   "==",
 			Args: []any{nil},
 		}}}, nil
 	case cue.StringKind:
 		s, _ := v.String()
 
 		return FieldType{Type: TypeString, Constraints: []TypeConstraint{{
-			Op:   "eq",
+			Op:   "==",
 			Args: []any{s},
 		}}}, nil
 	case cue.NumberKind, cue.FloatKind:
 		f, _ := v.Float64()
 
 		return FieldType{Type: TypeFloat64, Constraints: []TypeConstraint{{
-			Op:   "eq",
+			Op:   "==",
 			Args: []any{f},
 		}}}, nil
 	case cue.IntKind:
 		i, _ := v.Int64()
 
 		return FieldType{Type: TypeInt64, Constraints: []TypeConstraint{{
-			Op:   "eq",
+			Op:   "==",
 			Args: []any{i},
 		}}}, nil
 	case cue.BoolKind:
 		b, _ := v.Bool()
 
 		return FieldType{Type: TypeBool, Constraints: []TypeConstraint{{
-			Op:   "eq",
+			Op:   "==",
 			Args: []any{b},
 		}}}, nil
 	default:
@@ -1222,40 +1238,27 @@ func concreteScalarType(v cue.Value) (FieldType, error) {
 	}
 }
 
-func scalarFieldType(k cue.Kind) FieldType {
+func scalarFieldType(v cue.Value, k cue.Kind, constraints ...TypeConstraint) FieldType {
+	typeConstraints := extractConstraints(v)
+	mergedConstraints := append(typeConstraints, constraints...)
+
 	switch k {
 	case cue.BoolKind:
-		return FieldType{Type: TypeBool}
+		return FieldType{Type: TypeBool, Constraints: mergedConstraints}
 	case cue.StringKind:
-		return FieldType{Type: TypeString}
+		return FieldType{Type: TypeString, Constraints: mergedConstraints}
 	case cue.IntKind:
 		// TODO: better identification of actual type
-		return FieldType{Type: TypeInt64}
+		return FieldType{Type: TypeInt64, Constraints: mergedConstraints}
 	case cue.NumberKind, cue.FloatKind:
-		return FieldType{Type: TypeFloat64}
+		// TODO: better identification of actual type
+		return FieldType{Type: TypeFloat64, Constraints: mergedConstraints}
 	case cue.TopKind:
 		return FieldType{Type: TypeAny}
 	case cue.NullKind:
 		return FieldType{Type: TypeNull}
 	default:
 		return FieldType{Type: TypeUnknown}
-	}
-}
-
-func tsprintType(k cue.Kind) ts.Expr {
-	switch k {
-	case cue.BoolKind:
-		return ts.Ident("boolean")
-	case cue.StringKind:
-		return ts.Ident("string")
-	case cue.NumberKind, cue.FloatKind, cue.IntKind:
-		return ts.Ident("number")
-	case cue.TopKind:
-		return ts.Ident("unknown")
-	case cue.NullKind:
-		return ts.Ident("null")
-	default:
-		return nil
 	}
 }
 
@@ -1271,52 +1274,6 @@ func valError(v cue.Value, format string, args ...interface{}) error {
 	}
 	f := fmt.Sprintf("%sError: %s", msg, format)
 	return errors.Newf(s.Pos(), f, args...)
-}
-
-func refAsInterface(v cue.Value) (ts.Expr, error) {
-	// Bail out right away if the value isn't a reference
-	op, dvals := v.Expr()
-	if !isReference(v) && op != cue.SelectorOp {
-		return nil, fmt.Errorf("not a reference")
-	}
-
-	// Have to do attribute checks on the referenced field itself, so deref
-	deref := cue.Dereference(v)
-	dstr, _ := dvals[1].String()
-
-	// FIXME It's horrifying, teasing out the type of selector kinds this way. *Horrifying*.
-	switch dvals[0].Source().(type) {
-	case nil:
-		// A nil subject means an unqualified selector (no "."
-		// literal).  This can only possibly be a reference to some
-		// sibling or parent of the top-level Value being generated.
-		// (We can't do cycle detection with the meager tools
-		// exported in cuelang.org/go/cue, so all we have for the
-		// parent case is hopium.)
-		if _, ok := dvals[1].Source().(*ast.Ident); ok && targetsKind(deref, TargetType) {
-			return ts.Ident(dstr), nil
-		}
-	case *ast.SelectorExpr:
-		if targetsKind(deref, TargetType) {
-			return ts.Ident(dstr), nil
-		}
-	case *ast.Ident:
-		if targetsKind(deref, TargetType) {
-			str, ok := dvals[0].Source().(fmt.Stringer)
-			if !ok {
-				return nil, valError(v, "expected dvals[0].Source() to implement String()")
-			}
-
-			return tsast.SelectorExpr{
-				Expr: ts.Ident(str.String()),
-				Sel:  ts.Ident(dstr),
-			}, nil
-		}
-	default:
-		return nil, valError(v, "unknown selector subject type %T, cannot translate", dvals[0].Source())
-	}
-
-	return nil, nil
 }
 
 // typeFromReference returns the string that should be used to create a Typescript
@@ -1377,13 +1334,11 @@ func typeFromReference(v cue.Value, kinds ...ASTTarget) (*FieldType, error) {
 		// exported in cuelang.org/go/cue, so all we have for the
 		// parent case is hopium.)
 		if _, ok := dvals[1].Source().(*ast.Ident); ok && targetsKind(deref, kinds...) {
-			return &FieldType{Type: TypeID(dstr)}, nil
-			//return ts.Ident(dstr), nil
+			return &FieldType{Type: TypeID(strings.TrimPrefix(dstr, "#"))}, nil
 		}
 	case *ast.SelectorExpr:
 		if targetsKind(deref, kinds...) {
-			return &FieldType{Type: TypeID(dstr)}, nil
-			//return ts.Ident(dstr), nil
+			return &FieldType{Type: TypeID(strings.TrimPrefix(dstr, "#"))}, nil
 		}
 	case *ast.Ident:
 		if targetsKind(deref, kinds...) {
@@ -1405,7 +1360,7 @@ func typeFromReference(v cue.Value, kinds ...ASTTarget) (*FieldType, error) {
 		// It happens when we are overriding a Type parent with a default value. Because `hasOverrides` is true,
 		// dstr is the default value, and we need to set the Type name here
 		if str, ok := dvals[0].Source().(fmt.Stringer); ok {
-			return &FieldType{Type: TypeID(str.String())}, nil
+			return &FieldType{Type: TypeID(strings.TrimPrefix(str.String(), "#"))}, nil
 			//return ts.Ident(str.String()), nil
 		}
 	default:

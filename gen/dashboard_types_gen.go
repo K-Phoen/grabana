@@ -35,6 +35,33 @@ type AnnotationTarget struct {
 	Type     string   `json:"type"`
 }
 
+// This is a dashboard.
+type Dashboard struct {
+	Id                   *int64              `json:"id,omitempty"`
+	Uid                  string              `json:"uid,omitempty"`
+	Title                string              `json:"title,omitempty"`
+	Description          string              `json:"description,omitempty"`
+	Revision             int64               `json:"revision,omitempty"`
+	GnetId               string              `json:"gnetId,omitempty"`
+	Tags                 []string            `json:"tags,omitempty"`
+	Style                DashboardStyle      `json:"style"`
+	Timezone             string              `json:"timezone,omitempty"`
+	Editable             bool                `json:"editable"`
+	GraphTooltip         DashboardCursorSync `json:"graphTooltip"`
+	Time                 TimeInterval        `json:"time,omitempty"`
+	Timepicker           TimePicker          `json:"timepicker,omitempty"`
+	FiscalYearStartMonth int64               `json:"fiscalYearStartMonth,omitempty"`
+	LiveNow              bool                `json:"liveNow,omitempty"`
+	WeekStart            string              `json:"weekStart,omitempty"`
+	Refresh              StringOrBool        `json:"refresh,omitempty"`
+	SchemaVersion        int64               `json:"schemaVersion"`
+	Version              int64               `json:"version,omitempty"`
+	Panels               []RowPanel          `json:"panels,omitempty"`
+	Templating           DashboardTemplating `json:"templating,omitempty"`
+	Annotations          AnnotationContainer `json:"annotations,omitempty"`
+	Links                []DashboardLink     `json:"links,omitempty"`
+}
+
 // 0 for no shared crosshair or tooltip (default).
 // 1 for shared crosshair.
 // 2 for shared crosshair AND shared tooltip.
@@ -305,6 +332,16 @@ const (
 	Empty      SpecialValueMatch = "empty"
 )
 
+type StringOrArray struct {
+	ValString *string  `json:"ValString,omitempty"`
+	ValArray  []string `json:"ValArray,omitempty"`
+}
+
+type StringOrBool struct {
+	ValString *string `json:"ValString,omitempty"`
+	ValBool   *bool   `json:"ValBool,omitempty"`
+}
+
 // Schema for panel targets is specified by datasource
 // plugins. We use a placeholder definition, which the Go
 // schema loader either left open/as-is with the Base
@@ -456,40 +493,3 @@ const (
 	Custom     VariableType = "custom"
 	System     VariableType = "system"
 )
-
-// This is a dashboard.
-type Dashboard struct {
-	Id                   *int64              `json:"id,omitempty"`
-	Uid                  string              `json:"uid,omitempty"`
-	Title                string              `json:"title,omitempty"`
-	Description          string              `json:"description,omitempty"`
-	Revision             int64               `json:"revision,omitempty"`
-	GnetId               string              `json:"gnetId,omitempty"`
-	Tags                 []string            `json:"tags,omitempty"`
-	Style                DashboardStyle      `json:"style"`
-	Timezone             string              `json:"timezone,omitempty"`
-	Editable             bool                `json:"editable"`
-	GraphTooltip         DashboardCursorSync `json:"graphTooltip"`
-	Time                 TimeInterval        `json:"time,omitempty"`
-	Timepicker           TimePicker          `json:"timepicker,omitempty"`
-	FiscalYearStartMonth int64               `json:"fiscalYearStartMonth,omitempty"`
-	LiveNow              bool                `json:"liveNow,omitempty"`
-	WeekStart            string              `json:"weekStart,omitempty"`
-	Refresh              StringOrBool        `json:"refresh,omitempty"`
-	SchemaVersion        int64               `json:"schemaVersion"`
-	Version              int64               `json:"version,omitempty"`
-	Panels               []RowPanel          `json:"panels,omitempty"`
-	Templating           DashboardTemplating `json:"templating,omitempty"`
-	Annotations          AnnotationContainer `json:"annotations,omitempty"`
-	Links                []DashboardLink     `json:"links,omitempty"`
-}
-
-type StringOrArray struct {
-	ValString *string  `json:"ValString,omitempty"`
-	ValArray  []string `json:"ValArray,omitempty"`
-}
-
-type StringOrBool struct {
-	ValString *string `json:"ValString,omitempty"`
-	ValBool   *bool   `json:"ValBool,omitempty"`
-}

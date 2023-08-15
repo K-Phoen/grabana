@@ -132,7 +132,7 @@ func formatType(def simplecue.FieldType) string {
 		return formatArray(def)
 	}
 
-	typeName := stripHashtag(string(def.Type))
+	typeName := string(def.Type)
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {

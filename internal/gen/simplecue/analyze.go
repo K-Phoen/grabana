@@ -286,6 +286,41 @@ outer:
 	return a
 }
 
+func extractConstraints(v cue.Value) []TypeConstraint {
+	var constraints []TypeConstraint
+
+	_, args := v.Expr()
+	for _, a := range args {
+		exprOp, exprArgs := a.Expr()
+
+		// FIXME: what's that about?
+		if exprOp.String() == "" {
+			continue
+		}
+
+		value, err := cueConcreteToScalar(exprArgs[0])
+		if err != nil {
+			continue
+		}
+
+		constraints = append(constraints, TypeConstraint{
+			Op:   exprOp.String(),
+			Args: []any{value},
+		})
+	}
+
+	return constraints
+}
+
+func mustDumpsyn(v cue.Value) string {
+	dump, err := dumpsyn(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return dump
+}
+
 func dumpsyn(v cue.Value) (string, error) {
 	syn := v.Syntax(
 		cue.Concrete(false), // allow incomplete values

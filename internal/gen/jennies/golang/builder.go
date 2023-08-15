@@ -124,16 +124,44 @@ func (jenny GoBuilder) fieldToOption(def simplecue.FieldDefinition) string {
 	var buffer strings.Builder
 
 	fieldName := strings.Title(def.Name)
+	typeName := strings.TrimPrefix(formatType(def.Type), "*")
+	generatedConstraints := strings.Join(jenny.constraints(def.Name, def.Type.Constraints), "\n")
+	asPointer := ""
+	if def.Type.Nullable {
+		asPointer = "&"
+	}
 
 	buffer.WriteString(fmt.Sprintf(`
 func %[1]s(%[2]s %[3]s) Option {
 	return func(builder *Builder) error {
-		builder.internal.%[1]s = %[2]s
+		%[4]s
+		builder.internal.%[1]s = %[5]s%[2]s
 
 		return nil
 	}
 }
-`, fieldName, def.Name, formatType(def.Type)))
+`, fieldName, def.Name, typeName, generatedConstraints, asPointer))
+
+	return buffer.String()
+}
+
+func (jenny GoBuilder) constraints(argumentName string, constraints []simplecue.TypeConstraint) []string {
+	output := make([]string, 0, len(constraints))
+
+	for _, constraint := range constraints {
+		output = append(output, jenny.constraint(argumentName, constraint))
+	}
+
+	return output
+}
+
+func (jenny GoBuilder) constraint(argumentName string, constraint simplecue.TypeConstraint) string {
+	var buffer strings.Builder
+
+	// FIXME
+	buffer.WriteString(fmt.Sprintf("if !(%[1]s %[2]s %[3]v) {\n", argumentName, constraint.Op, constraint.Args[0]))
+	buffer.WriteString(fmt.Sprintf("return errors.New(\"%[1]s must be %[2]s %[3]v\")\n", argumentName, constraint.Op, constraint.Args[0]))
+	buffer.WriteString("}\n")
 
 	return buffer.String()
 }
