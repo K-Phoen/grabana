@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	t "time"
 	"strings"
 )
 
@@ -32,7 +31,7 @@ Dashboard: {
 
 	// Theme of dashboard.
 	// Default value: dark.
-	style: #Style
+	style: #DashboardStyle
 
 	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
 	timezone?: string | *"browser"
@@ -86,12 +85,9 @@ Dashboard: {
 
 	// Links with references to other dashboards or external websites.
 	links?: [...#DashboardLink]
-
-	// Snapshot options. They are present only if the dashboard is a snapshot.
-	snapshot?: #Snapshot 
 } @cuetsy(kind="type") @grafana(TSVeneer="type")
 
-#Style: "light" | "dark" @cuetsy(kind="enum")
+#DashboardStyle: "light" | "dark" @cuetsy(kind="enum")
 
 #DashboardTemplating: {
 	// List of configured template variables with their saved values along with some other metadata
@@ -478,40 +474,6 @@ Dashboard: {
 #Target: {
 	...
 } @cuetsy(kind="type")
-
-// A dashboard snapshot shares an interactive dashboard publicly.
-// It is a read-only version of a dashboard, and is not editable.
-// It is possible to create a snapshot of a snapshot.
-// Grafana strips away all sensitive information from the dashboard.
-// Sensitive information stripped: queries (metric, template,annotation) and panel links.
-#Snapshot: {
-	// Time when the snapshot was created
-	created: t.Time & {
-		string
-	}
-	// Time when the snapshot expires, default is never to expire
-	expires: string 
-	// Is the snapshot saved in an external grafana instance
-	external: bool 
-	// external url, if snapshot was shared in external grafana instance
-	externalUrl: string 
-	// Unique identifier of the snapshot
-	id: uint32 
-	// Optional, defined the unique key of the snapshot, required if external is true
-	key: string 
-	// Optional, name of the snapshot
-	name: string 
-	// org id of the snapshot
-	orgId: uint32 
-	// last time when the snapshot was updated
-	updated: t.Time & {
-		string
-	}
-	// url of the snapshot, if snapshot was shared internally
-	url?: string 
-	// user id of the snapshot creator
-	userId: uint32 
-} @cuetsy(kind="type") 
 
 // Dashboard panels are the basic visualization building blocks.
 #Panel: {

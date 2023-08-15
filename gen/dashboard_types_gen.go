@@ -68,6 +68,13 @@ const (
 	Dashboards DashboardLinkType = "dashboards"
 )
 
+type DashboardStyle string
+
+const (
+	Light DashboardStyle = "light"
+	Dark  DashboardStyle = "dark"
+)
+
 type DashboardTemplating struct {
 	List []VariableModel `json:"list,omitempty"`
 }
@@ -279,25 +286,6 @@ type RowPanel struct {
 	Repeat     string        `json:"repeat,omitempty"`
 }
 
-// A dashboard snapshot shares an interactive dashboard publicly.
-// It is a read-only version of a dashboard, and is not editable.
-// It is possible to create a snapshot of a snapshot.
-// Grafana strips away all sensitive information from the dashboard.
-// Sensitive information stripped: queries (metric, template,annotation) and panel links.
-type Snapshot struct {
-	Created     string `json:"created"`
-	Expires     string `json:"expires"`
-	External    bool   `json:"external"`
-	ExternalUrl string `json:"externalUrl"`
-	Id          int64  `json:"id"`
-	Key         string `json:"key"`
-	Name        string `json:"name"`
-	OrgId       int64  `json:"orgId"`
-	Updated     string `json:"updated"`
-	Url         string `json:"url,omitempty"`
-	UserId      int64  `json:"userId"`
-}
-
 // Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color.
 // See SpecialValueMatch to see the list of special values.
 // For example, you can configure a special value mapping so that null values appear as N/A.
@@ -315,13 +303,6 @@ const (
 	NaN        SpecialValueMatch = "nan"
 	NullAndNan SpecialValueMatch = "null+nan"
 	Empty      SpecialValueMatch = "empty"
-)
-
-type Style string
-
-const (
-	Light Style = "light"
-	Dark  Style = "dark"
 )
 
 // Schema for panel targets is specified by datasource
@@ -485,7 +466,7 @@ type Dashboard struct {
 	Revision             int64               `json:"revision,omitempty"`
 	GnetId               string              `json:"gnetId,omitempty"`
 	Tags                 []string            `json:"tags,omitempty"`
-	Style                Style               `json:"style"`
+	Style                DashboardStyle      `json:"style"`
 	Timezone             string              `json:"timezone,omitempty"`
 	Editable             bool                `json:"editable"`
 	GraphTooltip         DashboardCursorSync `json:"graphTooltip"`
@@ -501,7 +482,6 @@ type Dashboard struct {
 	Templating           DashboardTemplating `json:"templating,omitempty"`
 	Annotations          AnnotationContainer `json:"annotations,omitempty"`
 	Links                []DashboardLink     `json:"links,omitempty"`
-	Snapshot             Snapshot            `json:"snapshot,omitempty"`
 }
 
 type StringOrArray struct {

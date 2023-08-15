@@ -98,16 +98,13 @@ func Tags(tags []string) Option {
 	}
 }
 
-/*
-func Style(style Style) Option {
+func Style(style DashboardStyle) Option {
 	return func(builder *Builder) error {
 		builder.internal.Style = style
 
 		return nil
 	}
 }
-
-*/
 
 func Timezone(timezone string) Option {
 	return func(builder *Builder) error {
