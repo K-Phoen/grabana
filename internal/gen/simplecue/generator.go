@@ -20,8 +20,6 @@ const (
 	attrKind        = "kind"
 )
 
-type FilePrinter func(file *File) ([]byte, error)
-
 // ASTTarget strings indicate the kind of declaration to which a CUE
 // value should be translated. They are used in both @cuetsy attributes, and in
 // calls to certain methods.
@@ -47,19 +45,6 @@ type Config struct {
 
 	// Package name used to generate code into.
 	Package string
-}
-
-// GenerateAny takes a cue.Value and generates the corresponding code for all
-// top-level members of that value.
-//
-// Hidden fields are ignored.
-func GenerateAny(val cue.Value, c Config, printer FilePrinter) (b []byte, err error) {
-	file, err := GenerateAST(val, c)
-	if err != nil {
-		return nil, err
-	}
-
-	return printer(file)
 }
 
 func GenerateAST(val cue.Value, c Config) (*File, error) {

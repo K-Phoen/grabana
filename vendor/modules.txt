@@ -95,6 +95,13 @@ github.com/emicklei/proto
 # github.com/golang/protobuf v1.5.2
 ## explicit; go 1.9
 github.com/golang/protobuf/proto
+# github.com/google/go-cmp v0.5.9
+## explicit; go 1.13
+github.com/google/go-cmp/cmp
+github.com/google/go-cmp/cmp/internal/diff
+github.com/google/go-cmp/cmp/internal/flags
+github.com/google/go-cmp/cmp/internal/function
+github.com/google/go-cmp/cmp/internal/value
 # github.com/google/go-github/v30 v30.1.0
 ## explicit; go 1.13
 github.com/google/go-github/v30/github
@@ -110,6 +117,15 @@ github.com/gosimple/slug
 # github.com/gosimple/unidecode v1.0.1
 ## explicit; go 1.16
 github.com/gosimple/unidecode
+# github.com/grafana/codejen v0.0.3
+## explicit; go 1.19
+github.com/grafana/codejen
+# github.com/hashicorp/errwrap v1.0.0
+## explicit
+github.com/hashicorp/errwrap
+# github.com/hashicorp/go-multierror v1.1.1
+## explicit; go 1.13
+github.com/hashicorp/go-multierror
 # github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf
 ## explicit
 github.com/inconshreveable/go-update
@@ -188,6 +204,9 @@ golang.org/x/net/idna
 ## explicit; go 1.17
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
+# golang.org/x/sync v0.1.0
+## explicit
+golang.org/x/sync/errgroup
 # golang.org/x/text v0.8.0
 ## explicit; go 1.17
 golang.org/x/text/cases

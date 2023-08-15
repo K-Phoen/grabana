@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"os"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/load"
-	"github.com/K-Phoen/grabana/internal/gen/printer/golang"
+	"github.com/K-Phoen/grabana/internal/gen/jennies/golang"
 	"github.com/K-Phoen/grabana/internal/gen/simplecue"
+	"github.com/grafana/codejen"
 )
 
 func main() {
@@ -21,15 +22,33 @@ func main() {
 
 	fmt.Printf("instances: %d\n", len(runtimeInstances))
 
-	b, err := simplecue.GenerateAny(runtimeInstances[0].Value(), simplecue.Config{
+	ast, err := simplecue.GenerateAST(runtimeInstances[0].Value(), simplecue.Config{
 		Export:  true,
 		Package: "dashboard",
-	}, golang.Printer)
+	})
 	if err != nil {
 		panic(err)
 	}
 
-	err = os.WriteFile("gen/dashboard.go", b, 0644)
+	// Here begins the code generation setup
+	generationTargets := codejen.JennyListWithNamer[*simplecue.File](func(f *simplecue.File) string {
+		return f.Package
+	})
+	generationTargets.AppendOneToOne(golang.GoRawTypes{})
+
+	rootCodeJenFS := codejen.NewFS()
+
+	fs, err := generationTargets.GenerateFS(ast)
+	if err != nil {
+		panic(err)
+	}
+
+	err = rootCodeJenFS.Merge(fs)
+	if err != nil {
+		panic(err)
+	}
+
+	err = rootCodeJenFS.Write(context.Background(), "gen")
 	if err != nil {
 		panic(err)
 	}
