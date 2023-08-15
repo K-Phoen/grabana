@@ -16,7 +16,7 @@ func (jenny GoRawTypes) JennyName() string {
 }
 
 func (jenny GoRawTypes) Generate(file *simplecue.File) (*codejen.File, error) {
-	output, err := Printer(file)
+	output, err := jenny.generateFile(file)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (jenny GoRawTypes) Generate(file *simplecue.File) (*codejen.File, error) {
 	return codejen.NewFile(file.Package+"_types_gen.go", output, jenny), nil
 }
 
-func Printer(file *simplecue.File) ([]byte, error) {
+func (jenny GoRawTypes) generateFile(file *simplecue.File) ([]byte, error) {
 	var buffer strings.Builder
 	tr := newPreprocessor()
 
@@ -33,7 +33,7 @@ func Printer(file *simplecue.File) ([]byte, error) {
 	buffer.WriteString(fmt.Sprintf("package %s\n\n", file.Package))
 
 	for _, typeDef := range tr.sortedTypes() {
-		typeDefGen, err := formatTypeDef(typeDef)
+		typeDefGen, err := jenny.formatTypeDef(typeDef)
 		if err != nil {
 			return nil, err
 		}
@@ -45,15 +45,15 @@ func Printer(file *simplecue.File) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func formatTypeDef(def simplecue.TypeDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatTypeDef(def simplecue.TypeDefinition) ([]byte, error) {
 	if def.Type == simplecue.DefinitionStruct {
-		return formatStructDef(def)
+		return jenny.formatStructDef(def)
 	}
 
-	return formatEnumDef(def)
+	return jenny.formatEnumDef(def)
 }
 
-func formatEnumDef(def simplecue.TypeDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatEnumDef(def simplecue.TypeDefinition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
@@ -73,7 +73,7 @@ func formatEnumDef(def simplecue.TypeDefinition) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func formatStructDef(def simplecue.TypeDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatStructDef(def simplecue.TypeDefinition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
@@ -83,7 +83,7 @@ func formatStructDef(def simplecue.TypeDefinition) ([]byte, error) {
 	buffer.WriteString(fmt.Sprintf("type %s struct {\n", stripHashtag(def.Name)))
 
 	for _, fieldDef := range def.Fields {
-		fieldDefGen, err := formatField(fieldDef)
+		fieldDefGen, err := jenny.formatField(fieldDef)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +96,7 @@ func formatStructDef(def simplecue.TypeDefinition) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func formatField(def simplecue.FieldDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatField(def simplecue.FieldDefinition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
@@ -111,7 +111,7 @@ func formatField(def simplecue.FieldDefinition) ([]byte, error) {
 	buffer.WriteString(fmt.Sprintf(
 		"%s %s `json:\"%s%s\"`\n",
 		strings.Title(def.Name),
-		formatType(def.Type),
+		jenny.formatType(def.Type),
 		def.Name,
 		jsonOmitEmpty,
 	))
@@ -119,24 +119,24 @@ func formatField(def simplecue.FieldDefinition) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func formatType(def simplecue.FieldType) string {
+func (jenny GoRawTypes) formatType(def simplecue.FieldType) string {
 	if def.Type == "unknown" {
 		return "any"
 	}
 
 	if def.Type == "disjunction" {
-		return formatDisjunction(def)
+		return jenny.formatDisjunction(def)
 	}
 
 	if def.Type == "array" {
-		return formatArray(def)
+		return jenny.formatArray(def)
 	}
 
 	typeName := stripHashtag(string(def.Type))
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {
-			subTypes = append(subTypes, formatType(subType))
+			subTypes = append(subTypes, jenny.formatType(subType))
 		}
 
 		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
@@ -149,35 +149,31 @@ func formatType(def simplecue.FieldType) string {
 	return typeName
 }
 
-func formatArray(def simplecue.FieldType) string {
+func (jenny GoRawTypes) formatArray(def simplecue.FieldType) string {
 	var subTypeString string
 
 	// we don't know what to do here (yet)
 	if len(def.SubType) != 1 {
-		subTypeString = formatDisjunction(simplecue.FieldType{
+		subTypeString = jenny.formatDisjunction(simplecue.FieldType{
 			SubType: def.SubType,
 		})
 	} else {
-		subTypeString = formatType(def.SubType[0])
+		subTypeString = jenny.formatType(def.SubType[0])
 	}
 
 	return fmt.Sprintf("[]%s", subTypeString)
 }
 
-func formatDisjunction(def simplecue.FieldType) string {
+func (jenny GoRawTypes) formatDisjunction(def simplecue.FieldType) string {
 	typeName := stripHashtag(string(def.Type))
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {
-			subTypes = append(subTypes, formatType(subType))
+			subTypes = append(subTypes, jenny.formatType(subType))
 		}
 
 		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
 	}
 
 	return typeName
-}
-
-func stripHashtag(input string) string {
-	return strings.TrimPrefix(input, "#")
 }

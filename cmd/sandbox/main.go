@@ -34,7 +34,11 @@ func main() {
 	generationTargets := codejen.JennyListWithNamer[*simplecue.File](func(f *simplecue.File) string {
 		return f.Package
 	})
-	generationTargets.AppendOneToOne(golang.GoRawTypes{})
+	generationTargets.AppendOneToOne(
+		golang.GoRawTypes{},
+		golang.GoBuilder{},
+	)
+	generationTargets.AddPostprocessors(golang.PostProcessFile)
 
 	rootCodeJenFS := codejen.NewFS()
 
