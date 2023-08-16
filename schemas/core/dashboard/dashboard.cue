@@ -360,6 +360,7 @@ Dashboard: {
 }
 
 // Allow to transform the visual representation of specific data values in a visualization, irrespective of their original units
+// FIXME: not generated correctly
 #ValueMapping: #ValueMap | #RangeMap | #RegexMap | #SpecialValueMap
 
 // Supported value mapping types
