@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
 	"github.com/K-Phoen/grabana/internal/gen/jennies/golang"
 	"github.com/K-Phoen/grabana/internal/gen/simplecue"
@@ -18,12 +18,14 @@ func main() {
 	// the second arg is a configuration object, we'll see this later
 	bis := load.Instances(entrypoints, nil)
 
-	runtimeInstances := cue.Build(bis)
+	values, err := cuecontext.New().BuildInstances(bis)
+	if err != nil {
+		panic(err)
+	}
 
-	fmt.Printf("instances: %d\n", len(runtimeInstances))
+	fmt.Printf("len(values)=%d\n", len(values))
 
-	ast, err := simplecue.GenerateAST(runtimeInstances[0].Value(), simplecue.Config{
-		Export:  true,
+	ast, err := simplecue.GenerateAST(values[0].Value(), simplecue.Config{
 		Package: "dashboard",
 	})
 	if err != nil {

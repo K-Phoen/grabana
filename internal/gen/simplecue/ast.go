@@ -24,12 +24,13 @@ const (
 )
 
 type TypeDefinition struct {
-	Type     DefinitionType
-	Name     string
-	SubType  string
-	Comments []string
-	Fields   []FieldDefinition // for structs
-	Values   []EnumValue       // for enums
+	Type         DefinitionType
+	Name         string
+	SubType      string
+	Comments     []string
+	Fields       []FieldDefinition // for structs
+	Values       []EnumValue       // for enums
+	IsEntryPoint bool              // Dashboard is an entryPoint type. DashboardStyle isn't.
 }
 
 type TypeConstraint struct {

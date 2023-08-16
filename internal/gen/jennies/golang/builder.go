@@ -102,8 +102,8 @@ func (jenny GoBuilder) formatTypeDef(def simplecue.TypeDefinition) ([]byte, erro
 		return nil, nil
 	}
 
-	// What to do? I'll decide later.
-	if def.Name != "Dashboard" {
+	// No options if not main/entrypoint type
+	if !def.IsEntryPoint {
 		return nil, nil
 	}
 

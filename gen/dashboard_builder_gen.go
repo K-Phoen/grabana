@@ -47,9 +47,6 @@ func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
 
 func Id(id int64) Option {
 	return func(builder *Builder) error {
-		if !(id <= 9223372036854775807) {
-			return errors.New("id must be <= 9223372036854775807")
-		}
 
 		builder.internal.Id = &id
 
@@ -86,9 +83,6 @@ func Description(description string) Option {
 
 func Revision(revision int64) Option {
 	return func(builder *Builder) error {
-		if !(revision <= 9223372036854775807) {
-			return errors.New("revision must be <= 9223372036854775807")
-		}
 
 		builder.internal.Revision = revision
 
@@ -209,13 +203,6 @@ func Refresh(refresh StringOrBool) Option {
 
 func SchemaVersion(schemaVersion int64) Option {
 	return func(builder *Builder) error {
-		if !(schemaVersion >= 0) {
-			return errors.New("schemaVersion must be >= 0")
-		}
-
-		if !(schemaVersion <= 65535) {
-			return errors.New("schemaVersion must be <= 65535")
-		}
 
 		builder.internal.SchemaVersion = schemaVersion
 
@@ -225,13 +212,6 @@ func SchemaVersion(schemaVersion int64) Option {
 
 func Version(version int64) Option {
 	return func(builder *Builder) error {
-		if !(version >= 0) {
-			return errors.New("version must be >= 0")
-		}
-
-		if !(version <= 4294967295) {
-			return errors.New("version must be <= 4294967295")
-		}
 
 		builder.internal.Version = version
 

@@ -85,14 +85,14 @@ Dashboard: {
 
 	// Links with references to other dashboards or external websites.
 	links?: [...#DashboardLink]
-} @cuetsy(kind="type") @grafana(TSVeneer="type")
+}
 
-#DashboardStyle: "light" | "dark" @cuetsy(kind="enum")
+#DashboardStyle: "light" | "dark" @grabana(kind="enum")
 
 #DashboardTemplating: {
 	// List of configured template variables with their saved values along with some other metadata
 	list?: [...#VariableModel]
-} @cuetsy(kind="type")
+}
 
 #TimePicker: {
 	// Whether timepicker is visible or not.
@@ -105,12 +105,12 @@ Dashboard: {
 	enable: bool | *true
 	// Selectable options available in the time picker dropdown. Has no effect on provisioned dashboard.
 	time_options: [...string] | *["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
-} @cuetsy(kind="type")
+}
 
 #TimeInterval: {
 	from: string | *"now-6h"
 	to:   string | *"now"
-} @cuetsy(kind="type")
+}
 
 // TODO: this should be a regular DataQuery that depends on the selected dashboard
 // these match the properties of the "grafana" datasource that is default in most dashboards
@@ -128,7 +128,7 @@ Dashboard: {
 	// but code+tests is already depending on it so hard to change
 	type: string
 	...
-} @cuetsy(kind="type") 
+}
 
 #AnnotationPanelFilter: {
 	// Should the specified panels be included or excluded
@@ -136,7 +136,7 @@ Dashboard: {
 
 	// Panel IDs that should be included or excluded
 	ids: [...uint8]
-} @cuetsy(kind="type")
+}
 
 // Contains the list of annotations that are associated with the dashboard.
 // Annotations are used to overlay event markers and overlay event tags on graphs.
@@ -145,7 +145,7 @@ Dashboard: {
 #AnnotationContainer: {
 	// List of annotations
 	list?: [...#AnnotationQuery]
-} @cuetsy(kind="type") @grafana(TSVeneer="type")
+}
 
 // TODO docs
 // FROM: AnnotationQuery in grafana-data/src/types/annotations.ts
@@ -175,7 +175,7 @@ Dashboard: {
 	// TODO -- this should not exist here, it is based on the --grafana-- datasource
 	type?: string 
 	...
-} @cuetsy(kind="type") @grafana(TSVeneer="type") 
+}
 
 // A variable is a placeholder for a value. You can use variables in metric queries and in panel titles.
 #VariableModel: {
@@ -206,8 +206,7 @@ Dashboard: {
 	// Options that can be selected for a variable.
 	options?: [...#VariableOption]
 	refresh?: #VariableRefresh
-	...
-} @cuetsy(kind="type") @grafana(TSVeneer="type") 
+}
 
 // Option to be selected in a variable.
 #VariableOption: {
@@ -217,17 +216,17 @@ Dashboard: {
 	text: string | [...string]
 	// Value of the option
 	value: string | [...string]
-} @cuetsy(kind="type")
+}
 
 // Options to config when to refresh a variable
 // `0`: Never refresh the variable
 // `1`: Queries the data source every time the dashboard loads.
 // `2`: Queries the data source when the dashboard time range changes.
-#VariableRefresh: 0 | 1 | 2 @cuetsy(kind="enum",memberNames="never|onDashboardLoad|onTimeRangeChanged")
+#VariableRefresh: 0 | 1 | 2 @grabana(kind="enum",memberNames="never|onDashboardLoad|onTimeRangeChanged")
 
 // Determine if the variable shows on dashboard
 // Accepted values are 0 (show label and value), 1 (show value only), 2 (show nothing).
-#VariableHide: 0 | 1 | 2 @cuetsy(kind="enum",memberNames="dontHide|hideLabel|hideVariable") @grafana(TSVeneer="type")
+#VariableHide: 0 | 1 | 2 @grabana(kind="enum",memberNames="dontHide|hideLabel|hideVariable")
 
 // Sort variable options
 // Accepted values are:
@@ -238,11 +237,11 @@ Dashboard: {
 // `4`: Numerical DESC
 // `5`: Alphabetical Case Insensitive ASC
 // `6`: Alphabetical Case Insensitive DESC
-#VariableSort: 0 | 1 | 2 | 3 | 4 | 5 | 6 @cuetsy(kind="enum",memberNames="disabled|alphabeticalAsc|alphabeticalDesc|numericalAsc|numericalDesc|alphabeticalCaseInsensitiveAsc|alphabeticalCaseInsensitiveDesc")
+#VariableSort: 0 | 1 | 2 | 3 | 4 | 5 | 6 @grabana(kind="enum",memberNames="disabled|alphabeticalAsc|alphabeticalDesc|numericalAsc|numericalDesc|alphabeticalCaseInsensitiveAsc|alphabeticalCaseInsensitiveDesc")
 
 // Loading status
 // Accepted values are `NotStarted` (the request is not started), `Loading` (waiting for response), `Streaming` (pulling continuous data), `Done` (response received successfully) or `Error` (failed request).
-#LoadingState: "NotStarted" | "Loading" | "Streaming" | "Done" | "Error" @cuetsy(kind="enum")
+#LoadingState: "NotStarted" | "Loading" | "Streaming" | "Done" | "Error" @grabana(kind="enum")
 
 // Ref to a DataSource instance
 #DataSourceRef: {
@@ -251,7 +250,7 @@ Dashboard: {
 
 	// Specific datasource instance
 	uid?: string
-} @cuetsy(kind="type") @grafana(TSVeneer="type")
+}
 
 // Links with references to other dashboards or external resources
 #DashboardLink: {
@@ -275,10 +274,10 @@ Dashboard: {
 	includeVars: bool | *false
 	// If true, includes current time range in the link as query params
 	keepTime: bool | *false
-} @cuetsy(kind="type")
+}
 
 // Dashboard Link type. Accepted values are dashboards (to refer to another dashboard) and link (to refer to an external resource)
-#DashboardLinkType: "link" | "dashboards" @cuetsy(kind="enum")
+#DashboardLinkType: "link" | "dashboards" @grabana(kind="enum")
 
 // Dashboard variable type
 // `query`: Query-generated list of values such as metric names, server names, sensor IDs, data centers, and so on.
@@ -289,7 +288,7 @@ Dashboard: {
 // `textbox`: Display a free text input field with an optional default value.
 // `custom`: Define the variable options manually using a comma-separated list.
 // `system`: Variables defined by Grafana. See: https://grafana.com/docs/grafana/latest/dashboards/variables/add-template-variables/#global-variables
-#VariableType: "query" | "adhoc" | "constant" | "datasource" | "interval" | "textbox" | "custom" | "system" @cuetsy(kind="enum")
+#VariableType: "query" | "adhoc" | "constant" | "datasource" | "interval" | "textbox" | "custom" | "system" @grabana(kind="enum")
 
 // Color mode for a field. You can specify a single color, or select a continuous (gradient) color schemes, based on a value.
 // Continuous color interpolates a color using the percentage of a value relative to min and max.
@@ -309,10 +308,10 @@ Dashboard: {
 // `continuous-purples`: Continuous Purple palette mode
 // `shades`: Shades of a single color. Specify a single color, useful in an override rule.
 // `fixed`: Fixed color mode. Specify a single color, useful in an override rule.
-#FieldColorModeId: "thresholds" | "palette-classic" | "palette-classic-by-name" | "continuous-GrYlRd" | "continuous-RdYlGr" | "continuous-BlYlRd" | "continuous-YlRd" | "continuous-BlPu" | "continuous-YlBl" | "continuous-blues" | "continuous-reds" | "continuous-greens" | "continuous-purples" | "fixed" | "shades" @cuetsy(kind="enum",memberNames="Thresholds|PaletteClassic|PaletteClassicByName|ContinuousGrYlRd|ContinuousRdYlGr|ContinuousBlYlRd|ContinuousYlRd|ContinuousBlPu|ContinuousYlBl|ContinuousBlues|ContinuousReds|ContinuousGreens|ContinuousPurples|Fixed|Shades") 
+#FieldColorModeId: "thresholds" | "palette-classic" | "palette-classic-by-name" | "continuous-GrYlRd" | "continuous-RdYlGr" | "continuous-BlYlRd" | "continuous-YlRd" | "continuous-BlPu" | "continuous-YlBl" | "continuous-blues" | "continuous-reds" | "continuous-greens" | "continuous-purples" | "fixed" | "shades" @grabana(kind="enum",memberNames="Thresholds|PaletteClassic|PaletteClassicByName|ContinuousGrYlRd|ContinuousRdYlGr|ContinuousBlYlRd|ContinuousYlRd|ContinuousBlPu|ContinuousYlBl|ContinuousBlues|ContinuousReds|ContinuousGreens|ContinuousPurples|Fixed|Shades")
 
 // Defines how to assign a series color from "by value" color schemes. For example for an aggregated data points like a timeseries, the color can be assigned by the min, max or last value.
-#FieldColorSeriesByMode: "min" | "max" | "last" @cuetsy(kind="enum")
+#FieldColorSeriesByMode: "min" | "max" | "last" @grabana(kind="enum")
 
 // Map a field to a color.
 #FieldColor: {
@@ -322,7 +321,7 @@ Dashboard: {
 	fixedColor?: string
 	// Some visualizations need to know how to assign a series color from by value color schemes.
 	seriesBy?: #FieldColorSeriesByMode
-} @cuetsy(kind="type")
+}
 
 // Position and dimensions of a panel in the grid
 #GridPos: {
@@ -336,7 +335,7 @@ Dashboard: {
 	y: uint32 & >=0 | *0
 	// Whether the panel is fixed within the grid. If true, the panel will not be affected by other panels' interactions
 	static?: bool
-} @cuetsy(kind="type")
+}
 
 // User-defined value for a metric that triggers visual changes in a panel when this value is met or exceeded
 // They are used to conditionally style and color visualizations based on query results , and can be applied to most visualizations.
@@ -346,10 +345,10 @@ Dashboard: {
 	value: number | null 
 	// Color represents the color of the visual change that will occur in the dashboard when the threshold value is met or exceeded.
 	color: string 
-} @cuetsy(kind="type") 
+}
 
 // Thresholds can either be `absolute` (specific number) or `percentage` (relative to min or max, it will be values between 0 and 1).
-#ThresholdsMode: "absolute" | "percentage" @cuetsy(kind="enum",memberNames="Absolute|Percentage")
+#ThresholdsMode: "absolute" | "percentage" @grabana(kind="enum",memberNames="Absolute|Percentage")
 
 // Thresholds configuration for the panel
 #ThresholdsConfig: {
@@ -358,17 +357,17 @@ Dashboard: {
 
 	// Must be sorted by 'value', first value is always -Infinity
 	steps: [...#Threshold] 
-} @cuetsy(kind="type") 
+}
 
 // Allow to transform the visual representation of specific data values in a visualization, irrespective of their original units
-#ValueMapping: #ValueMap | #RangeMap | #RegexMap | #SpecialValueMap @cuetsy(kind="type")
+#ValueMapping: #ValueMap | #RangeMap | #RegexMap | #SpecialValueMap
 
 // Supported value mapping types
 // `value`: Maps text values to a color or different display text and color. For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
 // `range`: Maps numerical ranges to a display text and color. For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
 // `regex`: Maps regular expressions to replacement text and a color. For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.
 // `special`: Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color. See SpecialValueMatch to see the list of special values. For example, you can configure a special value mapping so that null values appear as N/A.
-#MappingType: "value" | "range" | "regex" | "special" @cuetsy(kind="enum",memberNames="ValueToText|RangeToText|RegexToText|SpecialValue") 
+#MappingType: "value" | "range" | "regex" | "special" @grabana(kind="enum",memberNames="ValueToText|RangeToText|RegexToText|SpecialValue")
 
 // Maps text values to a color or different display text and color.
 // For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
@@ -380,7 +379,7 @@ Dashboard: {
 	options: {
 		[string]: #ValueMappingResult
 	}
-} @cuetsy(kind="type")
+}
 
 // Maps numerical ranges to a display text and color.
 // For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
@@ -397,7 +396,7 @@ Dashboard: {
 		// Config to apply when the value is within the range
 		result: #ValueMappingResult
 	}
-} @cuetsy(kind="type") 
+}
 
 // Maps regular expressions to replacement text and a color.
 // For example, if a value is www.example.com, you can configure a regex value mapping so that Grafana displays www and truncates the domain.
@@ -412,7 +411,7 @@ Dashboard: {
 		// Config to apply when the value matches the regex
 		result: #ValueMappingResult
 	}
-} @cuetsy(kind="type") 
+}
 
 // Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color.
 // See SpecialValueMatch to see the list of special values.
@@ -427,10 +426,10 @@ Dashboard: {
 		// Config to apply when the value matches the special value
 		result: #ValueMappingResult
 	}
-} @cuetsy(kind="type") 
+}
 
 // Special value types supported by the `SpecialValueMap`
-#SpecialValueMatch: "true" | "false" | "null" | "nan" | "null+nan" | "empty" @cuetsy(kind="enum",memberNames="True|False|Null|NaN|NullAndNan|Empty")
+#SpecialValueMatch: "true" | "false" | "null" | "nan" | "null+nan" | "empty" @grabana(kind="enum",memberNames="True|False|Null|NaN|NullAndNan|Empty")
 
 // Result used as replacement with text and color when the value matches
 #ValueMappingResult: {
@@ -442,7 +441,7 @@ Dashboard: {
 	icon?: string
 	// Position in the mapping array. Only used internally.
 	index?: int32
-} @cuetsy(kind="type")
+}
 
 // Transformations allow to manipulate data returned by a query before the system applies a visualization.
 // Using transformations you can: rename fields, join time series data, perform mathematical operations across queries,
@@ -457,12 +456,12 @@ Dashboard: {
 	// Options to be passed to the transformer
 	// Valid options depend on the transformer id
 	options: _
-} @cuetsy(kind="type") @grafana(TSVeneer="type")
+}
 
 // 0 for no shared crosshair or tooltip (default).
 // 1 for shared crosshair.
 // 2 for shared crosshair AND shared tooltip.
-#DashboardCursorSync: *0 | 1 | 2 @cuetsy(kind="enum",memberNames="Off|Crosshair|Tooltip")
+#DashboardCursorSync: *0 | 1 | 2 @grabana(kind="enum",memberNames="Off|Crosshair|Tooltip")
 
 // Schema for panel targets is specified by datasource
 // plugins. We use a placeholder definition, which the Go
@@ -473,7 +472,7 @@ Dashboard: {
 // type directly to achieve the same effect.
 #Target: {
 	...
-} @cuetsy(kind="type")
+}
 
 // Dashboard panels are the basic visualization building blocks.
 #Panel: {
@@ -562,9 +561,9 @@ Dashboard: {
 
 	// Field options allow you to change how the data is displayed in your visualizations.
 	fieldConfig: #FieldConfigSource
-} @cuetsy(kind="type") @grafana(TSVeneer="type") 
+}
 
-#PanelRepeatDirection: "h" | "v" @cuetsy(kind="enum",memberNames="horizontal|vertical")
+#PanelRepeatDirection: "h" | "v" @grabana(kind="enum",memberNames="horizontal|vertical")
 
 // The data model used in Grafana, namely the data frame, is a columnar-oriented table structure that unifies both time series and table query results.
 // Each column within this structure is called a field. A field can represent a single time series or table column.
@@ -573,11 +572,13 @@ Dashboard: {
 	// Defaults are the options applied to all fields.
 	defaults: #FieldConfig
 	// Overrides are the options applied to specific fields overriding the defaults.
-	overrides: [...{
-		matcher: #MatcherConfig
-		properties: [...#DynamicConfigValue]
-	}] 
-} @cuetsy(kind="type") @grafana(TSVeneer="type") 
+	overrides: [...#FieldConfigSourceOverride]
+}
+
+#FieldConfigSourceOverride: {
+  matcher: #MatcherConfig
+	properties: [...#DynamicConfigValue]
+}
 
 // A library panel is a reusable panel that you can use in any dashboard.
 // When you make a change to a library panel, that change propagates to all instances of where the panel is used.
@@ -587,7 +588,7 @@ Dashboard: {
 	name: string
 	// Library panel uid
 	uid: string
-} @cuetsy(kind="type")
+}
 
 // Matcher is a predicate configuration. Based on the config a set of field(s) or values is filtered in order to apply override / transformation.
 // It comes with in id ( to resolve implementation from registry) and a configuration that’s specific to a particular matcher type.
@@ -596,7 +597,8 @@ Dashboard: {
 	id: string | *"" 
 	// The matcher options. This is specific to the matcher implementation.
 	options?: _ 
-} @cuetsy(kind="type") @grafana(TSVeneer="type")
+}
+
 #DynamicConfigValue: {
 	id:     string | *"" 
 	value?: _            
@@ -672,7 +674,7 @@ Dashboard: {
 	custom?: {
 		...
 	} 
-} @cuetsy(kind="type") @grafana(TSVeneer="type") 
+}
 
 // Row panel
 #RowPanel: {
@@ -699,4 +701,4 @@ Dashboard: {
 
 	// Name of template variable to repeat for.
 	repeat?: string
-} @cuetsy(kind="type") @grafana(TSVeneer="type")
+}
