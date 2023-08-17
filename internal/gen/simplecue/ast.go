@@ -20,7 +20,6 @@ type DefinitionType string
 const (
 	DefinitionStruct DefinitionType = "struct"
 	DefinitionEnum   DefinitionType = "enum"
-	DefinitionAlias  DefinitionType = "alias"
 )
 
 type TypeDefinition struct {
