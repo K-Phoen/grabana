@@ -57,17 +57,36 @@ func (preprocessor *preprocessor) translateTypeDefinition(def simplecue.TypeDefi
 }
 
 func (preprocessor *preprocessor) translateFieldDefinition(def simplecue.FieldDefinition) simplecue.FieldDefinition {
-	if def.Type.Type != simplecue.TypeDisjunction {
-		return def
-	}
-
 	newDef := def
-	newDef.Type = preprocessor.expandDisjunction(def.Type)
+	newDef.Type = preprocessor.translateFieldType(def.Type)
 
 	return newDef
 }
 
+// bool, string,..., [], disjunction
+func (preprocessor *preprocessor) translateFieldType(def simplecue.FieldType) simplecue.FieldType {
+	if def.Type == simplecue.TypeDisjunction || def.Type == simplecue.TypeArray {
+		return preprocessor.expandDisjunction(def)
+	}
+
+	return def
+}
+
+// def is either a disjunction or a list of unknown sub-types
 func (preprocessor *preprocessor) expandDisjunction(def simplecue.FieldType) simplecue.FieldType {
+	if def.Type == simplecue.TypeArray {
+		newSubTypes := make(simplecue.FieldTypes, 0, len(def.SubType))
+
+		for _, subType := range def.SubType {
+			newSubType := preprocessor.translateFieldType(subType)
+			newSubTypes = append(newSubTypes, newSubType)
+		}
+
+		def.SubType = newSubTypes
+
+		return def
+	}
+
 	// Ex: type | null
 	if len(def.SubType) == 2 && def.SubType.HasNullType() {
 		finalType := def.SubType.NonNullTypes()[0]

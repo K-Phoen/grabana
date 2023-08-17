@@ -298,7 +298,7 @@ type FieldConfig struct {
 	// The maximum value used in percentage threshold calculations. Leave blank for auto calculation based on all series and fields.
 	Max float64 `json:"max,omitempty"`
 	// Convert input values into a display string
-	Mappings []ValueMapping `json:"mappings,omitempty"`
+	Mappings []ValueMapOrRangeMapOrRegexMapOrSpecialValueMap `json:"mappings,omitempty"`
 	// Map numeric values to states
 	Thresholds ThresholdsConfig `json:"thresholds,omitempty"`
 	// Panel color configuration
@@ -585,8 +585,11 @@ type ValueMap struct {
 	Options any `json:"options"`
 }
 
-// Allow to transform the visual representation of specific data values in a visualization, irrespective of their original units
-type ValueMapping struct {
+type ValueMapOrRangeMapOrRegexMapOrSpecialValueMap struct {
+	ValValueMap        *ValueMap        `json:"ValValueMap,omitempty"`
+	ValRangeMap        *RangeMap        `json:"ValRangeMap,omitempty"`
+	ValRegexMap        *RegexMap        `json:"ValRegexMap,omitempty"`
+	ValSpecialValueMap *SpecialValueMap `json:"ValSpecialValueMap,omitempty"`
 }
 
 // Result used as replacement with text and color when the value matches

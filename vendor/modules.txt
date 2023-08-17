@@ -134,14 +134,8 @@ github.com/inconshreveable/go-update/internal/osext
 # github.com/inconshreveable/mousetrap v1.1.0
 ## explicit; go 1.18
 github.com/inconshreveable/mousetrap
-# github.com/kr/text v0.1.0
-## explicit
-github.com/kr/text
 # github.com/lib/pq v1.10.7
 ## explicit; go 1.13
-# github.com/matryer/is v1.4.1
-## explicit; go 1.14
-github.com/matryer/is
 # github.com/mitchellh/go-wordwrap v1.0.1
 ## explicit; go 1.14
 github.com/mitchellh/go-wordwrap
@@ -184,9 +178,6 @@ github.com/ulikunitz/xz
 github.com/ulikunitz/xz/internal/hash
 github.com/ulikunitz/xz/internal/xlog
 github.com/ulikunitz/xz/lzma
-# github.com/xlab/treeprint v1.2.0
-## explicit; go 1.13
-github.com/xlab/treeprint
 # golang.org/x/crypto v0.6.0
 ## explicit; go 1.17
 golang.org/x/crypto/cast5
@@ -217,17 +208,11 @@ golang.org/x/sync/errgroup
 golang.org/x/sys/execabs
 # golang.org/x/text v0.8.0
 ## explicit; go 1.17
-golang.org/x/text/cases
 golang.org/x/text/encoding
 golang.org/x/text/encoding/internal
 golang.org/x/text/encoding/internal/identifier
 golang.org/x/text/encoding/unicode
-golang.org/x/text/internal
-golang.org/x/text/internal/language
-golang.org/x/text/internal/language/compact
-golang.org/x/text/internal/tag
 golang.org/x/text/internal/utf8internal
-golang.org/x/text/language
 golang.org/x/text/runes
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform

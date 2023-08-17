@@ -359,10 +359,6 @@ Dashboard: {
 	steps: [...#Threshold] 
 }
 
-// Allow to transform the visual representation of specific data values in a visualization, irrespective of their original units
-// FIXME: not generated correctly
-#ValueMapping: #ValueMap | #RangeMap | #RegexMap | #SpecialValueMap
-
 // Supported value mapping types
 // `value`: Maps text values to a color or different display text and color. For example, you can configure a value mapping so that all instances of the value 10 appear as Perfection! rather than the number.
 // `range`: Maps numerical ranges to a display text and color. For example, if a value is within a certain range, you can configure a range value mapping to display Low or High rather than the number.
@@ -653,10 +649,10 @@ Dashboard: {
 	// The minimum value used in percentage threshold calculations. Leave blank for auto calculation based on all series and fields.
 	min?: number 
 	// The maximum value used in percentage threshold calculations. Leave blank for auto calculation based on all series and fields.
-	max?: number 
+	max?: number
 
 	// Convert input values into a display string
-	mappings?: [...#ValueMapping] 
+	mappings?: [...(#ValueMap | #RangeMap | #RegexMap | #SpecialValueMap)]
 
 	// Map numeric values to states
 	thresholds?: #ThresholdsConfig 

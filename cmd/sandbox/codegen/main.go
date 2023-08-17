@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
@@ -22,8 +21,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Printf("len(values)=%d\n", len(values))
 
 	ast, err := simplecue.GenerateAST(values[0].Value(), simplecue.Config{
 		Package: "dashboard",
