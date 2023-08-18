@@ -8,11 +8,21 @@ const (
 	TypeBytes       TypeID = "bytes"
 	TypeArray       TypeID = "array"
 	TypeString      TypeID = "string"
-	TypeFloat64     TypeID = "float64"
-	TypeInt64       TypeID = "int64"
-	TypeBool        TypeID = "bool"
-	TypeAny         TypeID = "any"
-	TypeUnknown     TypeID = "unknown"
+
+	TypeFloat32 TypeID = "float32"
+	TypeFloat64 TypeID = "float64"
+
+	TypeUint8  TypeID = "uint8"
+	TypeUint16 TypeID = "uint16"
+	TypeUint32 TypeID = "uint32"
+	TypeUint64 TypeID = "uint64"
+	TypeInt8   TypeID = "int8"
+	TypeInt16  TypeID = "int16"
+	TypeInt32  TypeID = "int32"
+	TypeInt64  TypeID = "int64"
+
+	TypeBool TypeID = "bool"
+	TypeAny  TypeID = "any"
 )
 
 type DefinitionType string

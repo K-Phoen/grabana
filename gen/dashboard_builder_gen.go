@@ -162,7 +162,7 @@ func Timepicker(timepicker TimePicker) Option {
 	}
 }
 
-func FiscalYearStartMonth(fiscalYearStartMonth int64) Option {
+func FiscalYearStartMonth(fiscalYearStartMonth uint64) Option {
 	return func(builder *Builder) error {
 		if !(fiscalYearStartMonth < 12) {
 			return errors.New("fiscalYearStartMonth must be < 12")
@@ -201,7 +201,7 @@ func Refresh(refresh StringOrBool) Option {
 	}
 }
 
-func SchemaVersion(schemaVersion int64) Option {
+func SchemaVersion(schemaVersion uint16) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.SchemaVersion = schemaVersion
@@ -210,7 +210,7 @@ func SchemaVersion(schemaVersion int64) Option {
 	}
 }
 
-func Version(version int64) Option {
+func Version(version uint32) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Version = version

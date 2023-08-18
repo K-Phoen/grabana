@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/format"
 )
 
 const annotationName = "grabana"
@@ -220,10 +221,8 @@ func (g *newGenerator) declareNode(v cue.Value) (*FieldType, error) {
 		return &FieldType{Type: TypeBytes}, nil
 	case cue.StringKind:
 		return &FieldType{Type: TypeString}, nil
-	case cue.FloatKind, cue.NumberKind:
-		return g.declareNumber(v, TypeFloat64)
-	case cue.IntKind:
-		return g.declareNumber(v, TypeInt64)
+	case cue.FloatKind, cue.NumberKind, cue.IntKind:
+		return g.declareNumber(v)
 	case cue.ListKind:
 		return g.declareList(v)
 	case cue.StructKind:
@@ -240,14 +239,41 @@ func (g *newGenerator) declareNode(v cue.Value) (*FieldType, error) {
 	}
 }
 
-func (g *newGenerator) declareNumber(v cue.Value, typeHint TypeID) (*FieldType, error) {
-	typeDef := &FieldType{
-		Type:     typeHint,
-		Nullable: false,
+func (g *newGenerator) declareNumber(v cue.Value) (*FieldType, error) {
+	numberTypeWithConstraintsAsString, err := format.Node(v.Syntax())
+	if err != nil {
+		return nil, err
+	}
+	parts := strings.Split(string(numberTypeWithConstraintsAsString), " ")
+	if len(parts) == 0 {
+		return nil, errorWithCueRef(v, "something went very wrong while formatting a number expression into a string")
 	}
 
-	// TODO: better representation of the type
-	// we currently convert everything to int64, float64 or number
+	// dirty way of preserving the actual type from cue
+	// FIXME: fails if the type has a custom bound that further restricts the values
+	// IE: uint8 & < 12 will be printed as "uint & < 12
+	var numberType TypeID
+	switch TypeID(parts[0]) {
+	case TypeFloat32, TypeFloat64:
+		numberType = TypeID(parts[0])
+	case TypeUint8, TypeUint16, TypeUint32, TypeUint64:
+		numberType = TypeID(parts[0])
+	case TypeInt8, TypeInt16, TypeInt32, TypeInt64:
+		numberType = TypeID(parts[0])
+	case "uint":
+		numberType = TypeUint64
+	case "int":
+		numberType = TypeInt64
+	case "number":
+		numberType = TypeFloat64
+	default:
+		return nil, errorWithCueRef(v, "unknown number type '%s'", parts[0])
+	}
+
+	typeDef := &FieldType{
+		Type:     numberType,
+		Nullable: false,
+	}
 
 	constraints, err := g.declareNumberConstraints(v)
 	if err != nil {
