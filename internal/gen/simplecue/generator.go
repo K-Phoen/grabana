@@ -88,7 +88,7 @@ func (g *newGenerator) declareTopLevelEnum(name string, v cue.Value) (*ast.TypeD
 
 	return &ast.TypeDefinition{
 		Type:     ast.DefinitionEnum,
-		SubType:  string(subType),
+		SubType:  subType,
 		Name:     name,
 		Comments: commentsFromCueValue(v),
 		Values:   values,

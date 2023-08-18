@@ -35,7 +35,7 @@ const (
 type TypeDefinition struct {
 	Type         DefinitionType
 	Name         string
-	SubType      string
+	SubType      TypeID
 	Comments     []string
 	Fields       []FieldDefinition // for structs
 	Values       []EnumValue       // for enums

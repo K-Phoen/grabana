@@ -42,15 +42,6 @@ func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
 	return json.MarshalIndent(builder.internal, "", "  ")
 }
 
-func Name(name string) Option {
-	return func(builder *Builder) error {
-
-		builder.internal.Name = name
-
-		return nil
-	}
-}
-
 func Interval(interval string) Option {
 	return func(builder *Builder) error {
 
@@ -64,6 +55,15 @@ func Items(items []PlaylistItem) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Items = items
+
+		return nil
+	}
+}
+
+func Name(name string) Option {
+	return func(builder *Builder) error {
+
+		builder.internal.Name = name
 
 		return nil
 	}
