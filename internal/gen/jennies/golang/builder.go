@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/K-Phoen/grabana/internal/gen/simplecue"
+	"github.com/K-Phoen/grabana/internal/gen/ast"
 	"github.com/grafana/codejen"
 )
 
@@ -15,7 +15,7 @@ func (jenny GoBuilder) JennyName() string {
 	return "GoRawTypes"
 }
 
-func (jenny GoBuilder) Generate(file *simplecue.File) (*codejen.File, error) {
+func (jenny GoBuilder) Generate(file *ast.File) (*codejen.File, error) {
 	output, err := jenny.generateFile(file)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (jenny GoBuilder) Generate(file *simplecue.File) (*codejen.File, error) {
 	return codejen.NewFile(file.Package+"_builder_gen.go", output, jenny), nil
 }
 
-func (jenny GoBuilder) generateFile(file *simplecue.File) ([]byte, error) {
+func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 	var buffer strings.Builder
 	tr := newPreprocessor()
 
@@ -96,9 +96,9 @@ func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoBuilder) formatTypeDef(def simplecue.TypeDefinition) ([]byte, error) {
+func (jenny GoBuilder) formatTypeDef(def ast.TypeDefinition) ([]byte, error) {
 	// nothing to do for enums & other non-struct types
-	if def.Type != simplecue.DefinitionStruct {
+	if def.Type != ast.DefinitionStruct {
 		return nil, nil
 	}
 
@@ -110,7 +110,7 @@ func (jenny GoBuilder) formatTypeDef(def simplecue.TypeDefinition) ([]byte, erro
 	return jenny.formatMainTypeOptions(def)
 }
 
-func (jenny GoBuilder) formatMainTypeOptions(def simplecue.TypeDefinition) ([]byte, error) {
+func (jenny GoBuilder) formatMainTypeOptions(def ast.TypeDefinition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, fieldDef := range def.Fields {
@@ -120,7 +120,7 @@ func (jenny GoBuilder) formatMainTypeOptions(def simplecue.TypeDefinition) ([]by
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoBuilder) fieldToOption(def simplecue.FieldDefinition) string {
+func (jenny GoBuilder) fieldToOption(def ast.FieldDefinition) string {
 	var buffer strings.Builder
 
 	fieldName := strings.Title(def.Name)
@@ -145,7 +145,7 @@ func %[1]s(%[2]s %[3]s) Option {
 	return buffer.String()
 }
 
-func (jenny GoBuilder) constraints(argumentName string, constraints []simplecue.TypeConstraint) []string {
+func (jenny GoBuilder) constraints(argumentName string, constraints []ast.TypeConstraint) []string {
 	output := make([]string, 0, len(constraints))
 
 	for _, constraint := range constraints {
@@ -155,7 +155,7 @@ func (jenny GoBuilder) constraints(argumentName string, constraints []simplecue.
 	return output
 }
 
-func (jenny GoBuilder) constraint(argumentName string, constraint simplecue.TypeConstraint) string {
+func (jenny GoBuilder) constraint(argumentName string, constraint ast.TypeConstraint) string {
 	var buffer strings.Builder
 
 	// FIXME

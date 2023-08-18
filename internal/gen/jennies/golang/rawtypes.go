@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/K-Phoen/grabana/internal/gen/simplecue"
+	"github.com/K-Phoen/grabana/internal/gen/ast"
 	"github.com/grafana/codejen"
 )
 
@@ -15,7 +15,7 @@ func (jenny GoRawTypes) JennyName() string {
 	return "GoRawTypes"
 }
 
-func (jenny GoRawTypes) Generate(file *simplecue.File) (*codejen.File, error) {
+func (jenny GoRawTypes) Generate(file *ast.File) (*codejen.File, error) {
 	output, err := jenny.generateFile(file)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (jenny GoRawTypes) Generate(file *simplecue.File) (*codejen.File, error) {
 	return codejen.NewFile(file.Package+"_types_gen.go", output, jenny), nil
 }
 
-func (jenny GoRawTypes) generateFile(file *simplecue.File) ([]byte, error) {
+func (jenny GoRawTypes) generateFile(file *ast.File) ([]byte, error) {
 	var buffer strings.Builder
 	tr := newPreprocessor()
 
@@ -45,42 +45,40 @@ func (jenny GoRawTypes) generateFile(file *simplecue.File) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoRawTypes) formatTypeDef(def simplecue.TypeDefinition) ([]byte, error) {
-	if def.Type == simplecue.DefinitionStruct {
+func (jenny GoRawTypes) formatTypeDef(def ast.TypeDefinition) ([]byte, error) {
+	if def.Type == ast.DefinitionStruct {
 		return jenny.formatStructDef(def)
 	}
 
 	return jenny.formatEnumDef(def)
 }
 
-func (jenny GoRawTypes) formatEnumDef(def simplecue.TypeDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatEnumDef(def ast.TypeDefinition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
 		buffer.WriteString(fmt.Sprintf("// %s\n", commentLine))
 	}
 
-	enumTypeName := stripHashtag(def.Name)
-
-	buffer.WriteString(fmt.Sprintf("type %s %s\n", enumTypeName, def.SubType))
+	buffer.WriteString(fmt.Sprintf("type %s %s\n", def.Name, def.SubType))
 
 	buffer.WriteString("const (\n")
 	for _, val := range def.Values {
-		buffer.WriteString(fmt.Sprintf("\t%s %s = %#v\n", strings.Title(val.Name), enumTypeName, val.Value))
+		buffer.WriteString(fmt.Sprintf("\t%s %s = %#v\n", strings.Title(val.Name), def.Name, val.Value))
 	}
 	buffer.WriteString(")\n")
 
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoRawTypes) formatStructDef(def simplecue.TypeDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatStructDef(def ast.TypeDefinition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
 		buffer.WriteString(fmt.Sprintf("// %s\n", commentLine))
 	}
 
-	buffer.WriteString(fmt.Sprintf("type %s struct {\n", stripHashtag(def.Name)))
+	buffer.WriteString(fmt.Sprintf("type %s struct {\n", def.Name))
 
 	for _, fieldDef := range def.Fields {
 		fieldDefGen, err := jenny.formatField(fieldDef)
@@ -96,7 +94,7 @@ func (jenny GoRawTypes) formatStructDef(def simplecue.TypeDefinition) ([]byte, e
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoRawTypes) formatField(def simplecue.FieldDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatField(def ast.FieldDefinition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
@@ -119,7 +117,7 @@ func (jenny GoRawTypes) formatField(def simplecue.FieldDefinition) ([]byte, erro
 	return []byte(buffer.String()), nil
 }
 
-func formatType(def simplecue.FieldType) string {
+func formatType(def ast.FieldType) string {
 	if def.Type == "unknown" {
 		return "any"
 	}
@@ -149,12 +147,12 @@ func formatType(def simplecue.FieldType) string {
 	return typeName
 }
 
-func formatArray(def simplecue.FieldType) string {
+func formatArray(def ast.FieldType) string {
 	var subTypeString string
 
 	// we don't know what to do here (yet)
 	if len(def.SubType) != 1 {
-		subTypeString = formatDisjunction(simplecue.FieldType{
+		subTypeString = formatDisjunction(ast.FieldType{
 			SubType: def.SubType,
 		})
 	} else {
@@ -164,8 +162,8 @@ func formatArray(def simplecue.FieldType) string {
 	return fmt.Sprintf("[]%s", subTypeString)
 }
 
-func formatDisjunction(def simplecue.FieldType) string {
-	typeName := stripHashtag(string(def.Type))
+func formatDisjunction(def ast.FieldType) string {
+	typeName := string(def.Type)
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {

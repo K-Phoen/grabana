@@ -1,4 +1,4 @@
-package simplecue
+package ast
 
 type TypeID string
 

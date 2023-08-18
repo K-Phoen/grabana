@@ -5,6 +5,7 @@ import (
 
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
+	"github.com/K-Phoen/grabana/internal/gen/ast"
 	"github.com/K-Phoen/grabana/internal/gen/jennies"
 	"github.com/K-Phoen/grabana/internal/gen/jennies/golang"
 	"github.com/K-Phoen/grabana/internal/gen/simplecue"
@@ -26,7 +27,7 @@ func main() {
 		panic(err)
 	}
 
-	ast, err := simplecue.GenerateAST(values[0].Value(), simplecue.Config{
+	schemaAst, err := simplecue.GenerateAST(values[0].Value(), simplecue.Config{
 		Package: pkg, // TODO: extract from input schema/folder?
 	})
 	if err != nil {
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	// Here begins the code generation setup
-	generationTargets := codejen.JennyListWithNamer[*simplecue.File](func(f *simplecue.File) string {
+	generationTargets := codejen.JennyListWithNamer[*ast.File](func(f *ast.File) string {
 		return f.Package
 	})
 	generationTargets.AppendOneToOne(
@@ -48,7 +49,7 @@ func main() {
 
 	rootCodeJenFS := codejen.NewFS()
 
-	fs, err := generationTargets.GenerateFS(ast)
+	fs, err := generationTargets.GenerateFS(schemaAst)
 	if err != nil {
 		panic(err)
 	}
