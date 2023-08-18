@@ -159,9 +159,6 @@ github.com/protocolbuffers/txtpbfmt/unquote
 # github.com/rhysd/go-github-selfupdate v1.2.3
 ## explicit; go 1.13
 github.com/rhysd/go-github-selfupdate/selfupdate
-# github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
-## explicit; go 1.19
-github.com/santhosh-tekuri/jsonschema/v5
 # github.com/spf13/cobra v1.7.0
 ## explicit; go 1.15
 github.com/spf13/cobra
