@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/K-Phoen/grabana/gen"
+	"github.com/K-Phoen/grabana/gen/dashboard"
 )
 
 func main() {

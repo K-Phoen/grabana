@@ -13,7 +13,6 @@ const hintKindEnum = "enum"
 const annotationKindFieldName = "kind"
 const enumMembersAttr = "memberNames"
 
-// Config governs certain variable behaviors when converting CUE to Typescript.
 type Config struct {
 	// Package name used to generate code into.
 	Package string
