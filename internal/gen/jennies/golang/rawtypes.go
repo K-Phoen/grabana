@@ -118,15 +118,15 @@ func (jenny GoRawTypes) formatField(def ast.FieldDefinition) ([]byte, error) {
 }
 
 func formatType(def ast.FieldType) string {
-	if def.Type == "unknown" {
+	if def.Type == ast.TypeAny {
 		return "any"
 	}
 
-	if def.Type == "disjunction" {
+	if def.Type == ast.TypeDisjunction {
 		return formatDisjunction(def)
 	}
 
-	if def.Type == "array" {
+	if def.Type == ast.TypeArray {
 		return formatArray(def)
 	}
 
