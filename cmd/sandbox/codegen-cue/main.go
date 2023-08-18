@@ -5,13 +5,17 @@ import (
 
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
+	"github.com/K-Phoen/grabana/internal/gen/jennies"
 	"github.com/K-Phoen/grabana/internal/gen/jennies/golang"
 	"github.com/K-Phoen/grabana/internal/gen/simplecue"
 	"github.com/grafana/codejen"
 )
 
 func main() {
-	entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/core/dashboard/dashboard.cue"}
+	//entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/dashboard/dashboard.cue"}
+	//pkg := "dashboard"
+	entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/playlist/playlist.cue"}
+	pkg := "playlist"
 
 	// Load Cue files into Cue build.Instances slice
 	// the second arg is a configuration object, we'll see this later
@@ -23,7 +27,7 @@ func main() {
 	}
 
 	ast, err := simplecue.GenerateAST(values[0].Value(), simplecue.Config{
-		Package: "dashboard",
+		Package: pkg, // TODO: extract from input schema/folder?
 	})
 	if err != nil {
 		panic(err)
@@ -37,7 +41,10 @@ func main() {
 		golang.GoRawTypes{},
 		golang.GoBuilder{},
 	)
-	generationTargets.AddPostprocessors(golang.PostProcessFile)
+	generationTargets.AddPostprocessors(
+		golang.PostProcessFile,
+		jennies.Prefixer(pkg),
+	)
 
 	rootCodeJenFS := codejen.NewFS()
 

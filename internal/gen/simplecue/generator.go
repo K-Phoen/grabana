@@ -19,13 +19,15 @@ type Config struct {
 }
 
 type newGenerator struct {
+	file                    *File
+	currentTopLevelTypeName string
 }
 
 func GenerateAST(val cue.Value, c Config) (*File, error) {
-	g := &newGenerator{}
-
-	file := File{
-		Package: c.Package,
+	g := &newGenerator{
+		file: &File{
+			Package: c.Package,
+		},
 	}
 
 	i, err := val.Fields(cue.Definitions(true))
@@ -35,15 +37,17 @@ func GenerateAST(val cue.Value, c Config) (*File, error) {
 	for i.Next() {
 		sel := i.Selector()
 
-		n, err := g.declareTopLevelType(selectorLabel(sel), i.Value(), sel.IsDefinition())
+		g.currentTopLevelTypeName = selectorLabel(sel)
+
+		n, err := g.declareTopLevelType(g.currentTopLevelTypeName, i.Value(), sel.IsDefinition())
 		if err != nil {
 			return nil, err
 		}
 
-		file.Types = append(file.Types, *n)
+		g.file.Types = append(g.file.Types, *n)
 	}
 
-	return &file, nil
+	return g.file, nil
 }
 
 func (g *newGenerator) declareTopLevelType(name string, v cue.Value, isCueDefinition bool) (*TypeDefinition, error) {
@@ -186,6 +190,12 @@ func (g *newGenerator) declareNode(v cue.Value) (*FieldType, error) {
 
 	disjunctions := appendSplit(nil, cue.OrOp, v)
 	if len(disjunctions) != 1 {
+		allowedKindsForAnonymousEnum := cue.StringKind | cue.IntKind
+		ik := v.IncompleteKind()
+		if ik&allowedKindsForAnonymousEnum == ik {
+			return g.declareAnonymousEnum(v)
+		}
+
 		subTypes := make([]FieldType, 0, len(disjunctions))
 		for _, subTypeValue := range disjunctions {
 			subType, err := g.declareNode(subTypeValue)
@@ -237,6 +247,25 @@ func (g *newGenerator) declareNode(v cue.Value) (*FieldType, error) {
 	default:
 		return nil, errorWithCueRef(v, "unexpected node with kind '%s'", v.IncompleteKind().String())
 	}
+}
+
+func (g *newGenerator) declareAnonymousEnum(v cue.Value) (*FieldType, error) {
+	fieldName, ok := v.Label()
+	if !ok {
+		return nil, errorWithCueRef(v, "could not determine field name")
+	}
+
+	enumName := g.currentTopLevelTypeName + strings.Title(fieldName)
+	enumType, err := g.declareTopLevelEnum(enumName, v)
+	if err != nil {
+		return nil, err
+	}
+
+	g.file.Types = append(g.file.Types, *enumType)
+
+	return &FieldType{
+		Type: TypeID(enumType.Name),
+	}, nil
 }
 
 func (g *newGenerator) declareNumber(v cue.Value) (*FieldType, error) {
