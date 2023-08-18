@@ -8,15 +8,16 @@ import (
 	"github.com/K-Phoen/grabana/internal/gen/ast"
 	"github.com/K-Phoen/grabana/internal/gen/jennies"
 	"github.com/K-Phoen/grabana/internal/gen/jennies/golang"
+	"github.com/K-Phoen/grabana/internal/gen/jennies/typescript"
 	"github.com/K-Phoen/grabana/internal/gen/simplecue"
 	"github.com/grafana/codejen"
 )
 
 func main() {
-	//entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/dashboard/dashboard.cue"}
-	//pkg := "dashboard"
-	entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/playlist/playlist.cue"}
-	pkg := "playlist"
+	entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/dashboard/dashboard.cue"}
+	pkg := "dashboard"
+	//entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/playlist/playlist.cue"}
+	//pkg := "playlist"
 
 	// Load Cue files into Cue build.Instances slice
 	// the second arg is a configuration object, we'll see this later
@@ -39,8 +40,12 @@ func main() {
 		return f.Package
 	})
 	generationTargets.AppendOneToOne(
+		// Golang
 		golang.GoRawTypes{},
 		golang.GoBuilder{},
+
+		// Typescript
+		typescript.TypescriptRawTypes{},
 	)
 	generationTargets.AddPostprocessors(
 		golang.PostProcessFile,
