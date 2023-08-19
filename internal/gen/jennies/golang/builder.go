@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/K-Phoen/grabana/internal/gen/ast"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/codejen"
 )
 
@@ -49,7 +48,6 @@ func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 
 	// Include veneers if any
 	templateFile := fmt.Sprintf("%s.builder.go.tmpl", strings.ToLower(entryPointType.Name))
-	spew.Dump(templateFile)
 	tmpl := templates.Lookup(templateFile)
 	if tmpl != nil {
 		buf := bytes.Buffer{}
