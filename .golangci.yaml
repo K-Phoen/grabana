@@ -10,7 +10,6 @@ linters:
     - typecheck
     - unused
     - varcheck
-    - depguard
     - gochecknoinits
     - gocritic
     - gocyclo
