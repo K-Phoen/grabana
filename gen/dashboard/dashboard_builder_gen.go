@@ -44,7 +44,6 @@ func (builder *Builder) MarshalJSON() ([]byte, error) {
 func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
 	return json.MarshalIndent(builder.internal, "", "  ")
 }
-
 func Id(id int64) Option {
 	return func(builder *Builder) error {
 

@@ -1,10 +1,12 @@
 package golang
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
 	"github.com/K-Phoen/grabana/internal/gen/ast"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/codejen"
 )
 
@@ -27,6 +29,10 @@ func (jenny GoBuilder) Generate(file *ast.File) (*codejen.File, error) {
 func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 	var buffer strings.Builder
 	tr := newPreprocessor()
+	entryPointType, ok := file.EntryPointType()
+	if !ok {
+		return nil, fmt.Errorf("coult not find entrypoint type")
+	}
 
 	tr.translateTypes(file.Types)
 
@@ -36,50 +42,25 @@ func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 	buffer.WriteString("type Option func(builder *Builder) error\n\n")
 
 	// Builder type declaration
-	buffer.WriteString(`type Builder struct {
-	internal *Dashboard
+	buffer.WriteString(fmt.Sprintf(`type Builder struct {
+	internal *%s
 }
-`)
+`, entryPointType.Name))
 
-	// Constructor type declaration
-	buffer.WriteString(`func New(title string, options ...Option) (Builder, error) {
-	dashboard := &Dashboard{
-	Title: &title,
-}
-
-	builder := &Builder{internal: dashboard}
-
-	for _, opt := range options {
-		if err := opt(builder); err != nil {
-			return *builder, err
+	// Include veneers if any
+	templateFile := fmt.Sprintf("%s.builder.go.tmpl", strings.ToLower(entryPointType.Name))
+	spew.Dump(templateFile)
+	tmpl := templates.Lookup(templateFile)
+	if tmpl != nil {
+		buf := bytes.Buffer{}
+		if err := tmpl.Execute(&buf, nil); err != nil {
+			return nil, fmt.Errorf("failed executing veneer template: %w", err)
 		}
+
+		buffer.WriteString(buf.String())
 	}
 
-	return *builder, nil
-}
-`)
-
-	// (un)marshaling utilities
-	buffer.WriteString(`
-// MarshalJSON implements the encoding/json.Marshaler interface.
-//
-// This method can be used to render the dashboard as JSON
-// which your configuration management tool of choice can then feed into
-// Grafana's dashboard via its provisioning support.
-// See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
-func (builder *Builder) MarshalJSON() ([]byte, error) {
-	return json.Marshal(builder.internal)
-}
-
-// MarshalIndentJSON renders the dashboard as indented JSON
-// which your configuration management tool of choice can then feed into
-// Grafana's dashboard via its provisioning support.
-// See https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
-func (builder *Builder) MarshalIndentJSON() ([]byte, error) {
-	return json.MarshalIndent(builder.internal, "", "  ")
-}
-`)
-
+	// Define options from types
 	for _, typeDef := range tr.sortedTypes() {
 		typeDefGen, err := jenny.formatTypeDef(typeDef)
 		if err != nil {

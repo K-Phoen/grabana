@@ -102,3 +102,13 @@ type File struct {
 	Package string
 	Types   []TypeDefinition
 }
+
+func (file *File) EntryPointType() (TypeDefinition, bool) {
+	for _, typeDef := range file.Types {
+		if typeDef.IsEntryPoint {
+			return typeDef, true
+		}
+	}
+
+	return TypeDefinition{}, false
+}
