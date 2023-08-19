@@ -31,6 +31,7 @@ linters:
     - lll
     - maligned
     - goconst
+    - depguard
 
 linters-settings:
   errcheck:
