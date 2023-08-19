@@ -13,7 +13,7 @@ type Builder struct {
 
 func New(title string, options ...Option) (Builder, error) {
 	dashboard := &Dashboard{
-		Title: title,
+		Title: &title,
 	}
 
 	builder := &Builder{internal: dashboard}
@@ -57,7 +57,7 @@ func Id(id int64) Option {
 func Uid(uid string) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Uid = uid
+		builder.internal.Uid = &uid
 
 		return nil
 	}
@@ -66,7 +66,7 @@ func Uid(uid string) Option {
 func Title(title string) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Title = title
+		builder.internal.Title = &title
 
 		return nil
 	}
@@ -75,7 +75,7 @@ func Title(title string) Option {
 func Description(description string) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Description = description
+		builder.internal.Description = &description
 
 		return nil
 	}
@@ -84,7 +84,7 @@ func Description(description string) Option {
 func Revision(revision int64) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Revision = revision
+		builder.internal.Revision = &revision
 
 		return nil
 	}
@@ -93,7 +93,7 @@ func Revision(revision int64) Option {
 func GnetId(gnetId string) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.GnetId = gnetId
+		builder.internal.GnetId = &gnetId
 
 		return nil
 	}
@@ -120,7 +120,7 @@ func Style(style DashboardStyle) Option {
 func Timezone(timezone string) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Timezone = timezone
+		builder.internal.Timezone = &timezone
 
 		return nil
 	}
@@ -147,7 +147,7 @@ func GraphTooltip(graphTooltip DashboardCursorSync) Option {
 func Time(time TimeInterval) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Time = time
+		builder.internal.Time = &time
 
 		return nil
 	}
@@ -156,7 +156,7 @@ func Time(time TimeInterval) Option {
 func Timepicker(timepicker TimePicker) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Timepicker = timepicker
+		builder.internal.Timepicker = &timepicker
 
 		return nil
 	}
@@ -168,7 +168,7 @@ func FiscalYearStartMonth(fiscalYearStartMonth uint64) Option {
 			return errors.New("fiscalYearStartMonth must be < 12")
 		}
 
-		builder.internal.FiscalYearStartMonth = fiscalYearStartMonth
+		builder.internal.FiscalYearStartMonth = &fiscalYearStartMonth
 
 		return nil
 	}
@@ -177,7 +177,7 @@ func FiscalYearStartMonth(fiscalYearStartMonth uint64) Option {
 func LiveNow(liveNow bool) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.LiveNow = liveNow
+		builder.internal.LiveNow = &liveNow
 
 		return nil
 	}
@@ -186,7 +186,7 @@ func LiveNow(liveNow bool) Option {
 func WeekStart(weekStart string) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.WeekStart = weekStart
+		builder.internal.WeekStart = &weekStart
 
 		return nil
 	}
@@ -195,7 +195,7 @@ func WeekStart(weekStart string) Option {
 func Refresh(refresh StringOrBool) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Refresh = refresh
+		builder.internal.Refresh = &refresh
 
 		return nil
 	}
@@ -213,7 +213,7 @@ func SchemaVersion(schemaVersion uint16) Option {
 func Version(version uint32) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Version = version
+		builder.internal.Version = &version
 
 		return nil
 	}
@@ -231,7 +231,7 @@ func Panels(panels []RowPanel) Option {
 func Templating(templating DashboardTemplating) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Templating = templating
+		builder.internal.Templating = &templating
 
 		return nil
 	}
@@ -240,7 +240,7 @@ func Templating(templating DashboardTemplating) Option {
 func Annotations(annotations AnnotationContainer) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Annotations = annotations
+		builder.internal.Annotations = &annotations
 
 		return nil
 	}

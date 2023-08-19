@@ -44,7 +44,7 @@ func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 	// Constructor type declaration
 	buffer.WriteString(`func New(title string, options ...Option) (Builder, error) {
 	dashboard := &Dashboard{
-	Title: title,
+	Title: &title,
 }
 
 	builder := &Builder{internal: dashboard}
@@ -124,10 +124,10 @@ func (jenny GoBuilder) fieldToOption(def ast.FieldDefinition) string {
 	var buffer strings.Builder
 
 	fieldName := strings.Title(def.Name)
-	typeName := strings.TrimPrefix(formatType(def.Type), "*")
+	typeName := strings.TrimPrefix(formatType(def.Type, def.Required), "*")
 	generatedConstraints := strings.Join(jenny.constraints(def.Name, def.Type.Constraints), "\n")
 	asPointer := ""
-	if def.Type.Nullable {
+	if def.Type.Nullable || (def.Type.Type != ast.TypeArray && !def.Required) {
 		asPointer = "&"
 	}
 

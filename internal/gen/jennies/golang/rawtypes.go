@@ -109,7 +109,7 @@ func (jenny GoRawTypes) formatField(def ast.FieldDefinition) ([]byte, error) {
 	buffer.WriteString(fmt.Sprintf(
 		"%s %s `json:\"%s%s\"`\n",
 		strings.Title(def.Name),
-		formatType(def.Type),
+		formatType(def.Type, def.Required),
 		def.Name,
 		jsonOmitEmpty,
 	))
@@ -117,7 +117,7 @@ func (jenny GoRawTypes) formatField(def ast.FieldDefinition) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func formatType(def ast.FieldType) string {
+func formatType(def ast.FieldType, fieldIsRequired bool) string {
 	if def.Type == ast.TypeAny {
 		return "any"
 	}
@@ -134,13 +134,13 @@ func formatType(def ast.FieldType) string {
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {
-			subTypes = append(subTypes, formatType(subType))
+			subTypes = append(subTypes, formatType(subType, true))
 		}
 
 		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
 	}
 
-	if def.Nullable {
+	if def.Nullable || !fieldIsRequired {
 		typeName = "*" + typeName
 	}
 
@@ -156,7 +156,7 @@ func formatArray(def ast.FieldType) string {
 			SubType: def.SubType,
 		})
 	} else {
-		subTypeString = formatType(def.SubType[0])
+		subTypeString = formatType(def.SubType[0], true)
 	}
 
 	return fmt.Sprintf("[]%s", subTypeString)
@@ -167,7 +167,7 @@ func formatDisjunction(def ast.FieldType) string {
 	if def.SubType != nil {
 		subTypes := make([]string, 0, len(def.SubType))
 		for _, subType := range def.SubType {
-			subTypes = append(subTypes, formatType(subType))
+			subTypes = append(subTypes, formatType(subType, true))
 		}
 
 		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
