@@ -74,7 +74,7 @@ func (g *newGenerator) declareTopLevelEnum(name string, schema Schema) (*ast.Def
 	}
 
 	typeDef := &ast.Definition{
-		Type:         ast.TypeEnum,
+		Kind:         ast.KindEnum,
 		Values:       values,
 		Name:         name,
 		Comments:     schemaComments(schema),
@@ -89,7 +89,7 @@ func (g *newGenerator) extractEnumValues(schema Schema) ([]ast.EnumValue, error)
 
 	for _, value := range schema.Enum {
 		fields = append(fields, ast.EnumValue{
-			Type:  ast.TypeString,           // TODO
+			Type:  ast.KindString,           // TODO
 			Name:  fmt.Sprintf("%v", value), // TODO
 			Value: value,
 		})
@@ -100,7 +100,7 @@ func (g *newGenerator) extractEnumValues(schema Schema) ([]ast.EnumValue, error)
 
 func (g *newGenerator) declareTopLevelStruct(name string, schema Schema) (*ast.Definition, error) {
 	typeDef := &ast.Definition{
-		Type:         ast.TypeStruct,
+		Kind:         ast.KindStruct,
 		Name:         name,
 		Comments:     schemaComments(schema),
 		IsEntryPoint: "#/definitions/"+name == g.schemaRootDefinition,
@@ -130,15 +130,15 @@ func (g *newGenerator) declareNode(schema Schema) (*ast.Definition, error) {
 		parts := strings.Split(schema.Ref, "/")
 
 		return &ast.Definition{
-			Nullable: false,                           // TODO
-			Type:     ast.TypeID(parts[len(parts)-1]), // this is definitely too naive
+			Nullable: false,                         // TODO
+			Kind:     ast.Kind(parts[len(parts)-1]), // this is definitely too naive
 		}, nil
 	}
 
 	// Disjunctions
 	if schema.Type.IsDisjunction() {
 		return &ast.Definition{
-			Type:     ast.TypeDisjunction,
+			Kind:     ast.KindDisjunction,
 			Branches: nil,   // TODO
 			Nullable: false, // TODO
 		}, nil
@@ -146,11 +146,11 @@ func (g *newGenerator) declareNode(schema Schema) (*ast.Definition, error) {
 
 	switch schema.Type[0] {
 	case TypeNull:
-		return &ast.Definition{Type: ast.TypeNull}, nil
+		return &ast.Definition{Kind: ast.KindNull}, nil
 	case TypeBoolean:
-		return &ast.Definition{Type: ast.TypeBool}, nil
+		return &ast.Definition{Kind: ast.KindBool}, nil
 	case TypeString:
-		return &ast.Definition{Type: ast.TypeString}, nil
+		return &ast.Definition{Kind: ast.KindString}, nil
 	case TypeNumber, TypeInteger:
 		return g.declareNumber(schema)
 	case TypeArray:
@@ -165,7 +165,7 @@ func (g *newGenerator) declareNode(schema Schema) (*ast.Definition, error) {
 func (g *newGenerator) declareNumber(schema Schema) (*ast.Definition, error) {
 	// TODO
 	return &ast.Definition{
-		Type:        ast.TypeInt64,
+		Kind:        ast.KindInt64,
 		Nullable:    false,
 		Constraints: nil,
 	}, nil
@@ -173,9 +173,9 @@ func (g *newGenerator) declareNumber(schema Schema) (*ast.Definition, error) {
 
 func (g *newGenerator) declareList(schema Schema) (*ast.Definition, error) {
 	typeDef := &ast.Definition{
-		Type:        ast.TypeArray,
+		Kind:        ast.KindArray,
 		Nullable:    false,
-		IndexType:   ast.TypeInt64,
+		IndexType:   ast.KindInt64,
 		Constraints: nil,
 	}
 

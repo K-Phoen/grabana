@@ -41,7 +41,7 @@ func (jenny TypescriptRawTypes) generateFile(file *ast.File) ([]byte, error) {
 }
 
 func (jenny TypescriptRawTypes) formatTypeDef(def ast.Definition) ([]byte, error) {
-	if def.Type == ast.TypeStruct {
+	if def.Kind == ast.KindStruct {
 		return jenny.formatStructDef(def)
 	}
 
@@ -141,36 +141,36 @@ func (jenny TypescriptRawTypes) formatField(def ast.FieldDefinition) ([]byte, er
 func (jenny TypescriptRawTypes) formatType(def ast.Definition) (string, error) {
 	// todo: handle nullable
 	// maybe if nullable, append | null to the type?
-	switch def.Type {
-	case ast.TypeDisjunction:
+	switch def.Kind {
+	case ast.KindDisjunction:
 		return jenny.formatDisjunction(def)
-	case ast.TypeArray:
+	case ast.KindArray:
 		return jenny.formatArray(def)
-	case ast.TypeStruct:
+	case ast.KindStruct:
 		return jenny.formatStructBody(def)
-	case ast.TypeMap:
+	case ast.KindMap:
 		return jenny.formatMap(def)
 
-	case ast.TypeNull:
+	case ast.KindNull:
 		return "null", nil
-	case ast.TypeAny:
+	case ast.KindAny:
 		return "any", nil
 
-	case ast.TypeBytes, ast.TypeString:
+	case ast.KindBytes, ast.KindString:
 		return "string", nil
 
-	case ast.TypeFloat32, ast.TypeFloat64:
+	case ast.KindFloat32, ast.KindFloat64:
 		return "number", nil
-	case ast.TypeUint8, ast.TypeUint16, ast.TypeUint32, ast.TypeUint64:
+	case ast.KindUint8, ast.KindUint16, ast.KindUint32, ast.KindUint64:
 		return "number", nil
-	case ast.TypeInt8, ast.TypeInt16, ast.TypeInt32, ast.TypeInt64:
+	case ast.KindInt8, ast.KintInt16, ast.KindInt32, ast.KindInt64:
 		return "number", nil
 
-	case ast.TypeBool:
+	case ast.KindBool:
 		return "boolean", nil
 
 	default:
-		return string(def.Type), nil
+		return string(def.Kind), nil
 	}
 }
 
@@ -185,7 +185,7 @@ func (jenny TypescriptRawTypes) formatArray(def ast.Definition) (string, error) 
 }
 
 func (jenny TypescriptRawTypes) formatDisjunction(def ast.Definition) (string, error) {
-	typeName := string(def.Type)
+	typeName := string(def.Kind)
 	subTypes := make([]string, 0, len(def.Branches))
 	for _, subType := range def.Branches {
 		formatted, err := jenny.formatType(subType)

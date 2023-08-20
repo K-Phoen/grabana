@@ -92,7 +92,7 @@ type Dashboard struct {
 	// Configuration of the time picker shown at the top of a dashboard.
 	Timepicker *TimePicker `json:"timepicker,omitempty"`
 	// The month that the fiscal year starts on.  0 = January, 11 = December
-	FiscalYearStartMonth *uint64 `json:"fiscalYearStartMonth,omitempty"`
+	FiscalYearStartMonth *uint8 `json:"fiscalYearStartMonth,omitempty"`
 	// When set to true, the dashboard will redraw panels at an interval matching the pixel width.
 	// This will keep data "moving left" regardless of the query refresh rate. This setting helps
 	// avoid dashboards presenting stale live data
@@ -335,9 +335,9 @@ type GridPos struct {
 	// Panel height. The height is the number of rows from the top edge of the panel.
 	H uint32 `json:"h"`
 	// Panel width. The width is the number of columns from the left edge of the panel.
-	W uint64 `json:"w"`
+	W uint32 `json:"w"`
 	// Panel x. The x coordinate is the number of columns from the left edge of the grid
-	X uint64 `json:"x"`
+	X uint32 `json:"x"`
 	// Panel y. The y coordinate is the number of rows from the top edge of the grid
 	Y uint32 `json:"y"`
 	// Whether the panel is fixed within the grid. If true, the panel will not be affected by other panels' interactions

@@ -46,7 +46,7 @@ func (jenny GoRawTypes) generateFile(file *ast.File) ([]byte, error) {
 }
 
 func (jenny GoRawTypes) formatTypeDef(def ast.Definition) ([]byte, error) {
-	if def.Type == ast.TypeStruct {
+	if def.Kind == ast.KindStruct {
 		return jenny.formatStructDef(def)
 	}
 
@@ -123,28 +123,28 @@ func formatField(def ast.FieldDefinition, typesPkg string) string {
 }
 
 func formatType(def ast.Definition, fieldIsRequired bool, typesPkg string) string {
-	if def.Type == ast.TypeAny {
+	if def.Kind == ast.KindAny {
 		return "any"
 	}
 
-	if def.Type == ast.TypeDisjunction {
+	if def.Kind == ast.KindDisjunction {
 		return formatDisjunction(def, typesPkg)
 	}
 
-	if def.Type == ast.TypeArray {
+	if def.Kind == ast.KindArray {
 		return formatArray(def, typesPkg)
 	}
 
-	if def.Type == ast.TypeMap {
+	if def.Kind == ast.KindMap {
 		return formatMap(def, typesPkg)
 	}
 
 	// anonymous struct
-	if def.Type == ast.TypeStruct {
+	if def.Kind == ast.KindStruct {
 		return formatStructBody(def, typesPkg)
 	}
 
-	typeName := string(def.Type)
+	typeName := string(def.Kind)
 
 	if def.IsReference() && typesPkg != "" {
 		typeName = typesPkg + "." + typeName
@@ -171,7 +171,7 @@ func formatMap(def ast.Definition, typesPkg string) string {
 }
 
 func formatDisjunction(def ast.Definition, typesPkg string) string {
-	typeName := string(def.Type)
+	typeName := string(def.Kind)
 	subTypes := make([]string, 0, len(def.Branches))
 	for _, subType := range def.Branches {
 		subTypes = append(subTypes, formatType(subType, true, typesPkg))

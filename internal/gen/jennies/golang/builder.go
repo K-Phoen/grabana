@@ -80,7 +80,7 @@ func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 
 func (jenny GoBuilder) formatTypeDef(def ast.Definition) ([]byte, error) {
 	// nothing to do for enums & other non-struct types
-	if def.Type != ast.TypeStruct {
+	if def.Kind != ast.KindStruct {
 		return nil, nil
 	}
 
@@ -110,7 +110,8 @@ func (jenny GoBuilder) fieldToOption(def ast.FieldDefinition) string {
 
 	generatedConstraints := strings.Join(jenny.constraints(def.Name, def.Type.Constraints), "\n")
 	asPointer := ""
-	if def.Type.Nullable || (def.Type.Type != ast.TypeArray && def.Type.Type != ast.TypeStruct && !def.Required) {
+	// FIXME: this condition is probably wrong
+	if def.Type.Nullable || (def.Type.Kind != ast.KindArray && def.Type.Kind != ast.KindStruct && !def.Required) {
 		asPointer = "&"
 	}
 

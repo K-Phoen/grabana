@@ -94,7 +94,7 @@ func (g *newGenerator) declareTopLevelEnum(name string, v cue.Value) (*ast.Defin
 	}
 
 	return &ast.Definition{
-		Type:     ast.TypeEnum,
+		Kind:     ast.KindEnum,
 		Name:     name,
 		Comments: commentsFromCueValue(v),
 		Values:   values,
@@ -123,9 +123,9 @@ func (g *newGenerator) extractEnumValues(v cue.Value) ([]ast.EnumValue, error) {
 		return nil, errorWithCueRef(v, "numeric enums may only be generated from memberNames attribute")
 	}
 
-	subType := ast.TypeString
+	subType := ast.KindString
 	if v.IncompleteKind() == cue.IntKind {
-		subType = ast.TypeInt64
+		subType = ast.KindInt64
 	}
 
 	var fields []ast.EnumValue
@@ -165,7 +165,7 @@ func (g *newGenerator) declareTopLevelStruct(name string, v cue.Value, isCueDefi
 	}
 
 	typeDef := &ast.Definition{
-		Type:         ast.TypeStruct,
+		Kind:         ast.KindStruct,
 		Name:         name,
 		Comments:     commentsFromCueValue(v),
 		IsEntryPoint: !isCueDefinition,
@@ -220,7 +220,7 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.Definition, error) {
 		selectors := path.Selectors()
 
 		return &ast.Definition{
-			Type: ast.TypeID(selectorLabel(selectors[len(selectors)-1])),
+			Kind: ast.Kind(selectorLabel(selectors[len(selectors)-1])),
 		}, nil
 	}
 
@@ -243,28 +243,21 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.Definition, error) {
 		}
 
 		return &ast.Definition{
-			Type:     ast.TypeDisjunction,
+			Kind:     ast.KindDisjunction,
 			Branches: subTypes,
 			Nullable: false,
 		}, nil
 	}
 
-	// remove defaults... for now.
-	defv, _ := v.Default()
-	if !defv.Equals(v) {
-		_, dvals := v.Expr()
-		v = dvals[0]
-	}
-
 	switch v.IncompleteKind() {
 	case cue.TopKind:
-		return &ast.Definition{Type: ast.TypeAny}, nil
+		return &ast.Definition{Kind: ast.KindAny}, nil
 	case cue.NullKind:
-		return &ast.Definition{Type: ast.TypeNull}, nil
+		return &ast.Definition{Kind: ast.KindNull}, nil
 	case cue.BoolKind:
-		return &ast.Definition{Type: ast.TypeBool}, nil
+		return &ast.Definition{Kind: ast.KindBool}, nil
 	case cue.BytesKind:
-		return &ast.Definition{Type: ast.TypeBytes}, nil
+		return &ast.Definition{Kind: ast.KindBytes}, nil
 	case cue.StringKind:
 		return g.declareString(v)
 	case cue.FloatKind, cue.NumberKind, cue.IntKind:
@@ -302,8 +295,8 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.Definition, error) {
 				}
 
 				return &ast.Definition{
-					Type:      ast.TypeMap,
-					IndexType: ast.TypeString,
+					Kind:      ast.KindMap,
+					IndexType: ast.KindString,
 					ValueType: typeDef,
 				}, nil
 			}
@@ -316,10 +309,10 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.Definition, error) {
 
 		// {...}
 		if len(fields) == 0 {
-			return &ast.Definition{Type: ast.TypeAny}, nil
+			return &ast.Definition{Kind: ast.KindAny}, nil
 		}
 
-		return &ast.Definition{Type: ast.TypeStruct, Fields: fields}, nil
+		return &ast.Definition{Kind: ast.KindStruct, Fields: fields}, nil
 	default:
 		return nil, errorWithCueRef(v, "unexpected node with kind '%s'", v.IncompleteKind().String())
 	}
@@ -340,15 +333,27 @@ func (g *newGenerator) declareAnonymousEnum(v cue.Value) (*ast.Definition, error
 	g.file.Types = append(g.file.Types, *enumType)
 
 	return &ast.Definition{
-		Type: ast.TypeID(enumType.Name),
+		Kind: ast.Kind(enumType.Name),
 	}, nil
 }
 
 func (g *newGenerator) declareString(v cue.Value) (*ast.Definition, error) {
 	typeDef := &ast.Definition{
-		Type: ast.TypeString,
+		Kind: ast.KindString,
 	}
 
+	// Extract the default value if it's there
+	defaultVal, ok := v.Default()
+	if ok {
+		defaultValStr, err := defaultVal.String()
+		if err != nil {
+			return nil, errorWithCueRef(v, "could not convert concrete value to string")
+		}
+
+		typeDef.Default = defaultValStr
+	}
+
+	// Extract constraints
 	constraints, err := g.declareStringConstraints(v)
 	if err != nil {
 		return nil, err
@@ -433,26 +438,26 @@ func (g *newGenerator) declareNumber(v cue.Value) (*ast.Definition, error) {
 	// dirty way of preserving the actual type from cue
 	// FIXME: fails if the type has a custom bound that further restricts the values
 	// IE: uint8 & < 12 will be printed as "uint & < 12
-	var numberType ast.TypeID
-	switch ast.TypeID(parts[0]) {
-	case ast.TypeFloat32, ast.TypeFloat64:
-		numberType = ast.TypeID(parts[0])
-	case ast.TypeUint8, ast.TypeUint16, ast.TypeUint32, ast.TypeUint64:
-		numberType = ast.TypeID(parts[0])
-	case ast.TypeInt8, ast.TypeInt16, ast.TypeInt32, ast.TypeInt64:
-		numberType = ast.TypeID(parts[0])
+	var numberType ast.Kind
+	switch ast.Kind(parts[0]) {
+	case ast.KindFloat32, ast.KindFloat64:
+		numberType = ast.Kind(parts[0])
+	case ast.KindUint8, ast.KindUint16, ast.KindUint32, ast.KindUint64:
+		numberType = ast.Kind(parts[0])
+	case ast.KindInt8, ast.KintInt16, ast.KindInt32, ast.KindInt64:
+		numberType = ast.Kind(parts[0])
 	case "uint":
-		numberType = ast.TypeUint64
+		numberType = ast.KindUint64
 	case "int":
-		numberType = ast.TypeInt64
+		numberType = ast.KindInt64
 	case "number":
-		numberType = ast.TypeFloat64
+		numberType = ast.KindFloat64
 	default:
 		return nil, errorWithCueRef(v, "unknown number type '%s'", parts[0])
 	}
 
 	typeDef := &ast.Definition{
-		Type:     numberType,
+		Kind:     numberType,
 		Nullable: false,
 	}
 
@@ -534,12 +539,12 @@ func (g *newGenerator) declareList(v cue.Value) (*ast.Definition, error) {
 	}
 
 	typeDef := &ast.Definition{
-		Type:      ast.TypeArray,
-		IndexType: ast.TypeInt64,
+		Kind:      ast.KindArray,
+		IndexType: ast.KindInt64,
 
 		// FIXME: we set a default type because our logic is broken
 		ValueType: &ast.Definition{
-			Type: ast.TypeAny,
+			Kind: ast.KindAny,
 		},
 
 		Nullable: false,

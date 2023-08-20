@@ -1,40 +1,40 @@
 package ast
 
-type TypeID string
+type Kind string
 
 const (
-	TypeDisjunction TypeID = "disjunction"
+	KindDisjunction Kind = "disjunction"
 
-	TypeStruct TypeID = "struct"
-	TypeEnum   TypeID = "enum"
-	TypeMap    TypeID = "map"
+	KindStruct Kind = "struct"
+	KindEnum   Kind = "enum"
+	KindMap    Kind = "map"
 
-	TypeNull   TypeID = "null"
-	TypeAny    TypeID = "any"
-	TypeBytes  TypeID = "bytes"
-	TypeArray  TypeID = "array"
-	TypeString TypeID = "string"
+	KindNull   Kind = "null"
+	KindAny    Kind = "any"
+	KindBytes  Kind = "bytes"
+	KindArray  Kind = "array"
+	KindString Kind = "string"
 
-	TypeFloat32 TypeID = "float32"
-	TypeFloat64 TypeID = "float64"
+	KindFloat32 Kind = "float32"
+	KindFloat64 Kind = "float64"
 
-	TypeUint8  TypeID = "uint8"
-	TypeUint16 TypeID = "uint16"
-	TypeUint32 TypeID = "uint32"
-	TypeUint64 TypeID = "uint64"
-	TypeInt8   TypeID = "int8"
-	TypeInt16  TypeID = "int16"
-	TypeInt32  TypeID = "int32"
-	TypeInt64  TypeID = "int64"
+	KindUint8  Kind = "uint8"
+	KindUint16 Kind = "uint16"
+	KindUint32 Kind = "uint32"
+	KindUint64 Kind = "uint64"
+	KindInt8   Kind = "int8"
+	KintInt16  Kind = "int16"
+	KindInt32  Kind = "int32"
+	KindInt64  Kind = "int64"
 
-	TypeBool TypeID = "bool"
+	KindBool Kind = "bool"
 )
 
 type Definition struct {
-	Type         TypeID
+	Kind         Kind
 	Name         string
 	Comments     []string
-	IndexType    TypeID            // for maps & arrays
+	IndexType    Kind              // for maps & arrays
 	ValueType    *Definition       // for maps & arrays
 	Branches     Definitions       // for disjunctions
 	Fields       []FieldDefinition // for structs
@@ -43,49 +43,51 @@ type Definition struct {
 
 	Nullable    bool
 	Constraints []TypeConstraint
+
+	Default any // the go type of the value depends on Kind
 }
 
 func (def Definition) IsReference() bool {
-	switch def.Type {
-	case TypeDisjunction:
+	switch def.Kind {
+	case KindDisjunction:
 		return false
-	case TypeStruct:
+	case KindStruct:
 		return false
-	case TypeEnum:
+	case KindEnum:
 		return false
-	case TypeMap:
+	case KindMap:
 		return false
-	case TypeNull:
+	case KindNull:
 		return false
-	case TypeAny:
+	case KindAny:
 		return false
-	case TypeBytes:
+	case KindBytes:
 		return false
-	case TypeArray:
+	case KindArray:
 		return false
-	case TypeString:
+	case KindString:
 		return false
-	case TypeFloat32:
+	case KindFloat32:
 		return false
-	case TypeFloat64:
+	case KindFloat64:
 		return false
-	case TypeUint8:
+	case KindUint8:
 		return false
-	case TypeUint16:
+	case KindUint16:
 		return false
-	case TypeUint32:
+	case KindUint32:
 		return false
-	case TypeUint64:
+	case KindUint64:
 		return false
-	case TypeInt8:
+	case KindInt8:
 		return false
-	case TypeInt16:
+	case KintInt16:
 		return false
-	case TypeInt32:
+	case KindInt32:
 		return false
-	case TypeInt64:
+	case KindInt64:
 		return false
-	case TypeBool:
+	case KindBool:
 		return false
 	}
 
@@ -94,9 +96,9 @@ func (def Definition) IsReference() bool {
 
 type Definitions []Definition
 
-func (types Definitions) HasNullType() bool {
-	for _, t := range types {
-		if t.Type == TypeNull {
+func (defs Definitions) HasNullType() bool {
+	for _, t := range defs {
+		if t.Kind == KindNull {
 			return true
 		}
 	}
@@ -104,27 +106,27 @@ func (types Definitions) HasNullType() bool {
 	return false
 }
 
-func (types Definitions) NonNullTypes() Definitions {
+func (defs Definitions) NonNullTypes() Definitions {
 	var filteredTypes Definitions
-	for _, t := range types {
-		if t.Type == TypeNull {
+	for _, def := range defs {
+		if def.Kind == KindNull {
 			continue
 		}
 
-		filteredTypes = append(filteredTypes, t)
+		filteredTypes = append(filteredTypes, def)
 	}
 
 	return filteredTypes
 }
 
 type TypeConstraint struct {
-	// TODO
+	// TODO: something more descriptive here? constant?
 	Op   string
 	Args []any
 }
 
 type EnumValue struct {
-	Type  TypeID
+	Type  Kind
 	Name  string
 	Value interface{}
 }
@@ -132,10 +134,8 @@ type EnumValue struct {
 type FieldDefinition struct {
 	Name     string
 	Comments []string
-	// Field needs to be defined
 	Required bool
 	Type     Definition
-	// TODO
 }
 
 type File struct {

@@ -45,18 +45,18 @@ func (preprocessor *preprocessor) translate(def ast.Definition) {
 }
 
 func (preprocessor *preprocessor) translateDefinition(def ast.Definition) ast.Definition {
-	if def.Type == ast.TypeDisjunction {
+	if def.Kind == ast.KindDisjunction {
 		return preprocessor.expandDisjunction(def)
 	}
 
-	if def.Type == ast.TypeArray {
+	if def.Kind == ast.KindArray {
 		translated := preprocessor.translateDefinition(*def.ValueType)
 		def.ValueType = &translated
 
 		return def
 	}
 
-	if def.Type != ast.TypeStruct {
+	if def.Kind != ast.KindStruct {
 		return def
 	}
 
@@ -80,7 +80,7 @@ func (preprocessor *preprocessor) translateFieldDefinition(def ast.FieldDefiniti
 
 // def is either a disjunction or a list of unknown sub-types
 func (preprocessor *preprocessor) expandDisjunction(def ast.Definition) ast.Definition {
-	if def.Type == ast.TypeArray {
+	if def.Kind == ast.KindArray {
 		translated := preprocessor.translateDefinition(*def.ValueType)
 		def.ValueType = &translated
 
@@ -102,20 +102,20 @@ func (preprocessor *preprocessor) expandDisjunction(def ast.Definition) ast.Defi
 
 	if _, ok := preprocessor.types[newTypeName]; !ok {
 		newType := ast.Definition{
-			Type: ast.TypeStruct,
+			Kind: ast.KindStruct,
 			Name: newTypeName,
 		}
 
 		for _, branch := range def.Branches {
-			if branch.Type == ast.TypeNull {
+			if branch.Kind == ast.KindNull {
 				continue
 			}
 
 			newType.Fields = append(newType.Fields, ast.FieldDefinition{
-				Name: "Val" + strings.Title(string(branch.Type)),
+				Name: "Val" + strings.Title(string(branch.Kind)),
 				Type: ast.Definition{
 					Nullable: true,
-					Type:     branch.Type,
+					Kind:     branch.Kind,
 
 					IndexType:   branch.IndexType,
 					ValueType:   branch.ValueType,
@@ -129,7 +129,7 @@ func (preprocessor *preprocessor) expandDisjunction(def ast.Definition) ast.Defi
 	}
 
 	return ast.Definition{
-		Type:     ast.TypeID(newTypeName),
+		Kind:     ast.Kind(newTypeName),
 		Nullable: def.Branches.HasNullType(),
 	}
 }
@@ -138,7 +138,7 @@ func (preprocessor *preprocessor) disjunctionTypeName(disjunctionTypes ast.Defin
 	parts := make([]string, 0, len(disjunctionTypes))
 
 	for _, subType := range disjunctionTypes {
-		parts = append(parts, strings.Title(string(subType.Type)))
+		parts = append(parts, strings.Title(string(subType.Kind)))
 	}
 
 	return strings.Title(strings.Join(parts, "Or"))
