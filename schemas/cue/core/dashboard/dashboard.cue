@@ -45,7 +45,10 @@ Dashboard: {
 
 	// Time range for dashboard.
 	// Accepted values are relative time strings like {from: 'now-6h', to: 'now'} or absolute time strings like {from: '2020-07-10T08:00:00.000Z', to: '2020-07-10T14:00:00.000Z'}.
-	time?: #TimeInterval
+	time?: {
+		from: string | *"now-6h"
+		to:   string | *"now"
+	}
 
 	// Configuration of the time picker shown at the top of a dashboard.
 	timepicker?: #TimePicker

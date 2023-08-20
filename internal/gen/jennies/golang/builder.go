@@ -33,16 +33,19 @@ func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 		return nil, fmt.Errorf("coult not find entrypoint type")
 	}
 
-	tr.translateTypes(file.Types)
+	tr.translateDefinitions(file.Types)
 
 	buffer.WriteString(fmt.Sprintf("package %s\n\n", file.Package))
+
+	// import generated types
+	buffer.WriteString("import \"github.com/K-Phoen/grabana/gen/dashboard/types\"\n\n")
 
 	// Option type declaration
 	buffer.WriteString("type Option func(builder *Builder) error\n\n")
 
 	// Builder type declaration
 	buffer.WriteString(fmt.Sprintf(`type Builder struct {
-	internal *%s
+	internal *types.%s
 }
 `, entryPointType.Name))
 
@@ -75,9 +78,9 @@ func (jenny GoBuilder) generateFile(file *ast.File) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoBuilder) formatTypeDef(def ast.TypeDefinition) ([]byte, error) {
+func (jenny GoBuilder) formatTypeDef(def ast.Definition) ([]byte, error) {
 	// nothing to do for enums & other non-struct types
-	if def.Type != ast.DefinitionStruct {
+	if def.Type != ast.TypeStruct {
 		return nil, nil
 	}
 
@@ -89,7 +92,7 @@ func (jenny GoBuilder) formatTypeDef(def ast.TypeDefinition) ([]byte, error) {
 	return jenny.formatMainTypeOptions(def)
 }
 
-func (jenny GoBuilder) formatMainTypeOptions(def ast.TypeDefinition) ([]byte, error) {
+func (jenny GoBuilder) formatMainTypeOptions(def ast.Definition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, fieldDef := range def.Fields {
@@ -103,10 +106,11 @@ func (jenny GoBuilder) fieldToOption(def ast.FieldDefinition) string {
 	var buffer strings.Builder
 
 	fieldName := strings.Title(def.Name)
-	typeName := strings.TrimPrefix(formatType(def.Type, def.Required), "*")
+	typeName := strings.TrimPrefix(formatType(def.Type, def.Required, "types"), "*")
+
 	generatedConstraints := strings.Join(jenny.constraints(def.Name, def.Type.Constraints), "\n")
 	asPointer := ""
-	if def.Type.Nullable || (def.Type.Type != ast.TypeArray && !def.Required) {
+	if def.Type.Nullable || (def.Type.Type != ast.TypeArray && def.Type.Type != ast.TypeStruct && !def.Required) {
 		asPointer = "&"
 	}
 

@@ -79,8 +79,6 @@ func NewFS() *FS {
 // If the provided prefix path is non-empty, it will be prepended to all file
 // entries in the map for writing. prefix may be an absolute path.
 func (fs *FS) Verify(ctx context.Context, prefix string) error {
-	fs.mu.RLock()
-	defer fs.mu.RUnlock()
 	g, _ := errgroup.WithContext(ctx)
 	g.SetLimit(12)
 	var result *multierror.Error
@@ -150,6 +148,10 @@ func (fs *FS) Write(ctx context.Context, prefix string) error {
 // The contents are sorted lexicographically, and it is guaranteed that the
 // invariants enforced by [Files.Validate] are met.
 func (fs *FS) AsFiles() []File {
+	if fs == nil {
+		return nil
+	}
+
 	fs.mu.RLock()
 	sl := make([]File, 0, len(fs.mapFS))
 
@@ -205,12 +207,16 @@ func (fs *FS) addValidated(flist ...File) error {
 
 // Merge combines all the entries from the provided FS into the receiver
 // FS. Duplicate paths result in an error.
-func (fs *FS) Merge(wd2 *FS) error {
+func (fs *FS) Merge(fs2 *FS) error {
+	if fs2 == nil {
+		return nil
+	}
+
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
-	flist := make([]File, 0, len(wd2.mapFS))
-	for k, inf := range wd2.mapFS {
+	flist := make([]File, 0, len(fs2.mapFS))
+	for k, inf := range fs2.mapFS {
 		flist = append(flist, toFile(k, inf))
 	}
 

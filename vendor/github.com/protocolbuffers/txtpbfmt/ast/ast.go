@@ -202,7 +202,7 @@ func (n *Node) fix() fixData {
 	d := fixData{
 		// ChildrenSameLine may be false for cases with no children such as a
 		// value `foo: false`. We don't want these to trigger expansion.
-		inline: n.ChildrenSameLine || (len(n.Children) == 0 && isEmptyAndWasOriginallyInline),
+		inline: n.ChildrenSameLine || (len(n.Children) == 0 && isEmptyAndWasOriginallyInline && len(n.Values) <= 1),
 	}
 
 	for _, c := range n.Children {

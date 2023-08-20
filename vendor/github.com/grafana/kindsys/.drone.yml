@@ -1,0 +1,79 @@
+---
+kind: pipeline
+type: docker
+name: test-pr
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: go lint
+  image: grafana/grafana-plugin-ci:1.6.1-alpine
+  commands:
+  - make lint
+
+- name: go test
+  image: grafana/grafana-plugin-ci:1.6.1-alpine
+  commands:
+  - make test
+
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
+
+image_pull_secrets:
+- dockerconfigjson
+
+trigger:
+  event:
+  - pull_request
+
+---
+kind: pipeline
+type: docker
+name: test-main
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: go lint
+  image: grafana/grafana-plugin-ci:1.6.1-alpine
+  commands:
+  - make lint
+
+- name: go test
+  image: grafana/grafana-plugin-ci:1.6.1-alpine
+  commands:
+  - make test
+
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
+
+image_pull_secrets:
+- dockerconfigjson
+
+trigger:
+  branch:
+  - main
+  event:
+  - push
+
+---
+kind: secret
+name: dockerconfigjson
+
+get:
+  path: secret/data/common/gcr
+  name: .dockerconfigjson
+
+---
+kind: signature
+hmac: 596f2393954df1c3da0b4f68b0dabf9611c8dcc3f11b9eda30ecdd25a9295e3b
+
+...

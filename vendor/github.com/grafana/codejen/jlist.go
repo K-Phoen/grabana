@@ -2,7 +2,6 @@ package codejen
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 
 	"github.com/hashicorp/go-multierror"
@@ -61,7 +60,7 @@ func (jl *JennyList[Input]) last() *jnode {
 }
 
 func (jl *JennyList[Input]) JennyName() string {
-	return fmt.Sprintf("JennyList[%s]", reflect.TypeOf(new(Input)).Elem().Name())
+	return fmt.Sprintf("JennyList[%T]", new(Input))
 }
 
 func (jl *JennyList[Input]) wrapinerr(in Input, err error) error {
@@ -205,7 +204,14 @@ func (jl *JennyList[Input]) Append(jennies ...Jenny[Input]) {
 				j: j,
 			}
 		default:
-			panic(fmt.Sprintf("%T is not a valid Jenny, must implement (OneToOne | OneToMany | ManyToOne | ManyToMany)", j))
+			intyp := *(new(Input))
+			errtxt := `%T is not a valid Jenny, must implement one of
+	codejen.OneToOne[%T]
+	codejen.OneToMany[%T]
+	codejen.ManyToOne[%T]
+	codejen.ManyToMany[%T]
+`
+			panic(fmt.Sprintf(errtxt, j, intyp, intyp, intyp, intyp))
 		}
 	}
 	jl.append(nlist...)

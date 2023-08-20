@@ -16,6 +16,10 @@ import (
 func main() {
 	entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/dashboard/dashboard.cue"}
 	pkg := "dashboard"
+
+	//entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/sandbox/sandbox.cue"}
+	//pkg := "sandbox"
+
 	//entrypoints := []string{"/home/kevin/sandbox/personal/grabana/schemas/cue/core/playlist/playlist.cue"}
 	//pkg := "playlist"
 
@@ -28,7 +32,7 @@ func main() {
 		panic(err)
 	}
 
-	schemaAst, err := simplecue.GenerateAST(values[0].Value(), simplecue.Config{
+	schemaAst, err := simplecue.GenerateAST(values[0], simplecue.Config{
 		Package: pkg, // TODO: extract from input schema/folder?
 	})
 	if err != nil {

@@ -8,17 +8,17 @@ import (
 )
 
 type preprocessor struct {
-	types map[string]ast.TypeDefinition
+	types map[string]ast.Definition
 }
 
 func newPreprocessor() *preprocessor {
 	return &preprocessor{
-		types: make(map[string]ast.TypeDefinition),
+		types: make(map[string]ast.Definition),
 	}
 }
 
 // inefficient, but I'm lazy. It's only used during code generation anyway.
-func (preprocessor *preprocessor) sortedTypes() []ast.TypeDefinition {
+func (preprocessor *preprocessor) sortedTypes() []ast.Definition {
 	typeNames := make([]string, 0, len(preprocessor.types))
 	for typeName := range preprocessor.types {
 		typeNames = append(typeNames, typeName)
@@ -26,7 +26,7 @@ func (preprocessor *preprocessor) sortedTypes() []ast.TypeDefinition {
 
 	sort.Strings(typeNames)
 
-	sorted := make([]ast.TypeDefinition, 0, len(preprocessor.types))
+	sorted := make([]ast.Definition, 0, len(preprocessor.types))
 	for _, k := range typeNames {
 		sorted = append(sorted, preprocessor.types[k])
 	}
@@ -34,17 +34,32 @@ func (preprocessor *preprocessor) sortedTypes() []ast.TypeDefinition {
 	return sorted
 }
 
-func (preprocessor *preprocessor) translateTypes(definitions []ast.TypeDefinition) {
+func (preprocessor *preprocessor) translateDefinitions(definitions []ast.Definition) {
 	for _, typeDef := range definitions {
 		preprocessor.translate(typeDef)
 	}
 }
 
-func (preprocessor *preprocessor) translate(def ast.TypeDefinition) {
-	preprocessor.types[def.Name] = preprocessor.translateTypeDefinition(def)
+func (preprocessor *preprocessor) translate(def ast.Definition) {
+	preprocessor.types[def.Name] = preprocessor.translateDefinition(def)
 }
 
-func (preprocessor *preprocessor) translateTypeDefinition(def ast.TypeDefinition) ast.TypeDefinition {
+func (preprocessor *preprocessor) translateDefinition(def ast.Definition) ast.Definition {
+	if def.Type == ast.TypeDisjunction {
+		return preprocessor.expandDisjunction(def)
+	}
+
+	if def.Type == ast.TypeArray {
+		translated := preprocessor.translateDefinition(*def.ValueType)
+		def.ValueType = &translated
+
+		return def
+	}
+
+	if def.Type != ast.TypeStruct {
+		return def
+	}
+
 	newFields := make([]ast.FieldDefinition, 0, len(def.Fields))
 	for _, fieldDef := range def.Fields {
 		newFields = append(newFields, preprocessor.translateFieldDefinition(fieldDef))
@@ -58,69 +73,53 @@ func (preprocessor *preprocessor) translateTypeDefinition(def ast.TypeDefinition
 
 func (preprocessor *preprocessor) translateFieldDefinition(def ast.FieldDefinition) ast.FieldDefinition {
 	newDef := def
-	newDef.Type = preprocessor.translateFieldType(def.Type)
+	newDef.Type = preprocessor.translateDefinition(def.Type)
 
 	return newDef
 }
 
-// bool, string,..., [], disjunction
-func (preprocessor *preprocessor) translateFieldType(def ast.FieldType) ast.FieldType {
-	if def.Type == ast.TypeDisjunction || def.Type == ast.TypeArray {
-		return preprocessor.expandDisjunction(def)
-	}
-
-	return def
-}
-
 // def is either a disjunction or a list of unknown sub-types
-func (preprocessor *preprocessor) expandDisjunction(def ast.FieldType) ast.FieldType {
+func (preprocessor *preprocessor) expandDisjunction(def ast.Definition) ast.Definition {
 	if def.Type == ast.TypeArray {
-		newSubTypes := make(ast.FieldTypes, 0, len(def.SubType))
-
-		for _, subType := range def.SubType {
-			newSubType := preprocessor.translateFieldType(subType)
-			newSubTypes = append(newSubTypes, newSubType)
-		}
-
-		def.SubType = newSubTypes
+		translated := preprocessor.translateDefinition(*def.ValueType)
+		def.ValueType = &translated
 
 		return def
 	}
 
 	// Ex: type | null
-	if len(def.SubType) == 2 && def.SubType.HasNullType() {
-		finalType := def.SubType.NonNullTypes()[0]
+	if len(def.Branches) == 2 && def.Branches.HasNullType() {
+		finalType := def.Branches.NonNullTypes()[0]
+		finalType.Nullable = true
 
-		return ast.FieldType{
-			Type:        finalType.Type,
-			Nullable:    true,
-			Constraints: finalType.Constraints,
-		}
+		return finalType
 	}
 
 	// type | otherType | something (| null)?
 	// generate a type with a nullable field for every branch of the disjunction,
 	// add it to preprocessor.types, and use it instead.
-	newTypeName := preprocessor.disjunctionTypeName(def.SubType)
+	newTypeName := preprocessor.disjunctionTypeName(def.Branches)
 
 	if _, ok := preprocessor.types[newTypeName]; !ok {
-		newType := ast.TypeDefinition{
-			Type: ast.DefinitionStruct,
+		newType := ast.Definition{
+			Type: ast.TypeStruct,
 			Name: newTypeName,
 		}
 
-		for _, subType := range def.SubType {
-			if subType.IsNull() {
+		for _, branch := range def.Branches {
+			if branch.Type == ast.TypeNull {
 				continue
 			}
 
 			newType.Fields = append(newType.Fields, ast.FieldDefinition{
-				Name: "Val" + strings.Title(string(subType.Type)),
-				Type: ast.FieldType{
-					Nullable:    true,
-					Type:        subType.Type,
-					SubType:     subType.SubType,
-					Constraints: subType.Constraints,
+				Name: "Val" + strings.Title(string(branch.Type)),
+				Type: ast.Definition{
+					Nullable: true,
+					Type:     branch.Type,
+
+					IndexType:   branch.IndexType,
+					ValueType:   branch.ValueType,
+					Constraints: branch.Constraints,
 				},
 				Required: false,
 			})
@@ -129,13 +128,13 @@ func (preprocessor *preprocessor) expandDisjunction(def ast.FieldType) ast.Field
 		preprocessor.types[newTypeName] = newType
 	}
 
-	return ast.FieldType{
+	return ast.Definition{
 		Type:     ast.TypeID(newTypeName),
-		Nullable: def.SubType.HasNullType(),
+		Nullable: def.Branches.HasNullType(),
 	}
 }
 
-func (preprocessor *preprocessor) disjunctionTypeName(disjunctionTypes ast.FieldTypes) string {
+func (preprocessor *preprocessor) disjunctionTypeName(disjunctionTypes ast.Definitions) string {
 	parts := make([]string, 0, len(disjunctionTypes))
 
 	for _, subType := range disjunctionTypes {

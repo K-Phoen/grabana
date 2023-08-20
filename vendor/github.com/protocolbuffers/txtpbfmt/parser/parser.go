@@ -173,7 +173,7 @@ func FormatWithConfig(in []byte, c Config) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return out(nodes), nil
+	return PrettyBytes(nodes, 0), nil
 }
 
 // Return the byte-positions of each bracket which has the corresponding close on the
@@ -1340,9 +1340,10 @@ func Pretty(nodes []*ast.Node, depth int) string {
 	return result.String()
 }
 
-func out(nodes []*ast.Node) []byte {
+// PrettyBytes returns formatted nodes at the given indentation depth (0 = top-level) as bytes.
+func PrettyBytes(nodes []*ast.Node, depth int) []byte {
 	var result bytes.Buffer
-	formatter{&result}.writeNodes(removeDeleted(nodes), 0, false /* isSameLine */, false /* asListItems */)
+	formatter{&result}.writeNodes(removeDeleted(nodes), depth, false /* isSameLine */, false /* asListItems */)
 	return result.Bytes()
 }
 

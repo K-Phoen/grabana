@@ -47,7 +47,7 @@ func GenerateAST(schemaReader io.Reader, c Config) (*ast.File, error) {
 	return g.file, nil
 }
 
-func (g *newGenerator) declareTopLevelType(name string, schema Schema) (*ast.TypeDefinition, error) {
+func (g *newGenerator) declareTopLevelType(name string, schema Schema) (*ast.Definition, error) {
 	if schema.Enum != nil {
 		return g.declareTopLevelEnum(name, schema)
 	}
@@ -59,7 +59,7 @@ func (g *newGenerator) declareTopLevelType(name string, schema Schema) (*ast.Typ
 	return nil, fmt.Errorf("unexpected top-level type '%s'", schema.Type)
 }
 
-func (g *newGenerator) declareTopLevelEnum(name string, schema Schema) (*ast.TypeDefinition, error) {
+func (g *newGenerator) declareTopLevelEnum(name string, schema Schema) (*ast.Definition, error) {
 	if schema.Type.IsDisjunction() {
 		return nil, fmt.Errorf("enums may only be generated from values of a single type: got '%s'", schema.Type)
 	}
@@ -73,9 +73,8 @@ func (g *newGenerator) declareTopLevelEnum(name string, schema Schema) (*ast.Typ
 		return nil, err
 	}
 
-	typeDef := &ast.TypeDefinition{
-		Type:         ast.DefinitionEnum,
-		SubType:      ast.TypeString, // TODO
+	typeDef := &ast.Definition{
+		Type:         ast.TypeEnum,
 		Values:       values,
 		Name:         name,
 		Comments:     schemaComments(schema),
@@ -90,6 +89,7 @@ func (g *newGenerator) extractEnumValues(schema Schema) ([]ast.EnumValue, error)
 
 	for _, value := range schema.Enum {
 		fields = append(fields, ast.EnumValue{
+			Type:  ast.TypeString,           // TODO
 			Name:  fmt.Sprintf("%v", value), // TODO
 			Value: value,
 		})
@@ -98,9 +98,9 @@ func (g *newGenerator) extractEnumValues(schema Schema) ([]ast.EnumValue, error)
 	return fields, nil
 }
 
-func (g *newGenerator) declareTopLevelStruct(name string, schema Schema) (*ast.TypeDefinition, error) {
-	typeDef := &ast.TypeDefinition{
-		Type:         ast.DefinitionStruct,
+func (g *newGenerator) declareTopLevelStruct(name string, schema Schema) (*ast.Definition, error) {
+	typeDef := &ast.Definition{
+		Type:         ast.TypeStruct,
 		Name:         name,
 		Comments:     schemaComments(schema),
 		IsEntryPoint: "#/definitions/"+name == g.schemaRootDefinition,
@@ -124,12 +124,12 @@ func (g *newGenerator) declareTopLevelStruct(name string, schema Schema) (*ast.T
 	return typeDef, nil
 }
 
-func (g *newGenerator) declareNode(schema Schema) (*ast.FieldType, error) {
+func (g *newGenerator) declareNode(schema Schema) (*ast.Definition, error) {
 	// This node is referring to another definition
 	if schema.Ref != "" {
 		parts := strings.Split(schema.Ref, "/")
 
-		return &ast.FieldType{
+		return &ast.Definition{
 			Nullable: false,                           // TODO
 			Type:     ast.TypeID(parts[len(parts)-1]), // this is definitely too naive
 		}, nil
@@ -137,20 +137,20 @@ func (g *newGenerator) declareNode(schema Schema) (*ast.FieldType, error) {
 
 	// Disjunctions
 	if schema.Type.IsDisjunction() {
-		return &ast.FieldType{
+		return &ast.Definition{
 			Type:     ast.TypeDisjunction,
-			SubType:  nil,   // TODO
+			Branches: nil,   // TODO
 			Nullable: false, // TODO
 		}, nil
 	}
 
 	switch schema.Type[0] {
 	case TypeNull:
-		return &ast.FieldType{Type: ast.TypeNull}, nil
+		return &ast.Definition{Type: ast.TypeNull}, nil
 	case TypeBoolean:
-		return &ast.FieldType{Type: ast.TypeBool}, nil
+		return &ast.Definition{Type: ast.TypeBool}, nil
 	case TypeString:
-		return &ast.FieldType{Type: ast.TypeString}, nil
+		return &ast.Definition{Type: ast.TypeString}, nil
 	case TypeNumber, TypeInteger:
 		return g.declareNumber(schema)
 	case TypeArray:
@@ -162,21 +162,20 @@ func (g *newGenerator) declareNode(schema Schema) (*ast.FieldType, error) {
 	}
 }
 
-func (g *newGenerator) declareNumber(schema Schema) (*ast.FieldType, error) {
+func (g *newGenerator) declareNumber(schema Schema) (*ast.Definition, error) {
 	// TODO
-	return &ast.FieldType{
+	return &ast.Definition{
 		Type:        ast.TypeInt64,
 		Nullable:    false,
-		SubType:     nil,
 		Constraints: nil,
 	}, nil
 }
 
-func (g *newGenerator) declareList(schema Schema) (*ast.FieldType, error) {
-	typeDef := &ast.FieldType{
+func (g *newGenerator) declareList(schema Schema) (*ast.Definition, error) {
+	typeDef := &ast.Definition{
 		Type:        ast.TypeArray,
 		Nullable:    false,
-		SubType:     nil,
+		IndexType:   ast.TypeInt64,
 		Constraints: nil,
 	}
 
@@ -185,7 +184,7 @@ func (g *newGenerator) declareList(schema Schema) (*ast.FieldType, error) {
 		return nil, err
 	}
 
-	typeDef.SubType = []ast.FieldType{*expr}
+	typeDef.ValueType = expr
 
 	return typeDef, nil
 }

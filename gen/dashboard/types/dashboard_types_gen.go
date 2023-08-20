@@ -1,4 +1,4 @@
-package dashboard
+package types
 
 // Contains the list of annotations that are associated with the dashboard.
 // Annotations are used to overlay event markers and overlay event tags on graphs.
@@ -85,7 +85,10 @@ type Dashboard struct {
 	GraphTooltip DashboardCursorSync `json:"graphTooltip"`
 	// Time range for dashboard.
 	// Accepted values are relative time strings like {from: 'now-6h', to: 'now'} or absolute time strings like {from: '2020-07-10T08:00:00.000Z', to: '2020-07-10T14:00:00.000Z'}.
-	Time *TimeInterval `json:"time,omitempty"`
+	Time struct {
+		From string `json:"from"`
+		To   string `json:"to"`
+	} `json:"time,omitempty"`
 	// Configuration of the time picker shown at the top of a dashboard.
 	Timepicker *TimePicker `json:"timepicker,omitempty"`
 	// The month that the fiscal year starts on.  0 = January, 11 = December
@@ -462,7 +465,14 @@ const (
 type RangeMap struct {
 	Type string `json:"type"`
 	// Range to match against and the result to apply when the value is within the range
-	Options any `json:"options"`
+	Options struct {
+		// Min value of the range. It can be null which means -Infinity
+		From *float64 `json:"from"`
+		// Max value of the range. It can be null which means +Infinity
+		To *float64 `json:"to"`
+		// Config to apply when the value is within the range
+		Result ValueMappingResult `json:"result"`
+	} `json:"options"`
 }
 
 // Maps regular expressions to replacement text and a color.
@@ -470,7 +480,12 @@ type RangeMap struct {
 type RegexMap struct {
 	Type string `json:"type"`
 	// Regular expression to match against and the result to apply when the value matches the regex
-	Options any `json:"options"`
+	Options struct {
+		// Regular expression to match against
+		Pattern string `json:"pattern"`
+		// Config to apply when the value matches the regex
+		Result ValueMappingResult `json:"result"`
+	} `json:"options"`
 }
 
 // Row panel
@@ -498,7 +513,12 @@ type RowPanel struct {
 // For example, you can configure a special value mapping so that null values appear as N/A.
 type SpecialValueMap struct {
 	Type    string `json:"type"`
-	Options any    `json:"options"`
+	Options struct {
+		// Special value to match against
+		Match SpecialValueMatch `json:"match"`
+		// Config to apply when the value matches the special value
+		Result ValueMappingResult `json:"result"`
+	} `json:"options"`
 }
 
 // Special value types supported by the `SpecialValueMap`
@@ -582,7 +602,7 @@ type TimePicker struct {
 type ValueMap struct {
 	Type string `json:"type"`
 	// Map with <value_to_match>: ValueMappingResult. For example: { "10": { text: "Perfection!", color: "green" } }
-	Options any `json:"options"`
+	Options map[string]ValueMappingResult `json:"options"`
 }
 
 type ValueMapOrRangeMapOrRegexMapOrSpecialValueMap struct {

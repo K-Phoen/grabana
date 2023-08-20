@@ -4,10 +4,16 @@ type TypeID string
 
 const (
 	TypeDisjunction TypeID = "disjunction"
-	TypeNull        TypeID = "null"
-	TypeBytes       TypeID = "bytes"
-	TypeArray       TypeID = "array"
-	TypeString      TypeID = "string"
+
+	TypeStruct TypeID = "struct"
+	TypeEnum   TypeID = "enum"
+	TypeMap    TypeID = "map"
+
+	TypeNull   TypeID = "null"
+	TypeAny    TypeID = "any"
+	TypeBytes  TypeID = "bytes"
+	TypeArray  TypeID = "array"
+	TypeString TypeID = "string"
 
 	TypeFloat32 TypeID = "float32"
 	TypeFloat64 TypeID = "float64"
@@ -22,37 +28,75 @@ const (
 	TypeInt64  TypeID = "int64"
 
 	TypeBool TypeID = "bool"
-	TypeAny  TypeID = "any"
 )
 
-type DefinitionType string
-
-const (
-	DefinitionStruct DefinitionType = "struct"
-	DefinitionEnum   DefinitionType = "enum"
-)
-
-type TypeDefinition struct {
-	Type         DefinitionType
+type Definition struct {
+	Type         TypeID
 	Name         string
-	SubType      TypeID
 	Comments     []string
+	IndexType    TypeID            // for maps & arrays
+	ValueType    *Definition       // for maps & arrays
+	Branches     Definitions       // for disjunctions
 	Fields       []FieldDefinition // for structs
 	Values       []EnumValue       // for enums
 	IsEntryPoint bool              // Dashboard is an entryPoint type. DashboardStyle isn't.
+
+	Nullable    bool
+	Constraints []TypeConstraint
 }
 
-type TypeConstraint struct {
-	// TODO
-	Op   string
-	Args []any
+func (def Definition) IsReference() bool {
+	switch def.Type {
+	case TypeDisjunction:
+		return false
+	case TypeStruct:
+		return false
+	case TypeEnum:
+		return false
+	case TypeMap:
+		return false
+	case TypeNull:
+		return false
+	case TypeAny:
+		return false
+	case TypeBytes:
+		return false
+	case TypeArray:
+		return false
+	case TypeString:
+		return false
+	case TypeFloat32:
+		return false
+	case TypeFloat64:
+		return false
+	case TypeUint8:
+		return false
+	case TypeUint16:
+		return false
+	case TypeUint32:
+		return false
+	case TypeUint64:
+		return false
+	case TypeInt8:
+		return false
+	case TypeInt16:
+		return false
+	case TypeInt32:
+		return false
+	case TypeInt64:
+		return false
+	case TypeBool:
+		return false
+	}
+
+	return true
 }
 
-type FieldTypes []FieldType
+type Definitions []Definition
 
-func (types FieldTypes) HasNullType() bool {
+func (types Definitions) HasNullType() bool {
 	for _, t := range types {
-		if t.IsNull() {
+		if t.Type == TypeNull {
 			return true
 		}
 	}
@@ -60,10 +104,10 @@ func (types FieldTypes) HasNullType() bool {
 	return false
 }
 
-func (types FieldTypes) NonNullTypes() FieldTypes {
-	var filteredTypes FieldTypes
+func (types Definitions) NonNullTypes() Definitions {
+	var filteredTypes Definitions
 	for _, t := range types {
-		if t.IsNull() {
+		if t.Type == TypeNull {
 			continue
 		}
 
@@ -73,20 +117,16 @@ func (types FieldTypes) NonNullTypes() FieldTypes {
 	return filteredTypes
 }
 
+type TypeConstraint struct {
+	// TODO
+	Op   string
+	Args []any
+}
+
 type EnumValue struct {
+	Type  TypeID
 	Name  string
 	Value interface{}
-}
-
-type FieldType struct {
-	Nullable    bool
-	Type        TypeID
-	SubType     FieldTypes
-	Constraints []TypeConstraint
-}
-
-func (t FieldType) IsNull() bool {
-	return t.Type == TypeNull
 }
 
 type FieldDefinition struct {
@@ -94,21 +134,21 @@ type FieldDefinition struct {
 	Comments []string
 	// Field needs to be defined
 	Required bool
-	Type     FieldType
+	Type     Definition
 	// TODO
 }
 
 type File struct {
 	Package string
-	Types   []TypeDefinition
+	Types   []Definition
 }
 
-func (file *File) EntryPointType() (TypeDefinition, bool) {
+func (file *File) EntryPointType() (Definition, bool) {
 	for _, typeDef := range file.Types {
 		if typeDef.IsEntryPoint {
 			return typeDef, true
 		}
 	}
 
-	return TypeDefinition{}, false
+	return Definition{}, false
 }

@@ -28,7 +28,10 @@ export interface Dashboard {
 	graphTooltip: DashboardCursorSync;
 	// Time range for dashboard.
 	// Accepted values are relative time strings like {from: 'now-6h', to: 'now'} or absolute time strings like {from: '2020-07-10T08:00:00.000Z', to: '2020-07-10T14:00:00.000Z'}.
-	time?: TimeInterval;
+	time?: {
+		from: string;
+		to: string;
+	};
 	// Configuration of the time picker shown at the top of a dashboard.
 	timepicker?: TimePicker;
 	// The month that the fiscal year starts on.  0 = January, 11 = December
@@ -396,7 +399,7 @@ export enum MappingType {
 export interface ValueMap {
 	type: string;
 	// Map with <value_to_match>: ValueMappingResult. For example: { "10": { text: "Perfection!", color: "green" } }
-	options: any;
+	options: Record<string, ValueMappingResult>;
 }
 
 // Maps numerical ranges to a display text and color.
@@ -404,7 +407,14 @@ export interface ValueMap {
 export interface RangeMap {
 	type: string;
 	// Range to match against and the result to apply when the value is within the range
-	options: any;
+	options: {
+		// Min value of the range. It can be null which means -Infinity
+		from: number | null;
+		// Max value of the range. It can be null which means +Infinity
+		to: number | null;
+		// Config to apply when the value is within the range
+		result: ValueMappingResult;
+	};
 }
 
 // Maps regular expressions to replacement text and a color.
@@ -412,7 +422,12 @@ export interface RangeMap {
 export interface RegexMap {
 	type: string;
 	// Regular expression to match against and the result to apply when the value matches the regex
-	options: any;
+	options: {
+		// Regular expression to match against
+		pattern: string;
+		// Config to apply when the value matches the regex
+		result: ValueMappingResult;
+	};
 }
 
 // Maps special values like Null, NaN (not a number), and boolean values like true and false to a display text and color.
@@ -420,7 +435,12 @@ export interface RegexMap {
 // For example, you can configure a special value mapping so that null values appear as N/A.
 export interface SpecialValueMap {
 	type: string;
-	options: any;
+	options: {
+		// Special value to match against
+		match: SpecialValueMatch;
+		// Config to apply when the value matches the special value
+		result: ValueMappingResult;
+	};
 }
 
 // Special value types supported by the `SpecialValueMap`

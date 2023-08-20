@@ -21,16 +21,16 @@ func (jenny GoRawTypes) Generate(file *ast.File) (*codejen.File, error) {
 		return nil, err
 	}
 
-	return codejen.NewFile(file.Package+"_types_gen.go", output, jenny), nil
+	return codejen.NewFile("types/"+file.Package+"_types_gen.go", output, jenny), nil
 }
 
 func (jenny GoRawTypes) generateFile(file *ast.File) ([]byte, error) {
 	var buffer strings.Builder
 	tr := newPreprocessor()
 
-	tr.translateTypes(file.Types)
+	tr.translateDefinitions(file.Types)
 
-	buffer.WriteString(fmt.Sprintf("package %s\n\n", file.Package))
+	buffer.WriteString("package types\n\n")
 
 	for _, typeDef := range tr.sortedTypes() {
 		typeDefGen, err := jenny.formatTypeDef(typeDef)
@@ -45,22 +45,22 @@ func (jenny GoRawTypes) generateFile(file *ast.File) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoRawTypes) formatTypeDef(def ast.TypeDefinition) ([]byte, error) {
-	if def.Type == ast.DefinitionStruct {
+func (jenny GoRawTypes) formatTypeDef(def ast.Definition) ([]byte, error) {
+	if def.Type == ast.TypeStruct {
 		return jenny.formatStructDef(def)
 	}
 
 	return jenny.formatEnumDef(def)
 }
 
-func (jenny GoRawTypes) formatEnumDef(def ast.TypeDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatEnumDef(def ast.Definition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
 		buffer.WriteString(fmt.Sprintf("// %s\n", commentLine))
 	}
 
-	buffer.WriteString(fmt.Sprintf("type %s %s\n", def.Name, def.SubType))
+	buffer.WriteString(fmt.Sprintf("type %s %s\n", def.Name, def.Values[0].Type))
 
 	buffer.WriteString("const (\n")
 	for _, val := range def.Values {
@@ -71,30 +71,35 @@ func (jenny GoRawTypes) formatEnumDef(def ast.TypeDefinition) ([]byte, error) {
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoRawTypes) formatStructDef(def ast.TypeDefinition) ([]byte, error) {
+func (jenny GoRawTypes) formatStructDef(def ast.Definition) ([]byte, error) {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
 		buffer.WriteString(fmt.Sprintf("// %s\n", commentLine))
 	}
 
-	buffer.WriteString(fmt.Sprintf("type %s struct {\n", def.Name))
-
-	for _, fieldDef := range def.Fields {
-		fieldDefGen, err := jenny.formatField(fieldDef)
-		if err != nil {
-			return nil, err
-		}
-
-		buffer.WriteString("\t" + string(fieldDefGen))
-	}
-
-	buffer.WriteString("}\n")
+	buffer.WriteString(fmt.Sprintf("type %s ", def.Name))
+	buffer.WriteString(formatStructBody(def, ""))
+	buffer.WriteString("\n")
 
 	return []byte(buffer.String()), nil
 }
 
-func (jenny GoRawTypes) formatField(def ast.FieldDefinition) ([]byte, error) {
+func formatStructBody(def ast.Definition, typesPkg string) string {
+	var buffer strings.Builder
+
+	buffer.WriteString("struct {\n")
+
+	for _, fieldDef := range def.Fields {
+		buffer.WriteString("\t" + formatField(fieldDef, typesPkg))
+	}
+
+	buffer.WriteString("}")
+
+	return buffer.String()
+}
+
+func formatField(def ast.FieldDefinition, typesPkg string) string {
 	var buffer strings.Builder
 
 	for _, commentLine := range def.Comments {
@@ -109,35 +114,40 @@ func (jenny GoRawTypes) formatField(def ast.FieldDefinition) ([]byte, error) {
 	buffer.WriteString(fmt.Sprintf(
 		"%s %s `json:\"%s%s\"`\n",
 		strings.Title(def.Name),
-		formatType(def.Type, def.Required),
+		formatType(def.Type, def.Required, typesPkg),
 		def.Name,
 		jsonOmitEmpty,
 	))
 
-	return []byte(buffer.String()), nil
+	return buffer.String()
 }
 
-func formatType(def ast.FieldType, fieldIsRequired bool) string {
+func formatType(def ast.Definition, fieldIsRequired bool, typesPkg string) string {
 	if def.Type == ast.TypeAny {
 		return "any"
 	}
 
 	if def.Type == ast.TypeDisjunction {
-		return formatDisjunction(def)
+		return formatDisjunction(def, typesPkg)
 	}
 
 	if def.Type == ast.TypeArray {
-		return formatArray(def)
+		return formatArray(def, typesPkg)
+	}
+
+	if def.Type == ast.TypeMap {
+		return formatMap(def, typesPkg)
+	}
+
+	// anonymous struct
+	if def.Type == ast.TypeStruct {
+		return formatStructBody(def, typesPkg)
 	}
 
 	typeName := string(def.Type)
-	if def.SubType != nil {
-		subTypes := make([]string, 0, len(def.SubType))
-		for _, subType := range def.SubType {
-			subTypes = append(subTypes, formatType(subType, true))
-		}
 
-		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
+	if def.IsReference() && typesPkg != "" {
+		typeName = typesPkg + "." + typeName
 	}
 
 	if def.Nullable || !fieldIsRequired {
@@ -147,31 +157,27 @@ func formatType(def ast.FieldType, fieldIsRequired bool) string {
 	return typeName
 }
 
-func formatArray(def ast.FieldType) string {
-	var subTypeString string
-
-	// we don't know what to do here (yet)
-	if len(def.SubType) != 1 {
-		subTypeString = formatDisjunction(ast.FieldType{
-			SubType: def.SubType,
-		})
-	} else {
-		subTypeString = formatType(def.SubType[0], true)
-	}
+func formatArray(def ast.Definition, typesPkg string) string {
+	subTypeString := formatType(*def.ValueType, true, typesPkg)
 
 	return fmt.Sprintf("[]%s", subTypeString)
 }
 
-func formatDisjunction(def ast.FieldType) string {
-	typeName := string(def.Type)
-	if def.SubType != nil {
-		subTypes := make([]string, 0, len(def.SubType))
-		for _, subType := range def.SubType {
-			subTypes = append(subTypes, formatType(subType, true))
-		}
+func formatMap(def ast.Definition, typesPkg string) string {
+	keyTypeString := def.IndexType
+	valueTypeString := formatType(*def.ValueType, true, typesPkg)
 
-		typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
+	return fmt.Sprintf("map[%s]%s", keyTypeString, valueTypeString)
+}
+
+func formatDisjunction(def ast.Definition, typesPkg string) string {
+	typeName := string(def.Type)
+	subTypes := make([]string, 0, len(def.Branches))
+	for _, subType := range def.Branches {
+		subTypes = append(subTypes, formatType(subType, true, typesPkg))
 	}
+
+	typeName = fmt.Sprintf("%s<%s>", typeName, strings.Join(subTypes, " | "))
 
 	return typeName
 }

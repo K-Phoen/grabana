@@ -1,6 +1,7 @@
 package simplecue
 
 import (
+	"fmt"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -12,6 +13,8 @@ const annotationName = "grabana"
 const hintKindEnum = "enum"
 const annotationKindFieldName = "kind"
 const enumMembersAttr = "memberNames"
+
+var errSkip = fmt.Errorf("skip")
 
 type Config struct {
 	// Package name used to generate code into.
@@ -50,13 +53,22 @@ func GenerateAST(val cue.Value, c Config) (*ast.File, error) {
 	return g.file, nil
 }
 
-func (g *newGenerator) declareTopLevelType(name string, v cue.Value, isCueDefinition bool) (*ast.TypeDefinition, error) {
+func (g *newGenerator) declareTopLevelType(name string, v cue.Value, isCueDefinition bool) (*ast.Definition, error) {
 	typeHint, err := getTypeHint(v)
 	if err != nil {
 		return nil, err
 	}
 
+	// Hinted as an enum
 	if typeHint == hintKindEnum {
+		return g.declareTopLevelEnum(name, v)
+	}
+
+	ik := v.IncompleteKind()
+
+	// Is it a string disjunction that we can turn into an enum?
+	disjunctions := appendSplit(nil, cue.OrOp, v)
+	if len(disjunctions) != 1 && ik&cue.StringKind == ik {
 		return g.declareTopLevelEnum(name, v)
 	}
 
@@ -68,7 +80,7 @@ func (g *newGenerator) declareTopLevelType(name string, v cue.Value, isCueDefini
 	}
 }
 
-func (g *newGenerator) declareTopLevelEnum(name string, v cue.Value) (*ast.TypeDefinition, error) {
+func (g *newGenerator) declareTopLevelEnum(name string, v cue.Value) (*ast.Definition, error) {
 	// Restrict the expression of enums to ints or strings.
 	allowed := cue.StringKind | cue.IntKind
 	ik := v.IncompleteKind()
@@ -81,14 +93,8 @@ func (g *newGenerator) declareTopLevelEnum(name string, v cue.Value) (*ast.TypeD
 		return nil, err
 	}
 
-	subType := ast.TypeString
-	if ik == cue.IntKind {
-		subType = ast.TypeInt64
-	}
-
-	return &ast.TypeDefinition{
-		Type:     ast.DefinitionEnum,
-		SubType:  subType,
+	return &ast.Definition{
+		Type:     ast.TypeEnum,
 		Name:     name,
 		Comments: commentsFromCueValue(v),
 		Values:   values,
@@ -117,6 +123,11 @@ func (g *newGenerator) extractEnumValues(v cue.Value) ([]ast.EnumValue, error) {
 		return nil, errorWithCueRef(v, "numeric enums may only be generated from memberNames attribute")
 	}
 
+	subType := ast.TypeString
+	if v.IncompleteKind() == cue.IntKind {
+		subType = ast.TypeInt64
+	}
+
 	var fields []ast.EnumValue
 	for idx, dv := range dvals {
 		var text string
@@ -135,6 +146,8 @@ func (g *newGenerator) extractEnumValues(v cue.Value) ([]ast.EnumValue, error) {
 			return nil, err
 		}
 		fields = append(fields, ast.EnumValue{
+			Type: subType,
+
 			// Simple mapping of all enum values (which we are assuming are in
 			// lowerCamelCase) to corresponding CamelCase
 			Name:  text,
@@ -145,29 +158,51 @@ func (g *newGenerator) extractEnumValues(v cue.Value) ([]ast.EnumValue, error) {
 	return fields, nil
 }
 
-func (g *newGenerator) declareTopLevelStruct(name string, v cue.Value, isCueDefinition bool) (*ast.TypeDefinition, error) {
+func (g *newGenerator) declareTopLevelStruct(name string, v cue.Value, isCueDefinition bool) (*ast.Definition, error) {
 	// This check might be too restrictive
 	if v.IncompleteKind() != cue.StructKind {
 		return nil, errorWithCueRef(v, "top-level type definitions may only be generated from structs")
 	}
 
-	typeDef := &ast.TypeDefinition{
-		Type:         ast.DefinitionStruct,
+	typeDef := &ast.Definition{
+		Type:         ast.TypeStruct,
 		Name:         name,
 		Comments:     commentsFromCueValue(v),
 		IsEntryPoint: !isCueDefinition,
 	}
 
 	// explore struct fields
+	fields, err := g.structFields(v)
+	if err != nil {
+		return nil, err
+	}
+
+	typeDef.Fields = fields
+
+	return typeDef, nil
+}
+
+func (g *newGenerator) structFields(v cue.Value) ([]ast.FieldDefinition, error) {
+	// This check might be too restrictive
+	if v.IncompleteKind() != cue.StructKind {
+		return nil, errorWithCueRef(v, "top-level type definitions may only be generated from structs")
+	}
+
+	var fields []ast.FieldDefinition
+
+	// explore struct fields
 	for i, _ := v.Fields(cue.Optional(true), cue.Definitions(true)); i.Next(); {
 		fieldLabel := selectorLabel(i.Selector())
 
 		node, err := g.declareNode(i.Value())
+		if err == errSkip {
+			continue
+		}
 		if err != nil {
 			return nil, err
 		}
 
-		typeDef.Fields = append(typeDef.Fields, ast.FieldDefinition{
+		fields = append(fields, ast.FieldDefinition{
 			Name:     fieldLabel,
 			Comments: commentsFromCueValue(i.Value()),
 			Required: !i.IsOptional(),
@@ -175,16 +210,17 @@ func (g *newGenerator) declareTopLevelStruct(name string, v cue.Value, isCueDefi
 		})
 	}
 
-	return typeDef, nil
+	return fields, nil
 }
 
-func (g *newGenerator) declareNode(v cue.Value) (*ast.FieldType, error) {
+func (g *newGenerator) declareNode(v cue.Value) (*ast.Definition, error) {
 	// This node is referring to another definition
 	_, path := v.ReferencePath()
 	if path.String() != "" {
-		return &ast.FieldType{
-			Nullable: false, // TODO
-			Type:     ast.TypeID(path.String()[1:]),
+		selectors := path.Selectors()
+
+		return &ast.Definition{
+			Type: ast.TypeID(selectorLabel(selectors[len(selectors)-1])),
 		}, nil
 	}
 
@@ -196,7 +232,7 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.FieldType, error) {
 			return g.declareAnonymousEnum(v)
 		}
 
-		subTypes := make([]ast.FieldType, 0, len(disjunctions))
+		subTypes := make([]ast.Definition, 0, len(disjunctions))
 		for _, subTypeValue := range disjunctions {
 			subType, err := g.declareNode(subTypeValue)
 			if err != nil {
@@ -206,10 +242,10 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.FieldType, error) {
 			subTypes = append(subTypes, *subType)
 		}
 
-		return &ast.FieldType{
+		return &ast.Definition{
 			Type:     ast.TypeDisjunction,
-			SubType:  subTypes,
-			Nullable: false, // TODO
+			Branches: subTypes,
+			Nullable: false,
 		}, nil
 	}
 
@@ -222,34 +258,74 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.FieldType, error) {
 
 	switch v.IncompleteKind() {
 	case cue.TopKind:
-		return &ast.FieldType{Type: ast.TypeAny}, nil
+		return &ast.Definition{Type: ast.TypeAny}, nil
 	case cue.NullKind:
-		return &ast.FieldType{Type: ast.TypeNull}, nil
+		return &ast.Definition{Type: ast.TypeNull}, nil
 	case cue.BoolKind:
-		return &ast.FieldType{Type: ast.TypeBool}, nil
+		return &ast.Definition{Type: ast.TypeBool}, nil
 	case cue.BytesKind:
-		return &ast.FieldType{Type: ast.TypeBytes}, nil
+		return &ast.Definition{Type: ast.TypeBytes}, nil
 	case cue.StringKind:
-		return &ast.FieldType{Type: ast.TypeString}, nil
+		return &ast.Definition{Type: ast.TypeString}, nil
 	case cue.FloatKind, cue.NumberKind, cue.IntKind:
 		return g.declareNumber(v)
 	case cue.ListKind:
 		return g.declareList(v)
 	case cue.StructKind:
-		op, _ := v.Expr()
+		pathParts := v.Path().Selectors()
+		selector := pathParts[len(pathParts)-1]
 
-		// in cue: {...}
-		if op == cue.NoOp {
-			return &ast.FieldType{Type: ast.TypeAny}, nil
+		// inline definition of a struct
+		if selector.IsDefinition() {
+			def, err := g.declareTopLevelStruct(selectorLabel(selector), v, true)
+			if err != nil {
+				return nil, err
+			}
+
+			g.file.Types = append(g.file.Types, *def)
+
+			return nil, errSkip
 		}
 
-		return nil, errorWithCueRef(v, "nested struct definitions are not supported")
+		op, opArgs := v.Expr()
+
+		// in cue: {...}, {[string]: type}, or inline struct
+
+		if op == cue.NoOp {
+			// looking for {[string]: type}
+			// (don't know how to do this properly)
+			t, ok := opArgs[0].Elem()
+			if ok && t.IncompleteKind() != cue.TopKind {
+				typeDef, err := g.declareNode(t)
+				if err != nil {
+					return nil, err
+				}
+
+				return &ast.Definition{
+					Type:      ast.TypeMap,
+					IndexType: ast.TypeString,
+					ValueType: typeDef,
+				}, nil
+			}
+		}
+
+		fields, err := g.structFields(v)
+		if err != nil {
+			return nil, err
+		}
+
+		// {...}
+		if len(fields) == 0 {
+			return &ast.Definition{Type: ast.TypeAny}, nil
+		}
+
+		return &ast.Definition{Type: ast.TypeStruct, Fields: fields}, nil
 	default:
 		return nil, errorWithCueRef(v, "unexpected node with kind '%s'", v.IncompleteKind().String())
 	}
 }
 
-func (g *newGenerator) declareAnonymousEnum(v cue.Value) (*ast.FieldType, error) {
+func (g *newGenerator) declareAnonymousEnum(v cue.Value) (*ast.Definition, error) {
 	fieldName, ok := v.Label()
 	if !ok {
 		return nil, errorWithCueRef(v, "could not determine field name")
@@ -263,12 +339,12 @@ func (g *newGenerator) declareAnonymousEnum(v cue.Value) (*ast.FieldType, error)
 
 	g.file.Types = append(g.file.Types, *enumType)
 
-	return &ast.FieldType{
+	return &ast.Definition{
 		Type: ast.TypeID(enumType.Name),
 	}, nil
 }
 
-func (g *newGenerator) declareNumber(v cue.Value) (*ast.FieldType, error) {
+func (g *newGenerator) declareNumber(v cue.Value) (*ast.Definition, error) {
 	numberTypeWithConstraintsAsString, err := format.Node(v.Syntax())
 	if err != nil {
 		return nil, err
@@ -299,7 +375,7 @@ func (g *newGenerator) declareNumber(v cue.Value) (*ast.FieldType, error) {
 		return nil, errorWithCueRef(v, "unknown number type '%s'", parts[0])
 	}
 
-	typeDef := &ast.FieldType{
+	typeDef := &ast.Definition{
 		Type:     numberType,
 		Nullable: false,
 	}
@@ -375,28 +451,36 @@ func (g *newGenerator) extractConstraint(v cue.Value) (ast.TypeConstraint, error
 	}
 }
 
-func (g *newGenerator) declareList(v cue.Value) (*ast.FieldType, error) {
+func (g *newGenerator) declareList(v cue.Value) (*ast.Definition, error) {
 	i, err := v.List()
 	if err != nil {
 		return nil, err
 	}
 
-	typeDef := &ast.FieldType{
-		Type:        ast.TypeArray,
-		Nullable:    false,
-		SubType:     nil,
-		Constraints: nil,
+	typeDef := &ast.Definition{
+		Type:      ast.TypeArray,
+		IndexType: ast.TypeInt64,
+
+		// FIXME: we set a default type because our logic is broken
+		ValueType: &ast.Definition{
+			Type: ast.TypeAny,
+		},
+
+		Nullable: false,
+		//SubType:     nil,
+		//Constraints: nil,
 	}
 
 	// works only for a closed/concrete list
 	if v.IsConcrete() {
+		// TODO
 		for i.Next() {
 			node, err := g.declareNode(i.Value())
 			if err != nil {
 				return nil, err
 			}
 
-			typeDef.SubType = append(typeDef.SubType, *node)
+			typeDef.ValueType = node
 		}
 
 		return typeDef, nil
@@ -424,7 +508,7 @@ func (g *newGenerator) declareList(v cue.Value) (*ast.FieldType, error) {
 		return nil, err
 	}
 
-	typeDef.SubType = []ast.FieldType{*expr}
+	typeDef.ValueType = expr
 
 	return typeDef, nil
 }

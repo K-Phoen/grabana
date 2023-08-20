@@ -3,16 +3,18 @@ package dashboard
 import (
 	"encoding/json"
 	"errors"
+
+	"github.com/K-Phoen/grabana/gen/dashboard/types"
 )
 
 type Option func(builder *Builder) error
 
 type Builder struct {
-	internal *Dashboard
+	internal *types.Dashboard
 }
 
 func New(title string, options ...Option) (Builder, error) {
-	dashboard := &Dashboard{
+	dashboard := &types.Dashboard{
 		Title: &title,
 	}
 
@@ -107,7 +109,7 @@ func Tags(tags []string) Option {
 	}
 }
 
-func Style(style DashboardStyle) Option {
+func Style(style types.DashboardStyle) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Style = style
@@ -134,7 +136,7 @@ func Editable(editable bool) Option {
 	}
 }
 
-func GraphTooltip(graphTooltip DashboardCursorSync) Option {
+func GraphTooltip(graphTooltip types.DashboardCursorSync) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.GraphTooltip = graphTooltip
@@ -143,16 +145,19 @@ func GraphTooltip(graphTooltip DashboardCursorSync) Option {
 	}
 }
 
-func Time(time TimeInterval) Option {
+func Time(time struct {
+	From string `json:"from"`
+	To   string `json:"to"`
+}) Option {
 	return func(builder *Builder) error {
 
-		builder.internal.Time = &time
+		builder.internal.Time = time
 
 		return nil
 	}
 }
 
-func Timepicker(timepicker TimePicker) Option {
+func Timepicker(timepicker types.TimePicker) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Timepicker = &timepicker
@@ -191,7 +196,7 @@ func WeekStart(weekStart string) Option {
 	}
 }
 
-func Refresh(refresh StringOrBool) Option {
+func Refresh(refresh types.StringOrBool) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Refresh = &refresh
@@ -218,7 +223,7 @@ func Version(version uint32) Option {
 	}
 }
 
-func Panels(panels []RowPanel) Option {
+func Panels(panels []types.RowPanel) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Panels = panels
@@ -227,7 +232,7 @@ func Panels(panels []RowPanel) Option {
 	}
 }
 
-func Templating(templating DashboardTemplating) Option {
+func Templating(templating types.DashboardTemplating) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Templating = &templating
@@ -236,7 +241,7 @@ func Templating(templating DashboardTemplating) Option {
 	}
 }
 
-func Annotations(annotations AnnotationContainer) Option {
+func Annotations(annotations types.AnnotationContainer) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Annotations = &annotations
@@ -245,7 +250,7 @@ func Annotations(annotations AnnotationContainer) Option {
 	}
 }
 
-func Links(links []DashboardLink) Option {
+func Links(links []types.DashboardLink) Option {
 	return func(builder *Builder) error {
 
 		builder.internal.Links = links
