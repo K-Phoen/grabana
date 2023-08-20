@@ -125,6 +125,25 @@ func cueConcreteToScalar(v cue.Value) (interface{}, error) {
 		return v.Int64()
 	case cue.BoolKind:
 		return v.Bool()
+	case cue.ListKind:
+		var values []any
+		it, err := v.List()
+		if err != nil {
+			return nil, errorWithCueRef(v, "can create list iterator: %s", v.Kind())
+		}
+
+		for it.Next() {
+			current := it.Value()
+
+			val, err := cueConcreteToScalar(current)
+			if err != nil {
+				return nil, err
+			}
+
+			values = append(values, val)
+		}
+
+		return values, nil
 	default:
 		return nil, errorWithCueRef(v, "can not convert kind to scalar: %s", v.Kind())
 	}

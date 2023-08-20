@@ -589,9 +589,17 @@ func (g *newGenerator) declareList(v cue.Value) (*ast.Definition, error) {
 		Nullable: false,
 	}
 
+	// Extract the default value if it's there
+	defVal, err := g.extractDefault(v)
+	if err != nil {
+		return nil, err
+	}
+
+	typeDef.Default = defVal
+
 	// works only for a closed/concrete list
 	if v.IsConcrete() {
-		// TODO
+		// fixme: this is wrong
 		for i.Next() {
 			node, err := g.declareNode(i.Value())
 			if err != nil {
