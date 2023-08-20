@@ -145,8 +145,10 @@ func GraphTooltip(graphTooltip types.DashboardCursorSync) Option {
 }
 
 func Time(time struct {
+	// Default: "now-6h"
 	From string `json:"from"`
-	To   string `json:"to"`
+	// Default: "now"
+	To string `json:"to"`
 }) Option {
 	return func(builder *Builder) error {
 

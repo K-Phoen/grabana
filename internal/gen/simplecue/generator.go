@@ -255,7 +255,7 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.Definition, error) {
 	case cue.NullKind:
 		return &ast.Definition{Kind: ast.KindNull}, nil
 	case cue.BoolKind:
-		return &ast.Definition{Kind: ast.KindBool}, nil
+		return g.declareBool(v)
 	case cue.BytesKind:
 		return &ast.Definition{Kind: ast.KindBytes}, nil
 	case cue.StringKind:
@@ -337,21 +337,37 @@ func (g *newGenerator) declareAnonymousEnum(v cue.Value) (*ast.Definition, error
 	}, nil
 }
 
+func (g *newGenerator) declareBool(v cue.Value) (*ast.Definition, error) {
+	typeDef := &ast.Definition{
+		Kind: ast.KindBool,
+	}
+
+	// Extract the default value if it's there
+	defaultVal, ok := v.Default()
+	if ok {
+		defaultValBool, err := defaultVal.Bool()
+		if err != nil {
+			return nil, errorWithCueRef(v, "could not convert concrete value to bool")
+		}
+
+		typeDef.Default = defaultValBool
+	}
+
+	return typeDef, nil
+}
+
 func (g *newGenerator) declareString(v cue.Value) (*ast.Definition, error) {
 	typeDef := &ast.Definition{
 		Kind: ast.KindString,
 	}
 
 	// Extract the default value if it's there
-	defaultVal, ok := v.Default()
-	if ok {
-		defaultValStr, err := defaultVal.String()
-		if err != nil {
-			return nil, errorWithCueRef(v, "could not convert concrete value to string")
-		}
-
-		typeDef.Default = defaultValStr
+	defVal, err := g.extractDefault(v)
+	if err != nil {
+		return nil, err
 	}
+
+	typeDef.Default = defVal
 
 	// Extract constraints
 	constraints, err := g.declareStringConstraints(v)
@@ -362,6 +378,20 @@ func (g *newGenerator) declareString(v cue.Value) (*ast.Definition, error) {
 	typeDef.Constraints = constraints
 
 	return typeDef, nil
+}
+
+func (g *newGenerator) extractDefault(v cue.Value) (any, error) {
+	defaultVal, ok := v.Default()
+	if !ok {
+		return nil, nil
+	}
+
+	def, err := cueConcreteToScalar(defaultVal)
+	if err != nil {
+		return nil, err
+	}
+
+	return def, nil
 }
 
 func (g *newGenerator) declareStringConstraints(v cue.Value) ([]ast.TypeConstraint, error) {
@@ -462,15 +492,12 @@ func (g *newGenerator) declareNumber(v cue.Value) (*ast.Definition, error) {
 	}
 
 	// Extract the default value if it's there
-	defaultVal, ok := v.Default()
-	if ok {
-		scalar, err := cueConcreteToScalar(defaultVal)
-		if err != nil {
-			return nil, err
-		}
-
-		typeDef.Default = scalar
+	defVal, err := g.extractDefault(v)
+	if err != nil {
+		return nil, err
 	}
+
+	typeDef.Default = defVal
 
 	// extract constraints
 	constraints, err := g.declareNumberConstraints(v)
@@ -560,8 +587,6 @@ func (g *newGenerator) declareList(v cue.Value) (*ast.Definition, error) {
 		},
 
 		Nullable: false,
-		//SubType:     nil,
-		//Constraints: nil,
 	}
 
 	// works only for a closed/concrete list

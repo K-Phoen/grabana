@@ -11,6 +11,7 @@ type AnnotationContainer struct {
 
 type AnnotationPanelFilter struct {
 	// Should the specified panels be included or excluded
+	// Default: false
 	Exclude *bool `json:"exclude,omitempty"`
 	// Panel IDs that should be included or excluded
 	Ids []uint8 `json:"ids"`
@@ -24,9 +25,11 @@ type AnnotationQuery struct {
 	// Datasource where the annotations data is
 	Datasource DataSourceRef `json:"datasource"`
 	// When enabled the annotation query is issued with every dashboard refresh
+	// Default: true
 	Enable bool `json:"enable"`
 	// Annotation queries can be toggled on or off at the top of the dashboard.
 	// When hide is true, the toggle is not shown in the dashboard.
+	// Default: false
 	Hide *bool `json:"hide,omitempty"`
 	// Color to use for the annotation event markers
 	IconColor string `json:"iconColor"`
@@ -77,8 +80,10 @@ type Dashboard struct {
 	// Default value: dark.
 	Style DashboardStyle `json:"style"`
 	// Timezone of dashboard. Accepted values are IANA TZDB zone ID or "browser" or "utc".
+	// Default: "browser"
 	Timezone *string `json:"timezone,omitempty"`
 	// Whether a dashboard is editable or not.
+	// Default: true
 	Editable bool `json:"editable"`
 	// Configuration of dashboard cursor sync behavior.
 	// Accepted values are 0 (sync turned off), 1 (shared crosshair), 2 (shared crosshair and tooltip).
@@ -86,12 +91,15 @@ type Dashboard struct {
 	// Time range for dashboard.
 	// Accepted values are relative time strings like {from: 'now-6h', to: 'now'} or absolute time strings like {from: '2020-07-10T08:00:00.000Z', to: '2020-07-10T14:00:00.000Z'}.
 	Time struct {
+		// Default: "now-6h"
 		From string `json:"from"`
-		To   string `json:"to"`
+		// Default: "now"
+		To string `json:"to"`
 	} `json:"time,omitempty"`
 	// Configuration of the time picker shown at the top of a dashboard.
 	Timepicker *TimePicker `json:"timepicker,omitempty"`
 	// The month that the fiscal year starts on.  0 = January, 11 = December
+	// Default: 0
 	FiscalYearStartMonth *uint8 `json:"fiscalYearStartMonth,omitempty"`
 	// When set to true, the dashboard will redraw panels at an interval matching the pixel width.
 	// This will keep data "moving left" regardless of the query refresh rate. This setting helps
@@ -103,6 +111,7 @@ type Dashboard struct {
 	Refresh *StringOrBool `json:"refresh,omitempty"`
 	// Version of the JSON schema, incremented each time a Grafana update brings
 	// changes to said schema.
+	// Default: 36
 	SchemaVersion uint16 `json:"schemaVersion"`
 	// Version of the dashboard, incremented each time the dashboard is updated.
 	Version *uint32 `json:"version,omitempty"`
@@ -145,12 +154,16 @@ type DashboardLink struct {
 	// List of tags to limit the linked dashboards. If empty, all dashboards will be displayed. Only valid if the type is dashboards
 	Tags []string `json:"tags"`
 	// If true, all dashboards links will be displayed in a dropdown. If false, all dashboards links will be displayed side by side. Only valid if the type is dashboards
+	// Default: false
 	AsDropdown bool `json:"asDropdown"`
 	// If true, the link will be opened in a new tab
+	// Default: false
 	TargetBlank bool `json:"targetBlank"`
 	// If true, includes current template variables values in the link as query params
+	// Default: false
 	IncludeVars bool `json:"includeVars"`
 	// If true, includes current time range in the link as query params
+	// Default: false
 	KeepTime bool `json:"keepTime"`
 }
 
@@ -198,6 +211,7 @@ type DataTransformerConfig struct {
 }
 
 type DynamicConfigValue struct {
+	// Default: ""
 	Id    string `json:"id"`
 	Value any    `json:"value,omitempty"`
 }
@@ -333,12 +347,16 @@ type FieldConfigSourceOverride struct {
 // Position and dimensions of a panel in the grid
 type GridPos struct {
 	// Panel height. The height is the number of rows from the top edge of the panel.
+	// Default: 9
 	H uint32 `json:"h"`
 	// Panel width. The width is the number of columns from the left edge of the panel.
+	// Default: 12
 	W uint32 `json:"w"`
 	// Panel x. The x coordinate is the number of columns from the left edge of the grid
+	// Default: 0
 	X uint32 `json:"x"`
 	// Panel y. The y coordinate is the number of rows from the top edge of the grid
+	// Default: 0
 	Y uint32 `json:"y"`
 	// Whether the panel is fixed within the grid. If true, the panel will not be affected by other panels' interactions
 	Static *bool `json:"static,omitempty"`
@@ -384,6 +402,7 @@ const (
 // It comes with in id ( to resolve implementation from registry) and a configuration that’s specific to a particular matcher type.
 type MatcherConfig struct {
 	// The matcher id. This is used to find the matcher implementation from registry.
+	// Default: ""
 	Id string `json:"id"`
 	// The matcher options. This is specific to the matcher implementation.
 	Options any `json:"options,omitempty"`
@@ -406,6 +425,7 @@ type Panel struct {
 	// Panel description.
 	Description *string `json:"description,omitempty"`
 	// Whether to display the panel without a background.
+	// Default: false
 	Transparent bool `json:"transparent"`
 	// The datasource used in all targets.
 	Datasource *DataSourceRef `json:"datasource,omitempty"`
@@ -493,6 +513,7 @@ type RowPanel struct {
 	// The panel type
 	Type string `json:"type"`
 	// Whether this row should be collapsed or not.
+	// Default: false
 	Collapsed bool `json:"collapsed"`
 	// Row title
 	Title *string `json:"title,omitempty"`
@@ -580,18 +601,23 @@ const (
 )
 
 type TimeInterval struct {
+	// Default: "now-6h"
 	From string `json:"from"`
-	To   string `json:"to"`
+	// Default: "now"
+	To string `json:"to"`
 }
 
 type TimePicker struct {
 	// Whether timepicker is visible or not.
+	// Default: false
 	Hidden bool `json:"hidden"`
 	// Interval options available in the refresh picker dropdown.
 	Refresh_intervals []string `json:"refresh_intervals"`
 	// Whether timepicker is collapsed or not. Has no effect on provisioned dashboard.
+	// Default: false
 	Collapse bool `json:"collapse"`
 	// Whether timepicker is enabled or not. Has no effect on provisioned dashboard.
+	// Default: true
 	Enable bool `json:"enable"`
 	// Selectable options available in the time picker dropdown. Has no effect on provisioned dashboard.
 	Time_options []string `json:"time_options"`
@@ -637,6 +663,7 @@ const (
 // A variable is a placeholder for a value. You can use variables in metric queries and in panel titles.
 type VariableModel struct {
 	// Unique numeric identifier for the variable.
+	// Default: "00000000-0000-0000-0000-000000000000"
 	Id string `json:"id"`
 	// Type of variable
 	Type VariableType `json:"type"`
@@ -647,6 +674,7 @@ type VariableModel struct {
 	// Visibility configuration for the variable
 	Hide VariableHide `json:"hide"`
 	// Whether the variable value should be managed by URL query params or not
+	// Default: false
 	SkipUrlSync bool `json:"skipUrlSync"`
 	// Description of variable. It can be defined but `null`.
 	Description *string `json:"description,omitempty"`
@@ -659,6 +687,7 @@ type VariableModel struct {
 	// Shows current selected variable text/value on the dashboard
 	Current *VariableOption `json:"current,omitempty"`
 	// Whether multiple values can be selected or not from variable value list
+	// Default: false
 	Multi *bool `json:"multi,omitempty"`
 	// Options that can be selected for a variable.
 	Options []VariableOption `json:"options,omitempty"`

@@ -106,6 +106,10 @@ func formatField(def ast.FieldDefinition, typesPkg string) string {
 		buffer.WriteString(fmt.Sprintf("// %s\n", commentLine))
 	}
 
+	if def.Type.Default != nil {
+		buffer.WriteString(fmt.Sprintf("// Default: %#v\n", def.Type.Default))
+	}
+
 	jsonOmitEmpty := ""
 	if !def.Required {
 		jsonOmitEmpty = ",omitempty"
