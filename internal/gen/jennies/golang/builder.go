@@ -141,10 +141,20 @@ func (jenny GoBuilder) constraints(argumentName string, constraints []ast.TypeCo
 func (jenny GoBuilder) constraint(argumentName string, constraint ast.TypeConstraint) string {
 	var buffer strings.Builder
 
-	// FIXME
-	buffer.WriteString(fmt.Sprintf("if !(%[1]s %[2]s %[3]v) {\n", argumentName, constraint.Op, constraint.Args[0]))
+	buffer.WriteString(fmt.Sprintf("if !(%s) {\n", jenny.constraintComparison(argumentName, constraint)))
 	buffer.WriteString(fmt.Sprintf("return errors.New(\"%[1]s must be %[2]s %[3]v\")\n", argumentName, constraint.Op, constraint.Args[0]))
 	buffer.WriteString("}\n")
 
 	return buffer.String()
+}
+
+func (jenny GoBuilder) constraintComparison(argumentName string, constraint ast.TypeConstraint) string {
+	if constraint.Op == "minLength" {
+		return fmt.Sprintf("len([]rune(%[1]s)) >= %[2]v", argumentName, constraint.Args[0])
+	}
+	if constraint.Op == "maxLength" {
+		return fmt.Sprintf("len([]rune(%[1]s)) <= %[2]v", argumentName, constraint.Args[0])
+	}
+
+	return fmt.Sprintf("%[1]s %[2]s %[3]v", argumentName, constraint.Op, constraint.Args[0])
 }

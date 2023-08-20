@@ -266,7 +266,7 @@ func (g *newGenerator) declareNode(v cue.Value) (*ast.Definition, error) {
 	case cue.BytesKind:
 		return &ast.Definition{Type: ast.TypeBytes}, nil
 	case cue.StringKind:
-		return &ast.Definition{Type: ast.TypeString}, nil
+		return g.declareString(v)
 	case cue.FloatKind, cue.NumberKind, cue.IntKind:
 		return g.declareNumber(v)
 	case cue.ListKind:
@@ -342,6 +342,82 @@ func (g *newGenerator) declareAnonymousEnum(v cue.Value) (*ast.Definition, error
 	return &ast.Definition{
 		Type: ast.TypeID(enumType.Name),
 	}, nil
+}
+
+func (g *newGenerator) declareString(v cue.Value) (*ast.Definition, error) {
+	typeDef := &ast.Definition{
+		Type: ast.TypeString,
+	}
+
+	constraints, err := g.declareStringConstraints(v)
+	if err != nil {
+		return nil, err
+	}
+
+	typeDef.Constraints = constraints
+
+	return typeDef, nil
+}
+
+func (g *newGenerator) declareStringConstraints(v cue.Value) ([]ast.TypeConstraint, error) {
+	typeAndConstraints := appendSplit(nil, cue.AndOp, v)
+
+	// nothing to do
+	if len(typeAndConstraints) == 1 {
+		return nil, nil
+	}
+
+	// the constraint allows cue to infer a concrete value
+	// ex: #SomeEnumType & "some value from the enum"
+	if v.IsConcrete() {
+		stringVal, err := v.String()
+		if err != nil {
+			return nil, errorWithCueRef(v, "could not convert concrete value to string")
+		}
+
+		return []ast.TypeConstraint{
+			{
+				Op:   "==",
+				Args: []any{stringVal},
+			},
+		}, nil
+	}
+
+	constraints := make([]ast.TypeConstraint, 0, len(typeAndConstraints))
+
+	for _, andExpr := range typeAndConstraints {
+		op, args := andExpr.Expr()
+
+		switch op {
+		case cue.CallOp:
+			switch fmt.Sprint(args[0]) {
+			case "strings.MinRunes":
+				scalar, err := cueConcreteToScalar(args[1])
+				if err != nil {
+					return nil, err
+				}
+
+				constraints = append(constraints, ast.TypeConstraint{
+					Op:   "minLength",
+					Args: []any{scalar},
+				})
+
+			case "strings.MaxRunes":
+				scalar, err := cueConcreteToScalar(args[1])
+				if err != nil {
+					return nil, err
+				}
+
+				constraints = append(constraints, ast.TypeConstraint{
+					Op:   "maxLength",
+					Args: []any{scalar},
+				})
+				// TODO: support more OPs?
+			}
+		}
+	}
+
+	return constraints, nil
 }
 
 func (g *newGenerator) declareNumber(v cue.Value) (*ast.Definition, error) {
