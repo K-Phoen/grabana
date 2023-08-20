@@ -461,6 +461,18 @@ func (g *newGenerator) declareNumber(v cue.Value) (*ast.Definition, error) {
 		Nullable: false,
 	}
 
+	// Extract the default value if it's there
+	defaultVal, ok := v.Default()
+	if ok {
+		scalar, err := cueConcreteToScalar(defaultVal)
+		if err != nil {
+			return nil, err
+		}
+
+		typeDef.Default = scalar
+	}
+
+	// extract constraints
 	constraints, err := g.declareNumberConstraints(v)
 	if err != nil {
 		return nil, err
