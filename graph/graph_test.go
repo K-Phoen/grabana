@@ -74,7 +74,7 @@ func TestGraphPanelCanHaveStackdriverTargets(t *testing.T) {
 func TestGraphPanelCanHaveCloudwatchTargets(t *testing.T) {
 	req := require.New(t)
 
-	query := cloudwatch.CloudwatchQueryParams{
+	query := cloudwatch.QueryParams{
 		Dimensions: map[string]string{
 			"QueueName": "test-queue",
 		},

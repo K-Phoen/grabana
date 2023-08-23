@@ -134,7 +134,7 @@ func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 }
 
 // WithCloudwatchTarget adds a cloudwatch query to the table.
-func WithCloudwatchTarget(queryParams cloudwatch.CloudwatchQueryParams, options ...cloudwatch.Option) Option {
+func WithCloudwatchTarget(queryParams cloudwatch.QueryParams, options ...cloudwatch.Option) Option {
 	target := cloudwatch.New(queryParams, options...)
 
 	return func(graph *Table) error {

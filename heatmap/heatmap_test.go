@@ -73,7 +73,7 @@ func TestHeatmapPanelCanHaveStackdriverTargets(t *testing.T) {
 func TestHeatmapPanelCanHaveCloudwatchTargets(t *testing.T) {
 	req := require.New(t)
 
-	query := cloudwatch.CloudwatchQueryParams{
+	query := cloudwatch.QueryParams{
 		Dimensions: map[string]string{
 			"QueueName": "test-queue",
 		},

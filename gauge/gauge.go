@@ -179,8 +179,8 @@ func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 	}
 }
 
-// WithCloudwatchTarget adds a cloudwatch query to the guage.
-func WithCloudwatchTarget(queryParams cloudwatch.CloudwatchQueryParams, options ...cloudwatch.Option) Option {
+// WithCloudwatchTarget adds a cloudwatch query to the gauge.
+func WithCloudwatchTarget(queryParams cloudwatch.QueryParams, options ...cloudwatch.Option) Option {
 	target := cloudwatch.New(queryParams, options...)
 
 	return func(graph *Gauge) error {

@@ -10,7 +10,7 @@ import (
 func TestQueriesCanBeCreated(t *testing.T) {
 	req := require.New(t)
 
-	query := &cloudwatch.CloudwatchQueryParams{
+	query := &cloudwatch.QueryParams{
 		Dimensions: map[string]string{
 			"QueueName": "test-queue",
 		},
@@ -34,7 +34,7 @@ func TestQueriesCanBeCreated(t *testing.T) {
 func TestRefCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	query := &cloudwatch.CloudwatchQueryParams{}
+	query := &cloudwatch.QueryParams{}
 
 	target := cloudwatch.New(*query, cloudwatch.Ref("A"))
 
@@ -44,7 +44,7 @@ func TestRefCanBeConfigured(t *testing.T) {
 func TestRefCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
-	query := &cloudwatch.CloudwatchQueryParams{}
+	query := &cloudwatch.QueryParams{}
 
 	target := cloudwatch.New(*query, cloudwatch.Hide())
 

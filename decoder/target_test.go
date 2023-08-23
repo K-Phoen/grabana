@@ -346,7 +346,7 @@ func TestGraphiteHiddenTarget(t *testing.T) {
 func TestCloudwatchTarget(t *testing.T) {
 	req := require.New(t)
 
-	query := cloudwatch.CloudwatchQueryParams{}
+	query := cloudwatch.QueryParams{}
 	opts := CloudwatchTarget{
 		QueryParams: query,
 	}.toOptions()
@@ -358,7 +358,7 @@ func TestCloudwatchTarget(t *testing.T) {
 func TestCloudwatchHiddenTarget(t *testing.T) {
 	req := require.New(t)
 
-	query := cloudwatch.CloudwatchQueryParams{}
+	query := cloudwatch.QueryParams{}
 
 	opts := CloudwatchTarget{Hidden: true}.toOptions()
 	target := cloudwatch.New(query, opts...)

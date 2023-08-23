@@ -10,7 +10,7 @@ type Cloudwatch struct {
 	Builder *sdk.Target
 }
 
-type CloudwatchQueryParams struct {
+type QueryParams struct {
 	Dimensions map[string]string `yaml:",omitempty"`
 	Statistics []string          `yaml:",omitempty"`
 	Namespace  string            `yaml:",omitempty"`
@@ -19,7 +19,7 @@ type CloudwatchQueryParams struct {
 	Region     string            `yaml:",omitempty"`
 }
 
-func New(target CloudwatchQueryParams, options ...Option) *Cloudwatch {
+func New(target QueryParams, options ...Option) *Cloudwatch {
 	cloudwatch := &Cloudwatch{
 		Builder: &sdk.Target{
 			Namespace:  target.Namespace,

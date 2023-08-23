@@ -329,9 +329,9 @@ func (t StackdriverAlignment) toOption() (stackdriver.Option, error) {
 }
 
 type CloudwatchTarget struct {
-	QueryParams cloudwatch.CloudwatchQueryParams `yaml:",omitempty"`
-	Ref         string                           `yaml:",omitempty"`
-	Hidden      bool                             `yaml:",omitempty"`
+	QueryParams cloudwatch.QueryParams `yaml:",omitempty"`
+	Ref         string                 `yaml:",omitempty"`
+	Hidden      bool                   `yaml:",omitempty"`
 }
 
 func (t CloudwatchTarget) toOptions() []cloudwatch.Option {
