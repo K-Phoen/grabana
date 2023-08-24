@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/stat"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -76,4 +78,25 @@ func TestStatValidColorMode(t *testing.T) {
 			req.Equal(tc.expected, statPanel.Builder.StatPanel.Options.ColorMode)
 		})
 	}
+}
+
+func TestStatCloudwatchTarget(t *testing.T) {
+	panel := DashboardStat{
+		Title: "Stat target test",
+		Targets: []Target{
+			{
+				Cloudwatch: &CloudwatchTarget{
+					QueryParams: cloudwatch.QueryParams{
+						Dimensions: map[string]string{
+							"Name": "test",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	option, err := panel.target(panel.Targets[0])
+	assert.NoError(t, err)
+	assert.NotNil(t, option)
 }

@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/gauge"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -44,4 +46,26 @@ func TestGaugeValidValueTypes(t *testing.T) {
 			req.Equal(tc.expected, gaugePanel.Builder.GaugePanel.Options.ReduceOptions.Calcs[0])
 		})
 	}
+}
+
+func TestGaugeCloudwatchTarget(t *testing.T) {
+
+	panel := DashboardGauge{
+		Title: "cloudwatch target test",
+		Targets: []Target{
+			{
+				Cloudwatch: &CloudwatchTarget{
+					QueryParams: cloudwatch.QueryParams{
+						Dimensions: map[string]string{
+							"Name": "test",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	option, err := panel.target(panel.Targets[0])
+	assert.NoError(t, err)
+	assert.NotNil(t, option)
 }
