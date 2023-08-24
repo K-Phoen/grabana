@@ -123,6 +123,7 @@ type AlertStackdriver struct {
 	Ref      string `yaml:",omitempty"`
 	Lookback string `yaml:",omitempty"`
 
+	Project      string `yaml:",omitempty"`
 	Type         string
 	Metric       string
 	Filters      StackdriverAlertFilters    `yaml:",omitempty"`
@@ -193,6 +194,10 @@ func (t AlertStackdriver) targetOptions() ([]stackdriver.Option, error) {
 
 	if len(t.GroupBy) != 0 {
 		opts = append(opts, stackdriver.GroupBys(t.GroupBy...))
+	}
+
+	if t.Project != "" {
+		opts = append(opts, stackdriver.Project(t.Project))
 	}
 
 	if t.Aggregation != "" {

@@ -1,5 +1,5 @@
-github.com/K-Phoen/sdk v0.12.2 h1:0QofDlKE+lloyBOzhjEEMW21061zts/WIpfpQ5NLLAs=
-github.com/K-Phoen/sdk v0.12.2/go.mod h1:qmM0wO23CtoDux528MXPpYvS4XkRWkWX6rvX9Za8EVU=
+github.com/K-Phoen/sdk v0.12.3 h1:ScutEQASc9VEKJCm3OjIMD82BIS9B2XtNg3gEf6Gs+M=
+github.com/K-Phoen/sdk v0.12.3/go.mod h1:qmM0wO23CtoDux528MXPpYvS4XkRWkWX6rvX9Za8EVU=
 github.com/blang/semver v3.5.1+incompatible h1:cQNTCjp13qL8KC3Nbxr/y2Bqb63oX6wdnnjpJbkM4JQ=
 github.com/blang/semver v3.5.1+incompatible/go.mod h1:kRBLl5iJ+tD4TcOOxsy/0fnwebNt5EWlYSAyrTnjyyk=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
