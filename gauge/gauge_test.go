@@ -6,7 +6,6 @@ import (
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/links"
 
-	// "github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
