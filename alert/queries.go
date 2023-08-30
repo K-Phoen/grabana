@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/alert/queries/loki"
 	"github.com/K-Phoen/grabana/alert/queries/prometheus"
 	"github.com/K-Phoen/grabana/alert/queries/stackdriver"
+	"github.com/K-Phoen/grabana/alert/queries/cloudwatch"
 )
 
 // WithPrometheusQuery adds a prometheus query to the alert.
@@ -43,6 +44,14 @@ func WithStackdriverQuery(query *stackdriver.Stackdriver) Option {
 func WithInfluxDBQuery(ref string, query string, options ...influxdb.Option) Option {
 	return func(alert *Alert) {
 		target := influxdb.New(ref, query, options...)
+		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, target.Builder)
+	}
+}
+
+// WithCloudWatch adds a cloudwatch query to the alert.
+func WithCloudWatchQuery(ref string, query string, options ...cloudwatch.Option) Option {
+	return func(alert *Alert) {
+		target := cloudwatch.New(ref, query, options...)
 		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, target.Builder)
 	}
 }
