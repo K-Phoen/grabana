@@ -3,6 +3,7 @@ package decoder
 import (
 	"fmt"
 
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/loki"
@@ -22,6 +23,7 @@ type Target struct {
 	InfluxDB    *InfluxDBTarget    `yaml:"influxdb,omitempty"`
 	Stackdriver *StackdriverTarget `yaml:",omitempty"`
 	Loki        *LokiTarget        `yaml:",omitempty"`
+	Cloudwatch  *CloudwatchTarget  `yaml:",omitempty"`
 }
 
 type PrometheusTarget struct {
@@ -324,4 +326,22 @@ func (t StackdriverAlignment) toOption() (stackdriver.Option, error) {
 	default:
 		return nil, ErrInvalidStackdriverAlignment
 	}
+}
+
+type CloudwatchTarget struct {
+	QueryParams cloudwatch.QueryParams `yaml:",omitempty"`
+	Ref         string                 `yaml:",omitempty"`
+	Hidden      bool                   `yaml:",omitempty"`
+}
+
+func (t CloudwatchTarget) toOptions() []cloudwatch.Option {
+	opts := []cloudwatch.Option{
+		cloudwatch.Ref(t.Ref),
+	}
+
+	if t.Hidden {
+		opts = append(opts, cloudwatch.Hide())
+	}
+
+	return opts
 }

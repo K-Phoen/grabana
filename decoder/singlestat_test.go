@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/K-Phoen/grabana/singlestat"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -73,4 +75,25 @@ func TestSparkLineModes(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSinglestatCloudwatchTarget(t *testing.T) {
+	panel := DashboardSingleStat{
+		Title: "Singlestat target test",
+		Targets: []Target{
+			{
+				Cloudwatch: &CloudwatchTarget{
+					QueryParams: cloudwatch.QueryParams{
+						Dimensions: map[string]string{
+							"Name": "test",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	option, err := panel.target(panel.Targets[0])
+	assert.NoError(t, err)
+	assert.NotNil(t, option)
 }

@@ -1,6 +1,7 @@
 package timeseries
 
 import (
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/loki"
@@ -71,6 +72,17 @@ func WithLokiTarget(query string, options ...loki.Option) Option {
 			Expr:         target.Expr,
 			LegendFormat: target.LegendFormat,
 		})
+
+		return nil
+	}
+}
+
+// WithCloudwatchTarget adds a cloudwatch query to the timeseries.
+func WithCloudwatchTarget(queryParams cloudwatch.QueryParams, options ...cloudwatch.Option) Option {
+	target := cloudwatch.New(queryParams, options...)
+
+	return func(graph *TimeSeries) error {
+		graph.Builder.AddTarget(target.Builder)
 
 		return nil
 	}

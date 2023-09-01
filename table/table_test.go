@@ -5,6 +5,8 @@ import (
 
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/links"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -86,6 +88,26 @@ func TestTablePanelCanHaveInfluxDBTargets(t *testing.T) {
 	req := require.New(t)
 
 	panel, err := New("", WithInfluxDBTarget("buckets()"))
+
+	req.NoError(err)
+	req.Len(panel.Builder.TablePanel.Targets, 1)
+}
+
+func TestTablePanelCanHaveCloudwatchTargets(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.QueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		MetricName: "NumberOfMessagesReceived",
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		Period:     "30",
+		Region:     "us-east-1",
+	}
+
+	panel, err := New("", WithCloudwatchTarget(query))
 
 	req.NoError(err)
 	req.Len(panel.Builder.TablePanel.Targets, 1)

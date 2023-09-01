@@ -183,6 +183,9 @@ func (timeseriesPanel DashboardTimeSeries) target(t Target) (timeseries.Option, 
 
 		return timeseries.WithStackdriverTarget(stackdriverTarget), nil
 	}
+	if t.Cloudwatch != nil {
+		return timeseries.WithCloudwatchTarget(t.Cloudwatch.QueryParams, t.Cloudwatch.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

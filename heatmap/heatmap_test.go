@@ -6,6 +6,8 @@ import (
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/heatmap/axis"
 	"github.com/K-Phoen/grabana/links"
+
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/stackdriver"
 	"github.com/stretchr/testify/require"
 )
@@ -63,6 +65,26 @@ func TestHeatmapPanelCanHaveStackdriverTargets(t *testing.T) {
 	req := require.New(t)
 
 	panel, err := New("", WithStackdriverTarget(stackdriver.Gauge("pubsub.googleapis.com/subscription/ack_message_count")))
+
+	req.NoError(err)
+	req.Len(panel.Builder.HeatmapPanel.Targets, 1)
+}
+
+func TestHeatmapPanelCanHaveCloudwatchTargets(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.QueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		MetricName: "NumberOfMessagesReceived",
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		Period:     "30",
+		Region:     "us-east-1",
+	}
+
+	panel, err := New("", WithCloudwatchTarget(query))
 
 	req.NoError(err)
 	req.Len(panel.Builder.HeatmapPanel.Targets, 1)
