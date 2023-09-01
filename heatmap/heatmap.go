@@ -7,7 +7,6 @@ import (
 	"github.com/K-Phoen/grabana/heatmap/axis"
 	"github.com/K-Phoen/grabana/links"
 
-	// "github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
