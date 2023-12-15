@@ -363,6 +363,15 @@ func Repeat(repeat string) Option {
 	}
 }
 
+// Repeatdirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(gauge *Graph) error {
+		gauge.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}
+
 // SeriesOverride configures how null values are displayed.
 // See https://grafana.com/docs/grafana/latest/panels/field-options/
 func SeriesOverride(opts ...series.OverrideOption) Option {

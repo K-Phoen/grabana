@@ -144,6 +144,15 @@ func Repeat(repeat string) Option {
 	}
 }
 
+// Repeatdirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(gauge *Logs) error {
+		gauge.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}
+
 // Time displays the "time" column. This is the timestamp associated with the
 // log line as reported from the data source.
 func Time() Option {

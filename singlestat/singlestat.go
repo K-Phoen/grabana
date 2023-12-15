@@ -470,3 +470,12 @@ func Repeat(repeat string) Option {
 		return nil
 	}
 }
+
+// Repeatdirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(gauge *SingleStat) error {
+		gauge.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}

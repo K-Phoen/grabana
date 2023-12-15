@@ -416,6 +416,15 @@ func Repeat(repeat string) Option {
 	}
 }
 
+// Repeatdirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(gauge *Stat) error {
+		gauge.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}
+
 // Text indicates if name and value is displayed or just name.
 func Text(mode TextMode) Option {
 	return func(stat *Stat) error {

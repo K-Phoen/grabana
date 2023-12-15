@@ -348,6 +348,15 @@ func Repeat(repeat string) Option {
 	}
 }
 
+// Repeatdirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(gauge *Gauge) error {
+		gauge.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}
+
 // ColorScheme configures the color scheme.
 func ColorScheme(options ...scheme.Option) Option {
 	return func(gauge *Gauge) error {

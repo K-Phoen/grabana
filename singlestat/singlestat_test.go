@@ -6,6 +6,7 @@ import (
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/stackdriver"
+	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
 )
 
@@ -130,6 +131,16 @@ func TestRepeatCanBeConfigured(t *testing.T) {
 	req.NoError(err)
 	req.NotNil(panel.Builder.Repeat)
 	req.Equal("ds", *panel.Builder.Repeat)
+}
+
+func TestRepeatDirectionCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", RepeatDirection(sdk.RepeatDirectionHorizontal))
+
+	req.NoError(err)
+	req.NotNil(panel.Builder.RepeatDirection)
+	req.Equal(sdk.RepeatDirectionHorizontal, *panel.Builder.RepeatDirection)
 }
 
 func TestUnitCanBeConfigured(t *testing.T) {

@@ -13,6 +13,7 @@ import (
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/K-Phoen/grabana/timeseries/threshold"
+	"github.com/K-Phoen/sdk"
 )
 
 func TestNewTimeSeriesPanelsCanBeCreated(t *testing.T) {
@@ -207,6 +208,16 @@ func TestRepeatCanBeConfigured(t *testing.T) {
 	req.NoError(err)
 	req.NotNil(panel.Builder.Repeat)
 	req.Equal("ds", *panel.Builder.Repeat)
+}
+
+func TestRepeatDirectionCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", RepeatDirection(sdk.RepeatDirectionHorizontal))
+
+	req.NoError(err)
+	req.NotNil(panel.Builder.RepeatDirection)
+	req.Equal(sdk.RepeatDirectionHorizontal, *panel.Builder.RepeatDirection)
 }
 
 func TestLegendCanBeHidden(t *testing.T) {

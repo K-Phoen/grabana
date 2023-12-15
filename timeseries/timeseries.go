@@ -426,6 +426,15 @@ func Repeat(repeat string) Option {
 	}
 }
 
+// Repeatdirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(gauge *TimeSeries) error {
+		gauge.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}
+
 // FieldOverride allows overriding visualization options.
 func FieldOverride(m fields.Matcher, opts ...fields.OverrideOption) Option {
 	return func(timeseries *TimeSeries) error {
