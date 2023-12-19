@@ -345,3 +345,12 @@ func Repeat(repeat string) Option {
 		return nil
 	}
 }
+
+// RepeatDirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(heatmap *Heatmap) error {
+		heatmap.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}

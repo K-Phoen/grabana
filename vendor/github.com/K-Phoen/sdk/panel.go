@@ -47,6 +47,13 @@ const (
 
 const MixedSource = "-- Mixed --"
 
+type RepeatDirection string
+
+const (
+	RepeatDirectionVertical   RepeatDirection = "v"
+	RepeatDirectionHorizontal RepeatDirection = "h"
+)
+
 type (
 	// Panel represents panels of different types defined in Grafana.
 	Panel struct {
@@ -80,15 +87,17 @@ type (
 			X *int `json:"x,omitempty"`
 			Y *int `json:"y,omitempty"`
 		} `json:"gridPos,omitempty"`
-		Height           interface{} `json:"height,omitempty"` // general
-		HideTimeOverride *bool       `json:"hideTimeOverride,omitempty"`
-		ID               uint        `json:"id"`
-		IsNew            bool        `json:"isNew"`
-		Links            []Link      `json:"links,omitempty"`    // general
-		MinSpan          *float32    `json:"minSpan,omitempty"`  // templating options
-		OfType           panelType   `json:"-"`                  // it required for defining type of the panel
-		Renderer         *string     `json:"renderer,omitempty"` // display styles
-		Repeat           *string     `json:"repeat,omitempty"`   // templating options
+		Height           interface{}      `json:"height,omitempty"` // general
+		HideTimeOverride *bool            `json:"hideTimeOverride,omitempty"`
+		ID               uint             `json:"id"`
+		IsNew            bool             `json:"isNew"`
+		Links            []Link           `json:"links,omitempty"`    // general
+		MinSpan          *float32         `json:"minSpan,omitempty"`  // templating options
+		OfType           panelType        `json:"-"`                  // it required for defining type of the panel
+		Renderer         *string          `json:"renderer,omitempty"` // display styles
+		Repeat           *string          `json:"repeat,omitempty"`   // templating options
+		RepeatDirection  *RepeatDirection `json:"repeatDirection,omitempty"`
+
 		// RepeatIteration *int64   `json:"repeatIteration,omitempty"`
 		RepeatPanelID *uint `json:"repeatPanelId,omitempty"`
 		ScopedVars    map[string]struct {

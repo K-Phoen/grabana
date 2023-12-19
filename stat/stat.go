@@ -416,6 +416,15 @@ func Repeat(repeat string) Option {
 	}
 }
 
+// RepeatDirection configures repeating vertical or horizontal
+func RepeatDirection(direction sdk.RepeatDirection) Option {
+	return func(stat *Stat) error {
+		stat.Builder.RepeatDirection = &direction
+
+		return nil
+	}
+}
+
 // Text indicates if name and value is displayed or just name.
 func Text(mode TextMode) Option {
 	return func(stat *Stat) error {

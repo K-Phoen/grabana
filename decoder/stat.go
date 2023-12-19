@@ -19,15 +19,16 @@ type StatThresholdStep struct {
 }
 
 type DashboardStat struct {
-	Title       string
-	Description string              `yaml:",omitempty"`
-	Span        float32             `yaml:",omitempty"`
-	Height      string              `yaml:",omitempty"`
-	Transparent bool                `yaml:",omitempty"`
-	Datasource  string              `yaml:",omitempty"`
-	Repeat      string              `yaml:",omitempty"`
-	Links       DashboardPanelLinks `yaml:",omitempty"`
-	Targets     []Target
+	Title           string
+	Description     string              `yaml:",omitempty"`
+	Span            float32             `yaml:",omitempty"`
+	Height          string              `yaml:",omitempty"`
+	Transparent     bool                `yaml:",omitempty"`
+	Datasource      string              `yaml:",omitempty"`
+	Repeat          string              `yaml:",omitempty"`
+	RepeatDirection string              `yaml:"repeat_direction,omitempty"`
+	Links           DashboardPanelLinks `yaml:",omitempty"`
+	Targets         []Target
 
 	Unit     string `yaml:",omitempty"`
 	Decimals *int   `yaml:",omitempty"`
@@ -64,6 +65,13 @@ func (statPanel DashboardStat) toOption() (row.Option, error) {
 	}
 	if statPanel.Repeat != "" {
 		opts = append(opts, stat.Repeat(statPanel.Repeat))
+	}
+	if statPanel.RepeatDirection != "" {
+		direction, err := parsePanelRepeatDirection(statPanel.RepeatDirection)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, stat.RepeatDirection(direction))
 	}
 	if len(statPanel.Links) != 0 {
 		opts = append(opts, stat.Links(statPanel.Links.toModel()...))

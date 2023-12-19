@@ -19,6 +19,7 @@ type DashboardSingleStat struct {
 	Transparent     bool                `yaml:",omitempty"`
 	Datasource      string              `yaml:",omitempty"`
 	Repeat          string              `yaml:",omitempty"`
+	RepeatDirection string              `yaml:"repeat_direction,omitempty"`
 	Links           DashboardPanelLinks `yaml:",omitempty"`
 	Unit            string
 	Decimals        *int   `yaml:",omitempty"`
@@ -54,6 +55,13 @@ func (singleStatPanel DashboardSingleStat) toOption() (row.Option, error) {
 	}
 	if singleStatPanel.Repeat != "" {
 		opts = append(opts, singlestat.Repeat(singleStatPanel.Repeat))
+	}
+	if singleStatPanel.RepeatDirection != "" {
+		direction, err := parsePanelRepeatDirection(singleStatPanel.RepeatDirection)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, singlestat.RepeatDirection(direction))
 	}
 	if len(singleStatPanel.Links) != 0 {
 		opts = append(opts, singlestat.Links(singleStatPanel.Links.toModel()...))

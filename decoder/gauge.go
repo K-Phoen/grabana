@@ -17,15 +17,16 @@ type GaugeThresholdStep struct {
 }
 
 type DashboardGauge struct {
-	Title       string
-	Description string              `yaml:",omitempty"`
-	Span        float32             `yaml:",omitempty"`
-	Height      string              `yaml:",omitempty"`
-	Transparent bool                `yaml:",omitempty"`
-	Datasource  string              `yaml:",omitempty"`
-	Repeat      string              `yaml:",omitempty"`
-	Links       DashboardPanelLinks `yaml:",omitempty"`
-	Targets     []Target
+	Title           string
+	Description     string              `yaml:",omitempty"`
+	Span            float32             `yaml:",omitempty"`
+	Height          string              `yaml:",omitempty"`
+	Transparent     bool                `yaml:",omitempty"`
+	Datasource      string              `yaml:",omitempty"`
+	Repeat          string              `yaml:",omitempty"`
+	RepeatDirection string              `yaml:"repeat_direction,omitempty"`
+	Links           DashboardPanelLinks `yaml:",omitempty"`
+	Targets         []Target
 
 	Unit     string `yaml:",omitempty"`
 	Decimals *int   `yaml:",omitempty"`
@@ -59,6 +60,13 @@ func (gaugePanel DashboardGauge) toOption() (row.Option, error) {
 	}
 	if gaugePanel.Repeat != "" {
 		opts = append(opts, gauge.Repeat(gaugePanel.Repeat))
+	}
+	if gaugePanel.RepeatDirection != "" {
+		direction, err := parsePanelRepeatDirection(gaugePanel.RepeatDirection)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, gauge.RepeatDirection(direction))
 	}
 	if len(gaugePanel.Links) != 0 {
 		opts = append(opts, gauge.Links(gaugePanel.Links.toModel()...))

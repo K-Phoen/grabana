@@ -12,19 +12,20 @@ import (
 var ErrInvalidLegendAttribute = fmt.Errorf("invalid legend attribute")
 
 type DashboardGraph struct {
-	Title         string
-	Description   string  `yaml:",omitempty"`
-	Span          float32 `yaml:",omitempty"`
-	Height        string  `yaml:",omitempty"`
-	Transparent   bool    `yaml:",omitempty"`
-	Datasource    string  `yaml:",omitempty"`
-	Repeat        string  `yaml:",omitempty"`
-	Targets       []Target
-	Links         DashboardPanelLinks `yaml:",omitempty"`
-	Axes          *GraphAxes          `yaml:",omitempty"`
-	Legend        []string            `yaml:",omitempty,flow"`
-	Alert         *Alert              `yaml:",omitempty"`
-	Visualization *GraphVisualization `yaml:",omitempty"`
+	Title           string
+	Description     string  `yaml:",omitempty"`
+	Span            float32 `yaml:",omitempty"`
+	Height          string  `yaml:",omitempty"`
+	Transparent     bool    `yaml:",omitempty"`
+	Datasource      string  `yaml:",omitempty"`
+	Repeat          string  `yaml:",omitempty"`
+	RepeatDirection string  `yaml:"repeat_direction,omitempty"`
+	Targets         []Target
+	Links           DashboardPanelLinks `yaml:",omitempty"`
+	Axes            *GraphAxes          `yaml:",omitempty"`
+	Legend          []string            `yaml:",omitempty,flow"`
+	Alert           *Alert              `yaml:",omitempty"`
+	Visualization   *GraphVisualization `yaml:",omitempty"`
 }
 
 func (graphPanel DashboardGraph) toOption() (row.Option, error) {
@@ -47,6 +48,13 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 	}
 	if graphPanel.Repeat != "" {
 		opts = append(opts, graph.Repeat(graphPanel.Repeat))
+	}
+	if graphPanel.RepeatDirection != "" {
+		direction, err := parsePanelRepeatDirection(graphPanel.RepeatDirection)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, graph.RepeatDirection(direction))
 	}
 	if len(graphPanel.Links) != 0 {
 		opts = append(opts, graph.Links(graphPanel.Links.toModel()...))

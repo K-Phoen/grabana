@@ -18,20 +18,21 @@ var ErrInvalidAxisScale = fmt.Errorf("invalid axis scale")
 var ErrInvalidOverrideMatcher = fmt.Errorf("invalid override matcher")
 
 type DashboardTimeSeries struct {
-	Title         string
-	Description   string              `yaml:",omitempty"`
-	Span          float32             `yaml:",omitempty"`
-	Height        string              `yaml:",omitempty"`
-	Transparent   bool                `yaml:",omitempty"`
-	Datasource    string              `yaml:",omitempty"`
-	Repeat        string              `yaml:",omitempty"`
-	Links         DashboardPanelLinks `yaml:",omitempty"`
-	Targets       []Target
-	Legend        []string                 `yaml:",omitempty,flow"`
-	Alert         *Alert                   `yaml:",omitempty"`
-	Visualization *TimeSeriesVisualization `yaml:",omitempty"`
-	Axis          *TimeSeriesAxis          `yaml:",omitempty"`
-	Overrides     []TimeSeriesOverride     `yaml:",omitempty"`
+	Title           string
+	Description     string              `yaml:",omitempty"`
+	Span            float32             `yaml:",omitempty"`
+	Height          string              `yaml:",omitempty"`
+	Transparent     bool                `yaml:",omitempty"`
+	Datasource      string              `yaml:",omitempty"`
+	Repeat          string              `yaml:",omitempty"`
+	RepeatDirection string              `yaml:"repeat_direction,omitempty"`
+	Links           DashboardPanelLinks `yaml:",omitempty"`
+	Targets         []Target
+	Legend          []string                 `yaml:",omitempty,flow"`
+	Alert           *Alert                   `yaml:",omitempty"`
+	Visualization   *TimeSeriesVisualization `yaml:",omitempty"`
+	Axis            *TimeSeriesAxis          `yaml:",omitempty"`
+	Overrides       []TimeSeriesOverride     `yaml:",omitempty"`
 }
 
 func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
@@ -54,6 +55,13 @@ func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
 	}
 	if timeseriesPanel.Repeat != "" {
 		opts = append(opts, timeseries.Repeat(timeseriesPanel.Repeat))
+	}
+	if timeseriesPanel.RepeatDirection != "" {
+		direction, err := parsePanelRepeatDirection(timeseriesPanel.RepeatDirection)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, timeseries.RepeatDirection(direction))
 	}
 	if len(timeseriesPanel.Links) != 0 {
 		opts = append(opts, timeseries.Links(timeseriesPanel.Links.toModel()...))

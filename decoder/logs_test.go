@@ -5,6 +5,7 @@ import (
 
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/logs"
+	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,13 +13,14 @@ func TestLogsPanelsCanBeDecoded(t *testing.T) {
 	req := require.New(t)
 
 	panel := DashboardLogs{
-		Title:       "awesome logs",
-		Description: "awesome description",
-		Span:        12,
-		Height:      "300px",
-		Transparent: true,
-		Datasource:  "some-loki",
-		Repeat:      "ds",
+		Title:           "awesome logs",
+		Description:     "awesome description",
+		Span:            12,
+		Height:          "300px",
+		Transparent:     true,
+		Datasource:      "some-loki",
+		Repeat:          "ds",
+		RepeatDirection: "vertical",
 		Targets: []LogsTarget{
 			{
 				Loki: &LokiTarget{
@@ -58,6 +60,7 @@ func TestLogsPanelsCanBeDecoded(t *testing.T) {
 	req.True(sdkPanel.Transparent)
 	req.Equal(panel.Datasource, sdkPanel.Datasource.LegacyName)
 	req.Equal(panel.Repeat, *sdkPanel.Repeat)
+	req.Equal(sdk.RepeatDirectionVertical, *sdkPanel.RepeatDirection)
 }
 
 func TestLogsPanelsWithValidSortOrder(t *testing.T) {
