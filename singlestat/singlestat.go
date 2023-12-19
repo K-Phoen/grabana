@@ -471,10 +471,10 @@ func Repeat(repeat string) Option {
 	}
 }
 
-// Repeatdirection configures repeating vertical or horizontal
+// RepeatDirection configures repeating vertical or horizontal
 func RepeatDirection(direction sdk.RepeatDirection) Option {
-	return func(gauge *SingleStat) error {
-		gauge.Builder.RepeatDirection = &direction
+	return func(singleStat *SingleStat) error {
+		singleStat.Builder.RepeatDirection = &direction
 
 		return nil
 	}

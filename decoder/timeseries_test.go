@@ -3,6 +3,7 @@ package decoder
 import (
 	"testing"
 
+	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
 
 	"github.com/K-Phoen/grabana/dashboard"
@@ -14,14 +15,15 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 	req := require.New(t)
 
 	panel := DashboardTimeSeries{
-		Title:       "awesome timeseries",
-		Description: "awesome description",
-		Span:        12,
-		Height:      "300px",
-		Transparent: true,
-		Datasource:  "some-prometheus",
-		Repeat:      "ds",
-		Legend:      []string{"hide"},
+		Title:           "awesome timeseries",
+		Description:     "awesome description",
+		Span:            12,
+		Height:          "300px",
+		Transparent:     true,
+		Datasource:      "some-prometheus",
+		Repeat:          "ds",
+		RepeatDirection: "vertical",
+		Legend:          []string{"hide"},
 		Visualization: &TimeSeriesVisualization{
 			GradientMode: "opacity",
 			Tooltip:      "single_series",
@@ -58,6 +60,7 @@ func TestTimeSeriesCanBeDecoded(t *testing.T) {
 	req.Equal(panel.Description, *sdkPanel.Description)
 	req.Equal(panel.Datasource, sdkPanel.Datasource.LegacyName)
 	req.Equal(panel.Repeat, *sdkPanel.Repeat)
+	req.Equal(sdk.RepeatDirectionVertical, *sdkPanel.RepeatDirection)
 	req.Equal(panel.Span, sdkPanel.Span)
 	req.True(sdkPanel.Transparent)
 	req.Equal("hidden", tsPanel.Options.Legend.DisplayMode)

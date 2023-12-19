@@ -346,10 +346,10 @@ func Repeat(repeat string) Option {
 	}
 }
 
-// Repeatdirection configures repeating vertical or horizontal
+// RepeatDirection configures repeating vertical or horizontal
 func RepeatDirection(direction sdk.RepeatDirection) Option {
-	return func(gauge *Heatmap) error {
-		gauge.Builder.RepeatDirection = &direction
+	return func(heatmap *Heatmap) error {
+		heatmap.Builder.RepeatDirection = &direction
 
 		return nil
 	}

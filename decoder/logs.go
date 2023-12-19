@@ -11,16 +11,17 @@ var ErrInvalidSortOrder = fmt.Errorf("invalid sort order")
 var ErrInvalidDeduplicationStrategy = fmt.Errorf("invalid deduplication strategy")
 
 type DashboardLogs struct {
-	Title         string
-	Description   string              `yaml:",omitempty"`
-	Span          float32             `yaml:",omitempty"`
-	Height        string              `yaml:",omitempty"`
-	Transparent   bool                `yaml:",omitempty"`
-	Datasource    string              `yaml:",omitempty"`
-	Repeat        string              `yaml:",omitempty"`
-	Links         DashboardPanelLinks `yaml:",omitempty"`
-	Targets       []LogsTarget        `yaml:",omitempty"`
-	Visualization *LogsVisualization  `yaml:",omitempty"`
+	Title           string
+	Description     string              `yaml:",omitempty"`
+	Span            float32             `yaml:",omitempty"`
+	Height          string              `yaml:",omitempty"`
+	Transparent     bool                `yaml:",omitempty"`
+	Datasource      string              `yaml:",omitempty"`
+	Repeat          string              `yaml:",omitempty"`
+	RepeatDirection string              `yaml:"repeat_direction,omitempty"`
+	Links           DashboardPanelLinks `yaml:",omitempty"`
+	Targets         []LogsTarget        `yaml:",omitempty"`
+	Visualization   *LogsVisualization  `yaml:",omitempty"`
 }
 
 type LogsTarget struct {
@@ -47,6 +48,13 @@ func (panel DashboardLogs) toOption() (row.Option, error) {
 	}
 	if panel.Repeat != "" {
 		opts = append(opts, logs.Repeat(panel.Repeat))
+	}
+	if panel.RepeatDirection != "" {
+		direction, err := parsePanelRepeatDirection(panel.RepeatDirection)
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, logs.RepeatDirection(direction))
 	}
 	if len(panel.Links) != 0 {
 		opts = append(opts, logs.Links(panel.Links.toModel()...))
