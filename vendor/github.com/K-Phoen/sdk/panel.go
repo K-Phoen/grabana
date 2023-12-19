@@ -97,6 +97,7 @@ type (
 		Renderer         *string          `json:"renderer,omitempty"` // display styles
 		Repeat           *string          `json:"repeat,omitempty"`   // templating options
 		RepeatDirection  *RepeatDirection `json:"repeatDirection,omitempty"`
+
 		// RepeatIteration *int64   `json:"repeatIteration,omitempty"`
 		RepeatPanelID *uint `json:"repeatPanelId,omitempty"`
 		ScopedVars    map[string]struct {
