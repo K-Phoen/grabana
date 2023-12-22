@@ -24,7 +24,25 @@ func (encoder *Encoder) encodeGraph(panel sdk.Panel) jen.Code {
 		encoder.encodeGraphDraw(*panel.GraphPanel),
 	)
 
-	// TODO: XAxis(), RightYAxis(), LeftYAxis(), SeriesOverride()
+	// TODO: SeriesOverride()
+
+	settings = append(
+		settings,
+		encoder.encodeGraphAxis("XAxis", panel.GraphPanel.Xaxis),
+	)
+
+	if len(panel.GraphPanel.Yaxes) >= 1 {
+		settings = append(
+			settings,
+			encoder.encodeGraphAxis("LeftYAxis", panel.GraphPanel.Yaxes[0]),
+		)
+	}
+	if len(panel.GraphPanel.Yaxes) >= 2 {
+		settings = append(
+			settings,
+			encoder.encodeGraphAxis("RightYAxis", panel.GraphPanel.Yaxes[1]),
+		)
+	}
 
 	// Null
 	if panel.GraphPanel.NullPointMode != "" {
@@ -62,6 +80,41 @@ func (encoder *Encoder) encodeGraph(panel sdk.Panel) jen.Code {
 	return qual("row", "WithGraph").MultiLineCall(
 		settings...,
 	)
+}
+
+func (encoder *Encoder) encodeGraphAxis(graphOptName string, axis sdk.Axis) jen.Code {
+	var opts []jen.Code
+
+	// Unit
+	if axis.Format != "" {
+		opts = append(opts, graphQual("Unit").Call(lit(axis.Format)))
+	}
+	// Hide
+	if !axis.Show {
+		opts = append(opts, graphQual("Hide").Call())
+	}
+	// LogBase
+	if axis.LogBase != 0 {
+		opts = append(opts, graphQual("LogBase").Call(lit(axis.LogBase)))
+	}
+	// Label
+	if axis.Label != "" {
+		opts = append(opts, graphQual("Label").Call(lit(axis.Label)))
+	}
+	// Min
+	if axis.Min != nil {
+		opts = append(opts, graphQual("Min").Call(lit(axis.Min.Value)))
+	}
+	// Max
+	if axis.Max != nil {
+		opts = append(opts, graphQual("Max").Call(lit(axis.Max.Value)))
+	}
+
+	if len(opts) == 0 {
+		return nil
+	}
+
+	return graphQual(graphOptName).Call(opts...)
 }
 
 func (encoder *Encoder) encodeGraphLegend(legend sdk.Legend) jen.Code {
