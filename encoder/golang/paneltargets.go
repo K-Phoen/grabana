@@ -92,9 +92,10 @@ func (encoder *Encoder) encodePrometheusTarget(target sdk.Target, grabanaPackage
 	case "heatmap":
 		formatConstName = "FormatHeatmap"
 	case "time_series":
+	case "":
 		formatConstName = "FormatTimeSeries"
 	default:
-		encoder.logger.Warn("unhandled prometheus target format '%s': using 'time_series' instead", zap.String("format", target.Format))
+		encoder.logger.Warn("unhandled prometheus target format: using 'time_series' instead", zap.String("format", target.Format))
 
 	}
 

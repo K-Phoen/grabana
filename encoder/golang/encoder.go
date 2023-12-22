@@ -136,6 +136,8 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 		return encoder.encodeTimeseries(panel), true
 	case "gauge":
 		return encoder.encodeGauge(panel), true
+	case "stat":
+		return encoder.encodeStat(panel), true
 	/*
 		case "graph":
 			return converter.convertGraph(panel), true
@@ -143,8 +145,6 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 			return converter.convertHeatmap(panel), true
 		case "singlestat":
 			return converter.convertSingleStat(panel), true
-		case "stat":
-			return converter.convertStat(panel), true
 		case "table":
 			return converter.convertTable(panel), true
 		case "text":
