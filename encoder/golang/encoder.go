@@ -9,6 +9,7 @@ import (
 )
 
 const packageImportPath = "github.com/K-Phoen/grabana"
+const sdkImportPath = "github.com/K-Phoen/sdk"
 
 type Encoder struct {
 	logger *zap.Logger
