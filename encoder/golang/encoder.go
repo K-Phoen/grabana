@@ -25,6 +25,7 @@ func (encoder *Encoder) EncodeDashboard(dashboard sdk.Board) (string, error) {
 		lit(dashboard.Title),
 	}
 
+	// TODO: links, annotations
 	dashboardStatements = append(dashboardStatements, encoder.encodeGeneralSettings(dashboard)...)
 	dashboardStatements = append(dashboardStatements, encoder.encodeVariables(dashboard.Templating.List)...)
 	dashboardStatements = append(dashboardStatements, encoder.encodePanels(dashboard)...)
@@ -67,7 +68,14 @@ func (encoder *Encoder) encodeGeneralSettings(dashboard sdk.Board) []jen.Code {
 		settings = append(settings, dashboardQual("AutoRefresh").Call(lit(dashboard.Refresh.Value)))
 	}
 
-	// TODO: timezone, tags
+	if len(dashboard.Tags) != 0 {
+		tagsLiterals := Map(dashboard.Tags, func(item string) jen.Code {
+			return lit(item)
+		})
+		settings = append(settings, dashboardQual("Tags").Call(jen.List(tagsLiterals...)))
+	}
+
+	// TODO: timezone
 
 	settings = append(
 		settings,

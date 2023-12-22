@@ -21,3 +21,13 @@ func qual(pkg string, name string) *jen.Statement {
 func lit(v interface{}) *jen.Statement {
 	return jen.Lit(v)
 }
+
+func Map[I any, O any](input []I, mapFunc func(item I) O) []O {
+	results := make([]O, 0, len(input))
+
+	for _, item := range input {
+		results = append(results, mapFunc(item))
+	}
+
+	return results
+}
