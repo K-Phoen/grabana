@@ -114,5 +114,5 @@ func (encoder *Encoder) encodeLogsTarget(target sdk.Target) jen.Code {
 }
 
 func logsQual(name string) *jen.Statement {
-	return jen.Qual(packageImportPath+"/logs", name)
+	return qual("logs", name)
 }

@@ -134,13 +134,13 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 		return encoder.convertLogs(panel), true
 	case "timeseries":
 		return encoder.encodeTimeseries(panel), true
+	case "graph":
+		return encoder.encodeGraph(panel), true
 	case "gauge":
 		return encoder.encodeGauge(panel), true
 	case "stat":
 		return encoder.encodeStat(panel), true
 	/*
-		case "graph":
-			return converter.convertGraph(panel), true
 		case "heatmap":
 			return converter.convertHeatmap(panel), true
 		case "singlestat":
@@ -149,8 +149,6 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 			return converter.convertTable(panel), true
 		case "text":
 			return converter.convertText(panel), true
-		case "gauge":
-			return converter.convertGauge(panel), true
 	*/
 	default:
 		encoder.logger.Warn("unhandled panel type: skipped", zap.String("type", panel.Type), zap.String("title", panel.Title))
