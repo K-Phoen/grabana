@@ -141,6 +141,8 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 		return encoder.encodeGauge(panel), true
 	case "stat":
 		return encoder.encodeStat(panel), true
+	case "text":
+		return encoder.encodeText(panel), true
 	/*
 		case "heatmap":
 			return converter.convertHeatmap(panel), true
@@ -148,8 +150,6 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 			return converter.convertSingleStat(panel), true
 		case "table":
 			return converter.convertTable(panel), true
-		case "text":
-			return converter.convertText(panel), true
 	*/
 	default:
 		encoder.logger.Warn("unhandled panel type: skipped", zap.String("type", panel.Type), zap.String("title", panel.Title))

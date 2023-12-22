@@ -71,6 +71,7 @@ func (encoder *Encoder) encodeStatOptions(options sdk.StatOptions) []jen.Code {
 	if options.Orientation != "" {
 		modes := map[string]string{
 			"":           "OrientationAuto",
+			"auto":       "OrientationAuto",
 			"horizontal": "OrientationHorizontal",
 			"vertical":   "OrientationVertical",
 		}
