@@ -65,7 +65,7 @@ func (encoder *Encoder) encodeGeneralSettings(dashboard sdk.Board) []jen.Code {
 		settings = append(settings, dashboardQual("ReadOnly").Call())
 	}
 
-	if dashboard.Refresh != nil {
+	if dashboard.Refresh != nil && dashboard.Refresh.Value != "" {
 		settings = append(settings, dashboardQual("AutoRefresh").Call(lit(dashboard.Refresh.Value)))
 	}
 
