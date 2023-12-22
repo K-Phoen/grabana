@@ -56,7 +56,7 @@ func convertGo(logger *zap.Logger, opts convertGoOpts) error {
 		return fmt.Errorf("could not encode input file '%s' to Go: %w", opts.inputJSON, err)
 	}
 
-	fmt.Println(string(golangDashboard))
+	fmt.Println(golangDashboard)
 
 	return nil
 }
