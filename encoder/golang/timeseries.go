@@ -167,7 +167,7 @@ func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Cod
 
 	// Line interpolation mode
 	if fieldConfig.Defaults.Custom.DrawStyle == "line" {
-		lineInterpolationConst := "Linear"
+		var lineInterpolationConst string
 
 		switch fieldConfig.Defaults.Custom.LineInterpolation {
 		case "smooth":
@@ -193,7 +193,7 @@ func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Cod
 	}
 
 	// Tooltip mode
-	toolTipModeConst := "SingleSeries"
+	var toolTipModeConst string
 	switch panel.TimeseriesPanel.Options.Tooltip.Mode {
 	case "none":
 		toolTipModeConst = "NoSeries"
@@ -211,7 +211,7 @@ func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Cod
 	}
 
 	// Gradient mode
-	gradientModeConst := "Opacity"
+	var gradientModeConst string
 	switch fieldConfig.Defaults.Custom.GradientMode {
 	case "none":
 		gradientModeConst = "NoGradient"
@@ -231,7 +231,7 @@ func (encoder *Encoder) encodeTimeseriesVizualization(panel sdk.Panel) []jen.Cod
 	}
 
 	// Stacking mode
-	stackingModeConst := "Unstacked"
+	var stackingModeConst string
 	switch fieldConfig.Defaults.Custom.Stacking.Mode {
 	case "none":
 		stackingModeConst = "Unstacked"

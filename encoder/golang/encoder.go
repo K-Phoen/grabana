@@ -40,7 +40,7 @@ func (encoder *Encoder) EncodeDashboard(dashboard sdk.Board) (string, error) {
 
 	buffer := &bytes.Buffer{}
 	if err := file.Render(buffer); err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return buffer.String(), nil

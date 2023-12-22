@@ -96,7 +96,6 @@ func (encoder *Encoder) encodePrometheusTarget(target sdk.Target, grabanaPackage
 		formatConstName = "FormatTimeSeries"
 	default:
 		encoder.logger.Warn("unhandled prometheus target format: using 'time_series' instead", zap.String("format", target.Format))
-
 	}
 
 	// only emit code if the default isn't used

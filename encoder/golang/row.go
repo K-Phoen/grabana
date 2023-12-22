@@ -24,9 +24,7 @@ func (encoder *Encoder) encodeRow(row RowIR) *jen.Statement {
 		rowSettings = append(rowSettings, rowQual("Collapse").Call())
 	}
 
-	for _, panel := range row.Panels {
-		rowSettings = append(rowSettings, panel)
-	}
+	rowSettings = append(rowSettings, row.Panels...)
 
 	return dashboardQual("Row").MultiLineCall(rowSettings...)
 }

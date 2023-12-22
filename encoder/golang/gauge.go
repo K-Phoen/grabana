@@ -50,7 +50,7 @@ func (encoder *Encoder) encodeGaugeSettings(panel sdk.Panel) []jen.Code {
 }
 
 func (encoder *Encoder) encodeGaugeOrientation(panel sdk.Panel) jen.Code {
-	orientationConst := "OrientationAuto"
+	var orientationConst string
 	switch panel.GaugePanel.Options.Orientation {
 	case "":
 		orientationConst = "OrientationAuto"

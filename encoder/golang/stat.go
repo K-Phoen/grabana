@@ -150,10 +150,12 @@ func (encoder *Encoder) encodeStatFieldConfigDefaults(defaults sdk.FieldConfigDe
 		settings = append(settings, statQual("NoValue").Call(lit(defaults.NoValue)))
 	}
 
+	// TODO: thresholds
 	// RelativeThresholds/AbsoluteThresholds
-	if defaults.Thresholds.Mode != "" && len(defaults.Thresholds.Steps) != 0 {
-		// TODO: thresholds
-	}
+	/*
+		if defaults.Thresholds.Mode != "" && len(defaults.Thresholds.Steps) != 0 {
+		}
+	*/
 
 	return settings
 }
