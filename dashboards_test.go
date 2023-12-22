@@ -9,14 +9,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/K-Phoen/sdk"
-	"github.com/stretchr/testify/require"
-
 	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/text"
 	"github.com/K-Phoen/grabana/timeseries"
+	"github.com/K-Phoen/sdk"
+	"github.com/stretchr/testify/require"
 )
 
 func TestADashboardCanBeFoundByTitle(t *testing.T) {
@@ -132,7 +131,6 @@ func TestFetchingAnUnknownDashboardByUIDFailsCleanly(t *testing.T) {
 	req := require.New(t)
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-
 	}))
 	defer ts.Close()
 

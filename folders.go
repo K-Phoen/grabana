@@ -23,7 +23,7 @@ type Folder struct {
 // FindOrCreateFolder returns the folder by its name or creates it if it doesn't exist.
 func (client *Client) FindOrCreateFolder(ctx context.Context, name string) (*Folder, error) {
 	folder, err := client.GetFolderByTitle(ctx, name)
-	if err != nil && err != ErrFolderNotFound {
+	if err != nil && !errors.Is(err, ErrFolderNotFound) {
 		return nil, fmt.Errorf("could not find or create folder: %w", err)
 	}
 	if folder == nil {

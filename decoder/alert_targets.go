@@ -57,7 +57,7 @@ func (t AlertPrometheus) toOptions() (alert.Option, error) {
 	if t.Lookback != "" {
 		from, err := time.ParseDuration(t.Lookback)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
+			return nil, fmt.Errorf("%w: %w", err, ErrInvalidLookback)
 		}
 
 		opts = append(opts, prometheus.TimeRange(from, 0))
@@ -85,7 +85,7 @@ func (t AlertLoki) toOptions() (alert.Option, error) {
 	if t.Lookback != "" {
 		from, err := time.ParseDuration(t.Lookback)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
+			return nil, fmt.Errorf("%w: %w", err, ErrInvalidLookback)
 		}
 
 		opts = append(opts, loki.TimeRange(from, 0))
@@ -110,7 +110,7 @@ func (t AlertGraphite) toOptions() (alert.Option, error) {
 	if t.Lookback != "" {
 		from, err := time.ParseDuration(t.Lookback)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
+			return nil, fmt.Errorf("%w: %w", err, ErrInvalidLookback)
 		}
 
 		opts = append(opts, graphite.TimeRange(from, 0))
@@ -181,7 +181,7 @@ func (t AlertStackdriver) targetOptions() ([]stackdriver.Option, error) {
 	if t.Lookback != "" {
 		from, err := time.ParseDuration(t.Lookback)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", err, ErrInvalidLookback)
+			return nil, fmt.Errorf("%w: %w", err, ErrInvalidLookback)
 		}
 
 		opts = append(opts, stackdriver.TimeRange(from, 0))

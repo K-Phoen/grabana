@@ -9,7 +9,7 @@ import (
 
 func TestProjectCanBeConfigured(t *testing.T) {
 	req := require.New(t)
-	
+
 	project := "some-gcp-project-id"
 
 	query := Delta("A", "some metric", Project(project))

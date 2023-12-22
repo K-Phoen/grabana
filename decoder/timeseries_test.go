@@ -3,12 +3,11 @@ package decoder
 import (
 	"testing"
 
-	"github.com/K-Phoen/sdk"
-	"github.com/stretchr/testify/require"
-
 	"github.com/K-Phoen/grabana/dashboard"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
+	"github.com/K-Phoen/sdk"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTimeSeriesCanBeDecoded(t *testing.T) {
