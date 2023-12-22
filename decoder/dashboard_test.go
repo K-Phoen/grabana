@@ -811,6 +811,8 @@ rows:
 }
 
 func dashboardFromFixtures(t *testing.T, path string) string {
+	t.Helper()
+
 	req := require.New(t)
 
 	payload, err := os.ReadFile(path)

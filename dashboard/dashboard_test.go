@@ -10,6 +10,8 @@ import (
 )
 
 func requireJSON(t *testing.T, payload []byte) {
+	t.Helper()
+
 	var receiver map[string]interface{}
 	if err := json.Unmarshal(payload, &receiver); err != nil {
 		t.Fatalf("invalid json: %s", err)

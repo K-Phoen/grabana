@@ -23,7 +23,7 @@ func (client *Client) UpsertDatasource(ctx context.Context, datasource datasourc
 	}
 
 	id, err := client.getDatasourceIDByName(ctx, datasource.Name())
-	if err != nil && err != ErrDatasourceNotFound {
+	if err != nil && !errors.Is(err, ErrDatasourceNotFound) {
 		return err
 	}
 

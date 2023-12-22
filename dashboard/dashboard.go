@@ -239,7 +239,7 @@ func ExternalLinks(links ...ExternalLink) Option {
 
 // DashboardLinks adds a dashboard-level links to other dashboards.
 // See https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/manage-dashboard-links/#dashboard-links
-func DashboardLinks(links ...DashboardLink) Option {
+func DashboardLinks(links ...DashboardLink) Option { //nolint:revive
 	return func(builder *Builder) error {
 		for _, link := range links {
 			builder.board.Links = append(builder.board.Links, link.asSdk())

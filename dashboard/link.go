@@ -49,7 +49,7 @@ func (link ExternalLink) asSdk() sdk.Link {
 
 // DashboardLink describes dashboard-level links to other dashboards.
 // See https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/manage-dashboard-links/#dashboard-links
-type DashboardLink struct {
+type DashboardLink struct { //nolint:revive
 	Title string
 	Tags  []string
 
