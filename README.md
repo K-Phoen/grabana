@@ -11,8 +11,9 @@ creation of dashboards, this library is meant for you.
 ## Design goals
 
 * provide an understandable abstraction over dashboards configuration
-* expose a developer-friendly API
-* allow IDE assistance and auto-completion
+* expose a **developer-friendly API**
+* allow IDE assistance and **auto-completion**
+* **generate Go code** from existing dashboards
 
 **Note**: Grafana 8+ is required, with [unified alerting](https://grafana.com/blog/2021/06/14/the-new-unified-alerting-system-for-grafana-everything-you-need-to-know/) enabled.
 
@@ -42,6 +43,9 @@ builder := dashboard.New(
     ),
 )
 ```
+
+> **Note**
+> Existing dashboards can be converted to Go code using the `grabana convert-go` CLI command.
 
 Dashboard creation:
 
