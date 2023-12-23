@@ -93,3 +93,12 @@ func TestAllValueCanBeOverriden(t *testing.T) {
 
 	req.Equal(".*", panel.Builder.AllValue)
 }
+
+func TestAnAllValuesCanBeTheDefault(t *testing.T) {
+	req := require.New(t)
+
+	panel := New("", DefaultAll())
+
+	req.Equal([]string{"All"}, panel.Builder.Current.Text.Value)
+	req.Equal("$__all", panel.Builder.Current.Value)
+}

@@ -4,6 +4,8 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
+const All = "$__all"
+
 // Option represents an option that can be used to configure a query.
 type Option func(constant *Query)
 
@@ -139,7 +141,7 @@ func IncludeAll() Option {
 		query.Builder.IncludeAll = true
 		query.Builder.Options = append(query.Builder.Options, sdk.Option{
 			Text:  "All",
-			Value: "$__all",
+			Value: All,
 		})
 	}
 }
@@ -147,7 +149,7 @@ func IncludeAll() Option {
 // DefaultAll selects "All" values by default.
 func DefaultAll() Option {
 	return func(query *Query) {
-		query.Builder.Current = sdk.Current{Text: &sdk.StringSliceString{Value: []string{"All"}, Valid: true}, Value: "$__all"}
+		query.Builder.Current = sdk.Current{Text: &sdk.StringSliceString{Value: []string{"All"}, Valid: true}, Value: All}
 	}
 }
 
