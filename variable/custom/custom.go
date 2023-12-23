@@ -7,6 +7,8 @@ import (
 	"github.com/K-Phoen/sdk"
 )
 
+const All = "$__all"
+
 // Option represents an option that can be used to configure a custom variable.
 type Option func(constant *Custom)
 
@@ -116,8 +118,15 @@ func IncludeAll() Option {
 		custom.Builder.IncludeAll = true
 		custom.Builder.Options = append(custom.Builder.Options, sdk.Option{
 			Text:  "All",
-			Value: "$__all",
+			Value: All,
 		})
+	}
+}
+
+// DefaultAll selects "All" values by default.
+func DefaultAll() Option {
+	return func(custom *Custom) {
+		custom.Builder.Current = sdk.Current{Text: &sdk.StringSliceString{Value: []string{"All"}, Valid: true}, Value: All}
 	}
 }
 
