@@ -61,7 +61,7 @@ func (client *Client) GetDashboardByTitle(ctx context.Context, title string) (*D
 	return nil, ErrDashboardNotFound
 }
 
-// GetDashboardByUID finds a dashboard, given its UID.
+// rawDashboardByUID finds a dashboard, given its UID.
 func (client *Client) rawDashboardByUID(ctx context.Context, uid string) (*sdk.Board, error) {
 	resp, err := client.get(ctx, "/api/dashboards/uid/"+url.PathEscape(uid))
 	if err != nil {
