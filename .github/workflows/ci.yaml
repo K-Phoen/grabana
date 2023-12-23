@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: nosborn/github-action-markdown-cli@v3.2.0
+      - uses: nosborn/github-action-markdown-cli@v3.3.0
         with:
           files: ./doc/
           config_file: .markdownlint.json
