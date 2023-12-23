@@ -17,7 +17,7 @@ type SDKAxis struct {
 	SplitFactor *float64 `json:"splitFactor"`
 }
 
-// YAxis represents a the Y axis of a heatmap.
+// YAxis represents the Y axis of a heatmap.
 type YAxis struct {
 	Builder *SDKAxis
 }

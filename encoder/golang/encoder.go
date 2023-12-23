@@ -143,13 +143,13 @@ func (encoder *Encoder) encodeDataPanel(panel sdk.Panel) (jen.Code, bool) {
 		return encoder.encodeStat(panel), true
 	case "text":
 		return encoder.encodeText(panel), true
+	case "heatmap":
+		return encoder.encodeHeatmap(panel), true
 	/*
-		case "heatmap":
-			return converter.convertHeatmap(panel), true
 		case "singlestat":
-			return converter.convertSingleStat(panel), true
+			return encoder.encodeSingleStat(panel), true
 		case "table":
-			return converter.convertTable(panel), true
+			return encoder.encodeTable(panel), true
 	*/
 	default:
 		encoder.logger.Warn("unhandled panel type: skipped", zap.String("type", panel.Type), zap.String("title", panel.Title))
