@@ -225,6 +225,9 @@ func (graphPanel *DashboardGraph) target(t Target) (graph.Option, error) {
 
 		return graph.WithStackdriverTarget(stackdriverTarget), nil
 	}
+	if t.Cloudwatch != nil {
+		return graph.WithCloudwatchTarget(t.Cloudwatch.MetricName, t.Cloudwatch.Namespace, t.Cloudwatch.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

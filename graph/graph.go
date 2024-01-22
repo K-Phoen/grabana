@@ -8,6 +8,7 @@ import (
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/graph/series"
 	"github.com/K-Phoen/grabana/links"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
@@ -181,6 +182,25 @@ func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 	return func(graph *Graph) error {
 		graph.Builder.AddTarget(target.Builder)
+
+		return nil
+	}
+}
+
+// WithCloudwatchTarget adds a cloudwatch metric to the graph.
+func WithCloudwatchTarget(metric string, namespace string, options ...cloudwatch.Option) Option {
+	target := cloudwatch.New(metric, namespace, options...)
+
+	return func(graph *Graph) error {
+		graph.Builder.AddTarget(&sdk.Target{
+			RefID:        target.Ref,
+			Namespace:    target.Namespace,
+			MetricName:   target.MetricName,
+			Statistics:   target.Statistics,
+			Dimensions:   target.Dimensions,
+			Region:       target.Region,
+			LegendFormat: target.LegendFormat,
+		})
 
 		return nil
 	}

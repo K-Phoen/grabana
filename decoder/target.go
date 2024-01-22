@@ -8,6 +8,7 @@ import (
 	"github.com/K-Phoen/grabana/target/loki"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 )
 
 var ErrTargetNotConfigured = fmt.Errorf("target not configured")
@@ -22,6 +23,7 @@ type Target struct {
 	InfluxDB    *InfluxDBTarget    `yaml:"influxdb,omitempty"`
 	Stackdriver *StackdriverTarget `yaml:",omitempty"`
 	Loki        *LokiTarget        `yaml:",omitempty"`
+	Cloudwatch  *CloudwatchTarget  `yaml:",omitempty"`
 }
 
 type PrometheusTarget struct {
@@ -324,4 +326,23 @@ func (t StackdriverAlignment) toOption() (stackdriver.Option, error) {
 	default:
 		return nil, ErrInvalidStackdriverAlignment
 	}
+}
+
+type CloudwatchTarget struct {
+	Namespace  string
+	MetricName string `yaml:"metric"`
+	Region string `yaml:,omitepty"`
+	Legend string `yaml:",omitempty"`
+	Statistics   []string `yaml:",omitempty"`
+	Dimensions   map[string]string `yaml:",omitempty"`
+	Ref    string `yaml:",omitempty"`
+}
+
+func (t CloudwatchTarget) toOptions() []cloudwatch.Option {
+	opts := []cloudwatch.Option{
+		cloudwatch.Legend(t.Legend),
+		cloudwatch.Ref(t.Ref),
+	}
+
+	return opts
 }
