@@ -67,6 +67,26 @@ func TestHeatmapPanelCanHaveStackdriverTargets(t *testing.T) {
 
 	req.NoError(err)
 	req.Len(panel.Builder.HeatmapPanel.Targets, 1)
+
+}
+func TestHeatmapPanelCanHaveCloudwatchTargets(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.QueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		MetricName: "NumberOfMessagesReceived",
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		Period:     "30",
+		Region:     "us-east-1",
+	}
+
+	panel, err := New("", WithCloudwatchTarget(query))
+
+	req.NoError(err)
+	req.Len(panel.Builder.HeatmapPanel.Targets, 1)
 }
 
 func TestHeatmapPanelWidthCanBeConfigured(t *testing.T) {

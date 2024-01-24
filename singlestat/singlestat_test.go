@@ -68,6 +68,26 @@ func TestSingleStatPanelCanHaveStackdriverTargets(t *testing.T) {
 	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
 }
 
+func TestSingleStatPanelCanHaveCloudwatchTargets(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.QueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		MetricName: "NumberOfMessagesReceived",
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		Period:     "30",
+		Region:     "us-east-1",
+	}
+
+	panel, err := New("", WithCloudwatchTarget(query))
+
+	req.NoError(err)
+	req.Len(panel.Builder.SinglestatPanel.Targets, 1)
+}
+
 func TestSingleStatPanelWidthCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 

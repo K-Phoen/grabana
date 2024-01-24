@@ -3,61 +3,51 @@ package cloudwatch
 import (
 	"testing"
 
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewCloudwatchTargetCanBeCreated(t *testing.T) {
+func TestQueriesCanBeCreated(t *testing.T) {
 	req := require.New(t)
-	metricName := "Cloudwatch"
-	namespace := "Test"
 
-	target := New(metricName, namespace)
+	query := &cloudwatch.QueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		MetricName: "NumberOfMessagesReceived",
+		Period:     "30",
+		Region:     "us-east-1",
+	}
 
-	req.Equal(metricName, target.MetricName)
-	req.Equal(namespace, target.Namespace)
-}
+	target := cloudwatch.New(*query)
 
-func TestLegendCanBeConfigured(t *testing.T) {
-	req := require.New(t)
-	legend := "lala"
-
-	target := New("", "", Legend(legend))
-
-	req.Equal(legend, target.LegendFormat)
+	req.Equal(query.Dimensions, target.Builder.Dimensions)
+	req.Equal(query.Statistics, target.Builder.Statistics)
+	req.Equal(query.Namespace, target.Builder.Namespace)
+	req.Equal(query.MetricName, target.Builder.MetricName)
+	req.Equal(query.Period, target.Builder.Period)
+	req.Equal(query.Region, target.Builder.Region)
+	req.Equal(query.MatchExact, target.Builder.MatchExact)
 }
 
 func TestRefCanBeConfigured(t *testing.T) {
 	req := require.New(t)
 
-	target := New("", "", Ref("A"))
+	query := &cloudwatch.QueryParams{}
 
-	req.Equal("A", target.Ref)
+	target := cloudwatch.New(*query, cloudwatch.Ref("A"))
+
+	req.Equal("A", target.Builder.RefID)
 }
 
-func TestRegionCanBeSet(t *testing.T) {
+func TestRefCanBeHidden(t *testing.T) {
 	req := require.New(t)
 
-	target := New("", "", Region("C"))
+	query := &cloudwatch.QueryParams{}
 
-	req.Equal("C", target.Region)
-}
+	target := cloudwatch.New(*query, cloudwatch.Hide())
 
-func TestStatisticCanBeSet(t *testing.T) {
-	req := require.New(t)
-	statistics := []string{"A", "B", "C"}
-
-	target := New("", "", Statistic(statistics))
-
-	req.Equal(statistics, target.Statistics)
-}
-
-func TestDimensionsCanBeSet(t *testing.T) {
-	req := require.New(t)
-	dimensions := map[string]string{
-		"one": "1",
-	}
-
-	target := New("", "", Dimensions(dimensions))
-
-	req.Equal(dimensions, target.Dimensions)
+	req.True(target.Builder.Hide)
 }

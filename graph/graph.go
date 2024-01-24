@@ -188,19 +188,11 @@ func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 }
 
 // WithCloudwatchTarget adds a cloudwatch metric to the graph.
-func WithCloudwatchTarget(metric string, namespace string, options ...cloudwatch.Option) Option {
-	target := cloudwatch.New(metric, namespace, options...)
+func WithCloudwatchTarget(queryParams cloudwatch.QueryParams, options ...cloudwatch.Option) Option {
+	target := cloudwatch.New(queryParams, options...)
 
 	return func(graph *Graph) error {
-		graph.Builder.AddTarget(&sdk.Target{
-			RefID:        target.Ref,
-			Namespace:    target.Namespace,
-			MetricName:   target.MetricName,
-			Statistics:   target.Statistics,
-			Dimensions:   target.Dimensions,
-			Region:       target.Region,
-			LegendFormat: target.LegendFormat,
-		})
+		graph.Builder.AddTarget(target.Builder)
 
 		return nil
 	}

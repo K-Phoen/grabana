@@ -8,6 +8,7 @@ import (
 	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/scheme"
 	"github.com/K-Phoen/grabana/target/stackdriver"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 	"github.com/K-Phoen/grabana/timeseries/fields"
 	"github.com/K-Phoen/grabana/timeseries/threshold"
@@ -467,4 +468,24 @@ func TestValuesCanBeStacked(t *testing.T) {
 
 	req.NoError(err)
 	req.Equal("percent", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode)
+}
+
+func TestTimeSeriesPanelCanHaveCloudwatchTargets(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.QueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		MetricName: "NumberOfMessagesReceived",
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		Period:     "30",
+		Region:     "us-east-1",
+	}
+
+	panel, err := New("", WithCloudwatchTarget(query))
+
+	req.NoError(err)
+	req.Len(panel.Builder.TimeseriesPanel.Targets, 1)
 }

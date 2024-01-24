@@ -10,6 +10,7 @@ import (
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/sdk"
 )
 
@@ -196,6 +197,17 @@ func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 
 // WithStackdriverTarget adds a stackdriver query to the graph.
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
+	return func(singleStat *SingleStat) error {
+		singleStat.Builder.AddTarget(target.Builder)
+
+		return nil
+	}
+}
+
+// WithCloudwatchTarget adds a cloudwatch query to the stat.
+func WithCloudwatchTarget(queryParams cloudwatch.QueryParams, options ...cloudwatch.Option) Option {
+	target := cloudwatch.New(queryParams, options...)
+
 	return func(singleStat *SingleStat) error {
 		singleStat.Builder.AddTarget(target.Builder)
 

@@ -1,25 +1,35 @@
 package cloudwatch
 
-// Option represents an option that can be used to configure a cloudwatch metric.
+import "github.com/K-Phoen/sdk"
+
+// Option represents an option that can be used to configure a cloudwatch query.
 type Option func(target *Cloudwatch)
 
-// Cloudwatch represents a cloudwatch metric.
+// Cloudwatch represents a cloudwatch query.
 type Cloudwatch struct {
-	Ref          string
-	Namespace    string
-	MetricName   string
-	Region       string
-	Statistics   []string
-	Dimensions   map[string]string
-	Period       string
-	LegendFormat string
+	Builder *sdk.Target
+}
+
+type QueryParams struct {
+	Dimensions    map[string]string `yaml:",omitempty"`
+	Statistics    []string          `yaml:",omitempty"`
+	Namespace     string            `yaml:",omitempty"`
+	MetricName    string            `yaml:",omitempty"`
+	Period        string            `yaml:",omitempty"`
+	Region        string            `yaml:",omitempty"`
 }
 
 // New creates a new cloudwatch query.
-func New(metric string, namespace string, options ...Option) *Cloudwatch {
+func New(target QueryParams, options ...Option) *Cloudwatch {
 	cloudwatch := &Cloudwatch{
-		MetricName: metric,
-		Namespace:  namespace,
+		Builder: &sdk.Target{
+			Namespace:     target.Namespace,
+			MetricName:    target.MetricName,
+			Dimensions:    target.Dimensions,
+			Statistics:    target.Statistics,
+			Period:        target.Period,
+			Region:        target.Region,
+		},
 	}
 
 	for _, opt := range options {
@@ -29,37 +39,17 @@ func New(metric string, namespace string, options ...Option) *Cloudwatch {
 	return cloudwatch
 }
 
-// Legend sets the legend format.
-func Legend(legend string) Option {
-	return func(cloudwatch *Cloudwatch) {
-		cloudwatch.LegendFormat = legend
-	}
-}
-
-// Region sets the region.
-func Region(region string) Option {
-	return func(cloudwatch *Cloudwatch) {
-		cloudwatch.Region = region
-	}
-}
-
-// Statistic sets the statistic.
-func Statistic(statistics []string) Option {
-	return func(cloudwatch *Cloudwatch) {
-		cloudwatch.Statistics = statistics
-	}
-}
-
-// Dimensions sets the dimensions.
-func Dimensions(dimensions map[string]string) Option {
-	return func(cloudwatch *Cloudwatch) {
-		cloudwatch.Dimensions = dimensions
-	}
-}
-
 // Ref sets the reference ID for this query.
 func Ref(ref string) Option {
 	return func(cloudwatch *Cloudwatch) {
-		cloudwatch.Ref = ref
+		cloudwatch.Builder.RefID = ref
+	}
+}
+
+// Hide the query. Grafana does not send hidden queries to the data source,
+// but they can still be referenced in alerts.
+func Hide() Option {
+	return func(cloudwatch *Cloudwatch) {
+		cloudwatch.Builder.Hide = true
 	}
 }

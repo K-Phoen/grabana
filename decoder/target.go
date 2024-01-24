@@ -329,19 +329,18 @@ func (t StackdriverAlignment) toOption() (stackdriver.Option, error) {
 }
 
 type CloudwatchTarget struct {
-	Namespace  string
-	MetricName string `yaml:"metric"`
-	Region string `yaml:,omitepty"`
-	Legend string `yaml:",omitempty"`
-	Statistics   []string `yaml:",omitempty"`
-	Dimensions   map[string]string `yaml:",omitempty"`
-	Ref    string `yaml:",omitempty"`
+	QueryParams cloudwatch.QueryParams `yaml:",omitempty"`
+	Ref         string                 `yaml:",omitempty"`
+	Hidden      bool                   `yaml:",omitempty"`
 }
 
 func (t CloudwatchTarget) toOptions() []cloudwatch.Option {
 	opts := []cloudwatch.Option{
-		cloudwatch.Legend(t.Legend),
 		cloudwatch.Ref(t.Ref),
+	}
+
+	if t.Hidden {
+		opts = append(opts, cloudwatch.Hide())
 	}
 
 	return opts
