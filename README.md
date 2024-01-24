@@ -17,6 +17,11 @@ creation of dashboards, this library is meant for you.
 
 **Note**: Grafana 8+ is required, with [unified alerting](https://grafana.com/blog/2021/06/14/the-new-unified-alerting-system-for-grafana-everything-you-need-to-know/) enabled.
 
+## See also
+
+* [`grafana-foundation-sdk`](https://github.com/grafana/grafana-foundation-sdk): A set of tools, types and libraries for building and manipulating Grafana objects – built by Grafana Labs
+* [`dark`](https://github.com/K-Phoen/dark): (grafana) Dashboards As Resources in Kubernetes
+
 ## Dashboard as code
 
 Dashboard configuration:
