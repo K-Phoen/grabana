@@ -48,7 +48,7 @@ func main() {
 			panic(fmt.Errorf("could not marshal schema to JSON: %w", err))
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("./schemas/%s.json", t.name), schemaJSON, 0644); err != nil {
+		if err := os.WriteFile(fmt.Sprintf("./schemas/%s.json", t.name), schemaJSON, 0600); err != nil {
 			panic(fmt.Errorf("could not write schema: %w", err))
 		}
 	}
