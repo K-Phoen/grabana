@@ -35,6 +35,11 @@ func main() {
 				return key
 			},
 		}
+
+		if err := reflector.AddGoComments("github.com/K-Phoen/grabana", "./decoder"); err != nil {
+			panic(fmt.Errorf("could not add Go comments to reflector: %w", err))
+		}
+
 		schema := reflector.Reflect(t.input)
 		schema.ID = jsonschema.ID(fmt.Sprintf("https://raw.githubusercontent.com/K-Phoen/grabana/master/schemas/%s.json", t.name))
 

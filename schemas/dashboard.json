@@ -66,7 +66,8 @@
           "type": "string"
         },
         "avg": {
-          "type": "string"
+          "type": "string",
+          "description": "Query reducers, only one should be used"
         },
         "sum": {
           "type": "string"
@@ -437,7 +438,8 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "DashboardHeatmap represents a heatmap panel."
     },
     "DashboardInternalLink": {
       "properties": {
@@ -655,7 +657,8 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "DashboardRow represents a dashboard row."
     },
     "DashboardSingleStat": {
       "properties": {
@@ -863,7 +866,8 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "DashboardTable represents a table panel."
     },
     "DashboardText": {
       "properties": {
