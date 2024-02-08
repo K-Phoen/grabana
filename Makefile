@@ -62,3 +62,8 @@ down-all: down
 
 install_goreleaser:
 	go install github.com/goreleaser/goreleaser@latest
+
+
+.PHONY: schemas
+schemas:
+	go run ./cmd/generate-jsonschema/*.go

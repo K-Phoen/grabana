@@ -1,0 +1,1691 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/K-Phoen/grabana/master/schemas/dashboard.json",
+  "$ref": "#/$defs/DashboardModel",
+  "$defs": {
+    "Aggregation": {
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Alert": {
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "runbook": {
+          "type": "string"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "evaluate_every": {
+          "type": "string"
+        },
+        "for": {
+          "type": "string"
+        },
+        "on_no_data": {
+          "type": "string"
+        },
+        "on_execution_error": {
+          "type": "string"
+        },
+        "if": {
+          "items": {
+            "$ref": "#/$defs/AlertCondition"
+          },
+          "type": "array"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/AlertTarget"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AlertCondition": {
+      "properties": {
+        "operand": {
+          "type": "string"
+        },
+        "avg": {
+          "type": "string"
+        },
+        "sum": {
+          "type": "string"
+        },
+        "count": {
+          "type": "string"
+        },
+        "last": {
+          "type": "string"
+        },
+        "min": {
+          "type": "string"
+        },
+        "max": {
+          "type": "string"
+        },
+        "median": {
+          "type": "string"
+        },
+        "diff": {
+          "type": "string"
+        },
+        "percent_diff": {
+          "type": "string"
+        },
+        "has_no_value": {
+          "type": "boolean"
+        },
+        "above": {
+          "type": "number"
+        },
+        "below": {
+          "type": "number"
+        },
+        "outside_range": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array",
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "within_range": {
+          "items": {
+            "type": "number"
+          },
+          "type": "array",
+          "maxItems": 2,
+          "minItems": 2
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AlertGraphite": {
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string"
+        },
+        "lookback": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AlertLoki": {
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string"
+        },
+        "legend": {
+          "type": "string"
+        },
+        "lookback": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AlertPrometheus": {
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "query": {
+          "type": "string"
+        },
+        "legend": {
+          "type": "string"
+        },
+        "lookback": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AlertStackdriver": {
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "lookback": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "filters": {
+          "$ref": "#/$defs/StackdriverAlertFilters"
+        },
+        "aggregation": {
+          "type": "string"
+        },
+        "alignment": {
+          "$ref": "#/$defs/StackdriverAlertAlignment"
+        },
+        "legend": {
+          "type": "string"
+        },
+        "preprocessor": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "group_by": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AlertTarget": {
+      "properties": {
+        "prometheus": {
+          "$ref": "#/$defs/AlertPrometheus"
+        },
+        "loki": {
+          "$ref": "#/$defs/AlertLoki"
+        },
+        "graphite": {
+          "$ref": "#/$defs/AlertGraphite"
+        },
+        "stackdriver": {
+          "$ref": "#/$defs/AlertStackdriver"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardExternalLink": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "include_time_range": {
+          "type": "boolean"
+        },
+        "include_variable_values": {
+          "type": "boolean"
+        },
+        "open_in_new_tab": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardGauge": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "string"
+        },
+        "repeat_direction": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer"
+        },
+        "orientation": {
+          "type": "string"
+        },
+        "value_type": {
+          "type": "string"
+        },
+        "title_font_size": {
+          "type": "integer"
+        },
+        "value_font_size": {
+          "type": "integer"
+        },
+        "threshold_mode": {
+          "type": "string"
+        },
+        "thresholds": {
+          "items": {
+            "$ref": "#/$defs/GaugeThresholdStep"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardGraph": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "string"
+        },
+        "repeat_direction": {
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "axes": {
+          "$ref": "#/$defs/GraphAxes"
+        },
+        "legend": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "alert": {
+          "$ref": "#/$defs/Alert"
+        },
+        "visualization": {
+          "$ref": "#/$defs/GraphVisualization"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardHeatmap": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "string"
+        },
+        "repeat_direction": {
+          "type": "string"
+        },
+        "data_format": {
+          "type": "string"
+        },
+        "hide_zero_buckets": {
+          "type": "boolean"
+        },
+        "highlight_cards": {
+          "type": "boolean"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array"
+        },
+        "reverse_y_buckets": {
+          "type": "boolean"
+        },
+        "tooltip": {
+          "$ref": "#/$defs/HeatmapTooltip"
+        },
+        "yaxis": {
+          "$ref": "#/$defs/HeatmapYAxis"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardInternalLink": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "as_dropdown": {
+          "type": "boolean"
+        },
+        "include_time_range": {
+          "type": "boolean"
+        },
+        "include_variable_values": {
+          "type": "boolean"
+        },
+        "open_in_new_tab": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardLogs": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "string"
+        },
+        "repeat_direction": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/LogsTarget"
+          },
+          "type": "array"
+        },
+        "visualization": {
+          "$ref": "#/$defs/LogsVisualization"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardModel": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "uid": {
+          "type": "string"
+        },
+        "editable": {
+          "type": "boolean"
+        },
+        "shared_crosshair": {
+          "type": "boolean"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "auto_refresh": {
+          "type": "string"
+        },
+        "time": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "timezone": {
+          "type": "string"
+        },
+        "tags_annotations": {
+          "items": {
+            "$ref": "#/$defs/TagAnnotation"
+          },
+          "type": "array"
+        },
+        "variables": {
+          "items": {
+            "$ref": "#/$defs/DashboardVariable"
+          },
+          "type": "array"
+        },
+        "external_links": {
+          "items": {
+            "$ref": "#/$defs/DashboardExternalLink"
+          },
+          "type": "array"
+        },
+        "dashboard_links": {
+          "items": {
+            "$ref": "#/$defs/DashboardInternalLink"
+          },
+          "type": "array"
+        },
+        "rows": {
+          "items": {
+            "$ref": "#/$defs/DashboardRow"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardPanel": {
+      "properties": {
+        "graph": {
+          "$ref": "#/$defs/DashboardGraph"
+        },
+        "table": {
+          "$ref": "#/$defs/DashboardTable"
+        },
+        "single_stat": {
+          "$ref": "#/$defs/DashboardSingleStat"
+        },
+        "stat": {
+          "$ref": "#/$defs/DashboardStat"
+        },
+        "text": {
+          "$ref": "#/$defs/DashboardText"
+        },
+        "heatmap": {
+          "$ref": "#/$defs/DashboardHeatmap"
+        },
+        "timeseries": {
+          "$ref": "#/$defs/DashboardTimeSeries"
+        },
+        "logs": {
+          "$ref": "#/$defs/DashboardLogs"
+        },
+        "gauge": {
+          "$ref": "#/$defs/DashboardGauge"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardPanelLink": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "open_in_new_tab": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardPanelLinks": {
+      "items": {
+        "$ref": "#/$defs/DashboardPanelLink"
+      },
+      "type": "array"
+    },
+    "DashboardRow": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "repeat_for": {
+          "type": "string"
+        },
+        "collapse": {
+          "type": "boolean"
+        },
+        "hide_title": {
+          "type": "boolean"
+        },
+        "panels": {
+          "items": {
+            "$ref": "#/$defs/DashboardPanel"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardSingleStat": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "string"
+        },
+        "repeat_direction": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer"
+        },
+        "value_type": {
+          "type": "string"
+        },
+        "value_font_size": {
+          "type": "string"
+        },
+        "prefix_font_size": {
+          "type": "string"
+        },
+        "postfix_font_size": {
+          "type": "string"
+        },
+        "sparkline": {
+          "type": "string"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array"
+        },
+        "thresholds": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "maxItems": 2,
+          "minItems": 2
+        },
+        "colors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "maxItems": 3,
+          "minItems": 3
+        },
+        "color": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ranges_to_text": {
+          "items": {
+            "$ref": "#/$defs/RangeMap"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardStat": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "string"
+        },
+        "repeat_direction": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "integer"
+        },
+        "sparkline": {
+          "type": "boolean"
+        },
+        "orientation": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "value_type": {
+          "type": "string"
+        },
+        "color_mode": {
+          "type": "string"
+        },
+        "title_font_size": {
+          "type": "integer"
+        },
+        "value_font_size": {
+          "type": "integer"
+        },
+        "threshold_mode": {
+          "type": "string"
+        },
+        "thresholds": {
+          "items": {
+            "$ref": "#/$defs/StatThresholdStep"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardTable": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array"
+        },
+        "hidden_columns": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "time_series_aggregations": {
+          "items": {
+            "$ref": "#/$defs/Aggregation"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardText": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "html": {
+          "type": "string"
+        },
+        "markdown": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardTimeSeries": {
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "span": {
+          "type": "number"
+        },
+        "height": {
+          "type": "string"
+        },
+        "transparent": {
+          "type": "boolean"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "repeat": {
+          "type": "string"
+        },
+        "repeat_direction": {
+          "type": "string"
+        },
+        "links": {
+          "$ref": "#/$defs/DashboardPanelLinks"
+        },
+        "targets": {
+          "items": {
+            "$ref": "#/$defs/Target"
+          },
+          "type": "array"
+        },
+        "legend": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "alert": {
+          "$ref": "#/$defs/Alert"
+        },
+        "visualization": {
+          "$ref": "#/$defs/TimeSeriesVisualization"
+        },
+        "axis": {
+          "$ref": "#/$defs/TimeSeriesAxis"
+        },
+        "overrides": {
+          "items": {
+            "$ref": "#/$defs/TimeSeriesOverride"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DashboardVariable": {
+      "properties": {
+        "interval": {
+          "$ref": "#/$defs/VariableInterval"
+        },
+        "custom": {
+          "$ref": "#/$defs/VariableCustom"
+        },
+        "query": {
+          "$ref": "#/$defs/VariableQuery"
+        },
+        "const": {
+          "$ref": "#/$defs/VariableConst"
+        },
+        "datasource": {
+          "$ref": "#/$defs/VariableDatasource"
+        },
+        "text": {
+          "$ref": "#/$defs/VariableText"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GaugeThresholdStep": {
+      "properties": {
+        "color": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GraphAxes": {
+      "properties": {
+        "left": {
+          "$ref": "#/$defs/GraphAxis"
+        },
+        "right": {
+          "$ref": "#/$defs/GraphAxis"
+        },
+        "bottom": {
+          "$ref": "#/$defs/GraphAxis"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GraphAxis": {
+      "properties": {
+        "hidden": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "log_base": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GraphSeriesOverride": {
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "dashes": {
+          "type": "boolean"
+        },
+        "lines": {
+          "type": "boolean"
+        },
+        "fill": {
+          "type": "integer"
+        },
+        "line_width": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GraphVisualization": {
+      "properties": {
+        "nullvalue": {
+          "type": "string"
+        },
+        "staircase": {
+          "type": "boolean"
+        },
+        "overrides": {
+          "items": {
+            "$ref": "#/$defs/GraphSeriesOverride"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "GraphiteTarget": {
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "HeatmapTooltip": {
+      "properties": {
+        "show": {
+          "type": "boolean"
+        },
+        "showhistogram": {
+          "type": "boolean"
+        },
+        "decimals": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "HeatmapYAxis": {
+      "properties": {
+        "decimals": {
+          "type": "integer"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "max": {
+          "type": "number"
+        },
+        "min": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "InfluxDBTarget": {
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "LogsTarget": {
+      "properties": {
+        "loki": {
+          "$ref": "#/$defs/LokiTarget"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "LogsVisualization": {
+      "properties": {
+        "time": {
+          "type": "boolean"
+        },
+        "unique_labels": {
+          "type": "boolean"
+        },
+        "common_labels": {
+          "type": "boolean"
+        },
+        "wrap_lines": {
+          "type": "boolean"
+        },
+        "prettify_json": {
+          "type": "boolean"
+        },
+        "hide_log_details": {
+          "type": "boolean"
+        },
+        "order": {
+          "type": "string"
+        },
+        "deduplication": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "LokiTarget": {
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "legend": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PrometheusTarget": {
+      "properties": {
+        "query": {
+          "type": "string"
+        },
+        "legend": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string"
+        },
+        "instant": {
+          "type": "boolean"
+        },
+        "interval_factor": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RangeMap": {
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "StackdriverAlertAlignment": {
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "StackdriverAlertFilters": {
+      "properties": {
+        "eq": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "neq": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "matches": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "not_matches": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "StackdriverAlignment": {
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "period": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "StackdriverFilters": {
+      "properties": {
+        "eq": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "neq": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "matches": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "not_matches": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "StackdriverTarget": {
+      "properties": {
+        "project": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "filters": {
+          "$ref": "#/$defs/StackdriverFilters"
+        },
+        "aggregation": {
+          "type": "string"
+        },
+        "alignment": {
+          "$ref": "#/$defs/StackdriverAlignment"
+        },
+        "legend": {
+          "type": "string"
+        },
+        "preprocessor": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "group_by": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "StatThresholdStep": {
+      "properties": {
+        "color": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TagAnnotation": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Target": {
+      "properties": {
+        "prometheus": {
+          "$ref": "#/$defs/PrometheusTarget"
+        },
+        "graphite": {
+          "$ref": "#/$defs/GraphiteTarget"
+        },
+        "influxdb": {
+          "$ref": "#/$defs/InfluxDBTarget"
+        },
+        "stackdriver": {
+          "$ref": "#/$defs/StackdriverTarget"
+        },
+        "loki": {
+          "$ref": "#/$defs/LokiTarget"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TimeSeriesAxis": {
+      "properties": {
+        "soft_min": {
+          "type": "integer"
+        },
+        "soft_max": {
+          "type": "integer"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "decimals": {
+          "type": "integer"
+        },
+        "display": {
+          "type": "string"
+        },
+        "scale": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TimeSeriesOverride": {
+      "properties": {
+        "match": {
+          "$ref": "#/$defs/TimeSeriesOverrideMatcher"
+        },
+        "properties": {
+          "$ref": "#/$defs/TimeSeriesOverrideProperties"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TimeSeriesOverrideMatcher": {
+      "properties": {
+        "field_name": {
+          "type": "string"
+        },
+        "query_ref": {
+          "type": "string"
+        },
+        "regex": {
+          "type": "string"
+        },
+        "field_type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TimeSeriesOverrideProperties": {
+      "properties": {
+        "unit": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "fill_opacity": {
+          "type": "integer"
+        },
+        "negative_Y": {
+          "type": "boolean"
+        },
+        "axis_display": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TimeSeriesVisualization": {
+      "properties": {
+        "gradient_mode": {
+          "type": "string"
+        },
+        "tooltip": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        },
+        "fill_opacity": {
+          "type": "integer"
+        },
+        "point_size": {
+          "type": "integer"
+        },
+        "line_interpolation": {
+          "type": "string"
+        },
+        "line_width": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "VariableConst": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "default": {
+          "type": "string"
+        },
+        "values_map": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "hide": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "VariableCustom": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "default": {
+          "type": "string"
+        },
+        "values_map": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "include_all": {
+          "type": "boolean"
+        },
+        "all_value": {
+          "type": "string"
+        },
+        "hide": {
+          "type": "string"
+        },
+        "multiple": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "VariableDatasource": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "regex": {
+          "type": "string"
+        },
+        "include_all": {
+          "type": "boolean"
+        },
+        "hide": {
+          "type": "string"
+        },
+        "multiple": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "VariableInterval": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "default": {
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "hide": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "VariableQuery": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "datasource": {
+          "type": "string"
+        },
+        "request": {
+          "type": "string"
+        },
+        "regex": {
+          "type": "string"
+        },
+        "include_all": {
+          "type": "boolean"
+        },
+        "default_all": {
+          "type": "boolean"
+        },
+        "all_value": {
+          "type": "string"
+        },
+        "hide": {
+          "type": "string"
+        },
+        "multiple": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "VariableText": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "hide": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}
