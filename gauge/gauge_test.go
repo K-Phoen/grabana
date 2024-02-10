@@ -6,7 +6,9 @@ import (
 	"github.com/K-Phoen/grabana/errors"
 	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/stackdriver"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/sdk"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -66,6 +68,28 @@ func TestGaugePanelCanHaveStackdriverTargets(t *testing.T) {
 
 	req.NoError(err)
 	req.Len(panel.Builder.GaugePanel.Targets, 1)
+}
+
+func TestGaugeCloudwatchTarget(t *testing.T) {
+
+	panel := DashboardGauge{
+		Title: "cloudwatch target test",
+		Targets: []Target{
+			{
+				Cloudwatch: &CloudwatchTarget{
+					QueryParams: cloudwatch.QueryParams{
+						Dimensions: map[string]string{
+							"Name": "test",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	option, err := panel.target(panel.Targets[0])
+	assert.NoError(t, err)
+	assert.NotNil(t, option)
 }
 
 func TestGaugePanelWidthCanBeConfigured(t *testing.T) {

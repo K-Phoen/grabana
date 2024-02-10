@@ -186,3 +186,23 @@ func TestTablePanelDescriptionCanBeSet(t *testing.T) {
 	req.NotNil(panel.Builder.Description)
 	req.Equal("lala", *panel.Builder.Description)
 }
+
+func TestTablePanelCanHaveCloudwatchTargets(t *testing.T) {
+	req := require.New(t)
+
+	query := cloudwatch.QueryParams{
+		Dimensions: map[string]string{
+			"QueueName": "test-queue",
+		},
+		MetricName: "NumberOfMessagesReceived",
+		Statistics: []string{"Sum"},
+		Namespace:  "AWS/SQS",
+		Period:     "30",
+		Region:     "us-east-1",
+	}
+
+	panel, err := New("", WithCloudwatchTarget(query))
+
+	req.NoError(err)
+	req.Len(panel.Builder.TablePanel.Targets, 1)
+}

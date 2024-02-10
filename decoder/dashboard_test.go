@@ -36,6 +36,7 @@ func TestUnmarshalYAML(t *testing.T) {
 		heatmapPanel(),
 		graphPanelWithGraphiteTarget(),
 		graphPanelWithInfluxdbTarget(),
+		graphPanelWithCloudwatchTarget(),
 		timeseriesPanel(),
 		collapseRow(),
 		logsPanel(),
@@ -567,6 +568,34 @@ rows:
 		yaml:                yaml,
 		expectedGrafanaJSON: "graph_panel_influxdb_target.json",
 	}
+}
+
+func graphPanelWithCloudwatchTarget() testCase {
+	yaml := `title: Awesome dashboard
+rows:
+  - name: Test row
+    panels:
+      - graph:
+          title: Dummy
+          datasource: cloudwatch-test
+          targets:
+            - cloudwatch:
+                queryparams:                
+                  dimensions: 
+                    QueueName: "test-queue"
+                  namespace: "AWS/SQS"
+                  metricname: "NumberofMessagesReceived"
+                  statistics:
+                    - "Sum"
+                  period: "30"
+                  region: "us-east-1"
+                  matchexact: false
+`
+
+	return testCase{
+		name:                "single row with single graph panel and cloudwatch target",
+		yaml:                yaml,
+		expectedGrafanaJSON: "graph_panel_cloudwatch_target.json"}
 }
 
 func singleStatPanel() testCase {
