@@ -170,6 +170,9 @@ func (singleStatPanel DashboardSingleStat) target(t Target) (singlestat.Option, 
 
 		return singlestat.WithStackdriverTarget(stackdriverTarget), nil
 	}
+	if t.Cloudwatch != nil {
+		return singlestat.WithCloudwatchTarget(t.Cloudwatch.QueryParams, t.Cloudwatch.toOptions()...), nil
+	}
 
 	return nil, ErrTargetNotConfigured
 }

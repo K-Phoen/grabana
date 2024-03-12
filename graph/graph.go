@@ -9,6 +9,7 @@ import (
 	"github.com/K-Phoen/grabana/graph/series"
 	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/target/graphite"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
@@ -179,6 +180,17 @@ func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 
 // WithStackdriverTarget adds a stackdriver query to the graph.
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
+	return func(graph *Graph) error {
+		graph.Builder.AddTarget(target.Builder)
+
+		return nil
+	}
+}
+
+// WithCloudwatchTarget adds a cloudwatch query to the graph.
+func WithCloudwatchTarget(queryParams cloudwatch.QueryParams, options ...cloudwatch.Option) Option {
+	target := cloudwatch.New(queryParams, options...)
+
 	return func(graph *Graph) error {
 		graph.Builder.AddTarget(target.Builder)
 

@@ -5,8 +5,10 @@ import (
 
 	"github.com/K-Phoen/grabana/heatmap/axis"
 	"github.com/K-Phoen/grabana/row"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/sdk"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHeatmapCanBeDecoded(t *testing.T) {
@@ -122,4 +124,25 @@ func TestHeatmapCanNotBeDecodedIfTargetIsInvalid(t *testing.T) {
 	_, err := panel.toOption()
 	req.Error(err)
 	req.Equal(ErrTargetNotConfigured, err)
+}
+
+func TestHeatmapCloudwatchTarget(t *testing.T) {
+	panel := DashboardHeatmap{
+		Title: "heatmap target test",
+		Targets: []Target{
+			{
+				Cloudwatch: &CloudwatchTarget{
+					QueryParams: cloudwatch.QueryParams{
+						Dimensions: map[string]string{
+							"Name": "test",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	option, err := panel.target(panel.Targets[0])
+	assert.NoError(t, err)
+	assert.NotNil(t, option)
 }

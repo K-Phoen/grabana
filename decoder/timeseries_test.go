@@ -3,9 +3,11 @@ package decoder
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/K-Phoen/grabana/dashboard"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
 )
@@ -499,4 +501,25 @@ func TestTimeSeriesAxisRejectsInvalidScale(t *testing.T) {
 	_, err := tsAxis.toOptions()
 
 	req.Equal(ErrInvalidAxisScale, err)
+}
+
+func TestTimeSeriesCloudwatchTarget(t *testing.T) {
+	panel := DashboardTimeSeries{
+		Title: "Timeseries target test",
+		Targets: []Target{
+			{
+				Cloudwatch: &CloudwatchTarget{
+					QueryParams: cloudwatch.QueryParams{
+						Dimensions: map[string]string{
+							"Name": "test",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	option, err := panel.target(panel.Targets[0])
+	assert.NoError(t, err)
+	assert.NotNil(t, option)
 }

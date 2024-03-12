@@ -214,3 +214,10 @@ func Tags(tags map[string]string) Option {
 		alert.Builder.Rules[0].Labels = tags
 	}
 }
+
+// DataSource sets the data source associated to the alert.
+func DataSource(dataSource string) Option {
+	return func(alert *Alert) {
+		alert.HookDatasourceUID(dataSource)
+	}
+}

@@ -7,6 +7,7 @@ import (
 	"github.com/K-Phoen/grabana/links"
 	"github.com/K-Phoen/grabana/scheme"
 	"github.com/K-Phoen/grabana/target/graphite"
+	"github.com/K-Phoen/grabana/target/cloudwatch"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/prometheus"
 	"github.com/K-Phoen/grabana/target/stackdriver"
@@ -171,6 +172,17 @@ func WithInfluxDBTarget(query string, options ...influxdb.Option) Option {
 func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 	return func(gauge *Gauge) error {
 		gauge.Builder.AddTarget(target.Builder)
+
+		return nil
+	}
+}
+
+// WithCloudwatchTarget adds a cloudwatch query to the gauge.
+func WithCloudwatchTarget(queryParams cloudwatch.QueryParams, options ...cloudwatch.Option) Option {
+	target := cloudwatch.New(queryParams, options...)
+
+	return func(graph *Gauge) error {
+		graph.Builder.AddTarget(target.Builder)
 
 		return nil
 	}
