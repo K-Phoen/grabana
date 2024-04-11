@@ -25,10 +25,10 @@ func NewPromQL(projectName, expr string, options ...PromQLOption) *PromQL {
 			QueryType: "promQL",
 			// For some reason I can't explain, Grafana seems to require TimeSeriesQuery to be set
 			// when we're making a promQL query.
-			TimeSeriesQuery: &sdk.StackdriverTimeSeriesQuery{
+			TimeSeriesQuery: &sdk.GCMTimeSeriesQuery{
 				ProjectName: projectName,
 			},
-			PromQLQuery: &sdk.StackdriverPromQLQuery{
+			PromQLQuery: &sdk.GCMPromQLQuery{
 				ProjectName: projectName,
 				Expr:        expr,
 				Step:        "10s",

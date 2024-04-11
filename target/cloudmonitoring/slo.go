@@ -38,6 +38,12 @@ func SLORef(id, name string) SLOOption {
 	}
 }
 
+func Goal(goal float64) SLOOption {
+	return func(s *SLO) {
+		s.target.SLOQuery.Goal = &goal
+	}
+}
+
 func LookbackPeriod(period string) SLOOption {
 	return func(s *SLO) {
 		s.target.SLOQuery.LookbackPeriod = period
@@ -52,7 +58,7 @@ func NewSLO(projectName string, options ...SLOOption) *SLO {
 	slo := &SLO{
 		target: &sdk.Target{
 			QueryType: "slo",
-			SLOQuery: &sdk.StackdriverSLOQuery{
+			SLOQuery: &sdk.GCMSLOQuery{
 				ProjectName: projectName,
 			},
 		},

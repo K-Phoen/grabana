@@ -30,7 +30,7 @@ func NewMQL(projectName, query string, options ...MQLOption) *MQL {
 	mql := &MQL{
 		target: &sdk.Target{
 			QueryType: "timeSeriesQuery",
-			TimeSeriesQuery: &sdk.StackdriverTimeSeriesQuery{
+			TimeSeriesQuery: &sdk.GCMTimeSeriesQuery{
 				ProjectName: projectName,
 				Query:       query,
 			},

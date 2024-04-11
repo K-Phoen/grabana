@@ -92,7 +92,7 @@ func NewTimeSeries(projectName, metricType string, options ...TimeSeriesOption) 
 	cloudMonitoring := &TimeSeries{
 		target: &sdk.Target{
 			QueryType: "timeSeriesList",
-			TimeSeriesList: &sdk.StackdriverTimeSeriesList{
+			TimeSeriesList: &sdk.GCMTimeSeriesList{
 				ProjectName: projectName,
 				Filters: []string{
 					"metric.type", string(FilterOperatorEqual), metricType,
