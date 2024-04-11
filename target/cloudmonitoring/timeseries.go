@@ -110,3 +110,11 @@ func NewTimeSeries(projectName, metricType string, options ...TimeSeriesOption) 
 
 // Target implements the Target interface
 func (t *TimeSeries) Target() *sdk.Target { return t.target }
+
+// AlertModel implements the AlertModel interface
+func (t *TimeSeries) AlertModel() sdk.AlertModel {
+	return sdk.AlertModel{
+		QueryType:      t.target.QueryType,
+		TimeSeriesList: t.target.TimeSeriesList,
+	}
+}

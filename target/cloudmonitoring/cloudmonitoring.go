@@ -79,3 +79,8 @@ const (
 type Target interface {
 	Target() *sdk.Target
 }
+
+// Target allows to return an alert model for a specific builder.
+type AlertModel interface {
+	AlertModel() sdk.AlertModel
+}

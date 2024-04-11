@@ -45,3 +45,11 @@ func NewMQL(projectName, query string, options ...MQLOption) *MQL {
 }
 
 func (m *MQL) Target() *sdk.Target { return m.target }
+
+// AlertModel implements the AlertModel interface
+func (m *MQL) AlertModel() sdk.AlertModel {
+	return sdk.AlertModel{
+		QueryType:       m.target.QueryType,
+		TimeSeriesQuery: m.target.TimeSeriesQuery,
+	}
+}

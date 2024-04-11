@@ -44,3 +44,10 @@ func NewPromQL(projectName, expr string, options ...PromQLOption) *PromQL {
 }
 
 func (p *PromQL) Target() *sdk.Target { return p.target }
+
+func (p *PromQL) AlertModel() sdk.AlertModel {
+	return sdk.AlertModel{
+		QueryType:   p.target.QueryType,
+		PromQLQuery: p.target.PromQLQuery,
+	}
+}

@@ -66,3 +66,9 @@ func NewSLO(projectName string, options ...SLOOption) *SLO {
 }
 
 func (s *SLO) Target() *sdk.Target { return s.target }
+func (s *SLO) AlertModel() sdk.AlertModel {
+	return sdk.AlertModel{
+		QueryType: s.target.QueryType,
+		SLOQuery:  s.target.SLOQuery,
+	}
+}
