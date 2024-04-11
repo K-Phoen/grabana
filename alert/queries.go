@@ -6,6 +6,8 @@ import (
 	"github.com/K-Phoen/grabana/alert/queries/loki"
 	"github.com/K-Phoen/grabana/alert/queries/prometheus"
 	"github.com/K-Phoen/grabana/alert/queries/stackdriver"
+	"github.com/K-Phoen/grabana/target/cloudmonitoring"
+	"github.com/K-Phoen/sdk"
 )
 
 // WithPrometheusQuery adds a prometheus query to the alert.
@@ -36,6 +38,22 @@ func WithLokiQuery(ref string, query string, options ...loki.Option) Option {
 func WithStackdriverQuery(query *stackdriver.Stackdriver) Option {
 	return func(alert *Alert) {
 		alert.Builder.Rules[0].GrafanaAlert.Data = append(alert.Builder.Rules[0].GrafanaAlert.Data, query.Builder)
+	}
+}
+
+// WithStackdriverQuery adds a cloud montioring query to the alert.
+func WithCloudMonitoringQuery(ref, datasource string, q cloudmonitoring.AlertModel) Option {
+	return func(alert *Alert) {
+		alert.Builder.Rules[0].GrafanaAlert.Data = append(
+			alert.Builder.Rules[0].GrafanaAlert.Data,
+			sdk.AlertQuery{
+				RefID:             ref,
+				QueryType:         "",
+				DatasourceUID:     "__FILL_ME__",
+				RelativeTimeRange: &sdk.AlertRelativeTimeRange{},
+				Model:             q.AlertModel(),
+			},
+		)
 	}
 }
 

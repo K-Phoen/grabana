@@ -1,6 +1,7 @@
 package timeseries
 
 import (
+	"github.com/K-Phoen/grabana/target/cloudmonitoring"
 	"github.com/K-Phoen/grabana/target/graphite"
 	"github.com/K-Phoen/grabana/target/influxdb"
 	"github.com/K-Phoen/grabana/target/loki"
@@ -57,6 +58,14 @@ func WithStackdriverTarget(target *stackdriver.Stackdriver) Option {
 	return func(graph *TimeSeries) error {
 		graph.Builder.AddTarget(target.Builder)
 
+		return nil
+	}
+}
+
+// WithCloudMonitoringTarget adds a cloud monitoring query to the graph.
+func WithCloudMonitoringTarget(target cloudmonitoring.Target) Option {
+	return func(graph *TimeSeries) error {
+		graph.Builder.AddTarget(target.Target())
 		return nil
 	}
 }
