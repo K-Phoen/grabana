@@ -125,6 +125,19 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		return nil, err
 	}
 
+	alertPanelNames := make(map[string]struct{})
+	for _, al := range alerts {
+		alertPanelNames[al.PanelName] = struct{}{}
+	}
+
+	// Clean alerts by panel name
+	for panelName := range alertPanelNames {
+		// Before we can add this alert, we need to delete any other alert that might exist for this dashboard and panel
+		if err := client.DeleteAlertGroup(ctx, folder.Title, panelName); err != nil && !errors.Is(err, ErrAlertNotFound) {
+			return nil, fmt.Errorf("could not delete existing alerts: %w", err)
+		}
+	}
+
 	for i := range alerts {
 		alert := *alerts[i]
 

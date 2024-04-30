@@ -146,7 +146,8 @@ func TestAlertsCanBeConfigured(t *testing.T) {
 	req.NoError(err)
 	req.NotNil(panel.Alerts)
 	req.Len(panel.Alerts, 1)
-	req.Equal("panel title", panel.Alerts[0].Builder.Name)
+	req.Equal("panel title", panel.Alerts[0].PanelName)
+	req.Equal("some alert", panel.Alerts[0].Builder.Name)
 }
 
 func TestTwoAlertsCanBeConfigured(t *testing.T) {
@@ -157,8 +158,10 @@ func TestTwoAlertsCanBeConfigured(t *testing.T) {
 	req.NoError(err)
 	req.NotNil(panel.Alerts)
 	req.Len(panel.Alerts, 2)
-	req.Equal("panel title", panel.Alerts[0].Builder.Name)
-	req.Equal("panel title", panel.Alerts[1].Builder.Name)
+	req.Equal("panel title", panel.Alerts[0].PanelName)
+	req.Equal("panel title", panel.Alerts[1].PanelName)
+	req.Equal("some alert", panel.Alerts[0].Builder.Name)
+	req.Equal("other alert", panel.Alerts[1].Builder.Name)
 }
 
 func TestLineWidthCanBeConfigured(t *testing.T) {

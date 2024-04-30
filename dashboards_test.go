@@ -844,7 +844,7 @@ func TestDashboardsCanBeCreatedWithNewAlertsAndDeletesPreviousAlerts(t *testing.
 			req.NoError(err)
 
 			req.JSONEq(`{
-  "name": "Heap allocations",
+  "name": "Too many heap allocations",
   "interval": "1m",
   "rules": [
     {

@@ -57,11 +57,6 @@ func (client *Client) AddAlert(ctx context.Context, namespace string, alertDefin
 
 	alertDefinition.HookDatasourceUID(datasourceUID)
 
-	// Before we can add this alert, we need to delete any other alert that might exist for this dashboard and panel
-	if err := client.DeleteAlertGroup(ctx, namespace, alertDefinition.Builder.Name); err != nil && !errors.Is(err, ErrAlertNotFound) {
-		return fmt.Errorf("could not delete existing alerts: %w", err)
-	}
-
 	buf, err := json.Marshal(alertDefinition.Builder)
 	if err != nil {
 		return err
