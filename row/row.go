@@ -58,15 +58,17 @@ func WithGraph(title string, options ...graph.Option) Option {
 
 		row.builder.Add(panel.Builder)
 
-		if panel.Alert == nil {
+		if panel.Alerts == nil || len(panel.Alerts) == 0 {
 			return nil
 		}
 
-		if panel.Builder.Datasource != nil {
-			panel.Alert.Datasource = panel.Builder.Datasource.LegacyName
-		}
+		for _, al := range panel.Alerts {
+			if panel.Builder.Datasource != nil {
+				al.Datasource = panel.Builder.Datasource.LegacyName
+			}
 
-		row.alerts = append(row.alerts, panel.Alert)
+			row.alerts = append(row.alerts, al)
+		}
 
 		return nil
 	}
@@ -82,15 +84,17 @@ func WithTimeSeries(title string, options ...timeseries.Option) Option {
 
 		row.builder.Add(panel.Builder)
 
-		if panel.Alert == nil {
+		if panel.Alerts == nil || len(panel.Alerts) == 0 {
 			return nil
 		}
 
-		if panel.Builder.Datasource != nil {
-			panel.Alert.Datasource = panel.Builder.Datasource.LegacyName
-		}
+		for _, al := range panel.Alerts {
+			if panel.Builder.Datasource != nil {
+				al.Datasource = panel.Builder.Datasource.LegacyName
+			}
 
-		row.alerts = append(row.alerts, panel.Alert)
+			row.alerts = append(row.alerts, al)
+		}
 
 		return nil
 	}
