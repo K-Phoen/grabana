@@ -10,7 +10,7 @@ import (
 func TestPrometheusQueriesCanBeAdded(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", WithPrometheusQuery("A", "some prometheus query"))
+	a := New("", "", WithPrometheusQuery("A", "some prometheus query"))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
@@ -18,7 +18,7 @@ func TestPrometheusQueriesCanBeAdded(t *testing.T) {
 func TestGraphiteQueriesCanBeAdded(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", WithGraphiteQuery("A", "some graphite query"))
+	a := New("", "", WithGraphiteQuery("A", "some graphite query"))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
@@ -26,7 +26,7 @@ func TestGraphiteQueriesCanBeAdded(t *testing.T) {
 func TestLokiQueriesCanBeAdded(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", WithLokiQuery("A", "some loki query"))
+	a := New("", "", WithLokiQuery("A", "some loki query"))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
@@ -34,7 +34,7 @@ func TestLokiQueriesCanBeAdded(t *testing.T) {
 func TestStackdriverQueriesCanBeAdded(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", WithStackdriverQuery(stackdriver.Gauge("A", "cloudsql.googleapis.com/database/cpu/utilization")))
+	a := New("", "", WithStackdriverQuery(stackdriver.Gauge("A", "cloudsql.googleapis.com/database/cpu/utilization")))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }
@@ -42,7 +42,7 @@ func TestStackdriverQueriesCanBeAdded(t *testing.T) {
 func TestInfluxDBQueriesCanBeAdded(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", WithInfluxDBQuery("A", "some influxdb query"))
+	a := New("", "", WithInfluxDBQuery("A", "some influxdb query"))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 2)
 }

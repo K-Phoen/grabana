@@ -636,6 +636,7 @@ func TestDashboardsCanBeCreatedWithNewAlertsAndDeletesPreviousAlerts(t *testing.
 				),
 				timeseries.Alert(
 					"Too many heap allocations",
+					alert.Summary("Too many heap allocations"),
 					alert.WithPrometheusQuery(
 						"A",
 						"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
@@ -849,7 +850,7 @@ func TestDashboardsCanBeCreatedWithNewAlertsAndDeletesPreviousAlerts(t *testing.
     {
       "for": "5m",
       "grafana_alert": {
-        "title": "Heap allocations",
+        "title": "Too many heap allocations",
         "condition": "_alert_condition_",
         "no_data_state": "NoData",
         "exec_err_state": "Alerting",

@@ -88,8 +88,8 @@ func New(name, panelName string, options ...Option) *Alert {
 					Labels:      map[string]string{},
 				},
 			},
-			PanelName: panelName,
 		},
+		PanelName: panelName,
 	}
 
 	for _, opt := range append(defaults(), options...) {

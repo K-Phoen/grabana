@@ -129,7 +129,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		alert := *alerts[i]
 
 		alert.HookDashboardUID(dashboardFromGrafana.UID)
-		alert.HookPanelID(panelIDByTitle(dashboardFromGrafana, alert.Builder.PanelName))
+		alert.HookPanelID(panelIDByTitle(dashboardFromGrafana, alert.PanelName))
 
 		if err := client.AddAlert(ctx, folder.Title, alert, datasourcesMap); err != nil {
 			return nil, fmt.Errorf("could not add new alerts for dashboard: %w", err)
