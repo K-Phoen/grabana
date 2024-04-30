@@ -266,7 +266,7 @@ func XAxis(opts ...axis.Option) Option {
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
 	return func(graph *Graph) error {
-		al := alert.New(graph.Builder.Title, append(opts, alert.Summary(name))...)
+		al := alert.New(name, graph.Builder.Title, opts...)
 		al.Builder.Name = graph.Builder.Title
 		graph.Alerts = append(graph.Alerts, al)
 

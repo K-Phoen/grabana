@@ -409,7 +409,7 @@ func Transparent() Option {
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
 	return func(timeseries *TimeSeries) error {
-		al := alert.New(timeseries.Builder.Title, append(opts, alert.Summary(name))...)
+		al := alert.New(name, timeseries.Builder.Title, opts...)
 		al.Builder.Name = timeseries.Builder.Title
 		timeseries.Alerts = append(timeseries.Alerts, al)
 

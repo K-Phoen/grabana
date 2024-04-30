@@ -51,10 +51,11 @@ type Alert struct {
 	Datasource   string
 	DashboardUID string
 	PanelID      string
+	PanelName    string
 }
 
 // New creates a new alert.
-func New(name string, options ...Option) *Alert {
+func New(name, panelName string, options ...Option) *Alert {
 	nope := false
 
 	alert := &Alert{
@@ -87,6 +88,7 @@ func New(name string, options ...Option) *Alert {
 					Labels:      map[string]string{},
 				},
 			},
+			PanelName: panelName,
 		},
 	}
 
