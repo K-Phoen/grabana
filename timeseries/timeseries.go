@@ -410,7 +410,6 @@ func Transparent() Option {
 func Alert(name string, opts ...alert.Option) Option {
 	return func(timeseries *TimeSeries) error {
 		al := alert.New(name, timeseries.Builder.Title, opts...)
-		al.Builder.Name = timeseries.Builder.Title
 		timeseries.Alerts = append(timeseries.Alerts, al)
 
 		return nil
