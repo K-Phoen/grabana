@@ -58,7 +58,7 @@ func WithGraph(title string, options ...graph.Option) Option {
 
 		row.builder.Add(panel.Builder)
 
-		if panel.Alerts == nil || len(panel.Alerts) == 0 {
+		if len(panel.Alerts) == 0 {
 			return nil
 		}
 
@@ -84,7 +84,7 @@ func WithTimeSeries(title string, options ...timeseries.Option) Option {
 
 		row.builder.Add(panel.Builder)
 
-		if panel.Alerts == nil || len(panel.Alerts) == 0 {
+		if len(panel.Alerts) == 0 {
 			return nil
 		}
 

@@ -125,7 +125,7 @@ func (client *Client) UpsertDashboard(ctx context.Context, folder *Folder, build
 		return nil, err
 	}
 
-	alertPanelNames := make(map[string]struct{})
+	alertPanelNames := make(map[string]struct{}, len(alerts))
 	for _, al := range alerts {
 		alertPanelNames[al.PanelName] = struct{}{}
 	}
