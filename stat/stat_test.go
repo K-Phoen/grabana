@@ -342,6 +342,24 @@ func TestInvalidValueTypeIsRejected(t *testing.T) {
 	req.ErrorIs(err, errors.ErrInvalidArgument)
 }
 
+func TestValueFieldCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", ValueField("somefield"))
+
+	req.NoError(err)
+	req.Equal("somefield", panel.Builder.StatPanel.Options.ReduceOptions.Fields)
+}
+
+func TestShowValuesCanBeSet(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", ShowValues(true))
+
+	req.NoError(err)
+	req.Equal(true, panel.Builder.StatPanel.Options.ReduceOptions.Values)
+}
+
 func TestValueFontSizeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
