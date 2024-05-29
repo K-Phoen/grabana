@@ -354,7 +354,7 @@ func TestValueFieldCanBeSet(t *testing.T) {
 func TestShowValuesCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	panel, err := New("", ShowValues(true))
+	panel, err := New("", Values(true))
 
 	req.NoError(err)
 	req.Equal(true, panel.Builder.StatPanel.Options.ReduceOptions.Values)

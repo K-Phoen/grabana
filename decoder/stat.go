@@ -37,6 +37,8 @@ type DashboardStat struct {
 	Orientation   string `yaml:",omitempty"`
 	Text          string `yaml:",omitempty"`
 	ValueType     string `yaml:"value_type,omitempty"`
+	ValueField    string `yaml:"value_field,omitempty"`
+	Values        bool   `yaml:"values,omitempty"`
 	ColorMode     string `yaml:"color_mode,omitempty"`
 	TitleFontSize int    `yaml:"title_font_size,omitempty"`
 	ValueFontSize int    `yaml:"value_font_size,omitempty"`
@@ -113,6 +115,12 @@ func (statPanel DashboardStat) toOption() (row.Option, error) {
 		}
 
 		opts = append(opts, opt)
+	}
+	if statPanel.ValueField != "" {
+		opts = append(opts, stat.ValueField(statPanel.ValueField))
+	}
+	if statPanel.Values {
+		opts = append(opts, stat.Values(statPanel.Values))
 	}
 	if statPanel.ColorMode != "" {
 		opt, err := statPanel.colorMode()

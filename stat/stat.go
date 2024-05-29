@@ -327,8 +327,8 @@ func ValueField(field string) Option {
 	}
 }
 
-// ShowValues allows to enable or disable showing values
-func ShowValues(show bool) Option {
+// Values allows to enable or disable showing values
+func Values(show bool) Option {
 	return func(stat *Stat) error {
 		stat.Builder.StatPanel.Options.ReduceOptions.Values = show
 
