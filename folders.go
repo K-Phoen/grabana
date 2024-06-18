@@ -70,7 +70,7 @@ func (client *Client) CreateFolder(ctx context.Context, name string) (*Folder, e
 
 // GetFolderByTitle finds a folder, given its title.
 func (client *Client) GetFolderByTitle(ctx context.Context, title string) (*Folder, error) {
-	resp, err := client.get(ctx, fmt.Sprintf("/api/search?query=%s", url.QueryEscape(title)))
+	resp, err := client.get(ctx, fmt.Sprintf("/api/search?type=dash-folder&query=%s", url.QueryEscape(title)))
 	if err != nil {
 		return nil, err
 	}
