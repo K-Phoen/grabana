@@ -69,12 +69,20 @@ func TestRowsCanHaveGraphsAndAlert(t *testing.T) {
 				),
 				alert.If(alert.Avg, "A", alert.IsAbove(3)),
 			),
+			graph.Alert(
+				"No heap allocations",
+				alert.WithPrometheusQuery(
+					"A",
+					"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+				),
+				alert.If(alert.Avg, "A", alert.IsBelow(0.01)),
+			),
 		),
 	)
 
 	req.NoError(err)
 	req.Len(panel.builder.Panels, 1)
-	req.Len(panel.Alerts(), 1)
+	req.Len(panel.Alerts(), 2)
 
 	req.Equal("Prometheus", panel.Alerts()[0].Datasource)
 }
@@ -107,12 +115,20 @@ func TestRowsCanHaveTimeSeriesAndAlert(t *testing.T) {
 				),
 				alert.If(alert.Avg, "A", alert.IsAbove(3)),
 			),
+			timeseries.Alert(
+				"No heap allocations",
+				alert.WithPrometheusQuery(
+					"A",
+					"sum(go_memstats_heap_alloc_bytes{app!=\"\"}) by (app)",
+				),
+				alert.If(alert.Avg, "A", alert.IsBelow(0.01)),
+			),
 		),
 	)
 
 	req.NoError(err)
 	req.Len(panel.builder.Panels, 1)
-	req.Len(panel.Alerts(), 1)
+	req.Len(panel.Alerts(), 2)
 
 	req.Equal("Prometheus", panel.Alerts()[0].Datasource)
 }
