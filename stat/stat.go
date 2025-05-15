@@ -318,6 +318,24 @@ func ValueType(valueType ReductionType) Option {
 	}
 }
 
+// ValueField selects the fields that should be includedin the panel
+func ValueField(field string) Option {
+	return func(stat *Stat) error {
+		stat.Builder.StatPanel.Options.ReduceOptions.Fields = field
+
+		return nil
+	}
+}
+
+// Values allows to enable or disable showing values
+func Values(show bool) Option {
+	return func(stat *Stat) error {
+		stat.Builder.StatPanel.Options.ReduceOptions.Values = show
+
+		return nil
+	}
+}
+
 // ValueFontSize sets the font size used to display the value.
 func ValueFontSize(size int) Option {
 	return func(stat *Stat) error {
