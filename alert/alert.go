@@ -133,6 +133,13 @@ func (alert *Alert) HookPanelID(id string) {
 	}
 }
 
+// Name sets the name associated to the alert.
+func Name(name string) Option {
+	return func(alert *Alert) {
+		alert.Builder.Rules[0].GrafanaAlert.Title = name
+	}
+}
+
 // Summary sets the summary associated to the alert.
 func Summary(content string) Option {
 	return func(alert *Alert) {
