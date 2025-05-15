@@ -1,7 +1,7 @@
 github.com/K-Phoen/jennifer v0.0.0-20230811102814-e6c78cf40086 h1:cvgm5R+2OIaCzMqyA8YAHuybHEbdvBIC3OAziNiMbEU=
 github.com/K-Phoen/jennifer v0.0.0-20230811102814-e6c78cf40086/go.mod h1:rm3gx5yYxh/Q3ynk+qaNoN6nQiII0Vn/uz46bIgj0P0=
-github.com/K-Phoen/sdk v0.12.4 h1:j2EYuBJm3zDTD0fGKACVFWxAXtkR0q5QzfVqxmHSeGQ=
-github.com/K-Phoen/sdk v0.12.4/go.mod h1:qmM0wO23CtoDux528MXPpYvS4XkRWkWX6rvX9Za8EVU=
+github.com/K-Phoen/sdk v0.13.0 h1:eMJWVekp0iFBJO5dCyKHWxMDow4EFSy2DURy46+b/sk=
+github.com/K-Phoen/sdk v0.13.0/go.mod h1:qmM0wO23CtoDux528MXPpYvS4XkRWkWX6rvX9Za8EVU=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
 github.com/bahlo/generic-list-go v0.2.0/go.mod h1:2KvAjgMlE5NNynlg/5iLrrCCZ2+5xWbdbCW3pNTGyYg=
 github.com/blang/semver v3.5.1+incompatible h1:cQNTCjp13qL8KC3Nbxr/y2Bqb63oX6wdnnjpJbkM4JQ=
