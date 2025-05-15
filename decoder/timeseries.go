@@ -3,6 +3,7 @@ package decoder
 import (
 	"fmt"
 
+	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/row"
 	"github.com/K-Phoen/grabana/timeseries"
 	"github.com/K-Phoen/grabana/timeseries/axis"
@@ -80,7 +81,10 @@ func (timeseriesPanel DashboardTimeSeries) toOption() (row.Option, error) {
 			return nil, err
 		}
 
-		opts = append(opts, timeseries.Alert(timeseriesPanel.Alert.Summary, alertOpts...))
+		opts = append(opts, timeseries.Alert(
+			timeseriesPanel.Alert.Summary,
+			append(alertOpts, alert.Summary(timeseriesPanel.Alert.Summary))...,
+		))
 	}
 	if timeseriesPanel.Visualization != nil {
 		vizOpts, err := timeseriesPanel.Visualization.toOptions()

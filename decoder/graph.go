@@ -3,6 +3,7 @@ package decoder
 import (
 	"fmt"
 
+	"github.com/K-Phoen/grabana/alert"
 	"github.com/K-Phoen/grabana/axis"
 	"github.com/K-Phoen/grabana/graph"
 	"github.com/K-Phoen/grabana/graph/series"
@@ -82,7 +83,10 @@ func (graphPanel DashboardGraph) toOption() (row.Option, error) {
 			return nil, err
 		}
 
-		opts = append(opts, graph.Alert(graphPanel.Alert.Summary, alertOpts...))
+		opts = append(opts, graph.Alert(
+			graphPanel.Alert.Summary,
+			append(alertOpts, alert.Summary(graphPanel.Alert.Summary))...),
+		)
 	}
 	if graphPanel.Visualization != nil {
 		opts = append(opts, graphPanel.Visualization.toOptions()...)

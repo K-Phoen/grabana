@@ -74,12 +74,12 @@ const (
 // Graph represents a graph panel.
 type Graph struct {
 	Builder *sdk.Panel
-	Alert   *alert.Alert
+	Alerts  []*alert.Alert
 }
 
 // New creates a new graph panel.
 func New(title string, options ...Option) (*Graph, error) {
-	panel := &Graph{Builder: sdk.NewGraph(title)}
+	panel := &Graph{Builder: sdk.NewGraph(title), Alerts: make([]*alert.Alert, 0)}
 
 	panel.Builder.AliasColors = make(map[string]interface{})
 	panel.Builder.IsNew = false
@@ -266,8 +266,8 @@ func XAxis(opts ...axis.Option) Option {
 // Alert creates an alert for this graph.
 func Alert(name string, opts ...alert.Option) Option {
 	return func(graph *Graph) error {
-		graph.Alert = alert.New(graph.Builder.Title, append(opts, alert.Summary(name))...)
-		graph.Alert.Builder.Name = graph.Builder.Title
+		al := alert.New(name, graph.Builder.Title, opts...)
+		graph.Alerts = append(graph.Alerts, al)
 
 		return nil
 	}

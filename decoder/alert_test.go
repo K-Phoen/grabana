@@ -32,7 +32,7 @@ func TestDecodingSimpleAlert(t *testing.T) {
 	opts, err := alertDef.toOptions()
 	req.NoError(err)
 
-	alertBuilder := alert.New("", opts...)
+	alertBuilder := alert.New("", "", opts...)
 	rule := alertBuilder.Builder.Rules[0]
 
 	req.Equal("description", rule.Annotations["description"])

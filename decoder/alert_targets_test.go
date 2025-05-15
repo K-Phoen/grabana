@@ -45,7 +45,7 @@ func TestDecodingAPrometheusTarget(t *testing.T) {
 
 	req.NoError(err)
 
-	alert := alertBuilder.New("", opt)
+	alert := alertBuilder.New("", "", opt)
 
 	req.Len(alert.Builder.Rules, 1)
 	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
@@ -101,7 +101,7 @@ func TestDecodingALokiTarget(t *testing.T) {
 
 	req.NoError(err)
 
-	alert := alertBuilder.New("", opt)
+	alert := alertBuilder.New("", "", opt)
 
 	req.Len(alert.Builder.Rules, 1)
 	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
@@ -156,7 +156,7 @@ func TestDecodingAGraphiteTarget(t *testing.T) {
 
 	req.NoError(err)
 
-	alert := alertBuilder.New("", opt)
+	alert := alertBuilder.New("", "", opt)
 
 	req.Len(alert.Builder.Rules, 1)
 	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
@@ -269,7 +269,7 @@ func TestDecodingStackdriverTarget(t *testing.T) {
 
 	req.NoError(err, ErrInvalidStackdriverType)
 
-	alert := alertBuilder.New("", opt)
+	alert := alertBuilder.New("", "", opt)
 
 	req.Len(alert.Builder.Rules, 1)
 	req.Len(alert.Builder.Rules[0].GrafanaAlert.Data, 2) // the query and the condition
@@ -335,7 +335,7 @@ func TestDecodingStackdriverPreprocessor(t *testing.T) {
 
 			req.NoError(err)
 
-			alert := alertBuilder.New("", opt)
+			alert := alertBuilder.New("", "", opt)
 			query := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 			req.Equal(tc.expected, query.Model.MetricQuery.Preprocessor)
@@ -449,7 +449,7 @@ func TestDecodingStackdriverAggregation(t *testing.T) {
 
 			req.NoError(err)
 
-			alert := alertBuilder.New("", opt)
+			alert := alertBuilder.New("", "", opt)
 			query := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 			req.Equal(string(tc.expected), query.Model.MetricQuery.CrossSeriesReducer)
@@ -591,7 +591,7 @@ func TestDecodingStackdriverAlignment(t *testing.T) {
 
 			req.NoError(err)
 
-			alert := alertBuilder.New("", opt)
+			alert := alertBuilder.New("", "", opt)
 			query := alert.Builder.Rules[0].GrafanaAlert.Data[1]
 
 			req.Equal(string(tc.expected), query.Model.MetricQuery.PerSeriesAligner)

@@ -9,8 +9,9 @@ import (
 func TestNewAlertCanBeCreated(t *testing.T) {
 	req := require.New(t)
 	alertTitle := "some alert"
+	panelTitle := "some panel"
 
-	a := New(alertTitle)
+	a := New(alertTitle, panelTitle)
 
 	req.Len(a.Builder.Rules, 1)
 
@@ -26,6 +27,7 @@ func TestConditionsCanBeCombined(t *testing.T) {
 
 	a := New(
 		"",
+		"",
 		IfOr(Avg, "A", IsBelow(10)),
 		IfOr(Avg, "B", IsBelow(8)),
 	)
@@ -36,7 +38,7 @@ func TestConditionsCanBeCombined(t *testing.T) {
 func TestPanelIDCanBeHooked(t *testing.T) {
 	req := require.New(t)
 
-	a := New("")
+	a := New("", "")
 
 	a.HookPanelID("id")
 
@@ -46,7 +48,7 @@ func TestPanelIDCanBeHooked(t *testing.T) {
 func TestDashboardUIDCanBeHooked(t *testing.T) {
 	req := require.New(t)
 
-	a := New("")
+	a := New("", "")
 
 	a.HookDashboardUID("uid")
 
@@ -57,7 +59,7 @@ func TestDatasourceUIDCanBeHooked(t *testing.T) {
 	req := require.New(t)
 
 	a := New(
-		"",
+		"", "",
 		WithPrometheusQuery("A", "some prometheus query"),
 		IfOr(Avg, "1", IsBelow(10)),
 	)
@@ -87,7 +89,7 @@ func TestDatasourceUIDCanBeHooked(t *testing.T) {
 func TestSummaryCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", Summary("summary content"))
+	a := New("", "", Summary("summary content"))
 
 	req.Equal("summary content", a.Builder.Rules[0].Annotations["summary"])
 }
@@ -95,7 +97,7 @@ func TestSummaryCanBeSet(t *testing.T) {
 func TestDescriptionCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", Description("description content"))
+	a := New("", "", Description("description content"))
 
 	req.Equal("description content", a.Builder.Rules[0].Annotations["description"])
 }
@@ -103,7 +105,7 @@ func TestDescriptionCanBeSet(t *testing.T) {
 func TestRunbookCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", Runbook("runbook url"))
+	a := New("", "", Runbook("runbook url"))
 
 	req.Equal("runbook url", a.Builder.Rules[0].Annotations["runbook_url"])
 }
@@ -111,7 +113,7 @@ func TestRunbookCanBeSet(t *testing.T) {
 func TestForIntervalCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", For("1m"))
+	a := New("", "", For("1m"))
 
 	req.Equal("1m", a.Builder.Rules[0].For)
 }
@@ -119,7 +121,7 @@ func TestForIntervalCanBeSet(t *testing.T) {
 func TestFrequencyCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", EvaluateEvery("1m"))
+	a := New("", "", EvaluateEvery("1m"))
 
 	req.Equal("1m", a.Builder.Interval)
 }
@@ -127,7 +129,7 @@ func TestFrequencyCanBeSet(t *testing.T) {
 func TestErrorModeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", OnExecutionError(ErrorKO))
+	a := New("", "", OnExecutionError(ErrorKO))
 
 	req.Equal(string(ErrorKO), a.Builder.Rules[0].GrafanaAlert.ExecutionErrorState)
 }
@@ -135,7 +137,7 @@ func TestErrorModeCanBeSet(t *testing.T) {
 func TestNoDataModeCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", OnNoData(NoDataAlerting))
+	a := New("", "", OnNoData(NoDataAlerting))
 
 	req.Equal(string(NoDataAlerting), a.Builder.Rules[0].GrafanaAlert.NoDataState)
 }
@@ -143,7 +145,7 @@ func TestNoDataModeCanBeSet(t *testing.T) {
 func TestTagsCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", Tags(map[string]string{
+	a := New("", "", Tags(map[string]string{
 		"severity": "warning",
 	}))
 
@@ -154,7 +156,7 @@ func TestTagsCanBeSet(t *testing.T) {
 func TestConditionsCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", If(Avg, "1", IsBelow(10)))
+	a := New("", "", If(Avg, "1", IsBelow(10)))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
 }
@@ -162,7 +164,7 @@ func TestConditionsCanBeSet(t *testing.T) {
 func TestOrConditionsCanBeSet(t *testing.T) {
 	req := require.New(t)
 
-	a := New("", IfOr(Avg, "1", IsBelow(10)))
+	a := New("", "", IfOr(Avg, "1", IsBelow(10)))
 
 	req.Len(a.Builder.Rules[0].GrafanaAlert.Data, 1)
 }
