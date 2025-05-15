@@ -8,6 +8,9 @@ Whether you prefer writing **code or YAML**, if you are looking for a way to
 version your dashboards configuration or automate tedious and error-prone
 creation of dashboards, this library is meant for you.
 
+> [!CAUTION]
+> This library is **no longer maintained**. Instead, please **use the [Grafana Foundation SDK](https://grafana.github.io/grafana-foundation-sdk/)**.
+
 ## Design goals
 
 * provide an understandable abstraction over dashboards configuration
