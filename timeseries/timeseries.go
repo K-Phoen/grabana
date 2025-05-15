@@ -450,3 +450,12 @@ func FieldOverride(m fields.Matcher, opts ...fields.OverrideOption) Option {
 		return nil
 	}
 }
+
+// ConnectNulls allow to connect lines with null values
+func ConnectNulls(enabled bool) Option {
+	return func(timeseries *TimeSeries) error {
+		timeseries.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.SpanNulls = enabled
+
+		return nil
+	}
+}

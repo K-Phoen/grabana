@@ -468,3 +468,12 @@ func TestValuesCanBeStacked(t *testing.T) {
 	req.NoError(err)
 	req.Equal("percent", panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.Stacking.Mode)
 }
+
+func TestConnectNullsCanBeConfigured(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", ConnectNulls(true))
+
+	req.NoError(err)
+	req.Equal(true, panel.Builder.TimeseriesPanel.FieldConfig.Defaults.Custom.SpanNulls)
+}
