@@ -377,3 +377,14 @@ func TestInvalidSeriesOverridesAreRejected(t *testing.T) {
 	req.Error(err)
 	req.ErrorIs(err, errors.ErrInvalidArgument)
 }
+
+func TestGraphPanelCanHaveCloudwatchTargets(t *testing.T) {
+	req := require.New(t)
+
+	panel, err := New("", WithCloudwatchTarget(
+		"AWS/ELB", "HTTPCode_Backend_5XX",
+	))
+
+	req.NoError(err)
+	req.Len(panel.Builder.GraphPanel.Targets, 1)
+}
